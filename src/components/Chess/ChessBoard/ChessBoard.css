@@ -19,3 +19,7 @@
 .blackChessSquare {
   background-color: black;
 }
+
+.highlighted {
+  background-color: red;
+}

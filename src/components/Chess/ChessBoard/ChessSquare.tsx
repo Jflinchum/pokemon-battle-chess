@@ -1,4 +1,3 @@
-import { useState, useEffect, useMemo } from 'react'
 import { PieceSymbol, Color } from 'chess.js';
 import { ChessBoardSquare } from '../types';
 import blackPawn from '../../../assets/blackPawn.png';
@@ -15,8 +14,10 @@ import whiteQueen from '../../../assets/whiteQueen.png';
 import whiteKing from '../../../assets/whiteKing.png';
 
 interface ChessSquareProps {
-  square: ChessBoardSquare,
+  square: ChessBoardSquare
   backgroundColor: 'white' | 'black'
+  onClick: (arg0: ChessBoardSquare) => void
+  highlighted: boolean
 }
 
 const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
@@ -41,9 +42,9 @@ const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
   }
 }
 
-const ChessSquare = ({ square, backgroundColor }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onClick, highlighted }: ChessSquareProps) => {
   return (
-    <div className={`chessSquare ${backgroundColor}ChessSquare`}>
+    <div className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''}`} onClick={() => { onClick(square) }}>
       {
         square?.type && square?.color && (
           <img src={getPieceImage(square?.type, square?.color)} className='chessPiece'/>

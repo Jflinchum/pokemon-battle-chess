@@ -1,23 +1,33 @@
-import { useState, useEffect, useMemo } from 'react'
+import { Square } from 'chess.js';
 import { ChessBoardSquare } from '../types';
-import { getSquareColor } from '../util';
+import { getSquareColor, getSquareFromIndices } from '../util';
 import ChessSquare from './ChessSquare';
 import './ChessBoard.css';
 
 interface ChessBoardProps {
-  boardState: ChessBoardSquare[][]
+  boardState: ChessBoardSquare[][],
+  onSquareClick: (arg0: Square) => void,
+  highlightedSquares: Square[],
 }
 
-const ChessBoard = ({ boardState }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, highlightedSquares }: ChessBoardProps) => {
 
   return (
     <>
     {
       boardState.map((boardRow, rowIndex) => (
-        <div className="chessRow">
+        <div className="chessRow" key={rowIndex}>
           {
             boardRow.map((boardSquare, columnIndex) => (
-              <ChessSquare square={boardSquare} backgroundColor={getSquareColor(rowIndex, columnIndex)} />
+              <ChessSquare
+                key={columnIndex}
+                square={boardSquare}
+                backgroundColor={getSquareColor(rowIndex, columnIndex)}
+                onClick={(square) => {
+                  onSquareClick(square?.square || getSquareFromIndices(rowIndex, columnIndex));
+                }}
+                highlighted={highlightedSquares.includes(getSquareFromIndices(rowIndex, columnIndex))}
+              />
             ))
           }
         </div>
