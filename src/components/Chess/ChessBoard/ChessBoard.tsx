@@ -8,9 +8,10 @@ interface ChessBoardProps {
   boardState: ChessBoardSquare[][],
   onSquareClick: (arg0: Square) => void,
   highlightedSquares: Square[],
+  selectedSquare: Square | null,
 }
 
-const ChessBoard = ({ boardState, onSquareClick, highlightedSquares }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare }: ChessBoardProps) => {
 
   return (
     <>
@@ -27,6 +28,7 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares }: ChessBoar
                   onSquareClick(square?.square || getSquareFromIndices(rowIndex, columnIndex));
                 }}
                 highlighted={highlightedSquares.includes(getSquareFromIndices(rowIndex, columnIndex))}
+                selected={selectedSquare === getSquareFromIndices(rowIndex, columnIndex)}
               />
             ))
           }

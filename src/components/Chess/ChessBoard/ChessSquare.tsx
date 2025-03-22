@@ -18,6 +18,7 @@ interface ChessSquareProps {
   backgroundColor: 'white' | 'black'
   onClick: (arg0: ChessBoardSquare) => void
   highlighted: boolean
+  selected: boolean
 }
 
 const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
@@ -42,9 +43,9 @@ const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
   }
 }
 
-const ChessSquare = ({ square, backgroundColor, onClick, highlighted }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected }: ChessSquareProps) => {
   return (
-    <div className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''}`} onClick={() => { onClick(square) }}>
+    <div className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''}`} onClick={() => { onClick(square) }}>
       {
         square?.type && square?.color && (
           <img src={getPieceImage(square?.type, square?.color)} className='chessPiece'/>

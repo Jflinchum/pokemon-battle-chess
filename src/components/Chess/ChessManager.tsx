@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Chess, Square } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
-import { ChessBoardSquare } from './types';
 
 const ChessManager = () => {
   const chessManager = useMemo(() => {
@@ -15,13 +14,20 @@ const ChessManager = () => {
   const handleSquareClick = (square: Square) => {
     // If there's no current selected square, or the clicked square isn't a valid move, then set the clicked square to the current selected square
     if (!selectedSquare || !chessManager.moves({ square: selectedSquare, piece: chessManager.get(selectedSquare)?.type, verbose: true }).some((move) => move.to === square)) {
-      setSelectedSquare(square);
-      const selectedSquareMoves = chessManager.moves({ square, piece: chessManager.get(square)?.type, verbose: true });
-      setHighlightedSquare(selectedSquareMoves.map((squareMove) => squareMove.to) as Square[]);
+      if (selectedSquare === square) {
+        // Cancel the selection if it's the same as the already selected square
+        setSelectedSquare(null);
+        setHighlightedSquare([]);
+      } else {
+        setSelectedSquare(square);
+        const selectedSquareMoves = chessManager.moves({ square, piece: chessManager.get(square)?.type, verbose: true });
+        setHighlightedSquare(selectedSquareMoves.map((squareMove) => squareMove.to) as Square[]);
+      }
     } else {
       chessManager.move({ from: selectedSquare, to: square });
       setBoard(chessManager.board());
       setHighlightedSquare([]);
+      setSelectedSquare(null);
     }
   };
 
@@ -31,7 +37,7 @@ const ChessManager = () => {
       <p>Move Number: {chessManager.moveNumber()}</p>
       {chessManager.isCheck() && (<p>Check!</p>)}
       {chessManager.isCheckmate() && (<p>Checkmate! Gameover!</p>)}
-      <ChessBoard boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares}/>
+      <ChessBoard boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare}/>
     </div>
   )
 }
