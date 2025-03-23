@@ -1,0 +1,4 @@
+.battleChessRoot {
+  display: flex;
+  flex-direction: column;
+}

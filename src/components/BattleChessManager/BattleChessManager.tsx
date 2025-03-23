@@ -1,8 +1,10 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { Chess } from 'chess.js';
-import { PokemonBattleChessManager } from '../PokemonBattleManager/PokemonBattleChessManager';
-import ChessManager from '../Chess/ChessManager';
-import PokemonBattleDisplay from '../PokemonBattleManager/PokemonBattleDisplay/PokemonBattleDisplay'
+import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
+import ChessManager from '../ChessManager/ChessManager';
+import PokemonBattleManager from '../PokemonManager/PokemonBattleManager/PokemonBattleManager';
+import { PokemonSet } from '@pkmn/data';
+import './BattleChessManager.css';
 
 function BattleChessManager() {
   const chessManager = useMemo(() => {
@@ -11,13 +13,15 @@ function BattleChessManager() {
   const pokemonManager = useMemo(() => {
     return new PokemonBattleChessManager(chessManager.board());
   }, []);
+  const [currentBattle, setCurrentBattle] = useState<{ p1Pokemon: PokemonSet, p2Pokemon: PokemonSet } | null>(null);
+
 
   return (
-    <div>
-      <ChessManager chessManager={chessManager} pokemonManager={pokemonManager}/>
+    <div className='battleChessRoot'>
+      <ChessManager chessManager={chessManager} pokemonManager={pokemonManager} onStartBattle={(p1Pokemon, p2Pokemon) => { setCurrentBattle({ p1Pokemon, p2Pokemon }) }}/>
       {
-        pokemonManager.getCurrentBattle().onGoing &&
-        (<PokemonBattleDisplay player1Pokemon={pokemonManager.getCurrentBattle().player1Pokemon!} player2Pokemon={pokemonManager.getCurrentBattle().player2Pokemon!}/>)
+        currentBattle &&
+        (<PokemonBattleManager p1Pokemon={currentBattle.p1Pokemon} p2Pokemon={currentBattle.p2Pokemon}/>)
       }
     </div>
   )

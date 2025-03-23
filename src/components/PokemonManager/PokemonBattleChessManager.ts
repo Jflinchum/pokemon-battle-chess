@@ -1,4 +1,4 @@
-import { ChessBoardSquare } from "../Chess/types";
+import { ChessBoardSquare } from "../ChessManager/types";
 import { PieceSymbol, Color, Square } from "chess.js";
 import { TeamGenerators } from '@pkmn/randoms';
 import { PokemonSet } from "@pkmn/data";

@@ -3,7 +3,7 @@ import { ChessBoardSquare } from '../types';
 import { getSquareColor, getSquareFromIndices } from '../util';
 import ChessSquare from './ChessSquare';
 import './ChessBoard.css';
-import { PokemonBattleChessManager } from '../../PokemonBattleManager/PokemonBattleChessManager';
+import { PokemonBattleChessManager } from '../../PokemonManager/PokemonBattleChessManager';
 
 interface ChessBoardProps {
   boardState: ChessBoardSquare[][],

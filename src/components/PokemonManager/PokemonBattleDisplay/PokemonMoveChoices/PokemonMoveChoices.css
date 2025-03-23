@@ -1,0 +1,28 @@
+.movesContainer {
+  text-align: center;
+}
+
+.moveButton {
+  position: relative;
+}
+
+.moveTooltip {
+  visibility: hidden;
+  
+  background-color: dimgray;
+  color: white;
+
+  position: absolute;
+  z-index: 1;
+  top: 125%;
+  left: 70%;
+  margin-left: -60px;
+  
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.moveButton:hover .moveTooltip {
+  visibility: visible;
+  opacity: 1;
+}
