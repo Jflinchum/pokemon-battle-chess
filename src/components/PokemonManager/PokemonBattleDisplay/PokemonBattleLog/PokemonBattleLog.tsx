@@ -29,8 +29,8 @@ const PokemonBattleLog = ({ battleHistory }: PokemonBattleLogProps) => {
               totalLog.push(formattedText);
             }
           }
-          return totalLog.map((formattedBattleText) => (
-            formattedBattleText && (<p>{formattedBattleText}</p>)
+          return totalLog.map((formattedBattleText, index) => (
+            formattedBattleText && (<p key={index}>{formattedBattleText}</p>)
           ));
         }
         )

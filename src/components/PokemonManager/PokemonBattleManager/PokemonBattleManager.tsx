@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BattleStreams, Teams } from '@pkmn/sim';
-import { PokemonSet } from "@pkmn/data";
-import { LogFormatter } from '@pkmn/view';
+import { PokemonSet, Generations } from "@pkmn/data";
+import { Dex } from '@pkmn/dex';
+import { Pokemon } from '@pkmn/client';
 import { Protocol } from '@pkmn/protocol';
+import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
 import PokemonBattleLog from '../PokemonBattleDisplay/PokemonBattleLog/PokemonBattleLog';
 import './PokemonBattleManager.css';
@@ -20,22 +22,22 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon }: PokemonBattleManagerProp
    * - Pokemon Details Card
    */
   const battleStream = useMemo(() => (BattleStreams.getPlayerStreams(new BattleStreams.BattleStream())), []);
+  const battle = useMemo(() => (new Battle(new Generations(Dex))), []);
   const spec = { formatid: 'gen9customgame' };
   const p1spec = { name: 'player 1', team: Teams.pack([p1Pokemon]) };
   const p2spec = { name: 'player 2', team: Teams.pack([p2Pokemon]) };
 
   const [battleHistory, setBattleHistory] = useState<string[]>([])
+  const [battleState, setBattleState] = useState<Battle | null>(null);
 
   const beginBattleStreamHandler = async () => {
-    const formatter = new LogFormatter();
     for await (const chunk of battleStream.omniscient) {
       for (const { args, kwArgs } of Protocol.parse(chunk)) {
-        const formattedText = formatter.formatText(args, kwArgs);
-        if (formattedText) {
-          console.log(formattedText);
-        }
+        console.log(args);
+        battle.add(args, kwArgs);
       }
       setBattleHistory((battleHistory) => [...battleHistory, chunk]);
+      setBattleState(battle);
     }
   }
 
@@ -53,6 +55,7 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon }: PokemonBattleManagerProp
       <PokemonBattleDisplay
         p1Pokemon={p1Pokemon}
         p2Pokemon={p2Pokemon}
+        battleState={battleState}
         onMoveSelect={(move) => {
           battleStream.omniscient.write(`>p1 move ${move}`);
         }}

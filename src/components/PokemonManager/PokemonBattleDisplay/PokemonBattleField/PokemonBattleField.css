@@ -6,15 +6,38 @@
   position: relative;
 }
 
-.player1PokemonSprite {
+.player1Pokemon {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   bottom: 100px;
   left: 100px;
-  transform: scale(2);
 }
 
-.player2PokemonSprite {
+.player2Pokemon {
+  display: flex;
+  flex-direction: column;
   position: absolute;
-  top: 150px;
-  right: 150px;
+  top: 120px;
+  right: 100px;
+}
+
+.healthbar {
+  display: block;
+  z-index: 1;
+}
+
+.pokemonHealth {
+  margin: 0;
+  text-align: center;
+  font-weight: bold;
+}
+
+.pokemonSprite {
+  width: fit-content;
+  margin: auto;
+}
+
+.player1PokemonSprite {
+  transform: scale(2);
 }
