@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { PieceSymbol, Color } from 'chess.js';
 import { Sprites } from '@pkmn/img';
 import { GenderName, PokemonSet } from '@pkmn/data';
@@ -23,6 +24,7 @@ interface ChessSquareProps {
   highlighted: boolean
   selected: boolean
   pokemon?: PokemonSet
+  pokemonHighVis: boolean
 }
 
 const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
@@ -47,9 +49,11 @@ const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
   }
 }
 
-const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, pokemon }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, pokemon, pokemonHighVis }: ChessSquareProps) => {
+  const [pokemonOpacity, setPokemonOpacity] = useState<number>(30);
+
   return (
-    <div className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''}`} onClick={() => { onClick(square) }}>
+    <div onMouseEnter={() => setPokemonOpacity(80)} onMouseLeave={() => setPokemonOpacity(30)} className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''}`} onClick={() => { onClick(square) }}>
       {
         square?.type && square?.color && (
           <img src={getPieceImage(square?.type, square?.color)} className='chessPiece' />
@@ -57,7 +61,7 @@ const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, 
       }
       {
         pokemon && (
-          <img src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url} className='pokemonPieceSprite'/>
+          <img style={{ opacity: `${pokemonHighVis ? 100 : pokemonOpacity}%` }} src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url} className='pokemonPieceSprite'/>
         )
       }
     </div>

@@ -11,12 +11,13 @@ interface ChessBoardProps {
   highlightedSquares: Square[],
   selectedSquare: Square | null,
   pokemonManager: PokemonBattleChessManager,
+  pokemonHighVis: boolean,
 }
 
-const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, pokemonManager }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, pokemonManager, pokemonHighVis }: ChessBoardProps) => {
 
   return (
-    <>
+    <div>
     {
       boardState.map((boardRow, rowIndex) => (
         <div className="chessRow" key={rowIndex}>
@@ -32,13 +33,14 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
                 highlighted={highlightedSquares.includes(getSquareFromIndices(rowIndex, columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(rowIndex, columnIndex)}
                 pokemon={pokemonManager.getPokemonFromSquare(getSquareFromIndices(rowIndex, columnIndex))?.pkmn}
+                pokemonHighVis={pokemonHighVis}
               />
             ))
           }
         </div>
       ))
     }
-    </>
+    </div>
   )
 }
 

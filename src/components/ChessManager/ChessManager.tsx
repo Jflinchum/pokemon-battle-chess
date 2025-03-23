@@ -21,6 +21,7 @@ const ChessManager = ({ chessManager, pokemonManager, onStartBattle, currentPoke
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
+  const [pokemonHighVis, setPokemonHighVis] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentPokemonBattle) {
@@ -85,9 +86,10 @@ const ChessManager = ({ chessManager, pokemonManager, onStartBattle, currentPoke
     <div>
       <p>Current Turn: {turnMapping[chessManager.turn()]}</p>
       <p>Move Number: {chessManager.moveNumber()}</p>
+      <button onClick={() => setPokemonHighVis(!pokemonHighVis)}>Toggle Higher Visibility</button>
       {chessManager.isCheck() && (<p>Check!</p>)}
       {chessManager.isCheckmate() && (<p>Checkmate! Gameover!</p>)}
-      <ChessBoard pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
+      <ChessBoard pokemonHighVis={pokemonHighVis} pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
     </div>
   )
 }
