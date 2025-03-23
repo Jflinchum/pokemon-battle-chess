@@ -10,6 +10,14 @@
 .chessPiece {
   width: 70px;
   height: 70px;
+  position: absolute;
+}
+
+.pokemonPieceSprite {
+  max-width: 70px;
+  max-height: 70px;
+  position: absolute;
+  opacity: 30%;
 }
 
 .whiteChessSquare {

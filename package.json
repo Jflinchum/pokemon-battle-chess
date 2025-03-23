@@ -13,6 +13,8 @@
     "@pkmn/client": "^0.6.32",
     "@pkmn/data": "^0.9.32",
     "@pkmn/dex": "^0.9.32",
+    "@pkmn/img": "^0.2.37",
+    "@pkmn/randoms": "^0.9.32",
     "@pkmn/view": "^0.6.32",
     "chess.js": "^1.1.0",
     "react": "^19.0.0",

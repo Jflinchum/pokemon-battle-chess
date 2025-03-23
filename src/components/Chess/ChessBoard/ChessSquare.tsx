@@ -1,4 +1,7 @@
 import { PieceSymbol, Color } from 'chess.js';
+import { Sprites } from '@pkmn/img';
+import { GenderName, PokemonSet } from '@pkmn/data';
+
 import { ChessBoardSquare } from '../types';
 import blackPawn from '../../../assets/blackPawn.png';
 import blackRook from '../../../assets/blackRook.png';
@@ -19,6 +22,7 @@ interface ChessSquareProps {
   onClick: (arg0: ChessBoardSquare) => void
   highlighted: boolean
   selected: boolean
+  pokemon?: PokemonSet
 }
 
 const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
@@ -43,12 +47,17 @@ const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
   }
 }
 
-const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, pokemon }: ChessSquareProps) => {
   return (
     <div className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''}`} onClick={() => { onClick(square) }}>
       {
         square?.type && square?.color && (
-          <img src={getPieceImage(square?.type, square?.color)} className='chessPiece'/>
+          <img src={getPieceImage(square?.type, square?.color)} className='chessPiece' />
+        )
+      }
+      {
+        pokemon && (
+          <img src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url} className='pokemonPieceSprite'/>
         )
       }
     </div>

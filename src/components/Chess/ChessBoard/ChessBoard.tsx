@@ -3,15 +3,17 @@ import { ChessBoardSquare } from '../types';
 import { getSquareColor, getSquareFromIndices } from '../util';
 import ChessSquare from './ChessSquare';
 import './ChessBoard.css';
+import { PokemonBattleChessManager } from '../../PokemonBattleManager/PokemonBattleChessManager';
 
 interface ChessBoardProps {
   boardState: ChessBoardSquare[][],
   onSquareClick: (arg0: Square) => void,
   highlightedSquares: Square[],
   selectedSquare: Square | null,
+  pokemonManager: PokemonBattleChessManager,
 }
 
-const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, pokemonManager }: ChessBoardProps) => {
 
   return (
     <>
@@ -29,6 +31,7 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
                 }}
                 highlighted={highlightedSquares.includes(getSquareFromIndices(rowIndex, columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(rowIndex, columnIndex)}
+                pokemon={pokemonManager.getPokemonFromSquare(getSquareFromIndices(rowIndex, columnIndex))}
               />
             ))
           }

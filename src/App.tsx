@@ -1,11 +1,9 @@
-import { useState } from 'react'
-import './App.css'
-import ChessManager from './components/Chess/ChessManager'
+import BattleChessManager from './components/BattleChessManager/BattleChessManager'
 
 function App() {
   return (
     <div>
-      <ChessManager/>
+      <BattleChessManager />
     </div>
   )
 }
