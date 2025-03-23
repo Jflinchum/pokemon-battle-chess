@@ -1,0 +1,4 @@
+.pokemonBattleManagerContainer {
+  display: flex;
+  flex-direction: row;
+}
