@@ -66,9 +66,14 @@ const ChessManager = ({ chessManager, pokemonManager, onStartBattle, currentPoke
    *    - What would I do about castling? Is there a smart way to keep track of each piece's movement
    *      - Castling is the only chess move that involves moving two pieces at once. Only one edge case
    *    - Pawn promotion
+   *    - En Passant
    */
 
   const handleSquareClick = (square: Square) => {
+    // Ignore inputs if ongoing pokemon battle
+    if (currentPokemonBattle) {
+      return;
+    }
     // If there's no current selected square, or the clicked square isn't a valid move, then set the clicked square to the current selected square
     if (!selectedSquare || !chessManager.moves({ square: selectedSquare, piece: chessManager.get(selectedSquare)?.type, verbose: true }).some((move) => move.to === square)) {
       if (selectedSquare === square) {
