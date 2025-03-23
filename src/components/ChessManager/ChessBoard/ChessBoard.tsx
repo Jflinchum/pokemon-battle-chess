@@ -31,7 +31,7 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
                 }}
                 highlighted={highlightedSquares.includes(getSquareFromIndices(rowIndex, columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(rowIndex, columnIndex)}
-                pokemon={pokemonManager.getPokemonFromSquare(getSquareFromIndices(rowIndex, columnIndex))}
+                pokemon={pokemonManager.getPokemonFromSquare(getSquareFromIndices(rowIndex, columnIndex))?.pkmn}
               />
             ))
           }

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { BattleStreams, Teams } from '@pkmn/sim';
 import { PokemonSet, Generations } from "@pkmn/data";
 import { Dex } from '@pkmn/dex';
-import { Pokemon } from '@pkmn/client';
 import { Protocol } from '@pkmn/protocol';
 import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
@@ -10,22 +9,24 @@ import PokemonBattleLog from '../PokemonBattleDisplay/PokemonBattleLog/PokemonBa
 import './PokemonBattleManager.css';
 
 interface PokemonBattleManagerProps {
+  p1Name: string,
+  p2Name: string,
   p1Pokemon: PokemonSet,
   p2Pokemon: PokemonSet,
+  onVictory: (victor: string) => void,
 }
 
-const PokemonBattleManager = ({ p1Pokemon, p2Pokemon }: PokemonBattleManagerProps) => {
+const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory }: PokemonBattleManagerProps) => {
   /**
    * TODO:
-   * - Health Bar above pokemon
    * - Win State/Lose State
    * - Pokemon Details Card
    */
   const battleStream = useMemo(() => (BattleStreams.getPlayerStreams(new BattleStreams.BattleStream())), []);
   const battle = useMemo(() => (new Battle(new Generations(Dex))), []);
   const spec = { formatid: 'gen9customgame' };
-  const p1spec = { name: 'player 1', team: Teams.pack([p1Pokemon]) };
-  const p2spec = { name: 'player 2', team: Teams.pack([p2Pokemon]) };
+  const p1spec = { name: p1Name, team: Teams.pack([p1Pokemon]) };
+  const p2spec = { name: p2Name, team: Teams.pack([p2Pokemon]) };
 
   const [battleHistory, setBattleHistory] = useState<string[]>([])
   const [battleState, setBattleState] = useState<Battle | null>(null);
@@ -35,6 +36,9 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon }: PokemonBattleManagerProp
       for (const { args, kwArgs } of Protocol.parse(chunk)) {
         console.log(args);
         battle.add(args, kwArgs);
+        if (args[0] === 'win') {
+          onVictory(args[1]);
+        }
       }
       setBattleHistory((battleHistory) => [...battleHistory, chunk]);
       setBattleState(battle);

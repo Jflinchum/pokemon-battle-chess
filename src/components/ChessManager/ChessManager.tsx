@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Chess, Square } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
-import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
-import { PokemonSet } from '@pkmn/data';
+import { PokemonBattleChessManager, PokemonPiece } from '../PokemonManager/PokemonBattleChessManager';
+import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 
 const turnMapping = {
   'w': 'White',
@@ -12,14 +12,25 @@ const turnMapping = {
 interface ChessManagerProps {
   chessManager: Chess,
   pokemonManager: PokemonBattleChessManager,
-  onStartBattle: (player1Pokemon: PokemonSet, player2Pokemon: PokemonSet) => void
+  onStartBattle: (player1Pokemon: PokemonPiece, player2Pokemon: PokemonPiece, attemptedMove: { fromSquare: Square, toSquare: Square }) => void
+  currentPokemonBattle: CurrentBattle | null
 }
 
-const ChessManager = ({ chessManager, pokemonManager, onStartBattle }: ChessManagerProps) => {
+const ChessManager = ({ chessManager, pokemonManager, onStartBattle, currentPokemonBattle }: ChessManagerProps) => {
   const [board, setBoard] = useState(chessManager.board());
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
+
+  useEffect(() => {
+    if (currentPokemonBattle) {
+      // UI on Chess board indicating current battle
+    } else {
+      setBoard(chessManager.board());
+      setHighlightedSquare([]);
+      setSelectedSquare(null);
+    }
+  }, [currentPokemonBattle]);
 
   const cancelSelection = () => {
     setSelectedSquare(null);
@@ -34,7 +45,7 @@ const ChessManager = ({ chessManager, pokemonManager, onStartBattle }: ChessMana
 
   const movePiece = (fromSquare: Square, toSquare: Square) => {
     if (pokemonManager.getPokemonFromSquare(toSquare)) {
-      onStartBattle(pokemonManager.getPokemonFromSquare(fromSquare)!, pokemonManager.getPokemonFromSquare(toSquare)!)
+      onStartBattle(pokemonManager.getPokemonFromSquare(fromSquare)!, pokemonManager.getPokemonFromSquare(toSquare)!, { fromSquare, toSquare })
     } else {
       chessManager.move({ from: fromSquare, to: toSquare });
       setBoard(chessManager.board());
@@ -52,8 +63,6 @@ const ChessManager = ({ chessManager, pokemonManager, onStartBattle }: ChessMana
    *    - What would I do about castling? Is there a smart way to keep track of each piece's movement
    *      - Castling is the only chess move that involves moving two pieces at once. Only one edge case
    *    - Pawn promotion
-   *  - Assign a random pokemon set to each "unique" piece
-   *  - When a piece attacks another, before the piece take step happens, decide if the piece is taken through battle
    */
 
   const handleSquareClick = (square: Square) => {

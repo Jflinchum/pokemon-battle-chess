@@ -35,7 +35,7 @@ export class PokemonBattleChessManager {
   public getChessPieces = () => (this._chessPieces);
 
   public getPokemonFromSquare = (square: Square) => {
-    return this._chessPieces.find((chessPiece) => chessPiece.square === square)?.pkmn;
+    return this._chessPieces.find((chessPiece) => chessPiece.square === square);
   }
 
   public movePokemonToSquare = (fromSquare: Square, toSquare: Square) => {
