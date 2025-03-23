@@ -1,4 +1,4 @@
-.battleChessRoot {
+.battleChessGameContainer {
   display: flex;
   flex-direction: column;
 }

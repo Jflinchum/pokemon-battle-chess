@@ -3,6 +3,8 @@ import { Chess, Square } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager, PokemonPiece } from '../PokemonManager/PokemonBattleChessManager';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
+import PokemonDetailsCard from '../PokemonManager/PokemonDetailsCard/PokemonDetailsCard';
+import './ChessManager.css';
 
 const turnMapping = {
   'w': 'White',
@@ -89,7 +91,10 @@ const ChessManager = ({ chessManager, pokemonManager, onStartBattle, currentPoke
       <button onClick={() => setPokemonHighVis(!pokemonHighVis)}>Toggle Higher Visibility</button>
       {chessManager.isCheck() && (<p>Check!</p>)}
       {chessManager.isCheckmate() && (<p>Checkmate! Gameover!</p>)}
-      <ChessBoard pokemonHighVis={pokemonHighVis} pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
+      <div className='chessGameContainer'>
+        <ChessBoard pokemonHighVis={pokemonHighVis} pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
+        {selectedSquare && pokemonManager.getPokemonFromSquare(selectedSquare) && <PokemonDetailsCard pokemon={pokemonManager.getPokemonFromSquare(selectedSquare)!.pkmn} />}
+      </div>
     </div>
   )
 }

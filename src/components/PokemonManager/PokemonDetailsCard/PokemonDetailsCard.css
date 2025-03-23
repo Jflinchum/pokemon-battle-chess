@@ -1,0 +1,9 @@
+.pokemonDetailsContainer {
+  background-color: dimgray;
+  padding: 8px;
+}
+
+.pokemonDetailsSprite {
+  display: block;
+  margin: auto;
+}

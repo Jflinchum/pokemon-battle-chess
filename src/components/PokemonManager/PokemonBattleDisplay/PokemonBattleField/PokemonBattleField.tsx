@@ -12,7 +12,7 @@ interface PokemonBattleFieldProps {
 }
 
 const getHealthBarColor = (maxHp: number, currentHp: number) => {
-  const percentage = (maxHp/currentHp) * 100;
+  const percentage = (currentHp/maxHp) * 100;
   if (percentage > 60) {
     return 'green';
   } else if (percentage > 25) {

@@ -45,12 +45,12 @@ function BattleChessManager() {
 
 
   return (
-    <div className='battleChessRoot'>
-      <ChessManager currentPokemonBattle={currentBattle} chessManager={chessManager} pokemonManager={pokemonManager} onStartBattle={(p1Pokemon, p2Pokemon, attemptedMove) => { setCurrentBattle({ p1Pokemon, p2Pokemon, attemptedMove }) }}/>
+    <div className='battleChessGameContainer'>
       {
         currentBattle &&
         (<PokemonBattleManager p1Name={player1Name} p2Name={player2Name} p1Pokemon={currentBattle.p1Pokemon.pkmn} p2Pokemon={currentBattle.p2Pokemon.pkmn} onVictory={handleVictory}/>)
       }
+      <ChessManager currentPokemonBattle={currentBattle} chessManager={chessManager} pokemonManager={pokemonManager} onStartBattle={(p1Pokemon, p2Pokemon, attemptedMove) => { setCurrentBattle({ p1Pokemon, p2Pokemon, attemptedMove }) }}/>
     </div>
   )
 }

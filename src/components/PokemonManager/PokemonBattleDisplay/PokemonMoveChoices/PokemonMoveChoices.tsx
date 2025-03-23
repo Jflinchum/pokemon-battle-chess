@@ -3,10 +3,10 @@ import './PokemonMoveChoices.css';
 
 interface PokemonMoveChoicesProps {
   moves: string[];
-  onMoveSelect: (move: string) => void;
+  onMoveSelect?: (move: string) => void;
 }
 
-const PokemonMoveChoices = ({ moves, onMoveSelect }: PokemonMoveChoicesProps) => {
+const PokemonMoveChoices = ({ moves, onMoveSelect = () => {} }: PokemonMoveChoicesProps) => {
 
   return (
     <div className='movesContainer'>
