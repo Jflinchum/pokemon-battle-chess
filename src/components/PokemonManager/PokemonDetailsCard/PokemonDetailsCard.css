@@ -1,6 +1,7 @@
 .pokemonDetailsContainer {
   background-color: dimgray;
   padding: 8px;
+  width: 400px;
 }
 
 .pokemonDetailsSprite {

@@ -1,6 +1,7 @@
 import { Dex } from "@pkmn/dex";
-import './PokemonMoveChoices.css';
 import { Move } from "@pkmn/data";
+import PokemonMoveButton from "./PokemonMoveButton";
+import './PokemonMoveChoices.css';
 
 interface PokemonMoveChoicesProps {
   moves: string[];
@@ -35,39 +36,20 @@ const PokemonMoveChoices = ({ moves, onMoveSelect = () => {} }: PokemonMoveChoic
 
   return (
     <div className='movesContainer'>
-      {moves.map((move, index) => {
-        const dexMoveInfo = Dex.moves.get(move);
-
-        return (
-          <button
-            key={index}
-            style={{ border: `${getMoveButtonColor(dexMoveInfo.type)} solid 3px`, background: `linear-gradient(0deg, ${getMoveButtonColor(dexMoveInfo.type)} 0%, white 100%)` }}
-            className='moveButton'
-            onClick={() => {onMoveSelect(move)}}
-          >
-            {dexMoveInfo.name}
-            <div className='moveTooltip'>
-              <div>
-                <strong>{dexMoveInfo.name}</strong>
-                <p>{dexMoveInfo.type} - {dexMoveInfo.category}</p>
-              </div>
-              <hr/>
-              {
-                dexMoveInfo.basePower && dexMoveInfo.accuracy ? (
-                  <div>
-                    <p>Base power: {dexMoveInfo.basePower}</p>
-                    <p>Accuracy: {dexMoveInfo.accuracy}</p>
-                    <hr/>
-                  </div>
-                ) : null
-              }
-              <div>
-                {dexMoveInfo.shortDesc}
-              </div>
-            </div>
-          </button>
-        )
-      })}
+      <div className='subMoveContainer'>
+        {moves.slice(0, 2).map((move, index) => {
+          return (
+            <PokemonMoveButton key={index} move={move} onMoveSelect={onMoveSelect}/>
+          )
+        })}
+      </div>
+      <div className='subMoveContainer'>
+        {moves.slice(2, 4).map((move, index) => {
+          return (
+            <PokemonMoveButton key={index} move={move} onMoveSelect={onMoveSelect}/>
+          )
+        })}
+      </div>
     </div>
   )
 }

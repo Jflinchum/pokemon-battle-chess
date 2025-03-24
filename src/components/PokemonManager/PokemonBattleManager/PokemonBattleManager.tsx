@@ -5,7 +5,6 @@ import { Dex } from '@pkmn/dex';
 import { Protocol } from '@pkmn/protocol';
 import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
-import PokemonBattleLog from '../PokemonBattleDisplay/PokemonBattleLog/PokemonBattleLog';
 import './PokemonBattleManager.css';
 
 interface PokemonBattleManagerProps {
@@ -19,7 +18,6 @@ interface PokemonBattleManagerProps {
 const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory }: PokemonBattleManagerProps) => {
   /**
    * TODO:
-   * - Win State/Lose State
    * - Pokemon Details Card
    */
   const battleStream = useMemo(() => (BattleStreams.getPlayerStreams(new BattleStreams.BattleStream())), []);
