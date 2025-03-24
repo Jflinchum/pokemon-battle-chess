@@ -1,0 +1,13 @@
+.progressBarContainer {
+  display: inline-block;
+  height: 10px;
+  width: 150px;
+  background-color: lightgrey;
+  border-radius: 10px;
+  border: solid white 1px;
+}
+
+.progressBarFiller {
+  height: 100%;
+  border-radius: inherit;
+}

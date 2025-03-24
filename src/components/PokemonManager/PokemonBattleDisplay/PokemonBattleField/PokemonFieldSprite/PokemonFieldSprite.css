@@ -1,0 +1,70 @@
+.p1Pokemon {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 100px;
+  left: 100px;
+}
+
+.p2Pokemon {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 120px;
+  right: 100px;
+}
+
+.healthbar {
+  display: inline;
+}
+
+.pokemonHealth {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: xx-small;
+  border-radius: 3px;
+  padding: 0px 2px;
+
+  .pokemonHealthProgress {
+    z-index: 2;
+  }
+
+  span {
+    margin-left: -5px;
+    padding-left: 8px;
+    padding-right: 2px;
+    background-color: #7a7a7a;
+    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+  }
+}
+
+.pokemonDetails {
+  text-align: center;
+  font-weight: 800;
+  color: black;
+  text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+
+  .pokemonGender {
+    padding-left: 4px;
+    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+  }
+
+  .pokemonLevel {
+    padding-left: 4px;
+    font-weight: 500;
+  }
+}
+
+.pokemonSpriteInfo {
+  z-index: 1;
+}
+
+.pokemonSprite {
+  width: fit-content;
+  margin: auto;
+}
+
+.p1PokemonSprite {
+  transform: scale(2);
+}
