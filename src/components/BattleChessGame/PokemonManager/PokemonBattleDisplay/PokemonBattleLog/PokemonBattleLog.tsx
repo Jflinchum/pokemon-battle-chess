@@ -1,14 +1,14 @@
 import { useRef, useEffect, useMemo } from "react";
-import { Protocol } from "@pkmn/protocol";
+import { ArgType, BattleArgsKWArgType, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from "@pkmn/view";
 import StylizedText from "../../../../common/StylizedText/StylizedText";
 import './PokemonBattleLog.css';
 
 interface PokemonBattleLogProps {
-  battleHistory: string[];
+  battleHistory: { args: ArgType, kwArgs: BattleArgsKWArgType }[];
 }
 
-const getClassnameFromBattleArg = (args: string[]) => {
+const getClassnameFromBattleArg = (args: ArgType) => {
   console.log(args);
   if (args[0] === 'turn') {
     return 'turnLog';
@@ -16,7 +16,7 @@ const getClassnameFromBattleArg = (args: string[]) => {
   return '';
 }
 
-const formatTextFromBattleArg = (text: string, args: string[]) => {
+const formatTextFromBattleArg = (text: string, args: ArgType) => {
   if (args[0] === 'turn') {
     return text.replace(/\=/g, '');
   }
@@ -37,21 +37,19 @@ const PokemonBattleLog = ({ battleHistory }: PokemonBattleLogProps) => {
   return (
     <div className='pokemonBattleLogContainer' ref={containerRef}>
       {
-        battleHistory.map((log) => {
+        battleHistory.map(({ args, kwArgs }, index) => {
           let totalLog: { text: string, args: string[]  }[] = [];
-          for (const { args, kwArgs } of Protocol.parse(log)) {
-            const formattedText = formatter.formatText(args, kwArgs);
-            if (formattedText) {
-              totalLog.push({ text: formattedText, args: (args as string[]) });
-            }
+          const formattedText = formatter.formatText(args, kwArgs);
+          if (formattedText) {
+            totalLog.push({ text: formattedText, args: (args as string[]) });
           }
-          return totalLog.map(({ text, args }, index) => (
-            text && (
+          if (formattedText) {
+            return (
               <p className={`textLog ${getClassnameFromBattleArg(args)}`} key={index}>
-                <StylizedText text={formatTextFromBattleArg(text, args)} />
+                <StylizedText text={formatTextFromBattleArg(formattedText, args)} />
               </p>
-            )
-          ));
+            );
+          }
         }
         )
       }

@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { BattleStreams, Teams } from '@pkmn/sim';
 import { PokemonSet, Generations } from "@pkmn/data";
 import { Dex } from '@pkmn/dex';
-import { Protocol } from '@pkmn/protocol';
+import { ArgType, BattleArgsKWArgType, Protocol } from '@pkmn/protocol';
 import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
 import './PokemonBattleManager.css';
@@ -15,10 +15,25 @@ interface PokemonBattleManagerProps {
   onVictory: (victor: string) => void,
 }
 
+const wait = async (ms: number) => {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      return resolve();
+    }, ms)
+  });
+}
+
+const shouldDelayBeforeContinuing = (logType: string) => {
+  const delayLogs = ['move', '-damage', '-heal', 'win'];
+  if (delayLogs.includes(logType)) {
+    return true;
+  }
+  return false;
+}
+
 const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory }: PokemonBattleManagerProps) => {
   /**
    * TODO:
-   * - Split pokemon stream output and process them 1 second at a time
    * - UI show status on pokemon
    * - On Hover in battle, show pokemon in depth details
    * - Pokemon Details Card
@@ -29,22 +44,39 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
   const p1spec = { name: p1Name, team: Teams.pack([p1Pokemon]) };
   const p2spec = { name: p2Name, team: Teams.pack([p2Pokemon]) };
 
-  const [battleHistory, setBattleHistory] = useState<string[]>([])
-  const [battleState, setBattleState] = useState<Battle | null>(null);
+  const [parsedBattleLog, setParsedBattleLog] = useState<{ args: ArgType, kwArgs: BattleArgsKWArgType }[]>([])
+  const [delayedBattleLog, setDelayedBattledLog] = useState<{ args: ArgType, kwArgs: BattleArgsKWArgType }[]>([])
+  const battleLogIndex = useRef(0);
 
   const beginBattleStreamHandler = async () => {
     for await (const chunk of battleStream.omniscient) {
       for (const { args, kwArgs } of Protocol.parse(chunk)) {
         console.log(args);
-        battle.add(args, kwArgs);
-        if (args[0] === 'win') {
-          onVictory(args[1]);
-        }
+        setParsedBattleLog((curr) => [...curr, { args, kwArgs }]);
       }
-      setBattleHistory((battleHistory) => [...battleHistory, chunk]);
-      setBattleState(battle);
     }
   }
+
+  useEffect(() => {
+    const iterateOverLog = async () => {
+      if (parsedBattleLog.length > 0) {
+        while (battleLogIndex.current < parsedBattleLog.length) {
+          const { args, kwArgs } = parsedBattleLog[battleLogIndex.current];
+          battle?.add(args, kwArgs);
+          setDelayedBattledLog((curr) => [...curr, { args, kwArgs }]);
+          battleLogIndex.current += 1;
+          if (shouldDelayBeforeContinuing(args[0])) {
+            await wait(1000);
+          }
+          if (args[0] === 'win') {
+            onVictory(args[1]);
+            return;
+          }
+        }
+      }
+    }
+    iterateOverLog();
+  }, [parsedBattleLog])
 
   useEffect(() => {
     beginBattleStreamHandler();
@@ -60,8 +92,8 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
       <PokemonBattleDisplay
         p1Pokemon={p1Pokemon}
         p2Pokemon={p2Pokemon}
-        battleState={battleState}
-        battleHistory={battleHistory}
+        battleState={battle}
+        parsedBattleLog={delayedBattleLog}
         onMoveSelect={(move) => {
           if (move === 'undo') {
             battleStream.omniscient.write(`>p1 undo`);

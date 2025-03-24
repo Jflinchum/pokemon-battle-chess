@@ -1,36 +1,55 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PokemonSet } from "@pkmn/data";
 import { Battle } from "@pkmn/client";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
 import PokemonMoveChoices from "./PokemonMoveChoices/PokemonMoveChoices";
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
 import './PokemonBattleDisplay.css';
+import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
 
 interface PokemonBattleDisplayProps {
   p1Pokemon: PokemonSet,
   p2Pokemon: PokemonSet,
   battleState: Battle | null,
-  battleHistory: string[],
+  parsedBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[],
   onMoveSelect: (move: string) => void,
   onP2MoveSelect: (move: string) => void,
 }
 
-const PokemonBattleDisplay = ({ p1Pokemon, p2Pokemon, battleState, battleHistory, onMoveSelect, onP2MoveSelect }: PokemonBattleDisplayProps) => {
+const wait = async (ms: number) => {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      return resolve();
+    }, ms)
+  });
+}
+
+const shouldDelayBeforeContinuing = (logType: string) => {
+  const delayLogs = ['move', '-damage', '-heal'];
+  if (delayLogs.includes(logType)) {
+    return true;
+  }
+  return false;
+}
+
+const PokemonBattleDisplay = ({ p1Pokemon, p2Pokemon, battleState, parsedBattleLog, onMoveSelect, onP2MoveSelect }: PokemonBattleDisplayProps) => {
   const [moveChosen, setMoveChosen] = useState<string>();
   const [moveP2Chosen, setP2MoveChosen] = useState<string>();
+  const battleLogIndex = useRef(0);
 
   useEffect(() => {
+    // TODO: Better handling for clearing move selection
     setMoveChosen(undefined);
     setP2MoveChosen(undefined);
-  }, [battleHistory]);
+  }, [parsedBattleLog]);
 
   return (
     <div>
-      {battleState && battleState.p1.active[0] && battleState.p2.active[0] && (
+      {battleState && (
         <>
           <div className='battlefieldAndLog'>
-            <PokemonBattleField p1Pokemon={battleState.p1.active[0]} p2Pokemon={battleState.p2.active[0]} battleState={battleState}/>
-            <PokemonBattleLog battleHistory={battleHistory}/>
+            <PokemonBattleField battleHistory={parsedBattleLog} battleState={battleState}/>
+            <PokemonBattleLog battleHistory={parsedBattleLog}/>
           </div>
           <div className='battleMoveContainer'>
             <p>Player 1 Moves</p>
