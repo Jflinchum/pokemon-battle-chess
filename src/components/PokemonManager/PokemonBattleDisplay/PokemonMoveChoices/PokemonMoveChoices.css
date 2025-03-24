@@ -1,5 +1,7 @@
 .movesContainer {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
 }
 
 .moveButton {
@@ -7,19 +9,29 @@
 }
 
 .moveTooltip {
+  width: 300px;
+  text-align: left;
+  padding: 3px;
   visibility: hidden;
-  
   background-color: dimgray;
   color: white;
+  border-radius: 10px;
 
   position: absolute;
   z-index: 1;
-  top: 125%;
-  left: 70%;
-  margin-left: -60px;
+  bottom: 125%;
+  left: 65%;
+  margin-left: -150px;
   
   opacity: 0;
   transition: opacity 0.3s;
+
+  p, strong {
+    margin: 0;
+  }
+  hr {
+    margin: 2px 0px;
+  }
 }
 
 .moveButton:hover .moveTooltip {

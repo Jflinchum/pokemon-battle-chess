@@ -10,12 +10,34 @@ const PokemonMoveChoices = ({ moves, onMoveSelect = () => {} }: PokemonMoveChoic
 
   return (
     <div className='movesContainer'>
-      {moves.map((move, index) => (
-        <button key={index} className='moveButton' onClick={() => {onMoveSelect(move)}}>
-          {Dex.moves.get(move).name}
-          <span className='moveTooltip'>{Dex.moves.get(move).shortDesc}</span>
-        </button>
-      ))}
+      {moves.map((move, index) => {
+        const dexMoveInfo = Dex.moves.get(move);
+
+        return (
+          <button key={index} className='moveButton' onClick={() => {onMoveSelect(move)}}>
+            {dexMoveInfo.name}
+            <div className='moveTooltip'>
+              <div>
+                <strong>{dexMoveInfo.name}</strong>
+                <p>{dexMoveInfo.type} - {dexMoveInfo.category}</p>
+              </div>
+              <hr/>
+              {
+                dexMoveInfo.basePower && dexMoveInfo.accuracy ? (
+                  <div>
+                    <p>Base power: {dexMoveInfo.basePower}</p>
+                    <p>Accuracy: {dexMoveInfo.accuracy}</p>
+                    <hr/>
+                  </div>
+                ) : null
+              }
+              <div>
+                {dexMoveInfo.shortDesc}
+              </div>
+            </div>
+          </button>
+        )
+      })}
     </div>
   )
 }
