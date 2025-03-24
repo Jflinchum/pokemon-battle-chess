@@ -1,5 +1,5 @@
 import { useRef, useEffect, useMemo } from "react";
-import { ArgType, BattleArgsKWArgType, Protocol } from "@pkmn/protocol";
+import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
 import { LogFormatter } from "@pkmn/view";
 import StylizedText from "../../../../common/StylizedText/StylizedText";
 import './PokemonBattleLog.css';

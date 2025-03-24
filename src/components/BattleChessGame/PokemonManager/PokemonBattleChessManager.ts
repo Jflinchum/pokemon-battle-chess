@@ -18,8 +18,6 @@ export interface PokemonBattle {
 
 export class PokemonBattleChessManager {
   private _chessPieces: PokemonPiece[] = [];
-  private _currentBattle: PokemonBattle = { onGoing: false };
-
   constructor(board: ChessBoardSquare[][]) {
     const generator = TeamGenerators.getTeamGenerator('gen9randombattle');
     for (let row = 0; row < board.length; row++) {
@@ -33,6 +31,10 @@ export class PokemonBattleChessManager {
   }
 
   public getChessPieces = () => (this._chessPieces);
+
+  public getTakenChessPieces = (color: Color) => {
+    return this._chessPieces.filter((piece) => piece.color === color && piece.square === null);
+  }
 
   public getPokemonFromSquare = (square?: Square) => {
     if (!square) {
@@ -55,19 +57,5 @@ export class PokemonBattleChessManager {
       pokemonToRemove.square = null;
     }
     return pokemonToMove;
-  }
-
-  public getCurrentBattle = () => (this._currentBattle);
-  
-  public startBattle = (p1Pokemon: PokemonSet, p2Pokemon: PokemonSet) => {
-    this._currentBattle.player1Pokemon = p1Pokemon;
-    this._currentBattle.player2Pokemon = p2Pokemon;
-    this._currentBattle.onGoing = true;
-  }
-
-  public finishBattle = () => {
-    this._currentBattle = {
-      onGoing: false,
-    };
   }
 }

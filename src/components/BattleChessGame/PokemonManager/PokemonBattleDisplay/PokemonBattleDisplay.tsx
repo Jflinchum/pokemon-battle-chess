@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { PokemonSet } from "@pkmn/data";
 import { Battle } from "@pkmn/client";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
@@ -16,26 +16,10 @@ interface PokemonBattleDisplayProps {
   onP2MoveSelect: (move: string) => void,
 }
 
-const wait = async (ms: number) => {
-  return new Promise<void>((resolve) => {
-    setTimeout(() => {
-      return resolve();
-    }, ms)
-  });
-}
-
-const shouldDelayBeforeContinuing = (logType: string) => {
-  const delayLogs = ['move', '-damage', '-heal'];
-  if (delayLogs.includes(logType)) {
-    return true;
-  }
-  return false;
-}
 
 const PokemonBattleDisplay = ({ p1Pokemon, p2Pokemon, battleState, parsedBattleLog, onMoveSelect, onP2MoveSelect }: PokemonBattleDisplayProps) => {
   const [moveChosen, setMoveChosen] = useState<string>();
   const [moveP2Chosen, setP2MoveChosen] = useState<string>();
-  const battleLogIndex = useRef(0);
 
   useEffect(() => {
     // TODO: Better handling for clearing move selection

@@ -7,6 +7,7 @@ import PokemonDetailsCard from '../PokemonManager/PokemonDetailsCard/PokemonDeta
 import './ChessManager.css';
 import { MoveAttempt } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
+import TakenChessPieces from './TakenChessPieces/TakenChessPieces';
 
 const turnMapping = {
   'w': 'White',
@@ -78,6 +79,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
+   *  - Show pieces taken with pokemon sprites
    *  - Keep track of each "unique" piece and it's position on the board
    *    - What would I do about castling? Is there a smart way to keep track of each piece's movement
    *      - Castling is the only chess move that involves moving two pieces at once. Only one edge case
@@ -124,10 +126,12 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
       )}
       {chessManager.isCheck() && (<p>Check!</p>)}
       {chessManager.isCheckmate() && (<p>Checkmate! Gameover!</p>)}
+      <TakenChessPieces pokemonManager={pokemonManager} color='w' />
       <div className='chessGameContainer'>
         <ChessBoard pokemonHighVis={pokemonHighVis} pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
         {selectedSquare && pokemonManager.getPokemonFromSquare(selectedSquare) && <PokemonDetailsCard pokemon={pokemonManager.getPokemonFromSquare(selectedSquare)!.pkmn} />}
       </div>
+      <TakenChessPieces pokemonManager={pokemonManager} color='b' />
     </div>
   )
 }
