@@ -2,6 +2,21 @@
   min-width: 100px;
   height: 392px;
   overflow-y: scroll;  
-  background-color:dimgray;
+  background-color: #eef2f5;
+  color: black;
   border: solid black 4px;
+}
+
+.textLog {
+  padding-left: 4px;
+  font-size: small;
+  margin: 4px 0px;
+}
+
+.turnLog {
+  font-weight: 600;
+  background-color: #e0e7ea;
+  border-top: 2px solid #c1c4c6;
+  border-bottom: 2px solid #c1c4c6;
+  font-size: medium;
 }
