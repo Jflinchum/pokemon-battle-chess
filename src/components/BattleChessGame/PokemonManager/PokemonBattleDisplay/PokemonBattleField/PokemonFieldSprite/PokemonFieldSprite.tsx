@@ -1,7 +1,7 @@
 import { Pokemon } from "@pkmn/client";
 import { Sprites } from "@pkmn/img";
 import { GenderName } from "@pkmn/data";
-import ProgressBar from "../../../../common/ProgressBar/ProgressBar";
+import ProgressBar from "../../../../../common/ProgressBar/ProgressBar";
 import './PokemonFieldSprite.css';
 
 interface PokemonFieldSpriteProps {

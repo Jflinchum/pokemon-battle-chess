@@ -1,4 +1,4 @@
-import BattleChessManager from './components/BattleChessManager/BattleChessManager'
+import BattleChessManager from './components/BattleChessGame/BattleChessManager/BattleChessManager'
 
 function App() {
   return (

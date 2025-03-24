@@ -1,7 +1,7 @@
 import { useRef, useEffect, useMemo } from "react";
 import { Protocol } from "@pkmn/protocol";
 import { LogFormatter } from "@pkmn/view";
-import StylizedText from "../../../common/StylizedText/StylizedText";
+import StylizedText from "../../../../common/StylizedText/StylizedText";
 import './PokemonBattleLog.css';
 
 interface PokemonBattleLogProps {

@@ -1,5 +1,5 @@
 import { Pokemon } from "@pkmn/client";
-import pokemonBattleBackgroundImage from '../../../../assets/pokemonBattleBackground.png';
+import pokemonBattleBackgroundImage from '../../../../../assets/pokemonBattleBackground.png';
 import './PokemonBattleField.css';
 import { Battle } from "@pkmn/client";
 import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";

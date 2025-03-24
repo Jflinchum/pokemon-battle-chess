@@ -4,18 +4,18 @@ import { Sprites } from '@pkmn/img';
 import { GenderName, PokemonSet } from '@pkmn/data';
 
 import { ChessBoardSquare } from '../types';
-import blackPawn from '../../../assets/blackPawn.png';
-import blackRook from '../../../assets/blackRook.png';
-import blackKnight from '../../../assets/blackKnight.png';
-import blackBishop from '../../../assets/blackBishop.png';
-import blackQueen from '../../../assets/blackQueen.png';
-import blackKing from '../../../assets/blackKing.png';
-import whitePawn from '../../../assets/whitePawn.png';
-import whiteRook from '../../../assets/whiteRook.png';
-import whiteKnight from '../../../assets/whiteKnight.png';
-import whiteBishop from '../../../assets/whiteBishop.png';
-import whiteQueen from '../../../assets/whiteQueen.png';
-import whiteKing from '../../../assets/whiteKing.png';
+import blackPawn from '../../../../assets/blackPawn.png';
+import blackRook from '../../../../assets/blackRook.png';
+import blackKnight from '../../../../assets/blackKnight.png';
+import blackBishop from '../../../../assets/blackBishop.png';
+import blackQueen from '../../../../assets/blackQueen.png';
+import blackKing from '../../../../assets/blackKing.png';
+import whitePawn from '../../../../assets/whitePawn.png';
+import whiteRook from '../../../../assets/whiteRook.png';
+import whiteKnight from '../../../../assets/whiteKnight.png';
+import whiteBishop from '../../../../assets/whiteBishop.png';
+import whiteQueen from '../../../../assets/whiteQueen.png';
+import whiteKing from '../../../../assets/whiteKing.png';
 
 interface ChessSquareProps {
   square: ChessBoardSquare
