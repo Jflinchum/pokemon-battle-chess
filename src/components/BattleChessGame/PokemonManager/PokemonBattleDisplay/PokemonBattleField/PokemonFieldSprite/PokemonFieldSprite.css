@@ -23,7 +23,6 @@
   flex-direction: row;
   align-items: center;
   font-size: xx-small;
-  border-radius: 3px;
   padding: 0px 2px;
 
   .pokemonHealthProgress {
@@ -35,6 +34,7 @@
     padding-left: 8px;
     padding-right: 2px;
     background-color: #7a7a7a;
+    border-radius: 3px;
     text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
   }
 }
@@ -66,6 +66,6 @@
 }
 
 .p1PokemonSprite {
-  transform: scale(2);
+  transform: scale(1.5) translateY(25%);
   z-index: 1;
 }
