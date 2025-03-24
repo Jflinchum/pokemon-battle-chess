@@ -41,12 +41,15 @@ export class PokemonBattleChessManager {
     return this._chessPieces.find((chessPiece) => chessPiece.square === square);
   }
 
-  public movePokemonToSquare = (fromSquare: Square, toSquare: Square) => {
+  public movePokemonToSquare = (fromSquare: Square, toSquare: Square, promotion?: PieceSymbol) => {
     const pokemonToMove = this._chessPieces.find((chessPiece) => chessPiece.square === fromSquare);
 
     const pokemonToRemove = this._chessPieces.find((chessPiece) => chessPiece.square === toSquare);
     if (pokemonToMove) {
       pokemonToMove.square = toSquare;
+      if (promotion) {
+        pokemonToMove.type = promotion;
+      }
     }
     if (pokemonToRemove) {
       pokemonToRemove.square = null;

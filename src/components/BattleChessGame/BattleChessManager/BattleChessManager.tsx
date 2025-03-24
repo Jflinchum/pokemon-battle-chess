@@ -41,15 +41,15 @@ function BattleChessManager() {
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(null);
   const handleVictory = (victor: string) => {
     if (currentBattle) {
-      const { fromSquare, toSquare } = currentBattle.attemptedMove;
+      const { fromSquare, toSquare, promotion } = currentBattle.attemptedMove;
       if (player1Name === victor) {
         currentBattle.p2Pokemon.square = null;
-        chessManager.move({ from: fromSquare, to: toSquare });
+        chessManager.move({ from: fromSquare, to: toSquare, promotion });
         pokemonManager.movePokemonToSquare(fromSquare, toSquare);
       } else {
         currentBattle.p1Pokemon.square = null; 
         const tempPiece = chessManager.get(toSquare);
-        chessManager.move({ from: fromSquare, to: toSquare });
+        chessManager.move({ from: fromSquare, to: toSquare, promotion });
         chessManager.remove(currentBattle.attemptedMove.fromSquare);
         chessManager.put(tempPiece!, toSquare)
       }
@@ -57,16 +57,15 @@ function BattleChessManager() {
     }
   };
 
-  const handleAttemptMove = ({ fromSquare, toSquare, capturedPieceSquare }: MoveAttempt) => {
-    debugger;
+  const handleAttemptMove = ({ fromSquare, toSquare, capturedPieceSquare, promotion }: MoveAttempt) => {
     if (pokemonManager.getPokemonFromSquare(capturedPieceSquare)) {
       setCurrentBattle({
         p1Pokemon: pokemonManager.getPokemonFromSquare(fromSquare)!,
         p2Pokemon: pokemonManager.getPokemonFromSquare(capturedPieceSquare)!,
-        attemptedMove: { fromSquare, toSquare, capturedPieceSquare },
+        attemptedMove: { fromSquare, toSquare, capturedPieceSquare, promotion },
       });
     } else {
-      chessManager.move({ from: fromSquare, to: toSquare });
+      chessManager.move({ from: fromSquare, to: toSquare, promotion });
       pokemonManager.movePokemonToSquare(fromSquare, toSquare);
     }
   }

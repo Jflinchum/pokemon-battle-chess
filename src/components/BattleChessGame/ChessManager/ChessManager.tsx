@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Chess, Square } from 'chess.js';
+import { Chess, PieceSymbol, Square, Move } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 import PokemonDetailsCard from '../PokemonManager/PokemonDetailsCard/PokemonDetailsCard';
 import './ChessManager.css';
 import { MoveAttempt } from './types';
+import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
 
 const turnMapping = {
   'w': 'White',
@@ -24,7 +25,8 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
-  const [pokemonHighVis, setPokemonHighVis] = useState<boolean>(false);
+  const [pokemonHighVis, setPokemonHighVis] = useState(false);
+  const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
 
   useEffect(() => {
     if (currentPokemonBattle) {
@@ -51,13 +53,15 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
     setHighlightedSquare(selectedSquareMoves.map((squareMove) => squareMove.to) as Square[]);
   }
 
-  const movePiece = (fromSquare: Square, toSquare: Square) => {
-    let promotion;
+  const movePiece = (fromSquare: Square, toSquare: Square, promotion?: PieceSymbol) => {
     let capturedPieceSquare;
     const verboseChessMove = getVerboseChessMove(fromSquare, toSquare);
-    if (verboseChessMove?.isPromotion()) {
-      // Handle Pawn Promotion
-
+    if (verboseChessMove?.isPromotion() && !promotion) {
+      // Before attempting the move, ask the player for their pawn promotion choice
+      setRequestedPawnPromotion(verboseChessMove);
+      return;
+    } else if (verboseChessMove?.isPromotion() && promotion) {
+      setRequestedPawnPromotion(null);
     }
     
     if (verboseChessMove?.isEnPassant()) {
@@ -74,11 +78,9 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
-   *  - UI Pawn Promotion
    *  - Keep track of each "unique" piece and it's position on the board
    *    - What would I do about castling? Is there a smart way to keep track of each piece's movement
    *      - Castling is the only chess move that involves moving two pieces at once. Only one edge case
-   *    - Pawn promotion
    */
 
   const handleSquareClick = (square: Square) => {
@@ -86,6 +88,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
     if (currentPokemonBattle) {
       return;
     }
+    setRequestedPawnPromotion(null);
     // If there's no current selected square, or the clicked square isn't a valid move, then set the clicked square to the current selected square
     if (!selectedSquare || !chessManager.moves({ square: selectedSquare, piece: chessManager.get(selectedSquare)?.type, verbose: true }).some((move) => move.to === square)) {
       if (selectedSquare === square) {
@@ -106,6 +109,19 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
       <p>Current Turn: {turnMapping[chessManager.turn()]}</p>
       <p>Move Number: {chessManager.moveNumber()}</p>
       <button onClick={() => setPokemonHighVis(!pokemonHighVis)}>Toggle Higher Visibility</button>
+      {requestedPawnPromotion && (
+        <ChessPawnPromotionChoice
+          color={requestedPawnPromotion.color}
+          onPromotionCancel={() => {
+            setRequestedPawnPromotion(null);
+            setHighlightedSquare([]);
+            setSelectedSquare(null);
+          }}
+          onPromotionChoice={(type) => {
+            movePiece(requestedPawnPromotion.from, requestedPawnPromotion.to, type);
+          }}
+        />
+      )}
       {chessManager.isCheck() && (<p>Check!</p>)}
       {chessManager.isCheckmate() && (<p>Checkmate! Gameover!</p>)}
       <div className='chessGameContainer'>
