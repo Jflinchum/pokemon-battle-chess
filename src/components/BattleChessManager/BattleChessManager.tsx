@@ -15,6 +15,21 @@ export interface CurrentBattle {
 }
 
 function BattleChessManager() {
+  /**
+   * TODO:
+   * - Networking websocket
+   * - Sync pokemon generation seeds
+   * - Draft pokemon onto pieces
+   * - Lobby UI
+   * - Disable support pokemon from team generation
+   * - Room Options
+   *    - Preserve damage after battle
+   *    - Preserve move usage after battle
+   *    - Preserve item usage after battle
+   *    - Draft or Randoms
+   *    - Buff on chess piece attack
+   *    - Weather on random chess spaces
+   */
   const player1Name = 'player 1';
   const player2Name = 'player 2';
   const chessManager = useMemo(() => {
@@ -50,7 +65,9 @@ function BattleChessManager() {
         currentBattle &&
         (<PokemonBattleManager p1Name={player1Name} p2Name={player2Name} p1Pokemon={currentBattle.p1Pokemon.pkmn} p2Pokemon={currentBattle.p2Pokemon.pkmn} onVictory={handleVictory}/>)
       }
-      <ChessManager currentPokemonBattle={currentBattle} chessManager={chessManager} pokemonManager={pokemonManager} onStartBattle={(p1Pokemon, p2Pokemon, attemptedMove) => { setCurrentBattle({ p1Pokemon, p2Pokemon, attemptedMove }) }}/>
+      <div style={{ display: currentBattle ? 'none' : 'block'}}>
+        <ChessManager currentPokemonBattle={currentBattle} chessManager={chessManager} pokemonManager={pokemonManager} onStartBattle={(p1Pokemon, p2Pokemon, attemptedMove) => { setCurrentBattle({ p1Pokemon, p2Pokemon, attemptedMove }) }}/>
+      </div>
     </div>
   )
 }

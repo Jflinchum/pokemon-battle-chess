@@ -18,6 +18,9 @@ interface PokemonBattleManagerProps {
 const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory }: PokemonBattleManagerProps) => {
   /**
    * TODO:
+   * - Split pokemon stream output and process them 1 second at a time
+   * - UI show status on pokemon
+   * - On Hover in battle, show pokemon in depth details
    * - Pokemon Details Card
    */
   const battleStream = useMemo(() => (BattleStreams.getPlayerStreams(new BattleStreams.BattleStream())), []);
@@ -60,10 +63,18 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
         battleState={battleState}
         battleHistory={battleHistory}
         onMoveSelect={(move) => {
-          battleStream.omniscient.write(`>p1 move ${move}`);
+          if (move === 'undo') {
+            battleStream.omniscient.write(`>p1 undo`);
+          } else {
+            battleStream.omniscient.write(`>p1 move ${move}`);
+          }
         }}
         onP2MoveSelect={(move) => {
-          battleStream.omniscient.write(`>p2 move ${move}`);
+          if (move === 'cancel') {
+            battleStream.omniscient.write(`>p2 undo`);
+          } else {
+            battleStream.omniscient.write(`>p2 move ${move}`);
+          }
         }}
       />
     </div>

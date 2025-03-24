@@ -2,3 +2,11 @@
   display: flex;
   flex-direction: row;
 }
+
+.battleMoveContainer {
+  padding: 10px;
+}
+
+.cancelButton {
+  margin-left: 4px;
+}
