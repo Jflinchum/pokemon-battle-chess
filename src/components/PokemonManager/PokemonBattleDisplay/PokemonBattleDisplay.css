@@ -1,0 +1,4 @@
+.battlefieldAndLog {
+  display: flex;
+  flex-direction: row;
+}

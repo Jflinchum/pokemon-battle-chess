@@ -60,6 +60,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
         p1Pokemon={p1Pokemon}
         p2Pokemon={p2Pokemon}
         battleState={battleState}
+        battleHistory={battleHistory}
         onMoveSelect={(move) => {
           battleStream.omniscient.write(`>p1 move ${move}`);
         }}
@@ -67,7 +68,6 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
           battleStream.omniscient.write(`>p2 move ${move}`);
         }}
       />
-      <PokemonBattleLog battleHistory={battleHistory}/>
     </div>
   )
 }

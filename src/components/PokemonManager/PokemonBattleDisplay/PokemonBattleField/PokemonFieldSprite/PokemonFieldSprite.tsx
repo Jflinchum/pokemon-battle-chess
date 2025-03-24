@@ -11,9 +11,9 @@ interface PokemonFieldSpriteProps {
 
 const getHealthBarColor = (maxHp: number, currentHp: number) => {
   const percentage = (currentHp/maxHp) * 100;
-  if (percentage > 60) {
+  if (percentage > 50) {
     return 'green';
-  } else if (percentage > 25) {
+  } else if (percentage > 20) {
     return 'yellow';
   } else {
     return 'red';
