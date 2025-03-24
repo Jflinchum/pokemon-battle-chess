@@ -66,6 +66,6 @@
 }
 
 .p1PokemonSprite {
-  transform: scale(1.5) translateY(25%);
+  transform: scale(1.5);
   z-index: 1;
 }

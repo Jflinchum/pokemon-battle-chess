@@ -1,17 +1,15 @@
 import { useMemo, useState } from 'react';
-import { Chess, Square } from 'chess.js';
+import { Chess } from 'chess.js';
 import { PokemonBattleChessManager, PokemonPiece } from '../PokemonManager/PokemonBattleChessManager';
 import ChessManager from '../ChessManager/ChessManager';
 import PokemonBattleManager from '../PokemonManager/PokemonBattleManager/PokemonBattleManager';
 import './BattleChessManager.css';
+import { MoveAttempt } from '../ChessManager/types';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
   p2Pokemon: PokemonPiece;
-  attemptedMove: {
-    toSquare: Square;
-    fromSquare: Square
-  }
+  attemptedMove: MoveAttempt;
 }
 
 function BattleChessManager() {
@@ -29,6 +27,7 @@ function BattleChessManager() {
    *    - Draft or Randoms
    *    - Buff on chess piece attack
    *    - Weather on random chess spaces
+   *    - Change pokemon on piece promotion
    */
   const player1Name = 'player 1';
   const player2Name = 'player 2';
@@ -58,6 +57,20 @@ function BattleChessManager() {
     }
   };
 
+  const handleAttemptMove = ({ fromSquare, toSquare, capturedPieceSquare }: MoveAttempt) => {
+    debugger;
+    if (pokemonManager.getPokemonFromSquare(capturedPieceSquare)) {
+      setCurrentBattle({
+        p1Pokemon: pokemonManager.getPokemonFromSquare(fromSquare)!,
+        p2Pokemon: pokemonManager.getPokemonFromSquare(capturedPieceSquare)!,
+        attemptedMove: { fromSquare, toSquare, capturedPieceSquare },
+      });
+    } else {
+      chessManager.move({ from: fromSquare, to: toSquare });
+      pokemonManager.movePokemonToSquare(fromSquare, toSquare);
+    }
+  }
+
 
   return (
     <div className='battleChessGameContainer'>
@@ -66,7 +79,7 @@ function BattleChessManager() {
         (<PokemonBattleManager p1Name={player1Name} p2Name={player2Name} p1Pokemon={currentBattle.p1Pokemon.pkmn} p2Pokemon={currentBattle.p2Pokemon.pkmn} onVictory={handleVictory}/>)
       }
       <div style={{ display: currentBattle ? 'none' : 'block'}}>
-        <ChessManager currentPokemonBattle={currentBattle} chessManager={chessManager} pokemonManager={pokemonManager} onStartBattle={(p1Pokemon, p2Pokemon, attemptedMove) => { setCurrentBattle({ p1Pokemon, p2Pokemon, attemptedMove }) }}/>
+        <ChessManager onAttemptMove={handleAttemptMove} currentPokemonBattle={currentBattle} chessManager={chessManager} pokemonManager={pokemonManager} />
       </div>
     </div>
   )
