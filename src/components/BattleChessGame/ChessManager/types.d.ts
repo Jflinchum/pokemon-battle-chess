@@ -8,4 +8,6 @@ export type MoveAttempt = {
   toSquare: Square,
   promotion?: PieceSymbol,
   capturedPieceSquare?: Square,
+  fromCastledRookSquare?: Square,
+  toCastledRookSquare?: Square,
 }

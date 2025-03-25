@@ -45,7 +45,7 @@ function BattleChessManager() {
       if (player1Name === victor) {
         currentBattle.p2Pokemon.square = null;
         chessManager.move({ from: fromSquare, to: toSquare, promotion });
-        pokemonManager.movePokemonToSquare(fromSquare, toSquare);
+        pokemonManager.movePokemonToSquare(fromSquare, toSquare, promotion);
       } else {
         currentBattle.p1Pokemon.square = null; 
         const tempPiece = chessManager.get(toSquare);
@@ -57,7 +57,7 @@ function BattleChessManager() {
     }
   };
 
-  const handleAttemptMove = ({ fromSquare, toSquare, capturedPieceSquare, promotion }: MoveAttempt) => {
+  const handleAttemptMove = ({ fromSquare, toSquare, capturedPieceSquare, promotion, fromCastledRookSquare, toCastledRookSquare }: MoveAttempt) => {
     if (pokemonManager.getPokemonFromSquare(capturedPieceSquare)) {
       setCurrentBattle({
         p1Pokemon: pokemonManager.getPokemonFromSquare(fromSquare)!,
@@ -67,6 +67,10 @@ function BattleChessManager() {
     } else {
       chessManager.move({ from: fromSquare, to: toSquare, promotion });
       pokemonManager.movePokemonToSquare(fromSquare, toSquare);
+    }
+
+    if (fromCastledRookSquare && toCastledRookSquare) {
+      pokemonManager.movePokemonToSquare(fromCastledRookSquare, toCastledRookSquare);
     }
   }
 

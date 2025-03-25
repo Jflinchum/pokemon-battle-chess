@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Chess, PieceSymbol, Square, Move } from 'chess.js';
+import { Chess, Square, Move } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
@@ -8,6 +8,7 @@ import './ChessManager.css';
 import { MoveAttempt } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
 import TakenChessPieces from './TakenChessPieces/TakenChessPieces';
+import { getCastledRookSquare } from './util';
 
 const turnMapping = {
   'w': 'White',
@@ -30,9 +31,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
   const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
 
   useEffect(() => {
-    if (currentPokemonBattle) {
-      // UI on Chess board indicating current battle
-    } else {
+    if (!currentPokemonBattle) {
       setBoard(chessManager.board());
       setHighlightedSquare([]);
       setSelectedSquare(null);
@@ -54,35 +53,43 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
     setHighlightedSquare(selectedSquareMoves.map((squareMove) => squareMove.to) as Square[]);
   }
 
-  const movePiece = (fromSquare: Square, toSquare: Square, promotion?: PieceSymbol) => {
+  const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
     let capturedPieceSquare;
+    let castledRookSquare;
     const verboseChessMove = getVerboseChessMove(fromSquare, toSquare);
+    // Before attempting the move, ask the player for their pawn promotion choice
     if (verboseChessMove?.isPromotion() && !promotion) {
-      // Before attempting the move, ask the player for their pawn promotion choice
       setRequestedPawnPromotion(verboseChessMove);
       return;
-    } else if (verboseChessMove?.isPromotion() && promotion) {
-      setRequestedPawnPromotion(null);
     }
-    
+        
     if (verboseChessMove?.isEnPassant()) {
       capturedPieceSquare = `${verboseChessMove.to[0] + (parseInt(verboseChessMove.to[1]) + (verboseChessMove.color === 'w' ? -1 : 1))}` as Square;
     } else if (verboseChessMove?.isCapture()) {
       capturedPieceSquare = toSquare;  
     }
-    onAttemptMove({ fromSquare, toSquare, promotion, capturedPieceSquare });
+
+    if (verboseChessMove?.isKingsideCastle() || verboseChessMove?.isQueensideCastle()) {
+      debugger;
+      castledRookSquare = getCastledRookSquare(verboseChessMove.color, verboseChessMove?.isKingsideCastle());
+    }
+    onAttemptMove({
+      fromSquare,
+      toSquare,
+      promotion,
+      capturedPieceSquare,
+      fromCastledRookSquare: castledRookSquare?.from,
+      toCastledRookSquare: castledRookSquare?.to
+    });
     setBoard(chessManager.board());
     setHighlightedSquare([]);
     setSelectedSquare(null);
+    setRequestedPawnPromotion(null);
   }
 
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
-   *  - Show pieces taken with pokemon sprites
-   *  - Keep track of each "unique" piece and it's position on the board
-   *    - What would I do about castling? Is there a smart way to keep track of each piece's movement
-   *      - Castling is the only chess move that involves moving two pieces at once. Only one edge case
    */
 
   const handleSquareClick = (square: Square) => {
@@ -102,7 +109,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
       }
     } else {
       // Employ the move that the current player is trying to do
-      movePiece(selectedSquare, square);
+      movePiece({ fromSquare: selectedSquare, toSquare: square });
     }
   };
 
@@ -120,7 +127,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
             setSelectedSquare(null);
           }}
           onPromotionChoice={(type) => {
-            movePiece(requestedPawnPromotion.from, requestedPawnPromotion.to, type);
+            movePiece({ fromSquare: requestedPawnPromotion.from, toSquare: requestedPawnPromotion.to, promotion: type });
           }}
         />
       )}
