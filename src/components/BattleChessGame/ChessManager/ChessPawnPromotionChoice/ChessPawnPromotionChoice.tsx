@@ -1,6 +1,6 @@
 import { Color, PieceSymbol } from "chess.js";
 import { allPieceTypes } from "../constants";
-import ChessPieceSprite from "../ChessBoard/ChessPieceSprite";
+import ChessPieceSprite from "../ChessBoard/ChessPieceSprite/ChessPieceSprite";
 import './ChessPawnPromotionChoice.css'
 
 interface ChessPawnPromotionChoiceProps {

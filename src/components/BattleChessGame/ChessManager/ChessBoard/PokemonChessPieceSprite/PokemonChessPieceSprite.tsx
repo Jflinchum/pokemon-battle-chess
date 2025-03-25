@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ChessPieceSprite from "../ChessPieceSprite";
+import ChessPieceSprite from "../ChessPieceSprite/ChessPieceSprite";
 import { Sprites } from "@pkmn/img";
 import { GenderName } from "@pkmn/data";
 import { Color, PieceSymbol } from "chess.js";

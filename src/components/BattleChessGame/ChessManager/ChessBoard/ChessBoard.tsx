@@ -1,7 +1,7 @@
 import { Square } from 'chess.js';
 import { ChessBoardSquare } from '../types';
 import { getSquareColor, getSquareFromIndices } from '../util';
-import ChessSquare from './ChessSquare';
+import ChessSquare from './ChessSquare/ChessSquare';
 import './ChessBoard.css';
 import { PokemonBattleChessManager } from '../../PokemonManager/PokemonBattleChessManager';
 

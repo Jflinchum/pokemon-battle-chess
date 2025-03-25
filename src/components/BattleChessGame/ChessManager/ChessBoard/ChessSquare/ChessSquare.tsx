@@ -1,6 +1,6 @@
 import { PokemonSet } from '@pkmn/data';
-import { ChessBoardSquare } from '../types';
-import PokemonChessPieceSprite from './PokemonChessPieceSprite/PokemonChessPieceSprite';
+import { ChessBoardSquare } from '../../types';
+import PokemonChessPieceSprite from '../PokemonChessPieceSprite/PokemonChessPieceSprite';
 
 interface ChessSquareProps {
   square: ChessBoardSquare
