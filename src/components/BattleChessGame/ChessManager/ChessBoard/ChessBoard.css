@@ -2,12 +2,6 @@
   display: flex;
 }
 
-.chessSquare {
-  width: 70px;
-  height: 70px;
-  position: relative;
-}
-
 .chessPiece {
   width: 70px;
   height: 70px;
@@ -21,20 +15,4 @@
   left: 50%;
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
-}
-
-.whiteChessSquare {
-  background-color: white;
-}
-
-.blackChessSquare {
-  background-color: black;
-}
-
-.highlighted {
-  background-color: red;
-}
-
-.selected {
-  background-color: blue;
 }

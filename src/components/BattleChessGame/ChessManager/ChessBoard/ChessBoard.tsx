@@ -25,7 +25,7 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
             boardRow.map((boardSquare, columnIndex) => (
               <ChessSquare
                 key={columnIndex}
-                square={boardSquare}
+                square={{...boardSquare, square: getSquareFromIndices(rowIndex, columnIndex)} as ChessBoardSquare}
                 backgroundColor={getSquareColor(rowIndex, columnIndex)}
                 onClick={(square) => {
                   onSquareClick(square?.square || getSquareFromIndices(rowIndex, columnIndex));

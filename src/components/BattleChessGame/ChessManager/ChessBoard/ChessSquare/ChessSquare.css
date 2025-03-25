@@ -1,0 +1,37 @@
+.chessSquare {
+  width: 70px;
+  height: 70px;
+  position: relative;
+}
+
+.whiteChessSquare {
+  color: black;
+  background-color: white;
+}
+
+.blackChessSquare {
+  color: white;
+  background-color: black;
+}
+
+.highlighted {
+  background-color: red;
+}
+
+.selected {
+  background-color: blue;
+}
+
+.squareText {
+  position: absolute;
+}
+
+.squareNum {
+  top: 0;
+  left: 3px;
+}
+
+.squareChar {
+  bottom: 0;
+  right: 3px;
+}
