@@ -1,6 +1,8 @@
 .chessSquare {
-  width: 70px;
-  height: 70px;
+  width: 7vw;
+  height: 7vw;
+  max-width: 100px;
+  max-height: 100px;
   position: relative;
 }
 

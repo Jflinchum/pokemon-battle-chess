@@ -70,7 +70,6 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
     }
 
     if (verboseChessMove?.isKingsideCastle() || verboseChessMove?.isQueensideCastle()) {
-      debugger;
       castledRookSquare = getCastledRookSquare(verboseChessMove.color, verboseChessMove?.isKingsideCastle());
     }
     onAttemptMove({

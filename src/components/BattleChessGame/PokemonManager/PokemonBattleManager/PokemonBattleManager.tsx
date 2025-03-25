@@ -37,6 +37,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
    * - UI show status on pokemon
    * - On Hover in battle, show pokemon in depth details
    * - Pokemon Details Card
+   * - Choice items disabling move changing
    */
   const battleStream = useMemo(() => (BattleStreams.getPlayerStreams(new BattleStreams.BattleStream())), []);
   const battle = useMemo(() => (new Battle(new Generations(Dex))), []);

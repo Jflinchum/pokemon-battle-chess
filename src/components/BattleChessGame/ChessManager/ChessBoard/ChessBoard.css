@@ -1,18 +1,3 @@
 .chessRow {
   display: flex;
 }
-
-.chessPiece {
-  width: 70px;
-  height: 70px;
-  position: absolute;
-}
-
-.pokemonPieceSprite {
-  max-width: 70px;
-  max-height: 70px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
-}
