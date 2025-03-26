@@ -6,13 +6,15 @@ export default class GameRoom {
   public roomId: string;
   public roomSeed: string;
   public roomPasscode: string;
-  public hostPlayer: User | null;
-  public clientPlayer: User | null;
+  public hostPlayer: User | null = null;
+  public clientPlayer: User | null = null;
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
 
   public whitePlayer: User;
   public blackPlayer: User;
+
+  public currentTurnWhite: boolean = true;
 
   constructor(roomId: string, hostPlayer: User) {
     this.roomId = roomId;
@@ -59,6 +61,14 @@ export default class GameRoom {
 
       this.whitePlayer.socket.emit('startGame', { color: 'w', seed: this.roomSeed, player1Name: this.whitePlayer.playerName, player2Name: this.blackPlayer.playerName });
       this.blackPlayer.socket.emit('startGame', { color: 'b', seed: this.roomSeed, player1Name: this.blackPlayer.playerName, player2Name: this.whitePlayer.playerName });
+    }
+  }
+
+  public validateAndEmitMove({ fromSquare, toSquare, promotion, playerId }) {
+    if ((this.currentTurnWhite && this.whitePlayer.playerId === playerId) || (!this.currentTurnWhite && this.blackPlayer.playerId === playerId)) {
+      this.currentTurnWhite = !this.currentTurnWhite;
+      this.whitePlayer.socket.emit('startChessMove', { fromSquare, toSquare, promotion });
+      this.blackPlayer.socket.emit('startChessMove', { fromSquare, toSquare, promotion });
     }
   }
 }

@@ -15,12 +15,11 @@ export interface CurrentBattle {
 }
 
 function BattleChessManager() {
-  const { userState, dispatch } = useUserState();
+  const { dispatch } = useUserState();
   const { gameState } = useGameState();
   /**
    * TODO:
    * - Networking websocket
-   * - Sync pokemon generation seeds
    * - Draft pokemon onto pieces
    * - Lobby UI
    * - Disable support pokemon from team generation

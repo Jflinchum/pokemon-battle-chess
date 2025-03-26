@@ -63,15 +63,16 @@ app.post<Empty, APIResponse<Partial<GameRoom>>, User>('/api/createRoom', (req, r
 app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User['playerId'], playerName: User['playerName'] }>('/api/joinRoom', (req, res) => {
   const roomId = req.body.roomId;
   const playerId = req.body.playerId;
-  const playerName = req.body.playerId;
+  const playerName = req.body.playerName;
   if (!roomId || !playerId || !playerName) {
-    res.status(400).send();
+    res.status(400).send({ message: 'Missing parameters' });
     return;
   } else if (!gameRoomManager.getRoom(roomId)) {
     res.status(400).send({ message: 'Room is no longer available' });
     return;
   } else if (gameRoomManager.getRoom(roomId).clientPlayer) {
     res.status(400).send({ message: 'Room is full' });
+    return;
   }
   const room = gameRoomManager.getRoom(roomId);
 
@@ -146,4 +147,13 @@ io.on('connection', (socket) => {
 
     room.startGame();
   });
+
+  socket.on('requestChessMove', ({ fromSquare, toSquare, promotion, roomId, playerId }) => {
+    const room = gameRoomManager.getRoom(roomId);
+    if (!room || !playerId) {
+      return socket.disconnect();
+    }
+
+    room.validateAndEmitMove({ fromSquare, toSquare, promotion, playerId });
+  })
 });
