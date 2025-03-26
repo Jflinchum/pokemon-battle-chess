@@ -7,6 +7,7 @@ import './BattleChessManager.css';
 import { MoveAttempt } from '../ChessManager/types';
 import { useUserState } from '../../../context/UserStateContext';
 import { useGameState } from '../../../context/GameStateContext';
+import { getVerboseChessMove } from '../ChessManager/util';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
@@ -45,12 +46,17 @@ function BattleChessManager() {
   const handleVictory = (victor: string) => {
     if (currentBattle) {
       const { fromSquare, toSquare, promotion } = currentBattle.attemptedMove;
-      if (player1Name === victor) {
-        currentBattle.p2Pokemon.square = null;
+
+      // TODO: Better logic handling this
+      const moveSucceeds = getVerboseChessMove(fromSquare, toSquare, chessManager)?.color === gameState.gameSettings?.color ?
+        player1Name === victor :
+        player2Name === victor;
+      if (moveSucceeds) {
+        pokemonManager.getPokemonFromSquare(toSquare)!.square = null;
         chessManager.move({ from: fromSquare, to: toSquare, promotion });
         pokemonManager.movePokemonToSquare(fromSquare, toSquare, promotion);
       } else {
-        currentBattle.p1Pokemon.square = null; 
+        pokemonManager.getPokemonFromSquare(fromSquare)!.square = null;
         const tempPiece = chessManager.get(toSquare);
         chessManager.move({ from: fromSquare, to: toSquare, promotion });
         chessManager.remove(currentBattle.attemptedMove.fromSquare);
@@ -63,8 +69,8 @@ function BattleChessManager() {
   const handleAttemptMove = ({ fromSquare, toSquare, capturedPieceSquare, promotion, fromCastledRookSquare, toCastledRookSquare }: MoveAttempt) => {
     if (pokemonManager.getPokemonFromSquare(capturedPieceSquare)) {
       setCurrentBattle({
-        p1Pokemon: pokemonManager.getPokemonFromSquare(fromSquare)!,
-        p2Pokemon: pokemonManager.getPokemonFromSquare(capturedPieceSquare)!,
+        p1Pokemon: pokemonManager.getPlayer1PokemonFromMoveAndColor(fromSquare, toSquare, gameState.gameSettings?.color)!,
+        p2Pokemon: pokemonManager.getPlayer2PokemonFromMoveAndColor(fromSquare, toSquare, gameState.gameSettings?.color)!,
         attemptedMove: { fromSquare, toSquare, capturedPieceSquare, promotion },
       });
     } else {

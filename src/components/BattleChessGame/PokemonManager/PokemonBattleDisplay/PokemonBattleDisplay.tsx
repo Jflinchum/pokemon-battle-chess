@@ -9,22 +9,18 @@ import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
 
 interface PokemonBattleDisplayProps {
   p1Pokemon: PokemonSet,
-  p2Pokemon: PokemonSet,
   battleState: Battle | null,
   parsedBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[],
   onMoveSelect: (move: string) => void,
-  onP2MoveSelect: (move: string) => void,
 }
 
 
-const PokemonBattleDisplay = ({ p1Pokemon, p2Pokemon, battleState, parsedBattleLog, onMoveSelect, onP2MoveSelect }: PokemonBattleDisplayProps) => {
+const PokemonBattleDisplay = ({ p1Pokemon, battleState, parsedBattleLog, onMoveSelect }: PokemonBattleDisplayProps) => {
   const [moveChosen, setMoveChosen] = useState<string>();
-  const [moveP2Chosen, setP2MoveChosen] = useState<string>();
 
   useEffect(() => {
     // TODO: Better handling for clearing move selection
     setMoveChosen(undefined);
-    setP2MoveChosen(undefined);
   }, [parsedBattleLog]);
 
   return (
@@ -36,7 +32,7 @@ const PokemonBattleDisplay = ({ p1Pokemon, p2Pokemon, battleState, parsedBattleL
             <PokemonBattleLog battleHistory={parsedBattleLog}/>
           </div>
           <div className='battleMoveContainer'>
-            <p>Player 1 Moves</p>
+            <p>Moves</p>
             {moveChosen ? (
               <div>
                 Waiting for opponent...
@@ -51,23 +47,6 @@ const PokemonBattleDisplay = ({ p1Pokemon, p2Pokemon, battleState, parsedBattleL
               <PokemonMoveChoices moves={p1Pokemon.moves} onMoveSelect={(move) => {
                 setMoveChosen(move);
                 onMoveSelect(move);
-              }}/>
-            )}
-            <p>Player 2 Moves</p>
-            {moveP2Chosen ? (
-              <div>
-                Waiting for opponent...
-                <button className='cancelButton' onClick={() => {
-                  setP2MoveChosen(undefined);
-                  onP2MoveSelect('undo');
-                }}>
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <PokemonMoveChoices moves={p2Pokemon.moves} onMoveSelect={(move) => {
-                setP2MoveChosen(move);
-                onP2MoveSelect(move);
               }}/>
             )}
           </div>

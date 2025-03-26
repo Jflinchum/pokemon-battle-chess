@@ -13,8 +13,9 @@ export default class GameRoom {
 
   public whitePlayer: User;
   public blackPlayer: User;
-
   public currentTurnWhite: boolean = true;
+  public whitePlayerPokemonMove: string | null = null;
+  public blackPlayerPokemonMove: string | null = null;
 
   constructor(roomId: string, hostPlayer: User) {
     this.roomId = roomId;
@@ -64,11 +65,57 @@ export default class GameRoom {
     }
   }
 
-  public validateAndEmitMove({ fromSquare, toSquare, promotion, playerId }) {
+  public validateAndEmitChessMove({ fromSquare, toSquare, promotion, playerId }) {
     if ((this.currentTurnWhite && this.whitePlayer.playerId === playerId) || (!this.currentTurnWhite && this.blackPlayer.playerId === playerId)) {
       this.currentTurnWhite = !this.currentTurnWhite;
       this.whitePlayer.socket.emit('startChessMove', { fromSquare, toSquare, promotion });
       this.blackPlayer.socket.emit('startChessMove', { fromSquare, toSquare, promotion });
+    }
+  }
+
+  public validateAndEmitePokemonMove({ pokemonMove, playerId }) {
+    const isUndo = pokemonMove === 'undo'
+    if (playerId === this.whitePlayer.playerId) {
+      if (isUndo) {
+        this.whitePlayerPokemonMove = null;
+      } else {
+        this.whitePlayerPokemonMove = pokemonMove;
+      }
+    } else if (playerId === this.blackPlayer.playerId) {
+      if (isUndo) {
+        this.blackPlayerPokemonMove = null;
+      } else {
+        this.blackPlayerPokemonMove = pokemonMove;
+      }
+    }
+
+    if (this.whitePlayerPokemonMove && this.blackPlayerPokemonMove) {
+      this.whitePlayer.socket.emit('startPokemonMove',
+        {
+          move: `>p1 move ${this.whitePlayerPokemonMove}`,
+          playerId: this.whitePlayer.playerId
+        }
+      );
+      this.whitePlayer.socket.emit('startPokemonMove',
+        {
+          move: `>p2 move ${this.blackPlayerPokemonMove}`,
+          playerId: this.whitePlayer.playerId
+        }
+      );
+      this.blackPlayer.socket.emit('startPokemonMove',
+        {
+          move: `>p1 move ${this.blackPlayerPokemonMove}`,
+          playerId: this.blackPlayer.playerId
+        }
+      );
+      this.blackPlayer.socket.emit('startPokemonMove',
+        {
+          move: `>p2 move ${this.whitePlayerPokemonMove}`,
+          playerId: this.blackPlayer.playerId
+        }
+      );
+      this.whitePlayerPokemonMove = null;
+      this.blackPlayerPokemonMove = null;
     }
   }
 }

@@ -154,6 +154,15 @@ io.on('connection', (socket) => {
       return socket.disconnect();
     }
 
-    room.validateAndEmitMove({ fromSquare, toSquare, promotion, playerId });
-  })
+    room.validateAndEmitChessMove({ fromSquare, toSquare, promotion, playerId });
+  });
+
+  socket.on('requestPokemonMove', ({ pokemonMove, roomId, playerId }) => {
+    const room = gameRoomManager.getRoom(roomId);
+    if (!room || !playerId) {
+      return socket.disconnect();
+    }
+
+    room.validateAndEmitePokemonMove({ pokemonMove, playerId });
+  });
 });

@@ -8,7 +8,7 @@ import './ChessManager.css';
 import { MoveAttempt } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
 import TakenChessPieces from './TakenChessPieces/TakenChessPieces';
-import { getCastledRookSquare } from './util';
+import { getCastledRookSquare, getVerboseChessMove } from './util';
 import { useGameState } from '../../../context/GameStateContext';
 import { socket } from '../../../socket';
 import { useUserState } from '../../../context/UserStateContext';
@@ -40,7 +40,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
     socket.on('startChessMove', ({ fromSquare, toSquare, promotion }) => {
       let capturedPieceSquare;
       let castledRookSquare;
-      const verboseChessMove = getVerboseChessMove(fromSquare, toSquare);
+      const verboseChessMove = getVerboseChessMove(fromSquare, toSquare, chessManager);
 
       if (verboseChessMove?.isEnPassant()) {
         capturedPieceSquare = `${verboseChessMove.to[0] + (parseInt(verboseChessMove.to[1]) + (verboseChessMove.color === 'w' ? -1 : 1))}` as Square;
@@ -78,10 +78,6 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
     }
   }, [currentPokemonBattle]);
 
-  const getVerboseChessMove = (fromSquare: Square, toSquare: Square) => {
-    return chessManager.moves({ square: fromSquare, piece: chessManager.get(fromSquare)?.type, verbose: true }).find((move) => move.to === toSquare);
-  }
-
   const cancelSelection = () => {
     setSelectedSquare(null);
     setHighlightedSquare([]);
@@ -94,7 +90,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
   }
 
   const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
-    const verboseChessMove = getVerboseChessMove(fromSquare, toSquare);
+    const verboseChessMove = getVerboseChessMove(fromSquare, toSquare, chessManager);
     // Before attempting the move, ask the player for their pawn promotion choice
     if (verboseChessMove?.isPromotion() && !promotion) {
       setRequestedPawnPromotion(verboseChessMove);
@@ -125,7 +121,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
       }
     } else {
       // Employ the move that the current player is trying to do
-      if (getVerboseChessMove(selectedSquare, square)?.color === color) {
+      if (getVerboseChessMove(selectedSquare, square, chessManager)?.color === color) {
         movePiece({ fromSquare: selectedSquare, toSquare: square });
       }
     }

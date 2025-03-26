@@ -6,6 +6,9 @@ import { ArgType, BattleArgsKWArgType, Protocol } from '@pkmn/protocol';
 import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
 import './PokemonBattleManager.css';
+import { socket } from '../../../../socket';
+import { useUserState } from '../../../../context/UserStateContext';
+import { useGameState } from '../../../../context/GameStateContext';
 
 interface PokemonBattleManagerProps {
   p1Name: string,
@@ -39,9 +42,11 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
    * - Pokemon Details Card
    * - Choice items disabling move changing
    */
+  const { userState } = useUserState();
+  const { gameState } = useGameState();
   const battleStream = useMemo(() => (BattleStreams.getPlayerStreams(new BattleStreams.BattleStream())), []);
   const battle = useMemo(() => (new Battle(new Generations(Dex))), []);
-  const spec = { formatid: 'gen9customgame' };
+  const spec = { formatid: 'gen9customgame', seed: gameState.gameSettings!.seed };
   const p1spec = { name: p1Name, team: Teams.pack([p1Pokemon]) };
   const p2spec = { name: p2Name, team: Teams.pack([p2Pokemon]) };
 
@@ -86,28 +91,25 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
     battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2spec)}`);
     battleStream.omniscient.write(`>p1 team 1`);
     battleStream.omniscient.write(`>p2 team 1`);
-  }, [])
+
+    socket.on('startPokemonMove', ({ move, playerId }) => {
+      if (playerId === userState.id) {
+        battleStream.omniscient.write(move);
+      }
+    });
+    return () => {
+      socket.off('startPokemonMove');
+    };
+  }, []);
 
   return (
     <div className='pokemonBattleManagerContainer'>
       <PokemonBattleDisplay
         p1Pokemon={p1Pokemon}
-        p2Pokemon={p2Pokemon}
         battleState={battle}
         parsedBattleLog={delayedBattleLog}
         onMoveSelect={(move) => {
-          if (move === 'undo') {
-            battleStream.omniscient.write(`>p1 undo`);
-          } else {
-            battleStream.omniscient.write(`>p1 move ${move}`);
-          }
-        }}
-        onP2MoveSelect={(move) => {
-          if (move === 'cancel') {
-            battleStream.omniscient.write(`>p2 undo`);
-          } else {
-            battleStream.omniscient.write(`>p2 move ${move}`);
-          }
+          socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
         }}
       />
     </div>
