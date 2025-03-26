@@ -6,6 +6,7 @@ import PokemonBattleManager from '../PokemonManager/PokemonBattleManager/Pokemon
 import './BattleChessManager.css';
 import { MoveAttempt } from '../ChessManager/types';
 import { useUserState } from '../../../context/UserStateContext';
+import { useGameState } from '../../../context/GameStateContext';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
@@ -14,7 +15,8 @@ export interface CurrentBattle {
 }
 
 function BattleChessManager() {
-  const { dispatch } = useUserState();
+  const { userState, dispatch } = useUserState();
+  const { gameState } = useGameState();
   /**
    * TODO:
    * - Networking websocket
@@ -31,13 +33,13 @@ function BattleChessManager() {
    *    - Weather on random chess spaces
    *    - Change pokemon on piece promotion
    */
-  const player1Name = 'player 1';
-  const player2Name = 'player 2';
+  const player1Name = gameState.gameSettings!.player1Name;
+  const player2Name = gameState.gameSettings!.player2Name;
   const chessManager = useMemo(() => {
     return new Chess();
   }, []);
   const pokemonManager = useMemo(() => {
-    return new PokemonBattleChessManager(chessManager.board());
+    return new PokemonBattleChessManager(chessManager.board(), gameState.gameSettings!.seed);
   }, []);
 
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(null);

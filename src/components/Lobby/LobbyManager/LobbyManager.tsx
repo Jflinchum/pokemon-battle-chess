@@ -4,15 +4,18 @@ import MenuOptions from "../MenuOptions/MenuOptions";
 import CreateLobbyForm from "../CreateLobbyForm/CreateLobbyForm";
 import { useUserState } from "../../../context/UserStateContext";
 import { createNewRoom, getAvailableRooms } from "../../../service/lobby";
+import { useGameState } from "../../../context/GameStateContext";
 
 const LobbyManager = () => {
   const [creatingRoom, setCreatingRoom] = useState(false);
   const [availableRooms, setAvailableRooms] = useState([]);
   const { userState, dispatch } = useUserState();
+  const { dispatch: dispatchGameState } = useGameState();
 
   const handleCreateLobby = async () => {
     const roomId = await createNewRoom(userState.id, userState.name);
     dispatch({ type: 'SET_ROOM', payload: roomId });
+    dispatchGameState({ type: 'CREATE_ROOM' });
   };
 
   const handleRefreshRoom = () => {
@@ -29,6 +32,8 @@ const LobbyManager = () => {
       setAvailableRooms(rooms);
     }
     fetchRooms();
+    // Whenever we're back at the lobby, reset the room to a clean slate
+    dispatchGameState({ type: 'RESET_ROOM' });
   }, []);
 
   return (

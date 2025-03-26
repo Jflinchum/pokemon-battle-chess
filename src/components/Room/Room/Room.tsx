@@ -6,7 +6,7 @@ import './Room.css';
 
 const Room = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
-  const { dispatch } = useGameState();
+  const { gameState, dispatch } = useGameState();
 
   const [connectedPlayers, setConnectedPlayers] = useState([userState.name]);
 
@@ -26,6 +26,10 @@ const Room = () => {
       setConnectedPlayers((curr) => curr.filter((name) => name !== playerName));
     });
 
+    socket.on('startGame', (gameOptions) => {
+      dispatch({ type: 'START_MATCH', payload: gameOptions });
+    });
+
     return () => {
       socket.off('connect');
       socket.off('disconnect');
@@ -33,8 +37,9 @@ const Room = () => {
   }, []);
 
   const handleStartGame = () => {
-    dispatch({ type: 'START_MATCH' });
+    socket.emit('requestStartGame', userState.currentRoomId, userState.id);
   }
+
   const handleLeaveGame = () => {
     dispatchUserState({ type: 'LEAVE_ROOM' });
   }
@@ -56,7 +61,7 @@ const Room = () => {
         </ul>
       </div>
 
-      <button onClick={handleStartGame}>Start Game</button>
+      <button onClick={handleStartGame} disabled={!gameState.isHost || connectedPlayers.length < 2}>Start Game</button>
       <button onClick={handleLeaveGame}>Leave Game</button>
     </div>
   );

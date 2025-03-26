@@ -56,7 +56,7 @@ app.post<Empty, APIResponse<Partial<GameRoom>>, User>('/api/createRoom', (req, r
   gameRoomManager.addRoom(newRoomId, gameRoom);
 
   res.status(200).send({
-    data: { roomId: newRoomId, roomSeed: gameRoom.getSeed() },
+    data: { roomId: newRoomId },
   });
 });
 
@@ -134,5 +134,16 @@ io.on('connection', (socket) => {
     socket.join(room.roomId)
     io.to(roomId).emit('connectedPlayers', room.getPlayerNames());
     console.log(`Player ${playerId} joined room ${roomId}`);
+  });
+
+  socket.on('requestStartGame', (roomId, playerId) => {
+    const room = gameRoomManager.getRoom(roomId);
+
+    if (!room || room.hostPlayer?.playerId !== playerId) {
+      socket.disconnect();
+      return;
+    }
+
+    room.startGame();
   });
 });

@@ -2,6 +2,7 @@ import { ChessBoardSquare } from "../ChessManager/types";
 import { PieceSymbol, Color, Square } from "chess.js";
 import { TeamGenerators } from '@pkmn/randoms';
 import { PokemonSet } from "@pkmn/data";
+import { PRNGSeed } from '@pkmn/sim'
 
 export interface PokemonPiece {
   type: PieceSymbol
@@ -18,8 +19,8 @@ export interface PokemonBattle {
 
 export class PokemonBattleChessManager {
   private _chessPieces: PokemonPiece[] = [];
-  constructor(board: ChessBoardSquare[][]) {
-    const generator = TeamGenerators.getTeamGenerator('gen9randombattle');
+  constructor(board: ChessBoardSquare[][], seed: PRNGSeed) {
+    const generator = TeamGenerators.getTeamGenerator('gen9randombattle', seed);
     for (let row = 0; row < board.length; row++) {
       for (let col = 0; col < board[row].length; col++) {
         const sq = board[row][col];
