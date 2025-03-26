@@ -1,12 +1,17 @@
 import { useState } from "react";
+import { useUserState } from "../../../context/UserStateContext";
 
 interface MenuOptionProps {
   onCreateRoom: () => void;
-  onChangeName: (name: string) => void;
 }
 
-const MenuOptions = ({ onCreateRoom, onChangeName }: MenuOptionProps) => {
-  const [name, setName] = useState('');
+const MenuOptions = ({ onCreateRoom }: MenuOptionProps) => {
+  const { userState, dispatch } = useUserState();
+  const [name, setName] = useState(userState.name);
+
+  const handleChangeName = (name: string) => {
+    dispatch({ type: 'SET_NAME', payload: name });
+  }
 
   return (
     <ul>
@@ -14,8 +19,8 @@ const MenuOptions = ({ onCreateRoom, onChangeName }: MenuOptionProps) => {
         <button onClick={onCreateRoom}>Create New Room</button>
       </li>
       <li>
-        <button onClick={() => onChangeName(name)}>Change Name</button>
-        <input onChange={(e) => setName(e.target.value)} />
+        <button onClick={() => handleChangeName(name)}>Change Name</button>
+        <input value={name} onChange={(e) => setName(e.target.value)} />
       </li>
     </ul>
   );

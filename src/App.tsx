@@ -1,20 +1,14 @@
-import { useState } from 'react'
-import BattleChessManager from './components/BattleChessGame/BattleChessManager/BattleChessManager'
-import LobbyManager from './components/Lobby/LobbyManager/LobbyManager'
+import UserStateProvider from './context/UserStateContext'
+import GameStateProvider from './context/GameStateContext'
+import MainMenu from './components/MainMenu/MainMenu';
 
 function App() {
-  const [inGame, setInGame] = useState(true);
-  
   return (
-    <div>
-      {
-        inGame ? (
-          <BattleChessManager />
-        ) : (
-          <LobbyManager onStartGame={() => setInGame(true)} />
-        )
-      }
-    </div>
+    <UserStateProvider>
+      <GameStateProvider>
+        <MainMenu />
+      </GameStateProvider>
+    </UserStateProvider>
   )
 }
 

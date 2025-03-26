@@ -18,7 +18,7 @@ const CreateLobbyForm = ({ handleCreateLobby, handleCancelLobbyCreation }: Creat
     <form onSubmit={handleSubmit}>
       <div>
         <span>Room Password: </span>
-        <input type={`${showPassword ? 'text' : 'password'}`} onChange={(e) => setRoomPassword(e.target.value)} />
+        <input value={roomPassword} type={`${showPassword ? 'text' : 'password'}`} onChange={(e) => setRoomPassword(e.target.value)} />
         <button onMouseLeave={() => setShowPassword(false)} onMouseUp={() => setShowPassword(false)} onMouseDown={() => setShowPassword(true)}>Show Password</button>
       </div>
       <div>

@@ -5,6 +5,7 @@ import ChessManager from '../ChessManager/ChessManager';
 import PokemonBattleManager from '../PokemonManager/PokemonBattleManager/PokemonBattleManager';
 import './BattleChessManager.css';
 import { MoveAttempt } from '../ChessManager/types';
+import { useUserState } from '../../../context/UserStateContext';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
@@ -13,6 +14,7 @@ export interface CurrentBattle {
 }
 
 function BattleChessManager() {
+  const { dispatch } = useUserState();
   /**
    * TODO:
    * - Networking websocket
@@ -74,6 +76,9 @@ function BattleChessManager() {
     }
   }
 
+  const handleLeaveRoom = () => {
+    dispatch({ type: 'LEAVE_ROOM' });
+  };
 
   return (
     <div className='battleChessGameContainer'>
@@ -84,6 +89,7 @@ function BattleChessManager() {
       <div style={{ display: currentBattle ? 'none' : 'block'}}>
         <ChessManager onAttemptMove={handleAttemptMove} currentPokemonBattle={currentBattle} chessManager={chessManager} pokemonManager={pokemonManager} />
       </div>
+      <button onClick={() => handleLeaveRoom()}>Leave Room</button>
     </div>
   )
 }

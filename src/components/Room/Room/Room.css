@@ -1,0 +1,5 @@
+
+.roomContainer {
+  display: flex;
+  flex-direction: column;
+}
