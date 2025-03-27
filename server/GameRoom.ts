@@ -5,7 +5,7 @@ import { PRNG, PRNGSeed } from '@pkmn/sim'
 export default class GameRoom {
   public roomId: string;
   public roomSeed: string;
-  public roomPasscode: string;
+  public password: string;
   public hostPlayer: User | null = null;
   public clientPlayer: User | null = null;
   public roomGameOptions: GameOptions;
@@ -17,11 +17,12 @@ export default class GameRoom {
   public whitePlayerPokemonMove: string | null = null;
   public blackPlayerPokemonMove: string | null = null;
 
-  constructor(roomId: string, hostPlayer: User) {
+  constructor(roomId: string, hostPlayer: User, password: string) {
     this.roomId = roomId;
     this.hostPlayer = hostPlayer;
     this.roomSeed = PRNG.generateSeed();
     this.isOngoing = false;
+    this.password = password;
   }
 
   public joinRoom(player: User) {

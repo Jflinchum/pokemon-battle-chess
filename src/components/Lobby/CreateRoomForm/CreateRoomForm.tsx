@@ -1,27 +1,25 @@
-import { useState } from "react";
+import { useRef } from "react";
 import Button from "../../common/Button/Button";
 import './CreateRoomForm.css'
+import PasscodeInput from "../../common/PasscodeInput/PasscodeInput";
 
 interface CreateRoomFormProps {
-  handleCreateRoom: () => void;
+  handleCreateRoom: ({ password }: { password: string }) => void;
   handleCancelRoomCreation: () => void;
 }
 
 const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation }: CreateRoomFormProps) => {
-  const [roomPassword, setRoomPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e: React.FormEvent) =>{ 
     e.preventDefault();
-    handleCreateRoom();
+    handleCreateRoom({ password: inputRef?.current?.value || '' });
   };
 
   return (
     <form autoComplete="off" onSubmit={handleSubmit}>
       <div className='roomFormOptions'>
-        <label htmlFor='password'>Room Password: </label>
-        <input name='password' autoComplete="off" value={roomPassword} type={showPassword ? 'text' : 'password'} onChange={(e) => setRoomPassword(e.target.value)} />
-        <button type='button' onMouseLeave={() => setShowPassword(false)} onMouseUp={() => setShowPassword(false)} onMouseDown={() => setShowPassword(true)}>Show Password</button>
+        <PasscodeInput label="Room Code:" ref={inputRef} />
       </div>
       <div className='roomFormActions'>
         <Button colorPrimary='brown' onClick={handleCancelRoomCreation}>Cancel</Button>

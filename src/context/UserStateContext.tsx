@@ -6,6 +6,7 @@ interface UserState {
   name: string;
   id: string;
   currentRoomId: string;
+  currentRoomCode: string;
 }
 
 interface UserStateType {
@@ -15,8 +16,8 @@ interface UserStateType {
 
 type UserStateAction = 
   { type: 'SET_NAME'; payload: string }
-  | { type: 'SET_ROOM'; payload: string }
-  | { type: 'JOIN_ROOM'; payload: string }
+  | { type: 'SET_ROOM'; payload: { roomId: string, roomCode: string } }
+  | { type: 'JOIN_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'LEAVE_ROOM' };
 
 export const UserStateContext = createContext<UserStateType | null>(null);
@@ -27,15 +28,14 @@ export const userStateReducer = (userState: UserState, action: UserStateAction):
       localStorage.setItem('name', action.payload);
       return { ...userState, name: action.payload };
     case 'SET_ROOM':
-      localStorage.setItem('mostRecentRoom', action.payload);
-      return { ...userState, currentRoomId: action.payload };
+      localStorage.setItem('mostRecentRoom', action.payload.roomId);
+      return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode };
     case 'LEAVE_ROOM':
       leaveRoom(userState.currentRoomId, userState.id);
-      return { ...userState, currentRoomId: '' };
+      return { ...userState, currentRoomId: '', currentRoomCode: '' };
     case 'JOIN_ROOM':
-      joinRoom(action.payload, userState.id, userState.name);
-      localStorage.setItem('mostRecentRoom', action.payload);
-      return { ...userState, currentRoomId: action.payload } ;
+      localStorage.setItem('mostRecentRoom', action.payload.roomId);
+      return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode } ;
     default:
       return userState;
   }
@@ -46,10 +46,10 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     name: getName(),
     id: getOrInitializeUUID(),
     currentRoomId: getLastRoom(),
+    currentRoomCode: '',
   });
 
   return (
-
     <UserStateContext.Provider value={{ userState, dispatch }}>
       {children}
     </UserStateContext.Provider>

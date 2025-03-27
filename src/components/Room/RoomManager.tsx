@@ -12,7 +12,7 @@ const RoomManager = () => {
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
-      socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name);
+      socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
     }
   }, [userState.currentRoomId]);
 

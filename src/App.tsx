@@ -1,12 +1,15 @@
-import UserStateProvider from './context/UserStateContext'
-import GameStateProvider from './context/GameStateContext'
+import UserStateProvider from './context/UserStateContext';
+import GameStateProvider from './context/GameStateContext';
+import ModalStateProvider from './context/ModalStateContext';
 import MainMenu from './components/MainMenu/MainMenu';
 
 function App() {
   return (
     <UserStateProvider>
       <GameStateProvider>
-        <MainMenu />
+        <ModalStateProvider>
+          <MainMenu />
+        </ModalStateProvider>
       </GameStateProvider>
     </UserStateProvider>
   )

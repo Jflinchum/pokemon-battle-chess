@@ -5,6 +5,7 @@ import cors from 'cors';
 import User from './User';
 import GameRoomManager from './GameRoomManager';
 import GameRoom from './GameRoom';
+import { captureRejectionSymbol } from 'events';
 
 const serverPort = 3000;
 const allowedOrigins = ['http://localhost:5173'];
@@ -41,9 +42,10 @@ app.get('/', (_, res) => {
  * Creates a room and adds it in memory.
  * The player that creates the room becomes the host.
  */
-app.post<Empty, APIResponse<Partial<GameRoom>>, User>('/api/createRoom', (req, res) => {
+app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password }>('/api/createRoom', (req, res) => {
   const playerName = req.body.playerName;
   const playerId = req.body.playerId;
+  const password = req.body.password;
 
   if (!playerName || !playerId) {
     res.status(400).send();
@@ -52,7 +54,7 @@ app.post<Empty, APIResponse<Partial<GameRoom>>, User>('/api/createRoom', (req, r
   const newRoomId = crypto.randomUUID();
 
   const host = new User(req.body.playerName, req.body.playerId);
-  const gameRoom = new GameRoom(newRoomId, host);
+  const gameRoom = new GameRoom(newRoomId, host, password);
   gameRoomManager.addRoom(newRoomId, gameRoom);
 
   res.status(200).send({
@@ -60,10 +62,12 @@ app.post<Empty, APIResponse<Partial<GameRoom>>, User>('/api/createRoom', (req, r
   });
 });
 
-app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User['playerId'], playerName: User['playerName'] }>('/api/joinRoom', (req, res) => {
+app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User['playerId'], playerName: User['playerName'], password: GameRoom['password'] }>('/api/joinRoom', (req, res) => {
   const roomId = req.body.roomId;
   const playerId = req.body.playerId;
   const playerName = req.body.playerName;
+  const password = req.body.password;
+
   if (!roomId || !playerId || !playerName) {
     res.status(400).send({ message: 'Missing parameters' });
     return;
@@ -73,11 +77,14 @@ app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User
   } else if (gameRoomManager.getRoom(roomId).clientPlayer) {
     res.status(400).send({ message: 'Room is full' });
     return;
+  } else if (gameRoomManager.getRoom(roomId).password !== password) {
+    res.status(401).send({ message: 'Invalid password' });
+    return;
   }
   const room = gameRoomManager.getRoom(roomId);
 
   room.joinRoom(new User(playerId, playerName));
-  res.status(200);
+  res.status(200).send({ data: { roomId: roomId } });
 });
 
 app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User['playerId'] }>('/api/leaveRoom', (req, res) => {
@@ -89,7 +96,7 @@ app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User
   const room = gameRoomManager.getRoom(roomId);
 
   room.leaveRoom(req.body.playerId);
-  res.status(200);
+  res.status(200).send();
 
   if (!room.hasPlayers()) {
     gameRoomManager.removeRoom(req.body.roomId);
@@ -102,6 +109,7 @@ app.get<Empty, Empty, { roomId: GameRoom['roomId'], hostName: User['playerName']
     return {
       roomId: id,
       hostName: gameRoomManager.getRoom(id).hostPlayer?.playerName,
+      hasPassword: !!gameRoomManager.getRoom(id).password,
     }
   })
   res.status(200).send({ rooms: roomResponse });
@@ -120,9 +128,12 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('joinRoom', (roomId, playerId, playerName) => {
+  socket.on('joinRoom', (roomId, playerId, playerName, password) => {
     const room = gameRoomManager.getRoom(roomId);
     if (!room || !playerId || !playerName) {
+      return socket.disconnect();
+    }
+    if (room.password !== password) {
       return socket.disconnect();
     }
 
@@ -133,7 +144,7 @@ io.on('connection', (socket) => {
       newUser.socket = socket;
       room.joinRoom(newUser);
     }
-    socket.join(room.roomId)
+    socket.join(room.roomId);
     io.to(roomId).emit('connectedPlayers', room.getPlayerNames());
     console.log(`Player ${playerId} joined room ${roomId}`);
   });

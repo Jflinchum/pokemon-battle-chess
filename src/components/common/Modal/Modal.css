@@ -1,0 +1,26 @@
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: black;
+  opacity: 80%;
+  z-index: 99;
+}
+
+.modalContainer {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -20%);
+  background-color: #374151;
+  z-index: 100;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.closeModalButton {
+  float: right;
+  cursor: pointer;
+}

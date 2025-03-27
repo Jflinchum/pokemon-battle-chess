@@ -15,10 +15,12 @@ const LobbyManager = () => {
   const { userState, dispatch } = useUserState();
   const { dispatch: dispatchGameState } = useGameState();
 
-  const handleCreateLobby = async () => {
-    const roomId = await createNewRoom(userState.id, userState.name);
-    dispatch({ type: 'SET_ROOM', payload: roomId });
-    dispatchGameState({ type: 'CREATE_ROOM' });
+  const handleCreateRoom = async ({ password }: { password: string }) => {
+    const roomId = await createNewRoom(userState.id, userState.name, password);
+    if (roomId) {
+      dispatch({ type: 'SET_ROOM', payload: { roomId: roomId, roomCode: password } });
+      dispatchGameState({ type: 'CREATE_ROOM' });
+    }
   };
 
   const handleRefreshRoom = () => {
@@ -45,7 +47,7 @@ const LobbyManager = () => {
         <MenuOptions onCreateRoom={() => { setCreatingRoom(!creatingRoom) }} />
         {
           creatingRoom ? (
-            <CreateRoomForm handleCreateRoom={handleCreateLobby} handleCancelRoomCreation={() => setCreatingRoom(false)}/>
+            <CreateRoomForm handleCreateRoom={handleCreateRoom} handleCancelRoomCreation={() => setCreatingRoom(false)}/>
           ) : null
         }
       </div>
