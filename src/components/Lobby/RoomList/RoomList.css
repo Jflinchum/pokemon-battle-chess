@@ -1,5 +1,5 @@
 .roomListContainer {
-  background-color: dimgray;
+  background-color: #374151;
   border-radius: 8px;
   padding: 12px;
 }
@@ -29,6 +29,21 @@
   }
 }
 
-.roomSearch {
-  float: right;
+.roomListTopActions {
+  display: flex;
+
+  .roomSearch {
+    margin-left: auto;
+  }
+}
+
+.roomListBottomActions {
+  display: flex;
+  justify-content: end;
+  padding-top: 20px;
+}
+
+.refreshButton {
+  height: 60px;
+  width: 120px;
 }

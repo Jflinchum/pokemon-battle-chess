@@ -3,16 +3,29 @@ import RoomListItem from "./RoomListItem";
 import { useUserState } from "../../../context/UserStateContext";
 import { useModalState } from "../../../context/ModalStateContext";
 import { joinRoom } from "../../../service/lobby";
+import Button from "../../common/Button/Button";
 import './RoomList.css';
 
 interface RoomListProps {
-  availableRooms: { roomId: string, hostName: string, hasPassword: boolean }[]
+  availableRooms: { roomId: string, hostName: string, hasPassword: boolean }[];
+  onRefresh: () => void;
 }
 
-const RoomList = ({ availableRooms }: RoomListProps) => {
+const RoomList = ({ availableRooms, onRefresh }: RoomListProps) => {
   const { dispatch, userState } = useUserState();
   const { dispatch: dispatchModalState } = useModalState();
   const [roomSearch, setRoomSearch] = useState('');
+  const [refreshDisabled, setRefreshDisabled] = useState(false);
+
+  const handleRefreshRoom = () => {
+    setRefreshDisabled(true);
+
+    onRefresh();
+  
+    setTimeout(() => {
+      setRefreshDisabled(false);
+    }, 1000);
+  }
 
   const handleJoinRoom = async ({ roomId, hasPassword }: { roomId: string, hasPassword: boolean }) => {
     if (hasPassword) {
@@ -27,7 +40,7 @@ const RoomList = ({ availableRooms }: RoomListProps) => {
   // TODO - Debounce room search and send to backend and pagination
   return (
     <div className='roomListContainer'>
-      <div>
+      <div className='roomListTopActions'>
         <span>Rooms:</span>
         <input value={roomSearch} onChange={(e) => setRoomSearch(e.target.value)} className='roomSearch' placeholder='Search for rooms'/>
       </div>
@@ -38,6 +51,9 @@ const RoomList = ({ availableRooms }: RoomListProps) => {
           ))
         } 
       </ul>
+      <div className='roomListBottomActions'>
+        <Button disabled={refreshDisabled} colorPrimary="brown" className='refreshButton' onClick={handleRefreshRoom}>Refresh Rooms</Button>
+      </div>
     </div>
   );
 };

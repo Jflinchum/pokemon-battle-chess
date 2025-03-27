@@ -1,6 +1,7 @@
 import { useModalState } from "../../../context/ModalStateContext";
 import RoomCodeModal from "./Modals/RoomCodeModal/RoomCodeModal";
 import NameChangeModal from "./Modals/NameChangeModal/NameChangeModal";
+import CreateRoomModal from "./Modals/CreateRoomModal/CreateRoomModal";
 import './Modal.css';
 
 const renderModal = (currentModal: string) => {
@@ -9,6 +10,8 @@ const renderModal = (currentModal: string) => {
       return (<RoomCodeModal />);
     case 'NAME_CHANGE':
       return (<NameChangeModal />);
+    case 'CREATE_ROOM':
+        return (<CreateRoomModal />)
     default:
       <div>Not implemented</div>
   }
