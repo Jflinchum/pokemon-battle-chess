@@ -2,17 +2,29 @@ import express from 'express';
 import path from 'path';
 import { Server } from 'socket.io'
 import cors from 'cors';
+import https from 'https';
+import fs from 'fs';
 import User from './User';
 import GameRoomManager from './GameRoomManager';
 import GameRoom from './GameRoom';
-import { captureRejectionSymbol } from 'events';
+import { keyLocation, certLocation } from './config';
 
 const serverPort = 3000;
-const allowedOrigins = ['http://localhost:5173'];
+const allowedOrigins = ['https://localhost:5173'];
 
 const app = express();
+const options = {
+  key: fs.readFileSync(keyLocation),
+  cert: fs.readFileSync(certLocation),
+}
+app.use(cors({
+  origin: allowedOrigins,
+  methods: 'GET,PUT,POST,OPTIONS',
+  credentials: true,
+  optionsSuccessStatus: 204,
+}));
 
-const server = app.listen(serverPort, () => {
+const server = https.createServer(options, app).listen(serverPort, () => {
   console.log(`App listening on ${serverPort}`);
 });
 const io = new Server(server, {
@@ -23,12 +35,6 @@ const io = new Server(server, {
 
 const gameRoomManager = new GameRoomManager();
 
-app.use(cors({
-  origin: allowedOrigins,
-  methods: 'GET,PUT,POST,OPTIONS',
-  credentials: true,
-  optionsSuccessStatus: 204,
-}));
 
 app.use(express.json());
 

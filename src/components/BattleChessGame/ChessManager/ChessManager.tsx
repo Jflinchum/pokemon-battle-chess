@@ -13,11 +13,6 @@ import { useGameState } from '../../../context/GameStateContext';
 import { socket } from '../../../socket';
 import { useUserState } from '../../../context/UserStateContext';
 
-const turnMapping = {
-  'w': 'White',
-  'b': 'Black',
-};
-
 interface ChessManagerProps {
   chessManager: Chess,
   pokemonManager: PokemonBattleChessManager,
