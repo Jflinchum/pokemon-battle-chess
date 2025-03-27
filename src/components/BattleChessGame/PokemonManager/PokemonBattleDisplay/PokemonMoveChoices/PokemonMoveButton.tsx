@@ -1,6 +1,7 @@
 import { Dex } from "@pkmn/dex";
-import './PokemonMoveChoices.css';
 import { Move } from "@pkmn/data";
+import Button from "../../../../common/Button/Button";
+import './PokemonMoveChoices.css';
 
 interface PokemonMoveButtonProps {
   move: string;
@@ -35,33 +36,35 @@ const PokemonMoveButton = ({ move, onMoveSelect = () => {} }: PokemonMoveButtonP
   const dexMoveInfo = Dex.moves.get(move);
 
   return (
-    <button
-      style={{ border: `${getMoveButtonColor(dexMoveInfo.type)} solid 3px`, background: `linear-gradient(0deg, ${getMoveButtonColor(dexMoveInfo.type)} 0%, white 100%)` }}
-      className='moveButton'
-      onClick={() => {onMoveSelect(move)}}
-    >
+    <Button colorPrimary={getMoveButtonColor(dexMoveInfo.type)} onClick={() => { onMoveSelect(move) }} toolTip={PokemonMoveTooltip({ move })}>
       {dexMoveInfo.name}
-      <div className='moveTooltip'>
-        <div>
-          <strong>{dexMoveInfo.name}</strong>
-          <p>{dexMoveInfo.type} - {dexMoveInfo.category}</p>
-        </div>
-        <hr/>
-        {
-          dexMoveInfo.basePower && dexMoveInfo.accuracy ? (
-            <div>
-              <p>Base power: {dexMoveInfo.basePower}</p>
-              <p>Accuracy: {dexMoveInfo.accuracy}</p>
-              <hr/>
-            </div>
-          ) : null
-        }
-        <div>
-          {dexMoveInfo.shortDesc}
-        </div>
-      </div>
-    </button>
+    </Button>
   )
+}
+
+const PokemonMoveTooltip = ({ move }: { move: string }) => {
+  const dexMoveInfo = Dex.moves.get(move);
+  return (
+    <div>
+      <div>
+        <strong>{dexMoveInfo.name}</strong>
+        <p>{dexMoveInfo.type} - {dexMoveInfo.category}</p>
+      </div>
+      <hr/>
+      {
+        dexMoveInfo.basePower && dexMoveInfo.accuracy ? (
+          <div>
+            <p>Base power: {dexMoveInfo.basePower}</p>
+            <p>Accuracy: {dexMoveInfo.accuracy}</p>
+            <hr/>
+          </div>
+        ) : null
+      }
+      <div>
+        {dexMoveInfo.shortDesc}
+      </div>
+    </div>
+  );
 }
 
 export default PokemonMoveButton;

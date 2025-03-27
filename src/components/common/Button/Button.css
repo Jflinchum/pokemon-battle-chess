@@ -1,0 +1,46 @@
+.button {
+  position: relative;
+  width: 140px;
+  height: 50px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tooltip {
+  width: 300px;
+  text-align: left;
+  padding: 3px;
+  visibility: hidden;
+  background-color: dimgray;
+  color: white;
+  border-radius: 10px;
+
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 65%;
+  margin-left: -150px;
+  
+  opacity: 0;
+  transition: opacity 0.3s;
+
+  p, strong {
+    margin: 0;
+  }
+  hr {
+    margin: 2px 0px;
+  }
+}
+
+.button:hover {
+  filter: brightness(85%);
+
+  .tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.button:disabled {
+  filter: grayscale(30%);
+}

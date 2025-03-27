@@ -1,0 +1,15 @@
+.lobbyContainer {
+  display: flex;
+  gap: 32px;
+
+  padding: 0px 60px;
+}
+
+.refreshButton {
+  height: 60px;
+  width: 120px;
+}
+
+.roomListLobbyContainer {
+  width: 100%;
+}

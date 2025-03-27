@@ -3,7 +3,6 @@ import { Chess } from 'chess.js';
 import { PokemonBattleChessManager, PokemonPiece } from '../PokemonManager/PokemonBattleChessManager';
 import ChessManager from '../ChessManager/ChessManager';
 import PokemonBattleManager from '../PokemonManager/PokemonBattleManager/PokemonBattleManager';
-import './BattleChessManager.css';
 import { MoveAttempt } from '../ChessManager/types';
 import { useUserState } from '../../../context/UserStateContext';
 import { useGameState } from '../../../context/GameStateContext';
@@ -88,7 +87,7 @@ function BattleChessManager() {
   };
 
   return (
-    <div className='battleChessGameContainer'>
+    <div className='battleChessContainer'>
       {
         currentBattle &&
         (<PokemonBattleManager p1Name={player1Name} p2Name={player2Name} p1Pokemon={currentBattle.p1Pokemon.pkmn} p2Pokemon={currentBattle.p2Pokemon.pkmn} onVictory={handleVictory}/>)

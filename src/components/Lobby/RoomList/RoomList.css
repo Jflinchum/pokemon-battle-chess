@@ -1,23 +1,14 @@
-
-.roomContainer {
-  display: flex;
-  flex-direction: column;
-  margin: 100px;
-
+.roomListContainer {
   background-color: dimgray;
-  border-radius: 4px;
-  padding: 20px;
+  border-radius: 8px;
+  padding: 12px;
 }
 
-.roomButtons {
-  button {
-    margin-right: 12px;
-  }
-}
-
-.roomPlayerList {
+.roomList {
   list-style: none;
   padding: 0;
+  margin: 0;
+  width: 100%;
 
   li {
     height: 32px;
@@ -25,6 +16,9 @@
     align-content: center;
     padding: 8px;
     border-radius: 4px;
+    &:hover {
+      filter: brightness(80%);
+    }
 
     &:nth-child(odd) {
       background-color: grey;
@@ -33,4 +27,8 @@
       background-color: darkcyan;
     }
   }
+}
+
+.roomSearch {
+  float: right;
 }

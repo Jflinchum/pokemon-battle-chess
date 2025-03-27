@@ -1,10 +1,15 @@
 .pokemonBattleLogContainer {
   min-width: 100px;
-  height: 392px;
+  height: 60vh;
+  width: 400px;
   overflow-y: scroll;  
   background-color: #eef2f5;
   color: black;
   border: solid black 4px;
+
+  @media (max-width: 1000px) {
+    display: none;
+  }
 }
 
 .textLog {

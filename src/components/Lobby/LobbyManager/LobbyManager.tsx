@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import RoomList from "../RoomList/RoomList";
 import MenuOptions from "../MenuOptions/MenuOptions";
-import CreateLobbyForm from "../CreateLobbyForm/CreateLobbyForm";
+import CreateRoomForm from "../CreateRoomForm/CreateRoomForm";
 import { useUserState } from "../../../context/UserStateContext";
 import { createNewRoom, getAvailableRooms } from "../../../service/lobby";
 import { useGameState } from "../../../context/GameStateContext";
+import Button from "../../common/Button/Button";
+import './LobbyManager.css';
 
 const LobbyManager = () => {
   const [creatingRoom, setCreatingRoom] = useState(false);
   const [availableRooms, setAvailableRooms] = useState([]);
+  const [refreshDisabled, setRefreshDisabled] = useState(false);
   const { userState, dispatch } = useUserState();
   const { dispatch: dispatchGameState } = useGameState();
 
@@ -19,33 +22,37 @@ const LobbyManager = () => {
   };
 
   const handleRefreshRoom = () => {
+    setRefreshDisabled(true);
     const fetchRooms = async () => {
       const rooms = await getAvailableRooms();
       setAvailableRooms(rooms);
     }
     fetchRooms();
+    setTimeout(() => {
+      setRefreshDisabled(false);
+    }, 1000);
   }
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      const rooms = await getAvailableRooms();
-      setAvailableRooms(rooms);
-    }
-    fetchRooms();
+    handleRefreshRoom();
     // Whenever we're back at the lobby, reset the room to a clean slate
     dispatchGameState({ type: 'RESET_ROOM' });
   }, []);
 
   return (
-    <div>
-      <MenuOptions onCreateRoom={() => { setCreatingRoom(true) }} />
-      <RoomList availableRooms={availableRooms} />
-      <button onClick={handleRefreshRoom}>Refresh Rooms</button>
-      {
-        creatingRoom ? (
-          <CreateLobbyForm handleCreateLobby={handleCreateLobby} handleCancelLobbyCreation={() => setCreatingRoom(false)}/>
-        ) : null
-      }
+    <div className='lobbyContainer'>
+      <div>
+        <MenuOptions onCreateRoom={() => { setCreatingRoom(!creatingRoom) }} />
+        {
+          creatingRoom ? (
+            <CreateRoomForm handleCreateRoom={handleCreateLobby} handleCancelRoomCreation={() => setCreatingRoom(false)}/>
+          ) : null
+        }
+      </div>
+      <div className='roomListLobbyContainer'>
+        <Button disabled={refreshDisabled} colorPrimary="brown" className='refreshButton' onClick={handleRefreshRoom}>Refresh Rooms</Button>
+        <RoomList availableRooms={availableRooms} />
+      </div>
     </div>
   );
 };

@@ -1,0 +1,11 @@
+.roomListItemButton {
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  border: 0;
+  padding: 0;
+  background-color: inherit;
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}

@@ -1,3 +1,5 @@
+import './RoomListItem.css';
+
 interface RoomListItem {
   name: string;
   onClick: () => void;
@@ -6,9 +8,9 @@ interface RoomListItem {
 const RoomListItem = ({ name, onClick }: RoomListItem) => {
   return (
     <li>
-      <div onClick={onClick}>
+      <button className='roomListItemButton' onClick={onClick}>
         {name}
-      </div>
+      </button>
     </li>
   );
 };

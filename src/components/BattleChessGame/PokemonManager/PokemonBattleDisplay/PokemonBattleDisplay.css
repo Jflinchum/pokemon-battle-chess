@@ -1,6 +1,7 @@
 .battlefieldAndLog {
   display: flex;
   flex-direction: row;
+  justify-content: center;
 }
 
 .battleMoveContainer {

@@ -28,27 +28,29 @@ const PokemonBattleDisplay = ({ p1Pokemon, battleState, parsedBattleLog, onMoveS
       {battleState && (
         <>
           <div className='battlefieldAndLog'>
+          <div>
             <PokemonBattleField battleHistory={parsedBattleLog} battleState={battleState}/>
-            <PokemonBattleLog battleHistory={parsedBattleLog}/>
+            <div className='battleMoveContainer'>
+              <p>Moves</p>
+              {moveChosen ? (
+                <div>
+                  Waiting for opponent...
+                  <button className='cancelButton' onClick={() => {
+                    setMoveChosen(undefined);
+                    onMoveSelect('undo');
+                  }}>
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <PokemonMoveChoices moves={p1Pokemon.moves} onMoveSelect={(move) => {
+                  setMoveChosen(move);
+                  onMoveSelect(move);
+                }}/>
+              )}
+            </div>
           </div>
-          <div className='battleMoveContainer'>
-            <p>Moves</p>
-            {moveChosen ? (
-              <div>
-                Waiting for opponent...
-                <button className='cancelButton' onClick={() => {
-                  setMoveChosen(undefined);
-                  onMoveSelect('undo');
-                }}>
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <PokemonMoveChoices moves={p1Pokemon.moves} onMoveSelect={(move) => {
-                setMoveChosen(move);
-                onMoveSelect(move);
-              }}/>
-            )}
+            <PokemonBattleLog battleHistory={parsedBattleLog}/>
           </div>
         </>
       )}

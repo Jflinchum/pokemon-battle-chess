@@ -96,6 +96,7 @@ app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User
   }
 });
 
+// TODO - pagination
 app.get<Empty, Empty, { roomId: GameRoom['roomId'], hostName: User['playerName'] }[]>('/api/getRooms', (req, res) => {
   const roomResponse = gameRoomManager.getAllRooms().map((id) => {
     return {

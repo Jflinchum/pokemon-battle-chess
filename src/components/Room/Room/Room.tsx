@@ -3,6 +3,7 @@ import { useGameState } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import { socket } from "../../../socket";
 import './Room.css';
+import Button from "../../common/Button/Button";
 
 const Room = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
@@ -47,12 +48,8 @@ const Room = () => {
   return (
     <div className="roomContainer">
       <div>
-        Room: {userState.currentRoomId}
-      </div>
-
-      <div>
         Connected Players:
-        <ul>
+        <ul className='roomPlayerList'>
           {connectedPlayers.map((player, index) => (
             <li key={index}>
               {player}
@@ -61,8 +58,10 @@ const Room = () => {
         </ul>
       </div>
 
-      <button onClick={handleStartGame} disabled={!gameState.isHost || connectedPlayers.length < 2}>Start Game</button>
-      <button onClick={handleLeaveGame}>Leave Game</button>
+      <div className='roomButtons'>
+        <Button colorPrimary='brown' onClick={handleLeaveGame}>Leave Game</Button>
+        <Button colorPrimary='green' onClick={handleStartGame} disabled={!gameState.isHost || connectedPlayers.length < 2}>Start Game</Button>
+      </div>
     </div>
   );
 };

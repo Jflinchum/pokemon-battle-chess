@@ -17,13 +17,13 @@ const RoomManager = () => {
   }, [userState.currentRoomId]);
 
   return (
-    <div>
+    <>
       {
         gameState.matchStarted ?
         (<BattleChessManager />) :
         (<Room />)
       }
-    </div>
+    </>
   );
 };
 

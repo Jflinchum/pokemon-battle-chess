@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useUserState } from "../../../context/UserStateContext";
+import Button from "../../common/Button/Button";
+import './MenuOptions.css';
 
 interface MenuOptionProps {
   onCreateRoom: () => void;
@@ -14,13 +16,13 @@ const MenuOptions = ({ onCreateRoom }: MenuOptionProps) => {
   }
 
   return (
-    <ul>
+    <ul className='menuOptions'>
       <li>
-        <button onClick={onCreateRoom}>Create New Room</button>
+        <Button colorPrimary="purple" onClick={() => handleChangeName(name)}>Change Name</Button>
+        <input value={name} onChange={(e) => setName(e.target.value)} />
       </li>
       <li>
-        <button onClick={() => handleChangeName(name)}>Change Name</button>
-        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <Button colorPrimary="green" onClick={onCreateRoom}>Create New Room</Button>
       </li>
     </ul>
   );

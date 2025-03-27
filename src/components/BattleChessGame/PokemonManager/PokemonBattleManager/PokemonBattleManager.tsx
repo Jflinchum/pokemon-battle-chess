@@ -5,7 +5,6 @@ import { Dex } from '@pkmn/dex';
 import { ArgType, BattleArgsKWArgType, Protocol } from '@pkmn/protocol';
 import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
-import './PokemonBattleManager.css';
 import { socket } from '../../../../socket';
 import { useUserState } from '../../../../context/UserStateContext';
 import { useGameState } from '../../../../context/GameStateContext';
@@ -103,7 +102,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
   }, []);
 
   return (
-    <div className='pokemonBattleManagerContainer'>
+    <>
       <PokemonBattleDisplay
         p1Pokemon={p1Pokemon}
         battleState={battle}
@@ -112,7 +111,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
           socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
         }}
       />
-    </div>
+    </>
   )
 }
 
