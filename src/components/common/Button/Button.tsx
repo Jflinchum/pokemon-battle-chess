@@ -8,7 +8,7 @@ interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {
   toolTip?: ReactNode;
 };
 
-const Button = ({ onClick, colorPrimary = 'white', colorSecondary = 'white', children, toolTip, className, disabled }: ButtonProps) => {
+const Button = ({ onClick, colorPrimary = 'white', colorSecondary = 'white', children, toolTip, className = '', disabled }: ButtonProps) => {
 
   return (
     <button

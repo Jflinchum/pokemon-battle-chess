@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { PokemonSet } from "@pkmn/data";
+import { useState, useEffect, useMemo } from "react";
 import { Battle } from "@pkmn/client";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
 import PokemonMoveChoices from "./PokemonMoveChoices/PokemonMoveChoices";
@@ -8,20 +7,34 @@ import './PokemonBattleDisplay.css';
 import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
 
 interface PokemonBattleDisplayProps {
-  p1Pokemon: PokemonSet,
   battleState: Battle | null,
   parsedBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[],
   onMoveSelect: (move: string) => void,
 }
 
 
-const PokemonBattleDisplay = ({ p1Pokemon, battleState, parsedBattleLog, onMoveSelect }: PokemonBattleDisplayProps) => {
+const PokemonBattleDisplay = ({ battleState, parsedBattleLog, onMoveSelect }: PokemonBattleDisplayProps) => {
   const [moveChosen, setMoveChosen] = useState<string>();
 
   useEffect(() => {
     // TODO: Better handling for clearing move selection
     setMoveChosen(undefined);
   }, [parsedBattleLog]);
+
+
+  const moves = useMemo(() => {
+    if (battleState?.request?.requestType === 'move' && battleState.request.active[0]?.moves) {
+      return battleState.request.active[0]?.moves.map((move) => {
+        // Typescript oddity. The union typings for the request don't match well
+        if ('disabled' in move) {
+          return move;
+        } else {
+          return move;
+        }
+      }) || [];
+    }
+    return [];
+  }, [battleState?.request]);
 
   return (
     <div>
@@ -43,7 +56,7 @@ const PokemonBattleDisplay = ({ p1Pokemon, battleState, parsedBattleLog, onMoveS
                   </button>
                 </div>
               ) : (
-                <PokemonMoveChoices moves={p1Pokemon.moves} onMoveSelect={(move) => {
+                <PokemonMoveChoices moves={moves} onMoveSelect={(move) => {
                   setMoveChosen(move);
                   onMoveSelect(move);
                 }}/>

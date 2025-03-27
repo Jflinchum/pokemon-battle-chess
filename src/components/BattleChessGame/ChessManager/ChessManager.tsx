@@ -129,9 +129,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
 
   return (
     <div>
-      <p>Current Turn: {turnMapping[chessManager.turn()]}</p>
-      <p>Your Color: {turnMapping[color]}</p>
-      <p>Move Number: {chessManager.moveNumber()}</p>
+      <p>Turn: {chessManager.moveNumber()}</p>
       <button onClick={() => setPokemonHighVis(!pokemonHighVis)}>Toggle Higher Visibility</button>
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice

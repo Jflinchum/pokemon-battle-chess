@@ -13,3 +13,22 @@
   padding: 6px 0px;
   gap: 10px;
 }
+
+.pokemonMoveName {
+  margin: 0;
+}
+
+.pokemonMovePP {
+  float: right;
+}
+
+.pokemonMoveButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.pokemonMoveSubInfo {
+  font-size: 12px;
+  text-align: left;
+}

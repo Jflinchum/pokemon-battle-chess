@@ -54,7 +54,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
   const battleLogIndex = useRef(0);
 
   const beginBattleStreamHandler = async () => {
-    for await (const chunk of battleStream.omniscient) {
+    for await (const chunk of battleStream.p1) {
       for (const { args, kwArgs } of Protocol.parse(chunk)) {
         console.log(args);
         setParsedBattleLog((curr) => [...curr, { args, kwArgs }]);
@@ -104,7 +104,6 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
   return (
     <>
       <PokemonBattleDisplay
-        p1Pokemon={p1Pokemon}
         battleState={battle}
         parsedBattleLog={delayedBattleLog}
         onMoveSelect={(move) => {

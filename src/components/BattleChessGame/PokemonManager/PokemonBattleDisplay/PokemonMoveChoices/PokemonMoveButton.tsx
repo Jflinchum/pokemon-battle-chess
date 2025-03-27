@@ -5,6 +5,9 @@ import './PokemonMoveChoices.css';
 
 interface PokemonMoveButtonProps {
   move: string;
+  disabled?: boolean;
+  pp?: number;
+  maxpp?: number;
   onMoveSelect?: (move: string) => void;
 }
 
@@ -32,12 +35,30 @@ const getMoveButtonColor = (moveType: Move['type']) => {
   }
 }
 
-const PokemonMoveButton = ({ move, onMoveSelect = () => {} }: PokemonMoveButtonProps) => {
+const PokemonMoveButton = ({ move, pp, maxpp, disabled, onMoveSelect = () => {} }: PokemonMoveButtonProps) => {
   const dexMoveInfo = Dex.moves.get(move);
 
   return (
-    <Button colorPrimary={getMoveButtonColor(dexMoveInfo.type)} onClick={() => { onMoveSelect(move) }} toolTip={PokemonMoveTooltip({ move })}>
-      {dexMoveInfo.name}
+    <Button className={'pokemonMoveButton'} disabled={disabled} colorPrimary={getMoveButtonColor(dexMoveInfo.type)} onClick={() => { onMoveSelect(move) }} toolTip={PokemonMoveTooltip({ move })}>
+      <p className='pokemonMoveName'>{dexMoveInfo.name}</p>
+
+      <div className='pokemonMoveSubInfo'>
+        {
+          dexMoveInfo.type && (
+            <span className='pokemonMoveTyping'>
+              {dexMoveInfo.type}
+            </span>
+          )
+        }
+
+        {
+          pp && maxpp && (
+            <span className='pokemonMovePP'>
+              {pp}/{maxpp}
+            </span>
+          )
+        }
+      </div>
     </Button>
   )
 }
@@ -51,15 +72,23 @@ const PokemonMoveTooltip = ({ move }: { move: string }) => {
         <p>{dexMoveInfo.type} - {dexMoveInfo.category}</p>
       </div>
       <hr/>
-      {
-        dexMoveInfo.basePower && dexMoveInfo.accuracy ? (
-          <div>
+      <div>
+        {
+          dexMoveInfo.basePower ? (
             <p>Base power: {dexMoveInfo.basePower}</p>
+          ) : null
+        }
+        {
+          typeof dexMoveInfo.accuracy === 'number' && (
             <p>Accuracy: {dexMoveInfo.accuracy}</p>
-            <hr/>
-          </div>
-        ) : null
-      }
+          )
+        }
+        {
+          dexMoveInfo.basePower || typeof dexMoveInfo.accuracy === 'number' ?
+          (<hr/>) :
+          (null)
+        }
+      </div>
       <div>
         {dexMoveInfo.shortDesc}
       </div>

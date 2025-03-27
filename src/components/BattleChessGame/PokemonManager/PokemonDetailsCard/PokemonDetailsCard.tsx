@@ -14,7 +14,7 @@ const PokemonDetailsCard = ({ pokemon }: PokemonDetailsCard) => {
     <div className='pokemonDetailsContainer'>
       <p>{pokemon.name}</p>
       <img className='pokemonDetailsSprite' src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url}/>
-      <PokemonMoveChoices moves={pokemon.moves}/>
+      <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
       <p>Item: {pokemon.item}</p> 
       <p>Ability: {pokemon.ability}</p>
     </div>
