@@ -1,7 +1,7 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
 import Modal from "../components/common/Modal/Modal";
 
-type ModalName = 'ROOM_CODE' | '';
+type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | '';
 
 interface RoomCodeModalProps {
   roomId: string;
@@ -9,6 +9,7 @@ interface RoomCodeModalProps {
 
 type ModalStateAction = 
   { type: 'OPEN_ROOM_MODAL'; payload: { required?: boolean, modalProps: RoomCodeModalProps }; }
+  | { type: 'OPEN_NAME_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'CLOSE_MODAL'; };
 
 interface ModalState {
@@ -28,6 +29,8 @@ export const modalStateReducer = (modalState: ModalState, action: ModalStateActi
   switch (action.type) {
     case 'OPEN_ROOM_MODAL':
       return { ...modalState, currentModal: 'ROOM_CODE', required: action.payload.required, modalProps: action.payload.modalProps };
+    case 'OPEN_NAME_MODAL':
+      return { ...modalState, currentModal: 'NAME_CHANGE', required: action.payload.required };
     case 'CLOSE_MODAL':
       return { ...modalState, currentModal: '', required: false };
     default:

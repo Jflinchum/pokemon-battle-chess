@@ -1,10 +1,14 @@
 .menuOptions {
   list-style: none;
-  padding: 0;
+  padding: 20px 0px;
   margin: 0;
   width: 35vw;
+  background-color: dimgray;
+  border-radius: 6px;
 
   li {
     margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
   }
 }

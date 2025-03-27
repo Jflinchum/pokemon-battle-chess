@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useUserState } from "../../../context/UserStateContext";
+import { useModalState } from "../../../context/ModalStateContext";
 import Button from "../../common/Button/Button";
 import './MenuOptions.css';
 
@@ -8,18 +7,16 @@ interface MenuOptionProps {
 }
 
 const MenuOptions = ({ onCreateRoom }: MenuOptionProps) => {
-  const { userState, dispatch } = useUserState();
-  const [name, setName] = useState(userState.name);
+  const { dispatch } = useModalState();
 
-  const handleChangeName = (name: string) => {
-    dispatch({ type: 'SET_NAME', payload: name });
+  const handleChangeName = () => {
+    dispatch({ type: 'OPEN_NAME_MODAL', payload: {} });
   }
 
   return (
     <ul className='menuOptions'>
       <li>
-        <Button colorPrimary="purple" onClick={() => handleChangeName(name)}>Change Name</Button>
-        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <Button colorPrimary="purple" onClick={() => handleChangeName()}>Change Name</Button>
       </li>
       <li>
         <Button colorPrimary="green" onClick={onCreateRoom}>Create New Room</Button>

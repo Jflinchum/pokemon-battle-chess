@@ -1,6 +1,6 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
 import { getLastRoom, getName, getOrInitializeUUID } from "../utils";
-import { leaveRoom, joinRoom } from "../service/lobby";
+import { leaveRoom } from "../service/lobby";
 
 interface UserState {
   name: string;

@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
-import { useModalState } from "../../../../context/ModalStateContext";
-import PasscodeInput from "../../PasscodeInput/PasscodeInput";
-import Button from "../../Button/Button";
-import { useUserState } from "../../../../context/UserStateContext";
-import { joinRoom } from "../../../../service/lobby";
+import { useModalState } from "../../../../../context/ModalStateContext";
+import PasscodeInput from "../../../PasscodeInput/PasscodeInput";
+import Button from "../../../Button/Button";
+import { useUserState } from "../../../../../context/UserStateContext";
+import { joinRoom } from "../../../../../service/lobby";
 import './RoomCodeModal.css';
 
 const RoomCodeModal = () => {

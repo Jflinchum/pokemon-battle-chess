@@ -1,11 +1,14 @@
 import { useModalState } from "../../../context/ModalStateContext";
-import RoomCodeModal from "./Modals/RoomCodeModal";
+import RoomCodeModal from "./Modals/RoomCodeModal/RoomCodeModal";
+import NameChangeModal from "./Modals/NameChangeModal/NameChangeModal";
 import './Modal.css';
 
 const renderModal = (currentModal: string) => {
   switch (currentModal) {
     case 'ROOM_CODE':
-      return (<RoomCodeModal />)
+      return (<RoomCodeModal />);
+    case 'NAME_CHANGE':
+      return (<NameChangeModal />);
     default:
       <div>Not implemented</div>
   }
@@ -15,7 +18,9 @@ const Modal = () => {
   const { dispatch, modalState } = useModalState();
 
   const handleCloseModal = () => {
-    dispatch({ type: 'CLOSE_MODAL' });
+    if (!modalState.required) {
+      dispatch({ type: 'CLOSE_MODAL' });
+    }
   };
 
   return (
