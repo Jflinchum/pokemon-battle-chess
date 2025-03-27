@@ -148,12 +148,12 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
       )}
       {chessManager.isCheck() && (<p>Check!</p>)}
       {chessManager.isCheckmate() && (<p>Checkmate! Gameover!</p>)}
-      <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color === 'w' ? 'b' : 'w'} />
+      <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color} />
       <div className='chessGameContainer'>
         <ChessBoard pokemonHighVis={pokemonHighVis} pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
         {selectedSquare && pokemonManager.getPokemonFromSquare(selectedSquare) && <PokemonDetailsCard pokemon={pokemonManager.getPokemonFromSquare(selectedSquare)!.pkmn} />}
       </div>
-      <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color} />
+      <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color === 'w' ? 'b' : 'w'} />
     </div>
   )
 }

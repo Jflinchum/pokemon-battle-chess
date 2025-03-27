@@ -1,0 +1,9 @@
+.takenChessPiecesContainer {
+  display: flex;
+  flex-direction: row;
+
+  .pieceContainer {
+    height: 50px;  
+    width: 50px;
+  }
+}
