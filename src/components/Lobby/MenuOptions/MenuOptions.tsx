@@ -1,4 +1,5 @@
 import { useModalState } from "../../../context/ModalStateContext";
+import { useUserState } from "../../../context/UserStateContext";
 import Button from "../../common/Button/Button";
 import './MenuOptions.css';
 
@@ -8,6 +9,7 @@ interface MenuOptionProps {
 
 const MenuOptions = ({ onCreateRoom }: MenuOptionProps) => {
   const { dispatch } = useModalState();
+  const { userState } = useUserState();
 
   const handleChangeName = () => {
     dispatch({ type: 'OPEN_NAME_MODAL', payload: {} });
@@ -15,6 +17,13 @@ const MenuOptions = ({ onCreateRoom }: MenuOptionProps) => {
 
   return (
     <ul className='menuOptions'>
+      <li>
+        {userState.name && (
+          <>
+            <strong>Name:</strong><span className='username'>{userState.name}</span>
+          </>
+        )}
+      </li>
       <li>
         <Button colorPrimary="purple" onClick={() => handleChangeName()}>Change Name</Button>
       </li>

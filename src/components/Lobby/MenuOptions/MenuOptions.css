@@ -2,7 +2,7 @@
   list-style: none;
   padding: 20px 0px;
   margin: 0;
-  width: 35vw;
+  width: 30vw;
   background-color: #374151;
   border-radius: 6px;
 
@@ -11,4 +11,8 @@
     display: flex;
     justify-content: center;
   }
+}
+
+.username {
+  margin-left: 6px;
 }
