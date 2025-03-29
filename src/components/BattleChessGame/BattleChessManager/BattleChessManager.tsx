@@ -7,6 +7,9 @@ import { MoveAttempt } from '../ChessManager/types';
 import { useUserState } from '../../../context/UserStateContext';
 import { useGameState } from '../../../context/GameStateContext';
 import { getVerboseChessMove } from '../ChessManager/util';
+import { useModalState } from '../../../context/ModalStateContext';
+import './BattleChessManager.css';
+import { socket } from '../../../socket';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
@@ -15,19 +18,19 @@ export interface CurrentBattle {
 }
 
 function BattleChessManager() {
-  const { dispatch } = useUserState();
+  const { userState, dispatch } = useUserState();
+  const { dispatch: modalStateDispatch } = useModalState();
   const { gameState } = useGameState();
   /**
    * TODO:
-   * - Networking websocket
    * - Draft pokemon onto pieces
-   * - Lobby UI
    * - Disable support pokemon from team generation
    * - Room Options
+   *    - Draft or Randoms
    *    - Preserve damage after battle
    *    - Preserve move usage after battle
    *    - Preserve item usage after battle
-   *    - Draft or Randoms
+   *    - Custom Teams
    *    - Buff on chess piece attack
    *    - Weather on random chess spaces
    *    - Change pokemon on piece promotion
@@ -80,6 +83,11 @@ function BattleChessManager() {
     if (fromCastledRookSquare && toCastledRookSquare) {
       pokemonManager.movePokemonToSquare(fromCastledRookSquare, toCastledRookSquare);
     }
+
+    if (chessManager.isCheckmate()) {
+      modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: chessManager.turn() === 'w' ? 'b' : 'w' } }});
+      socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
+    }
   }
 
   const handleLeaveRoom = () => {
@@ -95,7 +103,9 @@ function BattleChessManager() {
       <div style={{ display: currentBattle ? 'none' : 'block'}}>
         <ChessManager onAttemptMove={handleAttemptMove} currentPokemonBattle={currentBattle} chessManager={chessManager} pokemonManager={pokemonManager} />
       </div>
-      <button onClick={() => handleLeaveRoom()}>Leave Room</button>
+      <div className='gameManagerBottomActions'>
+        <button onClick={() => handleLeaveRoom()}>Forfeit and return to menu</button>
+      </div>
     </div>
   )
 }

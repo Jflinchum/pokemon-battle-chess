@@ -1,6 +1,8 @@
 import User from "./User";
 import GameOptions from './GameOptions';
-import { PRNG, PRNGSeed } from '@pkmn/sim'
+import { PRNG } from '@pkmn/sim'
+import { Socket } from "socket.io";
+import GameRoomManager from "./GameRoomManager";
 
 export default class GameRoom {
   public roomId: string;
@@ -11,25 +13,27 @@ export default class GameRoom {
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
 
-  public whitePlayer: User;
-  public blackPlayer: User;
-  public currentTurnWhite: boolean = true;
-  public whitePlayerPokemonMove: string | null = null;
-  public blackPlayerPokemonMove: string | null = null;
+  private gameRoomManager: GameRoomManager;
+  private whitePlayer: User;
+  private blackPlayer: User;
+  private currentTurnWhite: boolean = true;
+  private whitePlayerPokemonMove: string | null = null;
+  private blackPlayerPokemonMove: string | null = null;
 
-  constructor(roomId: string, hostPlayer: User, password: string) {
+  constructor(roomId: string, hostPlayer: User, password: string, gameRoomManager: GameRoomManager) {
     this.roomId = roomId;
     this.hostPlayer = hostPlayer;
     this.roomSeed = PRNG.generateSeed();
     this.isOngoing = false;
     this.password = password;
+    this.gameRoomManager = gameRoomManager;
   }
 
   public joinRoom(player: User) {
     this.clientPlayer = player;
   }
 
-  public leaveRoom(playerId: string) {
+  public leaveRoom(playerId?: string) {
     if (this.clientPlayer?.playerId === playerId) {
       this.clientPlayer = null;
     } else if (this.hostPlayer?.playerId === playerId) {
@@ -41,21 +45,93 @@ export default class GameRoom {
     return this.hostPlayer || this.clientPlayer;
   }
 
-  public getPlayerNames() {
-    const currentPlayers: User['playerName'][] = [];
-    if (this.hostPlayer) {
-      currentPlayers.push(this.hostPlayer.playerName);
+  public getPlayers(): User[] {
+    const currentPlayers: (User | null)[] = [this.hostPlayer, this.clientPlayer];
+    return (currentPlayers.filter((player) => player) as User[]);
+  }
+
+
+  public getPublicPlayerList() {
+    const currentPlayers: (User | null)[] = [this.hostPlayer, this.clientPlayer];
+    return (currentPlayers.filter((player) => player).map((player) => ({
+      playerName: player?.playerName,
+      playerId: player?.playerId,
+      transient: !!player?.transient,
+      viewingResults: player?.viewingResults,
+      isHost: player?.playerId === this.hostPlayer?.playerId
+    })));
+  }
+
+  public getTransientPlayers(): User[] {
+    const currentPlayers: (User | null)[] = [this.hostPlayer, this.clientPlayer];
+    return currentPlayers.filter((player) => player && player.transient) as User[];
+  }
+
+  /**
+   * Client, host, or spectator
+   */
+  public getPlayer(playerIdOrSocket?: string | Socket): User | null {
+    if (typeof playerIdOrSocket === 'string') {
+      if (this.hostPlayer?.playerId === playerIdOrSocket) {
+        return this.hostPlayer;
+      } else if (this.clientPlayer?.playerId === playerIdOrSocket) {
+        return this.clientPlayer;
+      }
+    } else if (playerIdOrSocket instanceof Socket) {
+      if (this.hostPlayer?.socket?.id === playerIdOrSocket.id) {
+        return this.hostPlayer;
+      } else if (this.clientPlayer?.socket?.id === playerIdOrSocket.id) {
+        return this.clientPlayer;
+      }
     }
-    
-    if (this.clientPlayer) {
-      currentPlayers.push(this.clientPlayer.playerName);
+
+    return null;
+  }
+
+  /**
+   * Either the client or host. Does not get spectators 
+   */
+  public getActivePlayer(playerIdOrSocket?: string | Socket): User | null {
+    if (typeof playerIdOrSocket === 'string') {
+      if (this.hostPlayer?.playerId === playerIdOrSocket) {
+        return this.hostPlayer;
+      } else if (this.clientPlayer?.playerId === playerIdOrSocket) {
+        return this.clientPlayer;
+      }
+    } else if (playerIdOrSocket instanceof Socket) {
+      if (this.hostPlayer?.socket?.id === playerIdOrSocket.id) {
+        return this.hostPlayer;
+      } else if (this.clientPlayer?.socket?.id === playerIdOrSocket.id) {
+        return this.clientPlayer;
+      }
     }
-    return currentPlayers;
+
+    return null;
+  }
+
+  public promoteToHost(playerId) {
+    const player = this.getPlayer(playerId);
+    if (player) {
+      if (this.clientPlayer?.playerId === player.playerId) {
+        let temp = this.clientPlayer;
+        this.clientPlayer = this.hostPlayer;
+        this.hostPlayer = temp;
+      }
+      // Spectators
+    }
+  }
+
+  public preparePlayerDisconnect(player: User) {
+    // const transientTimeout = setTimeout(() => {
+    //   this.gameRoomManager.playerLeaveRoom(player.playerId);
+    // }, 1000 * 60)
+    //player.setTransient(transientTimeout.ref());
   }
 
   public startGame() {
     if (this.hostPlayer && this.clientPlayer) {
       this.isOngoing = true;
+      this.roomSeed = PRNG.generateSeed();
       const coinFlip = Math.random() > 0.5;
 
       this.whitePlayer = coinFlip ? this.hostPlayer : this.clientPlayer;
@@ -72,6 +148,14 @@ export default class GameRoom {
       this.whitePlayer.socket.emit('startChessMove', { fromSquare, toSquare, promotion });
       this.blackPlayer.socket.emit('startChessMove', { fromSquare, toSquare, promotion });
     }
+  }
+
+  public resetRoomForRematch() {
+    this.isOngoing = false;
+    this.roomSeed = PRNG.generateSeed();
+    this.currentTurnWhite = true;
+    this.whitePlayerPokemonMove = null;
+    this.blackPlayerPokemonMove = null;
   }
 
   public validateAndEmitePokemonMove({ pokemonMove, playerId }) {

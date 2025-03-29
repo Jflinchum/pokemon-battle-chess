@@ -5,11 +5,29 @@ import { socket } from "../../../socket";
 import './Room.css';
 import Button from "../../common/Button/Button";
 
+interface Player {
+  playerName: string;
+  playerId: string;
+  transient: boolean;
+  viewingResults: boolean;
+  isHost: boolean;
+}
+
+const buildDefaultPlayer = (playerName: string, playerId: string, isHost: boolean): Player => {
+  return {
+    playerName,
+    playerId,
+    transient: false,
+    viewingResults: false,
+    isHost,
+  }
+}
+
 const Room = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
   const { gameState, dispatch } = useGameState();
 
-  const [connectedPlayers, setConnectedPlayers] = useState([userState.name]);
+  const [connectedPlayers, setConnectedPlayers] = useState<Player[]>([buildDefaultPlayer(userState.name, userState.id, gameState.isHost)]);
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -19,12 +37,8 @@ const Room = () => {
       console.log('disconnected');
     });
 
-    socket.on('connectedPlayers', (playerNames) => {
-      setConnectedPlayers(playerNames);
-    });
-
-    socket.on('playerDisconnected', (playerName) => {
-      setConnectedPlayers((curr) => curr.filter((name) => name !== playerName));
+    socket.on('connectedPlayers', (players: Player[]) => {
+      setConnectedPlayers(players);
     });
 
     socket.on('startGame', (gameOptions) => {
@@ -50,9 +64,9 @@ const Room = () => {
       <div>
         Connected Players:
         <ul className='roomPlayerList'>
-          {connectedPlayers.map((player, index) => (
-            <li key={index}>
-              {player}
+          {connectedPlayers.map((player) => (
+            <li key={player.playerId}>
+              {player.playerName} - {player.isHost ? 'Host ' : ' '} {player.viewingResults ? 'Viewing results... ' : ' '}
             </li>
           ))}
         </ul>

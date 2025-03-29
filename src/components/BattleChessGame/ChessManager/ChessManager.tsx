@@ -123,7 +123,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
   };
 
   return (
-    <div>
+    <div className='chessGameUI'>
       <p>Turn: {chessManager.moveNumber()}</p>
       <button onClick={() => setPokemonHighVis(!pokemonHighVis)}>Toggle Higher Visibility</button>
       {requestedPawnPromotion && (
@@ -139,8 +139,6 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
           }}
         />
       )}
-      {chessManager.isCheck() && (<p>Check!</p>)}
-      {chessManager.isCheckmate() && (<p>Checkmate! Gameover!</p>)}
       <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color} />
       <div className='chessGameContainer'>
         <ChessBoard pokemonHighVis={pokemonHighVis} pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />

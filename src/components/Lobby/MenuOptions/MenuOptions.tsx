@@ -30,6 +30,9 @@ const MenuOptions = ({ onCreateRoom }: MenuOptionProps) => {
       <li>
         <Button colorPrimary="green" onClick={onCreateRoom}>Create New Room</Button>
       </li>
+      <li>
+        <Button colorPrimary="darkblue" onClick={() => {}}>How to play</Button>
+      </li>
     </ul>
   );
 };

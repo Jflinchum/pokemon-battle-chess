@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useModalState } from "../../../../../context/ModalStateContext";
+import { RoomCodeModalProps, useModalState } from "../../../../../context/ModalStateContext";
 import PasscodeInput from "../../../PasscodeInput/PasscodeInput";
 import Button from "../../../Button/Button";
 import { useUserState } from "../../../../../context/UserStateContext";
@@ -13,7 +13,7 @@ const RoomCodeModal = () => {
   const [invalidPassword, setInvalidPassword] = useState(false)
 
   const handleJoinRoomClick = async () => {
-    const roomId = modalState.modalProps?.roomId || '';
+    const roomId = (modalState.modalProps as RoomCodeModalProps)?.roomId;
     const roomCode = inputRef.current?.value || '';
     const response = await joinRoom(roomId, roomCode, userState.id, userState.name);
     if (response.status !== 200) {

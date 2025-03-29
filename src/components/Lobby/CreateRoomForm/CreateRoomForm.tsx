@@ -4,11 +4,12 @@ import './CreateRoomForm.css'
 import PasscodeInput from "../../common/PasscodeInput/PasscodeInput";
 
 interface CreateRoomFormProps {
+  createRoomLoading: boolean;
   handleCreateRoom: ({ password }: { password: string }) => void;
   handleCancelRoomCreation: () => void;
 }
 
-const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation }: CreateRoomFormProps) => {
+const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation, createRoomLoading }: CreateRoomFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e: React.FormEvent) =>{ 
@@ -23,7 +24,7 @@ const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation }: CreateRo
       </div>
       <div className='roomFormActions'>
         <Button colorPrimary='brown' onClick={handleCancelRoomCreation}>Cancel</Button>
-        <Button colorPrimary='green' type='submit'>Create Room</Button>
+        <Button disabled={createRoomLoading} colorPrimary='green' type='submit'>Create Room</Button>
       </div>
     </form>
   );

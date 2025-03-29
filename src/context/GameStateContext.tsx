@@ -23,6 +23,7 @@ interface GameStateType {
 type GameStateAction = 
   { type: 'RESET_ROOM'; }
   | { type: 'CREATE_ROOM'; }
+  | { type: 'RETURN_TO_ROOM'; }
   | { type: 'START_MATCH'; payload: GameSettings };
 
 
@@ -42,6 +43,8 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
       return { ...gameState, isHost: true };
     case 'START_MATCH':
       return { ...gameState, matchStarted: true, gameSettings: action.payload };
+    case 'RETURN_TO_ROOM':
+      return { ...gameState, matchStarted: false };
     default:
       return gameState;
   }
@@ -51,7 +54,6 @@ const GameStateProvider = ({ children }: { children: ReactElement }) => {
   const [gameState, dispatch] = useReducer(gameStateReducer, initialGameState);
 
   return (
-
     <GameStateContext.Provider value={{ gameState, dispatch }}>
       {children}
     </GameStateContext.Provider>

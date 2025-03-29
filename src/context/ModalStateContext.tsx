@@ -1,22 +1,30 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
 import Modal from "../components/common/Modal/Modal";
+import { Color } from "chess.js";
 
-type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'CREATE_ROOM' | '';
+type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | '';
 
-interface RoomCodeModalProps {
+export interface RoomCodeModalProps {
   roomId: string;
 }
 
+export interface EndGameModalProps {
+  victor: Color;
+}
+
+type ModalProps = RoomCodeModalProps | EndGameModalProps | undefined;
+
 type ModalStateAction = 
-  { type: 'OPEN_ROOM_MODAL'; payload: { required?: boolean, modalProps: RoomCodeModalProps }; }
+  { type: 'OPEN_ROOM_MODAL'; payload: { required?: boolean, modalProps: ModalProps }; }
   | { type: 'OPEN_NAME_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_CREATE_ROOM_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
+  | { type: 'OPEN_END_GAME_MODAL'; payload: { required?: boolean, modalProps?: EndGameModalProps }; }
   | { type: 'CLOSE_MODAL'; };
 
 interface ModalState {
   currentModal: ModalName;
   required?: boolean;
-  modalProps?: RoomCodeModalProps;
+  modalProps?: RoomCodeModalProps | EndGameModalProps;
 }
 
 interface ModalStateType {
@@ -27,13 +35,16 @@ interface ModalStateType {
 export const ModalStateContext = createContext<ModalStateType | null>(null);
 
 export const modalStateReducer = (modalState: ModalState, action: ModalStateAction): ModalState => {
+
   switch (action.type) {
     case 'OPEN_ROOM_MODAL':
-      return { ...modalState, currentModal: 'ROOM_CODE', required: action.payload.required, modalProps: action.payload.modalProps };
+      return { ...modalState, currentModal: 'ROOM_CODE', required: action.payload.required, modalProps: action.payload.modalProps as RoomCodeModalProps };
     case 'OPEN_NAME_MODAL':
       return { ...modalState, currentModal: 'NAME_CHANGE', required: action.payload.required };
     case 'OPEN_CREATE_ROOM_MODAL':
       return { ...modalState, currentModal: 'CREATE_ROOM', required: action.payload.required };
+    case 'OPEN_END_GAME_MODAL':
+      return { ...modalState, currentModal: 'END_GAME', required: action.payload.required, modalProps: action.payload.modalProps as EndGameModalProps };
     case 'CLOSE_MODAL':
       return { ...modalState, currentModal: '', required: false };
     default:

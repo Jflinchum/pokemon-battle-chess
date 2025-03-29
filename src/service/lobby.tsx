@@ -49,7 +49,7 @@ export const joinRoom = async (roomId: string, password: string, playerId: strin
   });
 
   return response;
-}
+};
 
 export const getAvailableRooms = async () => {
   const response = await fetch('/api/getRooms', {
@@ -58,4 +58,4 @@ export const getAvailableRooms = async () => {
 
   const roomResponse = await response.json();
   return roomResponse.rooms;
-}
+};

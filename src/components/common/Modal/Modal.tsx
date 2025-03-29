@@ -2,6 +2,7 @@ import { useModalState } from "../../../context/ModalStateContext";
 import RoomCodeModal from "./Modals/RoomCodeModal/RoomCodeModal";
 import NameChangeModal from "./Modals/NameChangeModal/NameChangeModal";
 import CreateRoomModal from "./Modals/CreateRoomModal/CreateRoomModal";
+import EndGameModal from "./Modals/EndGameModal/EndGameModal";
 import './Modal.css';
 
 const renderModal = (currentModal: string) => {
@@ -12,6 +13,8 @@ const renderModal = (currentModal: string) => {
       return (<NameChangeModal />);
     case 'CREATE_ROOM':
         return (<CreateRoomModal />)
+    case 'END_GAME':
+        return (<EndGameModal />)
     default:
       <div>Not implemented</div>
   }
