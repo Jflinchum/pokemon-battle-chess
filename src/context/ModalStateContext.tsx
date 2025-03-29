@@ -2,7 +2,7 @@ import { useReducer, createContext, useContext, ReactElement, type Dispatch } fr
 import Modal from "../components/common/Modal/Modal";
 import { Color } from "chess.js";
 
-type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | '';
+type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'AVATAR_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | '';
 
 export interface RoomCodeModalProps {
   roomId: string;
@@ -17,6 +17,7 @@ type ModalProps = RoomCodeModalProps | EndGameModalProps | undefined;
 type ModalStateAction = 
   { type: 'OPEN_ROOM_MODAL'; payload: { required?: boolean, modalProps: ModalProps }; }
   | { type: 'OPEN_NAME_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
+  | { type: 'OPEN_AVATAR_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_CREATE_ROOM_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_END_GAME_MODAL'; payload: { required?: boolean, modalProps?: EndGameModalProps }; }
   | { type: 'CLOSE_MODAL'; };
@@ -41,6 +42,8 @@ export const modalStateReducer = (modalState: ModalState, action: ModalStateActi
       return { ...modalState, currentModal: 'ROOM_CODE', required: action.payload.required, modalProps: action.payload.modalProps as RoomCodeModalProps };
     case 'OPEN_NAME_MODAL':
       return { ...modalState, currentModal: 'NAME_CHANGE', required: action.payload.required };
+    case 'OPEN_AVATAR_MODAL':
+      return { ...modalState, currentModal: 'AVATAR_CHANGE', required: action.payload.required };
     case 'OPEN_CREATE_ROOM_MODAL':
       return { ...modalState, currentModal: 'CREATE_ROOM', required: action.payload.required };
     case 'OPEN_END_GAME_MODAL':

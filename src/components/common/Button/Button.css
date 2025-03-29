@@ -4,6 +4,7 @@
   height: 50px;
   border-radius: 6px;
   cursor: pointer;
+  box-shadow: 0 0 10px 0 black;
 }
 
 .tooltip {

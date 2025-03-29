@@ -1,10 +1,8 @@
 .lobbyContainer {
   display: flex;
-  gap: 32px;
-
-  padding: 0px 60px;
 }
 
 .roomListLobbyContainer {
   width: 100%;
+  padding: 0px 60px;
 }

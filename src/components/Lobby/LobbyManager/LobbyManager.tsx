@@ -4,11 +4,9 @@ import MenuOptions from "../MenuOptions/MenuOptions";
 import { getAvailableRooms } from "../../../service/lobby";
 import { useGameState } from "../../../context/GameStateContext";
 import './LobbyManager.css';
-import { useModalState } from "../../../context/ModalStateContext";
 
 const LobbyManager = () => {
   const [availableRooms, setAvailableRooms] = useState([]);
-  const { dispatch } = useModalState();
   const { dispatch: dispatchGameState } = useGameState();
 
 
@@ -27,14 +25,15 @@ const LobbyManager = () => {
   }, []);
 
   return (
-    <div className='lobbyContainer'>
-      <div>
-        <MenuOptions onCreateRoom={() => { dispatch({ type: 'OPEN_CREATE_ROOM_MODAL', payload: {} }); }} />
+    <>
+      <div className='lobbyContainer'>
+        <MenuOptions />
+        <div className='roomListLobbyContainer'>
+          <h1 className='mainMenuHeader'>Pokemon Battle Chess</h1>
+          <RoomList availableRooms={availableRooms} onRefresh={handleRefreshRoom}/>
+        </div>
       </div>
-      <div className='roomListLobbyContainer'>
-        <RoomList availableRooms={availableRooms} onRefresh={handleRefreshRoom}/>
-      </div>
-    </div>
+    </>
   );
 };
 

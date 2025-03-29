@@ -56,6 +56,10 @@ export const getAvailableRooms = async () => {
     method: 'GET',
   });
 
-  const roomResponse = await response.json();
-  return roomResponse.rooms;
+  if (response.status === 200) {
+    const roomResponse = await response.json();
+    return roomResponse?.rooms;
+  } else {
+    return [];
+  }
 };

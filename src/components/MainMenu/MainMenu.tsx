@@ -16,14 +16,13 @@ const MainMenu = () => {
   }, [userState.name]);
 
   return (
-    <div>
-      <h1 className='mainMenuHeader'>Pokemon Battle Chess</h1>
+    <>
       {
         userState.currentRoomId ?
         (<RoomManager />) :
         (<LobbyManager />)
       }
-    </div>
+    </>
   );
 }
 

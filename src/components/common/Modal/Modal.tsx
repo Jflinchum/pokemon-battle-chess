@@ -1,6 +1,9 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useModalState } from "../../../context/ModalStateContext";
 import RoomCodeModal from "./Modals/RoomCodeModal/RoomCodeModal";
 import NameChangeModal from "./Modals/NameChangeModal/NameChangeModal";
+import AvatarChangeModal from "./Modals/AvatarChangeModal/AvatarChangeModal";
 import CreateRoomModal from "./Modals/CreateRoomModal/CreateRoomModal";
 import EndGameModal from "./Modals/EndGameModal/EndGameModal";
 import './Modal.css';
@@ -11,6 +14,8 @@ const renderModal = (currentModal: string) => {
       return (<RoomCodeModal />);
     case 'NAME_CHANGE':
       return (<NameChangeModal />);
+    case 'AVATAR_CHANGE':
+      return (<AvatarChangeModal />);
     case 'CREATE_ROOM':
         return (<CreateRoomModal />)
     case 'END_GAME':
@@ -40,7 +45,9 @@ const Modal = () => {
                 {
                   !modalState.required && (
                     <div>
-                      <button onClick={handleCloseModal} className='closeModalButton' aria-label='Close Label'>x</button>
+                      <button onClick={handleCloseModal} className='closeModalButton' aria-label='Close Label'>
+                        <FontAwesomeIcon icon={faX} size='xl'/>
+                      </button>
                     </div>
                   )
                 }

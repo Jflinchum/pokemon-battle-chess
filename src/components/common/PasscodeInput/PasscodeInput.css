@@ -1,0 +1,26 @@
+.passcodeInputContainer {
+  display: inline-block;
+  label {
+    display: block;
+  }
+}
+
+.passcodeInputWrapper {
+  position: relative;
+
+  input {
+    height: 20px;
+  }
+
+  button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    height: 100%;
+  }
+}

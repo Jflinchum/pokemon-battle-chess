@@ -1,14 +1,14 @@
 import { ReactNode } from "react";
 import './Button.css';
 
-interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick?: () => void;
   colorPrimary?: string;
   colorSecondary?: string;
   toolTip?: ReactNode;
 };
 
-const Button = ({ onClick, colorPrimary = 'white', colorSecondary = 'white', children, toolTip, className = '', disabled }: ButtonProps) => {
+const Button = ({ onClick, colorPrimary = 'white', colorSecondary = 'white', children, toolTip, className = '', disabled, type }: ButtonProps) => {
 
   return (
     <button
@@ -16,6 +16,7 @@ const Button = ({ onClick, colorPrimary = 'white', colorSecondary = 'white', chi
       className={`button ${className}`}
       onClick={onClick}
       disabled={disabled}
+      type={type}
     >
       {children}
       {

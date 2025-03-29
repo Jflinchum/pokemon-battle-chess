@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useModalState } from "../../../../../context/ModalStateContext";
 import Button from "../../../Button/Button";
 import { useUserState } from "../../../../../context/UserStateContext";
@@ -9,8 +9,18 @@ const NameChangeModal = () => {
   const { userState, dispatch: userStateDispatch } = useUserState();
   const [name, setName] = useState(userState.name);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   const handleChangeName = () => {
     userStateDispatch({ type: 'SET_NAME', payload: name });
+    dispatch({ type: 'CLOSE_MODAL' });
+  }
+
+  const handleCancel = () => {
     dispatch({ type: 'CLOSE_MODAL' });
   }
 
@@ -25,10 +35,11 @@ const NameChangeModal = () => {
         }
         <div>
           <label>Name:</label>
-          <input value={name} onChange={(e) => setName(e.target.value)}/>
+          <input ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} maxLength={30}/>
         </div>
         <div>
-          <Button disabled={name.length === 0} colorPrimary="green" onClick={handleChangeName}>Submit</Button>
+          <Button type='button' colorPrimary="brown" onClick={handleCancel}>Cancel</Button>
+          <Button type='submit' disabled={name.length === 0} colorPrimary="green">Submit</Button>
         </div>
       </form>
     </div>

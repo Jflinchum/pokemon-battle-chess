@@ -16,6 +16,10 @@ export const getName = () => {
   return localStorage.getItem('name') || '';
 }
 
+export const getAvatar = () => {
+  return localStorage.getItem('avatarId') || '1';
+}
+
 export const getLastRoom = () => {
   return localStorage.getItem('mostRecentRoom') || '';
 }

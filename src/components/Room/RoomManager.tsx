@@ -25,6 +25,7 @@ const RoomManager = () => {
 
   return (
     <>
+      <h1 className='mainMenuHeader'>Pokemon Battle Chess</h1>
       {
         gameState.matchStarted ?
         (<BattleChessManager />) :

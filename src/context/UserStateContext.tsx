@@ -1,9 +1,10 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { getLastRoom, getName, getOrInitializeUUID } from "../utils";
+import { getAvatar, getLastRoom, getName, getOrInitializeUUID } from "../utils";
 import { leaveRoom } from "../service/lobby";
 
 interface UserState {
   name: string;
+  avatarId: string;
   id: string;
   currentRoomId: string;
   currentRoomCode: string;
@@ -16,6 +17,7 @@ interface UserStateType {
 
 type UserStateAction = 
   { type: 'SET_NAME'; payload: string }
+  | { type: 'SET_AVATAR'; payload: string }
   | { type: 'SET_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'JOIN_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'LEAVE_ROOM' };
@@ -27,6 +29,9 @@ export const userStateReducer = (userState: UserState, action: UserStateAction):
     case 'SET_NAME':
       localStorage.setItem('name', action.payload);
       return { ...userState, name: action.payload };
+    case 'SET_AVATAR':
+      localStorage.setItem('avatarId', `${action.payload}`);
+      return { ...userState, avatarId: action.payload };
     case 'SET_ROOM':
       localStorage.setItem('mostRecentRoom', action.payload.roomId);
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode };
@@ -44,6 +49,7 @@ export const userStateReducer = (userState: UserState, action: UserStateAction):
 const UserStateProvider = ({ children }: { children: ReactElement }) => {
   const [userState, dispatch] = useReducer(userStateReducer, {
     name: getName(),
+    avatarId: getAvatar(),
     id: getOrInitializeUUID(),
     currentRoomId: getLastRoom(),
     currentRoomCode: '',

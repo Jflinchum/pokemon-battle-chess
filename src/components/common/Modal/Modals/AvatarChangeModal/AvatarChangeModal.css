@@ -1,0 +1,27 @@
+.avatarChangeModalContainer {
+  width: 500px;
+}
+
+.avatarChangeTitle {
+  margin-top: 0;
+}
+
+.avatarChangeBody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 5px;
+  justify-content: center;
+  overflow-y: scroll;
+  max-height: 40vh;
+}
+
+.avatarButton {
+  display: inline-block;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, .15);
+  backdrop-filter: blur(5px);
+  height: 80px;
+  width: 80px;
+  border-radius: 4px;
+}

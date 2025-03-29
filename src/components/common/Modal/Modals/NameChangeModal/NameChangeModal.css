@@ -1,5 +1,24 @@
 .nameChangeModalContainer {
   width: 500px;
+
+  label {
+    display: block
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  button {
+    margin-right: 20px;
+  }
+
+  input {
+    height: 20px;
+    width: 60%;
+  }
 }
 
 .nameChangeTitle {
