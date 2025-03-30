@@ -1,0 +1,21 @@
+TODO:
+/api/getRooms pagination
+transient connection implementation and clean up
+spectators
+UI show status on pokemon
+Show stat buffs and drops on pokemon
+On Hover in battle, show pokemon in depth details
+Pokemon Details Card
+Choice items disabling move changing
+
+Draft pokemon onto pieces
+Disable support pokemon from team generation
+Room Options
+ - Draft or Randoms
+ - Preserve damage after battle
+ - Preserve move usage after battle
+ - Preserve item usage after battle
+ - Custom Teams
+ - Buff on chess piece attack
+ - Weather on random chess spaces
+ - Change pokemon on piece promotion
