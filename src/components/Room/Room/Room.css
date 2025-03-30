@@ -1,23 +1,33 @@
 
 .roomContainer {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   margin: 100px;
 
-  background-color: #374151;
+  background-color: rgb(70, 70, 70);
+  box-shadow: 0 0 10px 0 black;
   border-radius: 4px;
   padding: 20px;
 }
 
 .roomButtons {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+
   button {
-    margin-right: 12px;
+    margin-top: 12px;
   }
 }
 
-.roomPlayerList {
+.spectatorList {
+  width: 500px;
   list-style: none;
-  padding: 0;
+  padding: 10px;
+  background-color: #374151;
+  margin-left: auto;
+  overflow-y: scroll;
+  border-radius: 4px;
 
   li {
     height: 32px;
@@ -31,6 +41,36 @@
     }
     &:nth-child(even) {
       background-color: darkcyan;
+    }
+  }
+}
+
+.playerContainer {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  justify-content: center;
+  width: 100%;
+
+  span {
+    margin: auto 0;
+  }
+
+  .player {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    padding: 10px;
+    word-break: break-all;
+
+    span {
+      font-weight: 600;
+    }
+
+    img {
+      width: 80px;
+      height: 80px;
+      margin: auto;
     }
   }
 }

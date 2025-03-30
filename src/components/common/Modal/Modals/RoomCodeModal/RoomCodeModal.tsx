@@ -15,7 +15,7 @@ const RoomCodeModal = () => {
   const handleJoinRoomClick = async () => {
     const roomId = (modalState.modalProps as RoomCodeModalProps)?.roomId;
     const roomCode = inputRef.current?.value || '';
-    const response = await joinRoom(roomId, roomCode, userState.id, userState.name);
+    const response = await joinRoom(roomId, roomCode, userState.id, userState.name, userState.avatarId);
     if (response.status !== 200) {
       setInvalidPassword(true);
       return;

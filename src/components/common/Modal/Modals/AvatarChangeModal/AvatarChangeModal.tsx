@@ -1,4 +1,3 @@
-import { useRef, useEffect } from "react";
 import { Sprites } from "@pkmn/img";
 import { avatarIdMapping } from "./AvatarUtil";
 import { useUserState } from "../../../../../context/UserStateContext";

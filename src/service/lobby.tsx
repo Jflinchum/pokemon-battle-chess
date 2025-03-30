@@ -1,7 +1,7 @@
 import { socket } from "../socket";
 import { removeLastRoom } from "../utils";
 
-export const createNewRoom = async (playerId: string, playerName: string, password: string) => {
+export const createNewRoom = async (playerId: string, playerName: string, password: string, avatarId: string) => {
   const response = await fetch('/api/createRoom', {
     method: 'POST',
     headers: {
@@ -10,7 +10,8 @@ export const createNewRoom = async (playerId: string, playerName: string, passwo
     body: JSON.stringify({
       playerId,
       playerName,
-      password
+      password,
+      avatarId,
     })
   });
 
@@ -34,7 +35,7 @@ export const leaveRoom = async (roomId: string, playerId: string) => {
   socket.disconnect();
 };
 
-export const joinRoom = async (roomId: string, password: string, playerId: string, playerName: string) => {
+export const joinRoom = async (roomId: string, password: string, playerId: string, playerName: string, avatarId: string) => {
   const response = await fetch('/api/joinRoom', {
     method: 'POST',
     headers: {
@@ -44,7 +45,8 @@ export const joinRoom = async (roomId: string, password: string, playerId: strin
       roomId,
       password,
       playerId,
-      playerName
+      playerName,
+      avatarId,
     })
   });
 

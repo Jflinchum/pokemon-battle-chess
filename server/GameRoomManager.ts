@@ -15,8 +15,8 @@ export default class GameRoomManager{
     this.io = io;
   }
 
-  public getRoom(roomId: string): GameRoom | undefined {
-    return this.currentRooms[roomId];
+  public getRoom(roomId?: string): GameRoom | undefined {
+    return this.currentRooms[roomId || ''];
   }
 
   public addRoom(roomId: string, room: GameRoom) {

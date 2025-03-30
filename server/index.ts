@@ -50,10 +50,11 @@ app.get('/', (_, res) => {
  * The player that creates the room becomes the host.
  * TODO - restrict so player can only create one room
  */
-app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password }>('/api/createRoom', (req, res) => {
+app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password, avatarId }>('/api/createRoom', (req, res) => {
   const playerName = req.body.playerName;
   const playerId = req.body.playerId;
   const password = req.body.password;
+  const avatarId = req.body.avatarId;
 
   if (!playerName || !playerId) {
     res.status(400).send();
@@ -66,7 +67,7 @@ app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password
   }
   const newRoomId = crypto.randomUUID();
 
-  const host = new User(req.body.playerName, req.body.playerId);
+  const host = new User(req.body.playerName, req.body.playerId, req.body.avatarId || '1');
   const gameRoom = new GameRoom(newRoomId, host, password, gameRoomManager);
   gameRoomManager.addRoom(newRoomId, gameRoom);
 
@@ -82,11 +83,12 @@ app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password
  * - Send room id back to user
  * - User joins on socket
  */
-app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User['playerId'], playerName: User['playerName'], password: GameRoom['password'] }>('/api/joinRoom', (req, res) => {
+app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: User['playerId'], playerName?: User['playerName'], password?: GameRoom['password'], avatarId?: User['avatarId'] }>('/api/joinRoom', (req, res) => {
   const roomId = req.body.roomId;
   const playerId = req.body.playerId;
   const playerName = req.body.playerName;
   const password = req.body.password;
+  const avatarId = req.body.avatarId;
   const room = gameRoomManager.getRoom(roomId);
 
   if (!roomId || !playerId || !playerName) {
@@ -103,7 +105,7 @@ app.post<Empty, APIResponse<Empty>, { roomId: GameRoom['roomId'], playerId: User
     return;
   }
 
-  room.joinRoom(new User(playerName, playerId));
+  room.joinRoom(new User(playerName, playerId, avatarId || '1'));
   res.status(200).send({ data: { roomId: roomId } });
 });
 

@@ -9,7 +9,9 @@ export default class GameRoom {
   public roomSeed: string;
   public password: string;
   public hostPlayer: User | null = null;
+  // Rename to player 1 and player 2, since host can spectate
   public clientPlayer: User | null = null;
+  // Store list of spectators
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
 
@@ -56,9 +58,11 @@ export default class GameRoom {
     return (currentPlayers.filter((player) => player).map((player) => ({
       playerName: player?.playerName,
       playerId: player?.playerId,
+      avatarId: player?.avatarId,
       transient: !!player?.transient,
       viewingResults: player?.viewingResults,
-      isHost: player?.playerId === this.hostPlayer?.playerId
+      isHost: player?.playerId === this.hostPlayer?.playerId,
+      isClient: player?.playerId === this.clientPlayer?.playerId
     })));
   }
 

@@ -15,7 +15,7 @@ const CreateRoomModal = () => {
 
   const handleCreateRoom = async ({ password }: { password: string }) => {
     setCreateRoomLoading(true);
-    const roomId = await createNewRoom(userState.id, userState.name, password);
+    const roomId = await createNewRoom(userState.id, userState.name, password, userState.avatarId);
     if (roomId) {
       userStateDispatch({ type: 'SET_ROOM', payload: { roomId: roomId, roomCode: password } });
       dispatchGameState({ type: 'CREATE_ROOM' });
