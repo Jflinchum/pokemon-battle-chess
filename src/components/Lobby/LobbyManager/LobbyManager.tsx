@@ -22,6 +22,13 @@ const LobbyManager = () => {
     handleRefreshRoom();
     // Whenever we're back at the lobby, reset the room to a clean slate
     dispatchGameState({ type: 'RESET_ROOM' });
+
+    const refreshInterval = setInterval(() => {
+      handleRefreshRoom();
+    }, 1000 * 10);
+    return () => {
+      clearInterval(refreshInterval);
+    }
   }, []);
 
   return (

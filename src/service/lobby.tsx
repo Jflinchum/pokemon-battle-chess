@@ -1,5 +1,4 @@
 import { socket } from "../socket";
-import { removeLastRoom } from "../utils";
 
 export const createNewRoom = async (playerId: string, playerName: string, password: string, avatarId: string) => {
   const response = await fetch('/api/createRoom', {
@@ -31,7 +30,6 @@ export const leaveRoom = async (roomId: string, playerId: string) => {
       playerId
     })
   });
-  removeLastRoom();
   socket.disconnect();
 };
 

@@ -5,7 +5,7 @@ export default class User {
   public playerId: string;
   public avatarId: string;
   public playerSecret: string;
-  public socket: Socket;
+  public socket: Socket | null;
   // If the socket has disconnected temporarily
   public transient: NodeJS.Timeout | null;
   public viewingResults: boolean;

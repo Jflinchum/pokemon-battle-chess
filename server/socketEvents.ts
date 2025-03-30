@@ -60,6 +60,22 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
        */
     });
 
+    socket.on('requestToggleSpectating', (roomId, playerId) => {
+      const room = gameRoomManager.getRoom(roomId);
+
+      if (!room || !playerId) {
+        socket.disconnect();
+        return;
+      }
+      const player = room.getPlayer(playerId);
+      if (!player) {
+        return;
+      }
+
+      room.toggleSpectating(player);
+      io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
+    });
+
     socket.on('requestStartGame', (roomId, playerId) => {
       const room = gameRoomManager.getRoom(roomId);
 
@@ -86,7 +102,7 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
         return socket.disconnect();
       }
 
-      room.validateAndEmitePokemonMove({ pokemonMove, playerId });
+      room.validateAndEmitPokemonMove({ pokemonMove, playerId });
     });
 
     socket.on('setViewingResults', (roomId, playerId, viewingResults: boolean) => {

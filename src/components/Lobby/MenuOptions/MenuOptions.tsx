@@ -38,6 +38,9 @@ const MenuOptions = () => {
           )}
         </li>
         <li>
+          <Button colorPrimary="darkgoldenrod" onClick={() => {}}>Find Match (todo)</Button>
+        </li>
+        <li>
           <Button colorPrimary="green" onClick={handleCreateRoom}>Create New Room</Button>
         </li>
         <li>
@@ -47,7 +50,7 @@ const MenuOptions = () => {
           <Button colorPrimary="brown" onClick={handleChangeAvatar}>Change Avatar</Button>
         </li>
         <li>
-          <Button colorPrimary="darkblue" onClick={() => {}}>How to play</Button>
+          <Button colorPrimary="darkblue" onClick={() => {}}>How to play (todo)</Button>
         </li>
       </ul>
 

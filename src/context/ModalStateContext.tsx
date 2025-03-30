@@ -20,7 +20,7 @@ type ModalStateAction =
   | { type: 'OPEN_AVATAR_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_CREATE_ROOM_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_END_GAME_MODAL'; payload: { required?: boolean, modalProps?: EndGameModalProps }; }
-  | { type: 'CLOSE_MODAL'; };
+  | { type: 'CLOSE_MODAL'; payload?: {} };
 
 interface ModalState {
   currentModal: ModalName;
@@ -36,7 +36,6 @@ interface ModalStateType {
 export const ModalStateContext = createContext<ModalStateType | null>(null);
 
 export const modalStateReducer = (modalState: ModalState, action: ModalStateAction): ModalState => {
-
   switch (action.type) {
     case 'OPEN_ROOM_MODAL':
       return { ...modalState, currentModal: 'ROOM_CODE', required: action.payload.required, modalProps: action.payload.modalProps as RoomCodeModalProps };

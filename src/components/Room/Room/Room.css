@@ -8,6 +8,13 @@
   box-shadow: 0 0 10px 0 black;
   border-radius: 4px;
   padding: 20px;
+
+  @media (max-width: 1000px) {
+    flex-direction: column-reverse; 
+  }
+  @media (max-width: 500px) {
+    margin: 0;
+  }
 }
 
 .roomButtons {
@@ -18,29 +25,16 @@
   button {
     margin-top: 12px;
   }
-}
 
-.spectatorList {
-  width: 500px;
-  list-style: none;
-  padding: 10px;
-  background-color: #374151;
-  margin-left: auto;
-  overflow-y: scroll;
-  border-radius: 4px;
+  @media (max-width: 1000px) {
+    flex-direction: row-reverse;
+    justify-content: space-evenly;
+  }
 
-  li {
-    height: 32px;
-    font-size: 18px;
-    align-content: center;
-    padding: 8px;
-    border-radius: 4px;
-
-    &:nth-child(odd) {
-      background-color: grey;
-    }
-    &:nth-child(even) {
-      background-color: darkcyan;
+  @media (max-width: 500px) {
+    padding: 0;
+    button {
+      width: 80px;
     }
   }
 }

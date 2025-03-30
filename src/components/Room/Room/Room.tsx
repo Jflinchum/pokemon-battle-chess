@@ -5,15 +5,18 @@ import { socket } from "../../../socket";
 import './Room.css';
 import Button from "../../common/Button/Button";
 import { Sprites } from "@pkmn/img";
+import SpectatorList from "./SpectatorList/SpectatorList";
+import PlayerName from "./PlayerName/PlayerName";
 
-interface Player {
+export interface Player {
   playerName: string;
   playerId: string;
   avatarId: string;
   transient: boolean;
   viewingResults: boolean;
   isHost: boolean;
-  isClient: boolean;
+  isPlayer1: boolean;
+  isPlayer2: boolean;
   isSpectator: boolean;
 }
 
@@ -25,7 +28,8 @@ const buildDefaultPlayer = (playerName: string, playerId: string, avatarId: stri
     transient: false,
     viewingResults: false,
     isHost,
-    isClient: !isHost,
+    isPlayer1: false,
+    isPlayer2: false,
     isSpectator: false,
   }
 }
@@ -65,54 +69,68 @@ const Room = () => {
   const handleLeaveGame = () => {
     dispatchUserState({ type: 'LEAVE_ROOM' });
   }
+  
+  const handleToggleSpectating = () => {
+    socket.emit('requestToggleSpectating', userState.currentRoomId, userState.id);
+  }
 
-  const hostPlayer = useMemo(() => {
-    return connectedPlayers.find((player) => player.isHost);
+  const player1 = useMemo(() => {
+    return connectedPlayers.find((player) => player.isPlayer1);
   }, [connectedPlayers]);
 
-  const clientPlayer = useMemo(() => {
-    return connectedPlayers.find((player) => player.isClient);
+  const player2 = useMemo(() => {
+    return connectedPlayers.find((player) => player.isPlayer2);
   }, [connectedPlayers]);
+
+  const thisPlayer = useMemo(() => {
+    return connectedPlayers.find((player) => player.playerId === userState.id);
+  }, [connectedPlayers])
 
   return (
     <div className="roomContainer">
       <div className='roomButtons'>
-        <Button colorPrimary='green' onClick={handleStartGame} disabled={!gameState.isHost || connectedPlayers.length < 2}>Start Game</Button>
+        <Button
+          colorPrimary='green'
+          onClick={handleStartGame}
+          disabled={!gameState.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
+        >
+            Start Game
+        </Button>
+        <Button disabled={thisPlayer?.isSpectator ? (!!player1 && !!player2) : (false)} colorPrimary='blue' onClick={handleToggleSpectating}>
+          {
+            thisPlayer?.isSpectator ?
+            'Stop Spectating' :
+            'Move to Spectators'
+          }
+        </Button>
         <Button colorPrimary='brown' onClick={handleLeaveGame}>Leave Game</Button>
       </div>
 
       <div className='playerContainer'>
         <div className='player'>
-          <img src={Sprites.getAvatar(hostPlayer?.avatarId || '1')} />
-          <span>{hostPlayer?.playerName}</span>
+          {
+            player1 ? (
+              <>
+                <img src={Sprites.getAvatar(player1?.avatarId || '1')} />
+                <PlayerName player={player1}/>
+              </>
+            ) : null
+          }
         </div>
         <span>vs</span>
         <div className='player'>
           {
-            clientPlayer ? (
+            player2 ? (
               <>
-                <img src={Sprites.getAvatar(clientPlayer?.avatarId || '1')} />
-                <span>{clientPlayer?.playerName}</span>
+                <img src={Sprites.getAvatar(player2?.avatarId || '1')} />
+                <PlayerName player={player2}/>
               </>
             ) : null
           }
         </div>
       </div>
 
-      <div className='spectatorList'>
-        <span>Spectators</span>
-        <hr/>
-        <ul>
-          {connectedPlayers.map((player) => (
-            player.isSpectator ? 
-            (
-              <li key={player.playerId}>
-                {player.playerName} - {player.isHost ? 'Host ' : ' '} {player.viewingResults ? 'Viewing results... ' : ' '}
-              </li>
-            ) : null
-          ))}
-        </ul>
-      </div>
+      <SpectatorList players={connectedPlayers} />
     </div>
   );
 };

@@ -1,0 +1,36 @@
+
+.spectatorListContainer {
+  width: 500px;
+  background-color: #374151;
+  margin-left: auto;
+  overflow-y: scroll;
+  border-radius: 4px;
+  
+  @media (max-width: 1000px) {
+    width: 100%;
+  }
+  
+  .spectatorList {
+    padding: 10px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    word-break: break-all;
+    font-size: 12px;
+    align-content: center;
+    padding: 8px;
+    border-radius: 4px;
+
+    &:nth-child(odd) {
+      background-color: grey;
+    }
+    &:nth-child(even) {
+      background-color: darkcyan;
+    }
+  }
+}

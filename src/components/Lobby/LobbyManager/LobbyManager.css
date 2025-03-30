@@ -1,8 +1,16 @@
 .lobbyContainer {
   display: flex;
+
+  @media (max-width: 500px) {
+    flex-direction: column;
+  }
 }
 
 .roomListLobbyContainer {
   width: 100%;
-  padding: 0px 60px;
+  padding: 0px 60px; 
+  
+  @media (max-width: 500px) {
+    padding: 0;
+  }
 }

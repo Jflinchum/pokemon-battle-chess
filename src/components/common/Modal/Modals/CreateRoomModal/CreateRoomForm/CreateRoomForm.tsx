@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import Button from "../../common/Button/Button";
+import Button from "../../../../Button/Button";
 import './CreateRoomForm.css'
-import PasscodeInput from "../../common/PasscodeInput/PasscodeInput";
+import PasscodeInput from "../../../../PasscodeInput/PasscodeInput";
 
 interface CreateRoomFormProps {
   createRoomLoading: boolean;

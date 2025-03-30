@@ -2,7 +2,7 @@ import { useModalState } from "../../../../../context/ModalStateContext";
 import { useUserState } from "../../../../../context/UserStateContext";
 import { useGameState } from "../../../../../context/GameStateContext";
 import { createNewRoom } from "../../../../../service/lobby";
-import CreateRoomForm from "../../../../Lobby/CreateRoomForm/CreateRoomForm";
+import CreateRoomForm from "./CreateRoomForm/CreateRoomForm";
 import './CreateRoomModal.css';
 import { useState } from "react";
 

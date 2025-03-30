@@ -3,8 +3,14 @@ TODO:
 transient connection implementation and clean up
 spectators
 On Hover in battle, show pokemon in depth details
-Pokemon Details Card
-Choice items disabling move changing
+Battle Timers
+Matchmaking
+Changing to spectator and back
+Host controls
+  - Set player color
+  - Update settings
+  - Kick player
+  - Promote to host
 
 Draft pokemon onto pieces
 Disable support pokemon from team generation

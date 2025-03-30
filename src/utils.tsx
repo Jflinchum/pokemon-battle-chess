@@ -19,11 +19,3 @@ export const getName = () => {
 export const getAvatar = () => {
   return localStorage.getItem('avatarId') || '1';
 }
-
-export const getLastRoom = () => {
-  return localStorage.getItem('mostRecentRoom') || '';
-}
-
-export const removeLastRoom = () => {
-  return localStorage.removeItem('mostRecentRoom');
-}

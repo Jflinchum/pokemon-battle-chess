@@ -10,7 +10,9 @@ export default class GameRoom {
   public password: string;
   public hostPlayer: User | null = null;
   // Rename to player 1 and player 2, since host can spectate
-  public clientPlayer: User | null = null;
+  public player1: User | null = null;
+  public player2: User | null = null;
+  public playerList: User[];
   // Store list of spectators
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
@@ -25,6 +27,8 @@ export default class GameRoom {
   constructor(roomId: string, hostPlayer: User, password: string, gameRoomManager: GameRoomManager) {
     this.roomId = roomId;
     this.hostPlayer = hostPlayer;
+    this.player1 = hostPlayer;
+    this.playerList = [hostPlayer];
     this.roomSeed = PRNG.generateSeed();
     this.isOngoing = false;
     this.password = password;
@@ -32,64 +36,56 @@ export default class GameRoom {
   }
 
   public joinRoom(player: User) {
-    this.clientPlayer = player;
+    if (this.player2 === null) {
+      this.player2 = player;
+    }
+    this.playerList.push(player);
   }
 
   public leaveRoom(playerId?: string) {
-    if (this.clientPlayer?.playerId === playerId) {
-      this.clientPlayer = null;
-    } else if (this.hostPlayer?.playerId === playerId) {
+    if (this.player1?.playerId === playerId) {
+      this.player1 = null;
+    }
+    if (this.player2?.playerId === playerId) {
+      this.player2 = null;
+    }
+    if (this.hostPlayer?.playerId === playerId) {
       this.hostPlayer = null;
     }
+    this.playerList.filter((player) => playerId !== player.playerId);
   }
 
   public hasPlayers() {
-    return this.hostPlayer || this.clientPlayer;
+    return this.playerList.length > 0;
   }
 
   public getPlayers(): User[] {
-    const currentPlayers: (User | null)[] = [this.hostPlayer, this.clientPlayer];
-    return (currentPlayers.filter((player) => player) as User[]);
+    return this.playerList;
   }
 
-
   public getPublicPlayerList() {
-    const currentPlayers: (User | null)[] = [this.hostPlayer, this.clientPlayer];
-    return (currentPlayers.filter((player) => player).map((player) => ({
-      playerName: player?.playerName,
-      playerId: player?.playerId,
-      avatarId: player?.avatarId,
-      transient: !!player?.transient,
-      viewingResults: player?.viewingResults,
-      isHost: player?.playerId === this.hostPlayer?.playerId,
-      isClient: player?.playerId === this.clientPlayer?.playerId
+    return (this.playerList.map((player) => ({
+      playerName: player.playerName,
+      playerId: player.playerId,
+      avatarId: player.avatarId,
+      transient: !!player.transient,
+      viewingResults: player.viewingResults,
+      isHost: player.playerId === this.hostPlayer?.playerId,
+      isPlayer1: player.playerId === this.player1?.playerId,
+      isPlayer2: player.playerId === this.player2?.playerId,
+      isSpectator: player.playerId !== this.player1?.playerId && player.playerId !== this.player2?.playerId,
     })));
   }
 
   public getTransientPlayers(): User[] {
-    const currentPlayers: (User | null)[] = [this.hostPlayer, this.clientPlayer];
-    return currentPlayers.filter((player) => player && player.transient) as User[];
+    return this.playerList.filter((player) => player && player.transient) as User[];
   }
 
   /**
    * Client, host, or spectator
    */
   public getPlayer(playerIdOrSocket?: string | Socket): User | null {
-    if (typeof playerIdOrSocket === 'string') {
-      if (this.hostPlayer?.playerId === playerIdOrSocket) {
-        return this.hostPlayer;
-      } else if (this.clientPlayer?.playerId === playerIdOrSocket) {
-        return this.clientPlayer;
-      }
-    } else if (playerIdOrSocket instanceof Socket) {
-      if (this.hostPlayer?.socket?.id === playerIdOrSocket.id) {
-        return this.hostPlayer;
-      } else if (this.clientPlayer?.socket?.id === playerIdOrSocket.id) {
-        return this.clientPlayer;
-      }
-    }
-
-    return null;
+    return this.playerList.find((player) => (player.playerId === playerIdOrSocket || player.socket?.id === playerIdOrSocket)) || null;
   }
 
   /**
@@ -97,32 +93,20 @@ export default class GameRoom {
    */
   public getActivePlayer(playerIdOrSocket?: string | Socket): User | null {
     if (typeof playerIdOrSocket === 'string') {
-      if (this.hostPlayer?.playerId === playerIdOrSocket) {
-        return this.hostPlayer;
-      } else if (this.clientPlayer?.playerId === playerIdOrSocket) {
-        return this.clientPlayer;
+      if (this.player1?.playerId === playerIdOrSocket) {
+        return this.player1;
+      } else if (this.player2?.playerId === playerIdOrSocket) {
+        return this.player2;
       }
     } else if (playerIdOrSocket instanceof Socket) {
-      if (this.hostPlayer?.socket?.id === playerIdOrSocket.id) {
-        return this.hostPlayer;
-      } else if (this.clientPlayer?.socket?.id === playerIdOrSocket.id) {
-        return this.clientPlayer;
+      if (this.player1?.socket?.id === playerIdOrSocket.id) {
+        return this.player1;
+      } else if (this.player2?.socket?.id === playerIdOrSocket.id) {
+        return this.player2;
       }
     }
 
     return null;
-  }
-
-  public promoteToHost(playerId) {
-    const player = this.getPlayer(playerId);
-    if (player) {
-      if (this.clientPlayer?.playerId === player.playerId) {
-        let temp = this.clientPlayer;
-        this.clientPlayer = this.hostPlayer;
-        this.hostPlayer = temp;
-      }
-      // Spectators
-    }
   }
 
   public preparePlayerDisconnect(player: User) {
@@ -132,25 +116,48 @@ export default class GameRoom {
     //player.setTransient(transientTimeout.ref());
   }
 
+  public toggleSpectating(player: User) {
+    if (player.playerId === this.player1?.playerId) {
+      this.player1 = null;
+    } else if (player.playerId === this.player2?.playerId) {
+      this.player2 = null;
+    } else {
+      if (!this.player1) {
+        this.player1 = player;
+      } else if (!this.player2) {
+        this.player2 = player;
+      }
+    }
+  }
+
+  public getSpectators() {
+    return this.playerList.filter((player) =>
+      player.playerId !== this.player1?.playerId &&
+      player.playerId !== this.player2?.playerId
+    );
+  }
+
   public startGame() {
-    if (this.hostPlayer && this.clientPlayer) {
+    if (this.hostPlayer && this.player1 && this.player2) {
       this.isOngoing = true;
       this.roomSeed = PRNG.generateSeed();
       const coinFlip = Math.random() > 0.5;
 
-      this.whitePlayer = coinFlip ? this.hostPlayer : this.clientPlayer;
-      this.blackPlayer = coinFlip ? this.clientPlayer : this.hostPlayer;
+      this.whitePlayer = coinFlip ? this.player1 : this.player2;
+      this.blackPlayer = coinFlip ? this.player2 : this.player1;
 
-      this.whitePlayer.socket.emit('startGame', { color: 'w', seed: this.roomSeed, player1Name: this.whitePlayer.playerName, player2Name: this.blackPlayer.playerName });
-      this.blackPlayer.socket.emit('startGame', { color: 'b', seed: this.roomSeed, player1Name: this.blackPlayer.playerName, player2Name: this.whitePlayer.playerName });
+      this.whitePlayer.socket?.emit('startGame', { color: 'w', seed: this.roomSeed, player1Name: this.whitePlayer.playerName, player2Name: this.blackPlayer.playerName });
+      this.blackPlayer.socket?.emit('startGame', { color: 'b', seed: this.roomSeed, player1Name: this.blackPlayer.playerName, player2Name: this.whitePlayer.playerName });
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startGame', { color: 'w', seed: this.roomSeed, player1Name: this.whitePlayer.playerName, player2Name: this.blackPlayer.playerName }))
     }
   }
 
   public validateAndEmitChessMove({ fromSquare, toSquare, promotion, playerId }) {
     if ((this.currentTurnWhite && this.whitePlayer.playerId === playerId) || (!this.currentTurnWhite && this.blackPlayer.playerId === playerId)) {
       this.currentTurnWhite = !this.currentTurnWhite;
-      this.whitePlayer.socket.emit('startChessMove', { fromSquare, toSquare, promotion });
-      this.blackPlayer.socket.emit('startChessMove', { fromSquare, toSquare, promotion });
+      this.whitePlayer.socket?.emit('startChessMove', { fromSquare, toSquare, promotion });
+      this.blackPlayer.socket?.emit('startChessMove', { fromSquare, toSquare, promotion });
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startChessMove', { fromSquare, toSquare, promotion }))
     }
   }
 
@@ -162,7 +169,7 @@ export default class GameRoom {
     this.blackPlayerPokemonMove = null;
   }
 
-  public validateAndEmitePokemonMove({ pokemonMove, playerId }) {
+  public validateAndEmitPokemonMove({ pokemonMove, playerId }) {
     const isUndo = pokemonMove === 'undo'
     if (playerId === this.whitePlayer.playerId) {
       if (isUndo) {
@@ -179,30 +186,42 @@ export default class GameRoom {
     }
 
     if (this.whitePlayerPokemonMove && this.blackPlayerPokemonMove) {
-      this.whitePlayer.socket.emit('startPokemonMove',
+      this.whitePlayer.socket?.emit('startPokemonMove',
         {
           move: `>p1 move ${this.whitePlayerPokemonMove}`,
           playerId: this.whitePlayer.playerId
         }
       );
-      this.whitePlayer.socket.emit('startPokemonMove',
+      this.whitePlayer.socket?.emit('startPokemonMove',
         {
           move: `>p2 move ${this.blackPlayerPokemonMove}`,
           playerId: this.whitePlayer.playerId
         }
       );
-      this.blackPlayer.socket.emit('startPokemonMove',
+      this.blackPlayer.socket?.emit('startPokemonMove',
         {
           move: `>p1 move ${this.blackPlayerPokemonMove}`,
           playerId: this.blackPlayer.playerId
         }
       );
-      this.blackPlayer.socket.emit('startPokemonMove',
+      this.blackPlayer.socket?.emit('startPokemonMove',
         {
           move: `>p2 move ${this.whitePlayerPokemonMove}`,
           playerId: this.blackPlayer.playerId
         }
       );
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonMove',
+        {
+          move: `>p1 move ${this.whitePlayerPokemonMove}`,
+          playerId: this.whitePlayer.playerId
+        }
+      ))
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonMove',
+        {
+          move: `>p2 move ${this.blackPlayerPokemonMove}`,
+          playerId: this.whitePlayer.playerId
+        }
+      ))
       this.whitePlayerPokemonMove = null;
       this.blackPlayerPokemonMove = null;
     }

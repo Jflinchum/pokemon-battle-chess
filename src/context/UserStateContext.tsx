@@ -1,5 +1,5 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { getAvatar, getLastRoom, getName, getOrInitializeUUID } from "../utils";
+import { getAvatar, getName, getOrInitializeUUID } from "../utils";
 import { leaveRoom } from "../service/lobby";
 
 interface UserState {
@@ -33,13 +33,11 @@ export const userStateReducer = (userState: UserState, action: UserStateAction):
       localStorage.setItem('avatarId', `${action.payload}`);
       return { ...userState, avatarId: action.payload };
     case 'SET_ROOM':
-      localStorage.setItem('mostRecentRoom', action.payload.roomId);
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode };
     case 'LEAVE_ROOM':
       leaveRoom(userState.currentRoomId, userState.id);
       return { ...userState, currentRoomId: '', currentRoomCode: '' };
     case 'JOIN_ROOM':
-      localStorage.setItem('mostRecentRoom', action.payload.roomId);
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode } ;
     default:
       return userState;
@@ -51,7 +49,7 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     name: getName(),
     avatarId: getAvatar(),
     id: getOrInitializeUUID(),
-    currentRoomId: getLastRoom(),
+    currentRoomId: '',
     currentRoomCode: '',
   });
 

@@ -1,11 +1,9 @@
 .endGameModalContainer {
-  width: 500px;
   text-align: center;
 }
 
 .endGameTitle {
   margin-top: 0;
-  text-align: center;
 }
 
 .endGameBottomActions {

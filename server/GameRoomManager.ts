@@ -36,11 +36,7 @@ export default class GameRoomManager{
   public getGameFromUserSocket(socket: Socket): GameRoom | null {
     let gameRoom: GameRoom | null = null;
     for (let room in this.currentRooms) {
-      if (this.currentRooms[room].hostPlayer?.socket?.id === socket.id) {
-        gameRoom = this.currentRooms[room];
-        break;
-      }
-      if (this.currentRooms[room].clientPlayer?.socket?.id === socket.id) {
+      if (this.currentRooms[room].getPlayer(socket.id)) {
         gameRoom = this.currentRooms[room];
         break;
       }

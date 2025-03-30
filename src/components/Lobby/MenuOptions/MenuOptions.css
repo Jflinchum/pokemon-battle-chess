@@ -9,8 +9,18 @@
   background-color: rgb(70, 70, 70);
   box-shadow: 0 0 10px 0 black;
 
+  @media (max-width: 500px) {
+    flex-direction: row;
+    min-height: 30px;
+    width: 100%;
+  }
+
   ul {
     padding: 20px 0px;
+
+    @media (max-width: 500px) {
+      width: 100%;
+    }
   }
 
   li {
@@ -23,6 +33,7 @@
 .nameContainer {
   padding: 0 10px;
   text-align: center;
+
 }
 
 .avatarContainer {
@@ -30,9 +41,17 @@
     display: block;
     margin: 0 auto;
   }
+
+  @media (max-width: 500px) {
+    display: none;
+  }
 }
 
 .pokemonOfTheDayContainer {
   margin-top: auto;
   margin-bottom: 20px;
+
+  @media (max-width: 500px) {
+    display: none;
+  }
 }

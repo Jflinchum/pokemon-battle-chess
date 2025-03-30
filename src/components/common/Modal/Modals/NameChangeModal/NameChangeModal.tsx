@@ -38,7 +38,12 @@ const NameChangeModal = () => {
           <input ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} maxLength={30}/>
         </div>
         <div>
-          <Button type='button' colorPrimary="brown" onClick={handleCancel}>Cancel</Button>
+
+          {
+            (modalState.required ? null : (
+              <Button type='button' colorPrimary="brown" onClick={handleCancel}>Cancel</Button>
+            ))
+          }
           <Button type='submit' disabled={name.length === 0} colorPrimary="green">Submit</Button>
         </div>
       </form>

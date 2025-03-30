@@ -66,7 +66,7 @@ app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password
   }
   const newRoomId = crypto.randomUUID();
 
-  const host = new User(req.body.playerName, req.body.playerId, req.body.avatarId || '1');
+  const host = new User(playerName, playerId, avatarId || '1');
   const gameRoom = new GameRoom(newRoomId, host, password, gameRoomManager);
   gameRoomManager.addRoom(newRoomId, gameRoom);
 
@@ -95,9 +95,6 @@ app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: Us
     return;
   } else if (!room) {
     res.status(400).send({ message: 'Room is no longer available' });
-    return;
-  } else if (room?.clientPlayer) {
-    res.status(400).send({ message: 'Room is full' });
     return;
   } else if (room?.password !== password) {
     res.status(401).send({ message: 'Invalid password' });
