@@ -1,4 +1,3 @@
-import { useState } from "react";
 import ChessPieceSprite from "../ChessPieceSprite/ChessPieceSprite";
 import { Sprites } from "@pkmn/img";
 import { GenderName } from "@pkmn/data";
@@ -10,14 +9,12 @@ interface PokemonChessPieceSpriteProps {
   type?: PieceSymbol
   color?: Color
   pokemon?: PokemonSet
-  pokemonHighVis?: boolean
 }
 
-const PokemonChessPieceSprite = ({ type, color, pokemon, pokemonHighVis }: PokemonChessPieceSpriteProps) => {
-  const [pokemonOpacity, setPokemonOpacity] = useState<number>(30);
+const PokemonChessPieceSprite = ({ type, color, pokemon }: PokemonChessPieceSpriteProps) => {
 
   return (
-    <div className='pieceSpriteContainer' onMouseEnter={() => setPokemonOpacity(80)} onMouseLeave={() => setPokemonOpacity(30)}>
+    <div className='pieceSpriteContainer'>
       {
         type && color && (
           <ChessPieceSprite type={type} color={color} className='chessPiece' />
@@ -25,7 +22,7 @@ const PokemonChessPieceSprite = ({ type, color, pokemon, pokemonHighVis }: Pokem
       }
       {
         pokemon && (
-          <img style={{ opacity: `${pokemonHighVis ? 100 : pokemonOpacity}%` }} src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url} className='pokemonPieceSprite'/>
+          <img src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url} className='pokemonPieceSprite'/>
         )
       }
     </div>

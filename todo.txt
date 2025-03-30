@@ -2,8 +2,6 @@ TODO:
 /api/getRooms pagination
 transient connection implementation and clean up
 spectators
-UI show status on pokemon
-Show stat buffs and drops on pokemon
 On Hover in battle, show pokemon in depth details
 Pokemon Details Card
 Choice items disabling move changing

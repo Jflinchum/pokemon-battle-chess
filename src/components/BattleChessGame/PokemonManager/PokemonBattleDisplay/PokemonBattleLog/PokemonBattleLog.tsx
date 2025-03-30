@@ -6,6 +6,7 @@ import './PokemonBattleLog.css';
 
 interface PokemonBattleLogProps {
   battleHistory: { args: ArgType, kwArgs: BattleArgsKWArgType }[];
+  simple?: boolean;
 }
 
 const getClassnameFromBattleArg = (args: ArgType) => {
@@ -23,7 +24,7 @@ const formatTextFromBattleArg = (text: string, args: ArgType) => {
   return text;
 }
 
-const PokemonBattleLog = ({ battleHistory }: PokemonBattleLogProps) => {
+const PokemonBattleLog = ({ battleHistory, simple }: PokemonBattleLogProps) => {
   const formatter = useMemo(() => (new LogFormatter()), []);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +36,7 @@ const PokemonBattleLog = ({ battleHistory }: PokemonBattleLogProps) => {
   }, [battleHistory]);
 
   return (
-    <div className='pokemonBattleLogContainer' ref={containerRef}>
+    <div className={`pokemonBattleLogContainer ${simple ? 'simpleLogContainer' : ''}`} ref={containerRef}>
       {
         battleHistory.map(({ args, kwArgs }, index) => {
           let totalLog: { text: string, args: string[]  }[] = [];

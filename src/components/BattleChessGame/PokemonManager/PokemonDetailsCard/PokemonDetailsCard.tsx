@@ -5,18 +5,26 @@ import { GenderName } from "@pkmn/data";
 import PokemonMoveChoices from '../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices';
 
 interface PokemonDetailsCard {
-  pokemon: PokemonSet,
+  pokemon?: PokemonSet,
 }
 
 const PokemonDetailsCard = ({ pokemon }: PokemonDetailsCard) => {
 
   return (
     <div className='pokemonDetailsContainer'>
-      <p>{pokemon.name}</p>
-      <img className='pokemonDetailsSprite' src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url}/>
-      <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
-      <p>Item: {pokemon.item}</p> 
-      <p>Ability: {pokemon.ability}</p>
+      {
+        pokemon ?
+        (
+          <>
+            <p>{pokemon.name}</p>
+            <img className='pokemonDetailsSprite' src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url}/>
+            <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
+            <p>Item: {pokemon.item}</p> 
+            <p>Ability: {pokemon.ability}</p>
+          </>
+        ) :
+        null
+      }
     </div>
   )
 }

@@ -37,7 +37,7 @@ export class PokemonBattleChessManager {
     return this._chessPieces.filter((piece) => piece.color === color && piece.square === null);
   }
 
-  public getPokemonFromSquare = (square?: Square) => {
+  public getPokemonFromSquare = (square?: Square | null) => {
     if (!square) {
       return null;
     }

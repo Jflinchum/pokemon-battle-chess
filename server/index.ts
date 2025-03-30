@@ -48,7 +48,6 @@ app.get('/', (_, res) => {
 /**
  * Creates a room and adds it in memory.
  * The player that creates the room becomes the host.
- * TODO - restrict so player can only create one room
  */
 app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password, avatarId }>('/api/createRoom', (req, res) => {
   const playerName = req.body.playerName;

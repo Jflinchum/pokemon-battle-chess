@@ -12,10 +12,9 @@ interface ChessBoardProps {
   highlightedSquares: Square[],
   selectedSquare: Square | null,
   pokemonManager: PokemonBattleChessManager,
-  pokemonHighVis: boolean,
 }
 
-const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, pokemonManager, pokemonHighVis }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, pokemonManager }: ChessBoardProps) => {
   const { gameState } = useGameState();
 
   const boardColumnPerspective = (squares: ChessBoardSquare[][]) => {
@@ -51,7 +50,6 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
                 highlighted={highlightedSquares.includes(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
                 pokemon={pokemonManager.getPokemonFromSquare(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))?.pkmn}
-                pokemonHighVis={pokemonHighVis}
               />
             ))
           }

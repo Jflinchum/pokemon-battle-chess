@@ -10,15 +10,14 @@ interface ChessSquareProps {
   highlighted: boolean
   selected: boolean
   pokemon?: PokemonSet
-  pokemonHighVis: boolean
 }
 
 
-const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, pokemon, pokemonHighVis }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, pokemon }: ChessSquareProps) => {
 
   return (
     <div className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''}`} onClick={() => { onClick(square) }}>
-      <PokemonChessPieceSprite type={square?.type} color={square?.color} pokemon={pokemon} pokemonHighVis={pokemonHighVis} />
+      <PokemonChessPieceSprite type={square?.type} color={square?.color} pokemon={pokemon} />
       {
         square?.square[0] === 'a' &&
         (

@@ -28,7 +28,6 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
-  const [pokemonHighVis, setPokemonHighVis] = useState(false);
   const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
 
   useEffect(() => {
@@ -125,7 +124,6 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
   return (
     <div className='chessGameUI'>
       <p>Turn: {chessManager.moveNumber()}</p>
-      <button onClick={() => setPokemonHighVis(!pokemonHighVis)}>Toggle Higher Visibility</button>
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice
           color={requestedPawnPromotion.color}
@@ -141,8 +139,8 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
       )}
       <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color} />
       <div className='chessGameContainer'>
-        <ChessBoard pokemonHighVis={pokemonHighVis} pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
-        {selectedSquare && pokemonManager.getPokemonFromSquare(selectedSquare) && <PokemonDetailsCard pokemon={pokemonManager.getPokemonFromSquare(selectedSquare)!.pkmn} />}
+        <ChessBoard pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
+        <PokemonDetailsCard pokemon={pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn} />
       </div>
       <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color === 'w' ? 'b' : 'w'} />
     </div>

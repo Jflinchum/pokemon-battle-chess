@@ -105,7 +105,8 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory 
     <>
       <PokemonBattleDisplay
         battleState={battle}
-        parsedBattleLog={delayedBattleLog}
+        fullBattleLog={parsedBattleLog}
+        delayedBattleLog={delayedBattleLog}
         onMoveSelect={(move) => {
           socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
         }}

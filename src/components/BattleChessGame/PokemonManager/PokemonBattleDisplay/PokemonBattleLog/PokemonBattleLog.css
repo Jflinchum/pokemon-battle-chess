@@ -7,7 +7,20 @@
   color: black;
   border: solid black 4px;
 
+  &.simpleLogContainer {
+    height: 80px;
+    width: 600px;
+  }
+  @media (min-width: 999px) {
+    &.simpleLogContainer {
+      display: none;
+    }
+  }
+
   @media (max-width: 1000px) {
+    &.simpleLogContainer {
+      display: block;
+    }
     display: none;
   }
 }
