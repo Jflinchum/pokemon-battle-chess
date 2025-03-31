@@ -5,7 +5,7 @@ import { GenderName } from "@pkmn/data";
 import PokemonMoveChoices from '../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices';
 
 interface PokemonDetailsCard {
-  pokemon?: PokemonSet,
+  pokemon?: PokemonSet | null,
 }
 
 const PokemonDetailsCard = ({ pokemon }: PokemonDetailsCard) => {

@@ -1,5 +1,5 @@
 import User from "./User";
-import GameOptions from './GameOptions';
+import { GameOptions } from './GameOptions';
 import { PRNG } from '@pkmn/sim'
 import { Socket } from "socket.io";
 import GameRoomManager from "./GameRoomManager";
@@ -52,7 +52,7 @@ export default class GameRoom {
     if (this.hostPlayer?.playerId === playerId) {
       this.hostPlayer = null;
     }
-    this.playerList.filter((player) => playerId !== player.playerId);
+    this.playerList = this.playerList.filter((player) => playerId !== player.playerId);
   }
 
   public hasPlayers() {
@@ -137,6 +137,22 @@ export default class GameRoom {
     );
   }
 
+  public setOptions(options: GameOptions) {
+    this.roomGameOptions = {
+      format: options.format || 'random',
+    };
+  }
+
+  private buildStartGameArgs(color: 'w' | 'b') {
+    return {
+      color,
+      seed: this.roomSeed,
+      player1Name: this.whitePlayer.playerName,
+      player2Name: this.blackPlayer.playerName,
+      options: this.roomGameOptions,
+    };
+  }
+
   public startGame() {
     if (this.hostPlayer && this.player1 && this.player2) {
       this.isOngoing = true;
@@ -146,9 +162,9 @@ export default class GameRoom {
       this.whitePlayer = coinFlip ? this.player1 : this.player2;
       this.blackPlayer = coinFlip ? this.player2 : this.player1;
 
-      this.whitePlayer.socket?.emit('startGame', { color: 'w', seed: this.roomSeed, player1Name: this.whitePlayer.playerName, player2Name: this.blackPlayer.playerName });
-      this.blackPlayer.socket?.emit('startGame', { color: 'b', seed: this.roomSeed, player1Name: this.blackPlayer.playerName, player2Name: this.whitePlayer.playerName });
-      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startGame', { color: 'w', seed: this.roomSeed, player1Name: this.whitePlayer.playerName, player2Name: this.blackPlayer.playerName }))
+      this.whitePlayer.socket?.emit('startGame', this.buildStartGameArgs('w'));
+      this.blackPlayer.socket?.emit('startGame', this.buildStartGameArgs('b'));
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startGame', this.buildStartGameArgs('w')));
     }
   }
 
@@ -225,5 +241,15 @@ export default class GameRoom {
       this.whitePlayerPokemonMove = null;
       this.blackPlayerPokemonMove = null;
     }
-  }
+  };
+
+  public validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId }) {
+    if (playerId === this.whitePlayer.playerId) {
+      this.blackPlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w' });
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w' }));
+    } else if (playerId === this.blackPlayer.playerId) {
+      this.whitePlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b' });
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b' }));
+    }
+  };
 }

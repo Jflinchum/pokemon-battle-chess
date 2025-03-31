@@ -108,7 +108,7 @@ app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: Us
 app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: User['playerId'] }>('/api/leaveRoom', (req, res) => {
   const roomId = req.body.roomId;
   if (!roomId || !gameRoomManager.getRoom(roomId)) {
-    res.status(204);
+    res.status(204).send();
     return;
   }
   gameRoomManager.playerLeaveRoom(roomId, req.body.playerId);

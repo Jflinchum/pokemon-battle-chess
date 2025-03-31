@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useGameState } from "../../../context/GameStateContext";
+import { useGameState, GameOptions } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import { socket } from "../../../socket";
 import './Room.css';
@@ -7,6 +7,7 @@ import Button from "../../common/Button/Button";
 import { Sprites } from "@pkmn/img";
 import SpectatorList from "./SpectatorList/SpectatorList";
 import PlayerName from "./PlayerName/PlayerName";
+import RoomOptions from "./RoomOptions/RoomOptions";
 
 export interface Player {
   playerName: string;
@@ -39,6 +40,7 @@ const Room = () => {
   const { gameState, dispatch } = useGameState();
 
   const [connectedPlayers, setConnectedPlayers] = useState<Player[]>([buildDefaultPlayer(userState.name, userState.id, userState.avatarId, gameState.isHost)]);
+  const [gameOptions, setGameOptions] = useState<GameOptions>(gameState.gameSettings.options)
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -52,13 +54,21 @@ const Room = () => {
       setConnectedPlayers(players);
     });
 
-    socket.on('startGame', (gameOptions) => {
-      dispatch({ type: 'START_MATCH', payload: gameOptions });
+    socket.on('changeGameOptions', (options: GameOptions) => {
+      if (!gameState.isHost) {
+        setGameOptions(options);
+      }
+    });
+
+    socket.on('startGame', (settings) => {
+      dispatch({ type: 'START_MATCH', payload: settings });
     });
 
     return () => {
       socket.off('connect');
       socket.off('disconnect');
+      socket.off('connectedPlayers');
+      socket.off('changeGameOptions');
     }
   }, []);
 
@@ -74,6 +84,13 @@ const Room = () => {
     socket.emit('requestToggleSpectating', userState.currentRoomId, userState.id);
   }
 
+  const handleRoomOptionsChange = (options: GameOptions) => {
+    if (options && gameState.isHost) {
+      socket.emit('requestChangeGameOptions', userState.currentRoomId, userState.id, options);
+      setGameOptions(options);
+    }
+  }
+
   const player1 = useMemo(() => {
     return connectedPlayers.find((player) => player.isPlayer1);
   }, [connectedPlayers]);
@@ -87,50 +104,54 @@ const Room = () => {
   }, [connectedPlayers])
 
   return (
-    <div className="roomContainer">
-      <div className='roomButtons'>
-        <Button
-          colorPrimary='green'
-          onClick={handleStartGame}
-          disabled={!gameState.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
-        >
-            Start Game
-        </Button>
-        <Button disabled={thisPlayer?.isSpectator ? (!!player1 && !!player2) : (false)} colorPrimary='blue' onClick={handleToggleSpectating}>
-          {
-            thisPlayer?.isSpectator ?
-            'Stop Spectating' :
-            'Move to Spectators'
-          }
-        </Button>
-        <Button colorPrimary='brown' onClick={handleLeaveGame}>Leave Game</Button>
-      </div>
-
-      <div className='playerContainer'>
-        <div className='player'>
-          {
-            player1 ? (
-              <>
-                <img src={Sprites.getAvatar(player1?.avatarId || '1')} />
-                <PlayerName player={player1}/>
-              </>
-            ) : null
-          }
+    <div className='roomContainer'>
+      <div className="roomPlayerContainer">
+        <div className='roomButtons'>
+          <Button
+            colorPrimary='green'
+            onClick={handleStartGame}
+            disabled={!gameState.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
+          >
+              Start Game
+          </Button>
+          <Button disabled={thisPlayer?.isSpectator ? (!!player1 && !!player2) : (false)} colorPrimary='blue' onClick={handleToggleSpectating}>
+            {
+              thisPlayer?.isSpectator ?
+              'Stop Spectating' :
+              'Move to Spectators'
+            }
+          </Button>
+          <Button colorPrimary='brown' onClick={handleLeaveGame}>Leave Game</Button>
         </div>
-        <span>vs</span>
-        <div className='player'>
-          {
-            player2 ? (
-              <>
-                <img src={Sprites.getAvatar(player2?.avatarId || '1')} />
-                <PlayerName player={player2}/>
-              </>
-            ) : null
-          }
-        </div>
-      </div>
 
-      <SpectatorList players={connectedPlayers} />
+        <div className='playerContainer'>
+          <div className='player'>
+            {
+              player1 ? (
+                <>
+                  <img src={Sprites.getAvatar(player1?.avatarId || '1')} />
+                  <PlayerName player={player1}/>
+                </>
+              ) : null
+            }
+          </div>
+          <span>vs</span>
+          <div className='player'>
+            {
+              player2 ? (
+                <>
+                  <img src={Sprites.getAvatar(player2?.avatarId || '1')} />
+                  <PlayerName player={player2}/>
+                </>
+              ) : null
+            }
+          </div>
+        </div>
+
+        <SpectatorList players={connectedPlayers} />
+      </div>
+      <hr/>
+      <RoomOptions isHost={thisPlayer?.isHost} gameOptions={gameOptions} onChange={handleRoomOptionsChange} />
     </div>
   );
 };

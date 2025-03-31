@@ -53,6 +53,7 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       socket.join(room.roomId);
       io.to(roomId).emit('connectedPlayers', room.getPublicPlayerList());
       io.to(roomId).emit('transientPlayers', room.getTransientPlayers());
+      socket.emit('changeGameOptions', room.roomGameOptions);
       console.log(`Player ${playerId} joined room ${roomId}`);
 
       /**
@@ -74,6 +75,18 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
 
       room.toggleSpectating(player);
       io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
+    });
+
+    socket.on('requestChangeGameOptions', (roomId, playerId, gameOptions) => {
+      const room = gameRoomManager.getRoom(roomId);
+
+      if (!room || room.hostPlayer?.playerId !== playerId) {
+        socket.disconnect();
+        return;
+      }
+
+      room.setOptions(gameOptions);
+      room.hostPlayer?.socket?.broadcast.emit('changeGameOptions', gameOptions);
     });
 
     socket.on('requestStartGame', (roomId, playerId) => {
@@ -105,6 +118,15 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       room.validateAndEmitPokemonMove({ pokemonMove, playerId });
     });
 
+    socket.on('requestDraftPokemon', ({ roomId, playerId, square, draftPokemonIndex }) => {
+      const room = gameRoomManager.getRoom(roomId);
+      if (!room || !playerId) {
+        return socket.disconnect();
+      }
+
+      room.validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId });
+    });
+
     socket.on('setViewingResults', (roomId, playerId, viewingResults: boolean) => {
       const room = gameRoomManager.getRoom(roomId);
       if (!room || !playerId || !room.getPlayer(playerId)) {
@@ -116,6 +138,6 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       }
       room.getPlayer(playerId)?.setViewingResults(!!viewingResults);
       io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
-    })
+    });
   });
 }

@@ -1,7 +1,4 @@
-
 .roomContainer {
-  display: flex;
-  flex-direction: row;
   margin: 100px;
 
   background-color: rgb(70, 70, 70);
@@ -9,11 +6,17 @@
   border-radius: 4px;
   padding: 20px;
 
-  @media (max-width: 1000px) {
-    flex-direction: column-reverse; 
-  }
   @media (max-width: 500px) {
     margin: 0;
+  }
+}
+
+.roomPlayerContainer {
+  display: flex;
+  flex-direction: row;
+
+  @media (max-width: 1000px) {
+    flex-direction: column-reverse; 
   }
 }
 

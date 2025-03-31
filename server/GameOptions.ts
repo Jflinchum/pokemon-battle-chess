@@ -1,4 +1,5 @@
+type FormatID = 'random' | 'draft';
 
-export default class GameOptions {
-
-};
+export interface GameOptions {
+  format: FormatID;
+}

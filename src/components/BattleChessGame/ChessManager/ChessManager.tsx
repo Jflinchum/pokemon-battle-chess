@@ -2,13 +2,12 @@ import { useState, useEffect, useMemo } from 'react'
 import { Chess, Square, Move } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
-import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 import PokemonDetailsCard from '../PokemonManager/PokemonDetailsCard/PokemonDetailsCard';
 import './ChessManager.css';
 import { MoveAttempt } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
 import TakenChessPieces from './TakenChessPieces/TakenChessPieces';
-import { getCastledRookSquare, getVerboseChessMove } from './util';
+import { getCastledRookSquare, getVerboseChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
 import { socket } from '../../../socket';
 import { useUserState } from '../../../context/UserStateContext';
@@ -17,10 +16,13 @@ interface ChessManagerProps {
   chessManager: Chess,
   pokemonManager: PokemonBattleChessManager,
   onAttemptMove: (attemptedMove: MoveAttempt) => void;
-  currentPokemonBattle: CurrentBattle | null
 }
 
-const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPokemonBattle }: ChessManagerProps) => {
+const ChessManager = ({ chessManager, pokemonManager, onAttemptMove }: ChessManagerProps) => {
+  /**
+   * TODO: 
+   *  - Set up context providers to handle pokemon manager state
+   */
   const { gameState } = useGameState();
   const { userState } = useUserState();
   const color = useMemo(() => gameState.gameSettings!.color, [gameState])
@@ -64,14 +66,6 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
     }
   }, [])
 
-  useEffect(() => {
-    if (!currentPokemonBattle) {
-      setBoard(chessManager.board());
-      setHighlightedSquare([]);
-      setSelectedSquare(null);
-    }
-  }, [currentPokemonBattle]);
-
   const cancelSelection = () => {
     setSelectedSquare(null);
     setHighlightedSquare([]);
@@ -93,16 +87,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
     socket.emit('requestChessMove', { fromSquare, toSquare, promotion, roomId: userState.currentRoomId, playerId: userState.id });
   }
 
-  /**
-   * TODO: 
-   *  - Set up context providers to handle pokemon manager state
-   */
-
   const handleSquareClick = (square: Square) => {
-    // Ignore inputs if ongoing pokemon battle
-    if (currentPokemonBattle) {
-      return;
-    }
     setRequestedPawnPromotion(null);
     // If there's no current selected square, or the clicked square isn't a valid move, then set the clicked square to the current selected square
     if (!selectedSquare || !chessManager.moves({ square: selectedSquare, piece: chessManager.get(selectedSquare)?.type, verbose: true }).some((move) => (move.to === square && move.color === color))) {
@@ -137,12 +122,25 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, currentPoke
           }}
         />
       )}
-      <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color} />
+      <TakenChessPieces
+        takenPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color!)}
+      />
       <div className='chessGameContainer'>
-        <ChessBoard pokemonManager={pokemonManager} boardState={board} onSquareClick={handleSquareClick} highlightedSquares={highlightedSquares} selectedSquare={selectedSquare} />
-        <PokemonDetailsCard pokemon={pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn} />
+        <ChessBoard
+          boardState={mergeBoardAndPokemonState(board, pokemonManager)}
+          onSquareClick={handleSquareClick}
+          highlightedSquares={highlightedSquares}
+          selectedSquare={selectedSquare}
+        />
+        <PokemonDetailsCard
+          pokemon={
+            pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn
+          }
+        />
       </div>
-      <TakenChessPieces pokemonManager={pokemonManager} color={gameState.gameSettings!.color === 'w' ? 'b' : 'w'} />
+      <TakenChessPieces
+        takenPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
+      />
     </div>
   )
 }

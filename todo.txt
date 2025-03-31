@@ -11,6 +11,7 @@ Host controls
   - Update settings
   - Kick player
   - Promote to host
+Responsive design in game
 
 Draft pokemon onto pieces
 Disable support pokemon from team generation

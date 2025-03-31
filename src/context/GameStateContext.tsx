@@ -1,18 +1,26 @@
 import { Color } from "chess.js";
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
 import { PRNGSeed } from '@pkmn/sim';
+import { getGameOptions } from "../utils";
+
+export interface GameOptions {
+  format: FormatID;
+}
+
+export type FormatID = 'random' | 'draft';
 
 interface GameSettings {
-  seed: PRNGSeed;
-  player1Name: string;
-  player2Name: string;
-  color: Color;
+  seed?: PRNGSeed;
+  player1Name?: string;
+  player2Name?: string;
+  color?: Color;
+  options: GameOptions;
 }
 
 interface GameState {
   matchStarted: boolean;
   isHost: boolean;
-  gameSettings?: GameSettings;
+  gameSettings: GameSettings;
 }
 
 interface GameStateType {
@@ -26,19 +34,22 @@ type GameStateAction =
   | { type: 'RETURN_TO_ROOM'; }
   | { type: 'START_MATCH'; payload: GameSettings };
 
-
-const initialGameState = {
-  matchStarted: false,
-  isHost: false,
-  gameSettings: undefined,
-};
-
 export const GameStateContext = createContext<GameStateType | null>(null);
+
+const getInitialGameState = (): GameState => (
+  {
+    matchStarted: false,
+    isHost: false,
+    gameSettings: {
+      options: getGameOptions()
+    },
+  }
+);
 
 export const gameStateReducer = (gameState: GameState, action: GameStateAction): GameState => {
   switch (action.type) {
     case 'RESET_ROOM':
-      return initialGameState;
+      return getInitialGameState();
     case 'CREATE_ROOM':
       return { ...gameState, isHost: true };
     case 'START_MATCH':
@@ -51,7 +62,7 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
 }
 
 const GameStateProvider = ({ children }: { children: ReactElement }) => {
-  const [gameState, dispatch] = useReducer(gameStateReducer, initialGameState);
+  const [gameState, dispatch] = useReducer(gameStateReducer, getInitialGameState());
 
   return (
     <GameStateContext.Provider value={{ gameState, dispatch }}>

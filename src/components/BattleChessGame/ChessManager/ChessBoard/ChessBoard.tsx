@@ -1,23 +1,21 @@
 import { Square } from 'chess.js';
-import { ChessBoardSquare } from '../types';
+import { PokemonChessBoardSquare } from '../types';
 import { getSquareColor, getSquareFromIndices } from '../util';
 import ChessSquare from './ChessSquare/ChessSquare';
 import './ChessBoard.css';
-import { PokemonBattleChessManager } from '../../PokemonManager/PokemonBattleChessManager';
 import { useGameState } from '../../../../context/GameStateContext';
 
 interface ChessBoardProps {
-  boardState: ChessBoardSquare[][],
+  boardState: PokemonChessBoardSquare[][],
   onSquareClick: (arg0: Square) => void,
   highlightedSquares: Square[],
   selectedSquare: Square | null,
-  pokemonManager: PokemonBattleChessManager,
 }
 
-const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, pokemonManager }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare }: ChessBoardProps) => {
   const { gameState } = useGameState();
 
-  const boardColumnPerspective = (squares: ChessBoardSquare[][]) => {
+  const boardColumnPerspective = (squares: PokemonChessBoardSquare[][]) => {
     if (gameState.gameSettings?.color === 'w') {
       return squares;
     } else{
@@ -42,14 +40,14 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
             boardRow.map((boardSquare, columnIndex) => (
               <ChessSquare
                 key={columnIndex}
-                square={{...boardSquare, square: getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)} as ChessBoardSquare}
+                square={{...boardSquare, square: getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)} as PokemonChessBoardSquare}
                 backgroundColor={getSquareColor(normalizedRowIndex(rowIndex), columnIndex)}
                 onClick={(square) => {
                   onSquareClick(square?.square || getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex));
                 }}
                 highlighted={highlightedSquares.includes(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
-                pokemon={pokemonManager.getPokemonFromSquare(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))?.pkmn}
+                pokemon={boardSquare?.pokemon}
               />
             ))
           }

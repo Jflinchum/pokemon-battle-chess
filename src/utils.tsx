@@ -1,3 +1,4 @@
+import { GameOptions } from "./context/GameStateContext";
 
 export const getOrInitializeUUID = () => {
   const localStorageUUID = localStorage.getItem('uuid');
@@ -18,4 +19,13 @@ export const getName = () => {
 
 export const getAvatar = () => {
   return localStorage.getItem('avatarId') || '1';
+}
+
+
+export const getGameOptions = () => {
+  const defaultGameOptions: GameOptions = {
+    format: 'random',
+  };
+  const localStorageGameOptions = localStorage.getItem('defaultGameOptions');
+  return localStorageGameOptions ? JSON.parse(localStorageGameOptions ) : defaultGameOptions;
 }

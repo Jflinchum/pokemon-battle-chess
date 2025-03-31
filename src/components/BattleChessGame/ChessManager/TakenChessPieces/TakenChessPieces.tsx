@@ -1,15 +1,12 @@
-import { PokemonBattleChessManager } from "../../PokemonManager/PokemonBattleChessManager";
-import { Color } from "chess.js";
+import { PokemonPiece } from "../../PokemonManager/PokemonBattleChessManager";
 import PokemonChessPieceSprite from "../ChessBoard/PokemonChessPieceSprite/PokemonChessPieceSprite";
 import './TakenChessPieces.css';
 
 interface TakenChessPiecesProps {
-  pokemonManager: PokemonBattleChessManager,
-  color: Color,
+  takenPieces: PokemonPiece[];
 }
 
-const TakenChessPieces = ({ pokemonManager, color }: TakenChessPiecesProps) => {
-  const takenPieces = pokemonManager.getTakenChessPieces(color);
+const TakenChessPieces = ({ takenPieces }: TakenChessPiecesProps) => {
   return (
     <div className='takenChessPiecesContainer'>
       {
