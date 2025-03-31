@@ -13,10 +13,7 @@ export const createNewRoom = async (playerId: string, playerName: string, passwo
       avatarId,
     })
   });
-
-  const { data } = await response.json();
-
-  return data.roomId;
+  return response;
 };
 
 export const leaveRoom = async (roomId: string, playerId: string) => {
@@ -56,10 +53,5 @@ export const getAvailableRooms = async () => {
     method: 'GET',
   });
 
-  if (response.status === 200) {
-    const roomResponse = await response.json();
-    return roomResponse?.rooms;
-  } else {
-    return [];
-  }
+  return response;
 };

@@ -5,17 +5,20 @@ import { useModalState } from "../../../context/ModalStateContext";
 import { joinRoom } from "../../../service/lobby";
 import Button from "../../common/Button/Button";
 import './RoomList.css';
+import ErrorMessage from "../../common/ErrorMessage/ErrorMessage";
 
 interface RoomListProps {
   availableRooms: { roomId: string, hostName: string, hasPassword: boolean }[];
   onRefresh: () => void;
+  errorText?: string;
 }
 
-const RoomList = ({ availableRooms, onRefresh }: RoomListProps) => {
+const RoomList = ({ availableRooms, onRefresh, errorText }: RoomListProps) => {
   const { dispatch, userState } = useUserState();
   const { dispatch: dispatchModalState } = useModalState();
   const [roomSearch, setRoomSearch] = useState('');
   const [refreshDisabled, setRefreshDisabled] = useState(false);
+  const [joinErrorText, setJoinErrorText] = useState('');
 
   const handleRefreshRoom = () => {
     setRefreshDisabled(true);
@@ -28,11 +31,16 @@ const RoomList = ({ availableRooms, onRefresh }: RoomListProps) => {
   }
 
   const handleJoinRoom = async ({ roomId, hasPassword }: { roomId: string, hasPassword: boolean }) => {
+    setJoinErrorText('');
     if (hasPassword) {
       dispatchModalState({ type: 'OPEN_ROOM_MODAL', payload: { modalProps: { roomId: roomId } } });
     } else {
-      await joinRoom(roomId, '', userState.id, userState.name, userState.avatarId);
-      dispatch({ type: 'JOIN_ROOM', payload: { roomId: roomId, roomCode: '' } });
+      const response = await joinRoom(roomId, '', userState.id, userState.name, userState.avatarId);
+      if (response.status === 200) {
+        dispatch({ type: 'JOIN_ROOM', payload: { roomId: roomId, roomCode: '' } });
+      } else {
+        setJoinErrorText('Failed to join room.')
+      }
     }
   }
 
@@ -40,6 +48,8 @@ const RoomList = ({ availableRooms, onRefresh }: RoomListProps) => {
   // TODO - Debounce room search and send to backend and pagination
   return (
     <div className='roomListContainer'>
+      <ErrorMessage display='block'>{errorText}</ErrorMessage>
+      <ErrorMessage display='block'>{joinErrorText}</ErrorMessage>
       <div className='roomListTopActions'>
         <span>Rooms:</span>
         <input value={roomSearch} onChange={(e) => setRoomSearch(e.target.value)} className='roomSearch' placeholder='Search for rooms'/>

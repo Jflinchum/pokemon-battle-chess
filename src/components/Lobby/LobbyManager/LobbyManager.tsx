@@ -8,12 +8,18 @@ import './LobbyManager.css';
 const LobbyManager = () => {
   const [availableRooms, setAvailableRooms] = useState([]);
   const { dispatch: dispatchGameState } = useGameState();
-
+  const [errorText, setErrorText] = useState('');
 
   const handleRefreshRoom = () => {
+    setErrorText('');
     const fetchRooms = async () => {
-      const rooms = await getAvailableRooms();
-      setAvailableRooms(rooms);
+      const response = await getAvailableRooms();
+      if (response.status === 200) {
+        const { rooms } = await response.json();
+        setAvailableRooms(rooms || []);
+      } else {
+        setErrorText('Error while getting rooms.');
+      }
     }
     fetchRooms();
   }
@@ -37,7 +43,7 @@ const LobbyManager = () => {
         <MenuOptions />
         <div className='roomListLobbyContainer'>
           <h1 className='mainMenuHeader'>Pokemon Battle Chess</h1>
-          <RoomList availableRooms={availableRooms} onRefresh={handleRefreshRoom}/>
+          <RoomList availableRooms={availableRooms} onRefresh={handleRefreshRoom} errorText={errorText}/>
         </div>
       </div>
     </>

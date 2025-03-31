@@ -1,3 +1,13 @@
+.roomCodeModalContainer {
+  min-width: 250px;
+}
+
 .roomCodeTitle {
   margin-top: 0;
+}
+
+.roomCodeActions {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }

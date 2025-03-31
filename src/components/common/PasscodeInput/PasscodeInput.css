@@ -10,6 +10,7 @@
 
   input {
     height: 20px;
+    width: 95%;
   }
 
   button {
