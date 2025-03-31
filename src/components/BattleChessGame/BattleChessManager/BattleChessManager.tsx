@@ -24,7 +24,6 @@ function BattleChessManager() {
   const { gameState } = useGameState();
   /**
    * TODO:
-   * - Draft pokemon onto pieces
    * - Disable support pokemon from team generation
    * - Room Options
    *    - Draft or Randoms
