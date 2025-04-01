@@ -5,8 +5,6 @@ import GameRoomManager from "./GameRoomManager";
  * Custom Socket events
  * - joinRoom
  * - connectedPlayers
- * - transientPlayers
- *   - TODO - remove and wrap everything under 'connectedPlayers'
  * - requestStartGame
  * - startGame
  * - requestChessMove
@@ -26,8 +24,9 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       const room = gameRoomManager.getGameFromUserSocket(socket);
       const player = room?.getPlayer(socket);
       if (room && player) {
+        console.log(`Preparing player for disconnect. ${player.playerId}`);
         room.preparePlayerDisconnect(player);
-        io.to(room.roomId).emit('transientPlayers', room.getTransientPlayers());
+        io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
     });
 
@@ -45,14 +44,13 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
        */
       const user = room.getPlayer(playerId);
       user?.assignSocket(socket);
-      if (user?.transient) {
-        clearTimeout(user.transient);
-        user?.setTransient(null);
+      if (room.transientPlayerList[playerId]) {
+        clearTimeout(room.transientPlayerList[playerId]);
+        delete room.transientPlayerList[playerId];
       }
 
       socket.join(room.roomId);
       io.to(roomId).emit('connectedPlayers', room.getPublicPlayerList());
-      io.to(roomId).emit('transientPlayers', room.getTransientPlayers());
       socket.emit('changeGameOptions', room.roomGameOptions);
       console.log(`Player ${playerId} joined room ${roomId}`);
 

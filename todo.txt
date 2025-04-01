@@ -1,6 +1,5 @@
 TODO:
 /api/getRooms pagination
-transient connection implementation and clean up
 On Hover in battle, show pokemon in depth details
 Battle Timers
 Matchmaking
@@ -10,6 +9,11 @@ Host controls
   - Kick player
   - Promote to host
 Responsive design in game
+Rejoining a game in progress
+  - Would have to track history of game and send it back to client
+  - Could also store state of game clientside?
+    - Current board state
+    - Current pokemon battle state
 
 Disable support pokemon from team generation
 Room Options

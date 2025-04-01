@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCrown, faBookOpen, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faCrown, faBookOpen, faEye, faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { Player } from "../Room";
 import './PlayerName.css';
 
@@ -23,6 +23,11 @@ const PlayerName = ({ player }: PlayerNameProps) => {
       {
         player.isSpectator ? (
           <FontAwesomeIcon icon={faEye} className='nameIcon' title='Spectating' />
+        ) : null
+      }
+      {
+        player.transient ? (
+          <FontAwesomeIcon icon={faPlugCircleXmark} className='nameIcon' title='Connection Issues' />
         ) : null
       }
       {player.playerName}

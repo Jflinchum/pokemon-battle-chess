@@ -13,6 +13,7 @@ export default class GameRoom {
   public player1: User | null = null;
   public player2: User | null = null;
   public playerList: User[];
+  public transientPlayerList: Record<User['playerId'], NodeJS.Timeout> = {};
   // Store list of spectators
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
@@ -68,7 +69,7 @@ export default class GameRoom {
       playerName: player.playerName,
       playerId: player.playerId,
       avatarId: player.avatarId,
-      transient: !!player.transient,
+      transient: !!this.transientPlayerList[player.playerId],
       viewingResults: player.viewingResults,
       isHost: player.playerId === this.hostPlayer?.playerId,
       isPlayer1: player.playerId === this.player1?.playerId,
@@ -77,15 +78,17 @@ export default class GameRoom {
     })));
   }
 
-  public getTransientPlayers(): User[] {
-    return this.playerList.filter((player) => player && player.transient) as User[];
-  }
-
   /**
    * Client, host, or spectator
    */
   public getPlayer(playerIdOrSocket?: string | Socket): User | null {
-    return this.playerList.find((player) => (player.playerId === playerIdOrSocket || player.socket?.id === playerIdOrSocket)) || null;
+    return this.playerList.find((player) => {
+      if (playerIdOrSocket instanceof Socket) {
+        return player.socket?.id === playerIdOrSocket.id
+      } else {
+        return player.playerId === playerIdOrSocket;
+      }
+    }) || null;
   }
 
   /**
@@ -110,10 +113,11 @@ export default class GameRoom {
   }
 
   public preparePlayerDisconnect(player: User) {
-    // const transientTimeout = setTimeout(() => {
-    //   this.gameRoomManager.playerLeaveRoom(player.playerId);
-    // }, 1000 * 60)
-    //player.setTransient(transientTimeout.ref());
+    const transientTimeout = setTimeout(() => {
+      console.log('Player disconnection exceeded timeout. Forcing them out of the room.');
+      this.gameRoomManager.playerLeaveRoom(this.roomId, player.playerId);
+    }, 1000 * 5);
+    this.transientPlayerList[player.playerId] = transientTimeout;
   }
 
   public toggleSpectating(player: User) {

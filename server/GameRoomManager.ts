@@ -36,7 +36,7 @@ export default class GameRoomManager{
   public getGameFromUserSocket(socket: Socket): GameRoom | null {
     let gameRoom: GameRoom | null = null;
     for (let room in this.currentRooms) {
-      if (this.currentRooms[room].getPlayer(socket.id)) {
+      if (this.currentRooms[room].getPlayer(socket)) {
         gameRoom = this.currentRooms[room];
         break;
       }
@@ -55,7 +55,7 @@ export default class GameRoomManager{
     return player;
   }
   
-  public playerLeaveRoom (roomId: string, playerId?: string) {
+  public playerLeaveRoom(roomId: string, playerId?: string) {
     const room = this.getRoom(roomId);
 
     if (room) {

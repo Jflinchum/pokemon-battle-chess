@@ -10,6 +10,13 @@ import GameRoom from './GameRoom';
 import { keyLocation, certLocation } from './config';
 import { assignSocketEvents } from './socketEvents';
 
+interface APIResponse<Data> {
+  data?: Data
+  message?: string
+}
+
+interface Empty {}
+
 const serverPort = 3000;
 const allowedOrigins = ['https://localhost:5173'];
 
@@ -101,7 +108,11 @@ app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: Us
     return;
   }
 
-  room.joinRoom(new User(playerName, playerId, avatarId || '1'));
+  if (room.getPlayer(playerId) && room.transientPlayerList[playerId]) {
+    clearTimeout(room.transientPlayerList[playerId]);
+  } else {
+    room.joinRoom(new User(playerName, playerId, avatarId || '1'));
+  }
   res.status(200).send({ data: { roomId: roomId } });
 });
 
