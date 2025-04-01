@@ -62,6 +62,11 @@ export default class GameRoomManager{
       const player = room.getPlayer(playerId);
       const isActivePlayer = room.getActivePlayer(player?.playerId);
 
+      if (playerId && room.transientPlayerList[playerId]) {
+        clearTimeout(room.transientPlayerList[playerId]);
+        delete room.transientPlayerList[playerId];
+      }
+
       if (room.isOngoing && isActivePlayer) {
         this.io.to(room.roomId).emit('endGameFromDisconnect', player?.playerName);
       } 

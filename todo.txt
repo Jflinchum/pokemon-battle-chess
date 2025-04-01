@@ -17,10 +17,10 @@ Rejoining a game in progress
 
 Disable support pokemon from team generation
 Room Options
+ - Buff on chess piece attack
  - Preserve damage after battle
  - Preserve move usage after battle
  - Preserve item usage after battle
  - Custom Teams
- - Buff on chess piece attack
  - Weather on random chess spaces
  - Change pokemon on piece promotion
