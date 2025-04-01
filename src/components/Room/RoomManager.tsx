@@ -4,6 +4,7 @@ import Room from "./Room/Room";
 import { useEffect } from "react";
 import { useUserState } from "../../context/UserStateContext";
 import { socket } from "../../socket";
+import { Player } from "./Room/Room";
 
 const RoomManager = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
@@ -12,16 +13,24 @@ const RoomManager = () => {
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
-      socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
-      socket.on('endGameFromDisconnect', () => {
-        dispatch({ type: 'RETURN_TO_ROOM' });
-      });
-
-      socket.on('hostDisconnected', () => {
-        dispatchUserState({ type: 'LEAVE_ROOM' });
-      });
     }
-  }, [userState.currentRoomId]);
+    socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
+    socket.on('endGameFromDisconnect', () => {
+      dispatch({ type: 'RETURN_TO_ROOM' });
+    });
+    socket.on('connectedPlayers', (players: Player[]) => {
+      console.log(players);
+      dispatch({ type: 'SET_PLAYERS', payload: players });
+    });
+
+    socket.on('hostDisconnected', () => {
+      dispatchUserState({ type: 'LEAVE_ROOM' });
+    });
+    return () => {
+      socket.off('connectedPlayers');
+      socket.off('hostDisconnected');
+    }
+  }, []);
 
   return (
     <>

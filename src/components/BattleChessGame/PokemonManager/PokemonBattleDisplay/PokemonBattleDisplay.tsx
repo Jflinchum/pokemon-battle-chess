@@ -42,7 +42,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
       {battleState && (
         <>
           <div className='battlefieldAndLog'>
-            <div>
+            <span>
               <PokemonBattleField battleHistory={delayedBattleLog} battleState={battleState}/>
               <PokemonBattleLog battleHistory={delayedBattleLog} simple={true}/>
               <div className='battleMoveContainer'>
@@ -57,7 +57,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
                   moves={moves}
                   />
               </div>
-            </div>
+            </span>
             <PokemonBattleLog battleHistory={delayedBattleLog}/>
           </div>
         </>

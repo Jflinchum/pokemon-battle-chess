@@ -4,6 +4,13 @@
   position: absolute;
   bottom: 100px;
   left: 100px;
+
+  @media (max-width: 650px) {
+    width: 50%;
+    height: 50%;
+    bottom: 10px;
+    left: 20px;
+  }
 }
 
 .p2Pokemon {
@@ -12,6 +19,13 @@
   position: absolute;
   top: 120px;
   right: 100px;
+
+  @media (max-width: 650px) {
+    width: 50%;
+    height: 50%;
+    top: 50px;
+    right: 10px;
+  }
 }
 
 .healthbar {
@@ -98,8 +112,11 @@
 }
 
 .pokemonSprite {
-  width: fit-content;
   margin: auto;
+
+  @media (max-width: 650px) {
+    transform: scale(50%) translateY(-50%);
+  }
 }
 
 .p1PokemonSprite {

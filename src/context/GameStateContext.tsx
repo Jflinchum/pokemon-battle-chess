@@ -2,6 +2,7 @@ import { Color } from "chess.js";
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
 import { PRNGSeed } from '@pkmn/sim';
 import { getGameOptions } from "../utils";
+import { Player } from "../components/Room/Room/Room";
 
 export interface GameOptions {
   format: FormatID;
@@ -11,8 +12,6 @@ export type FormatID = 'random' | 'draft';
 
 interface GameSettings {
   seed?: PRNGSeed;
-  player1Name?: string;
-  player2Name?: string;
   color?: Color;
   options: GameOptions;
 }
@@ -20,6 +19,7 @@ interface GameSettings {
 interface GameState {
   matchStarted: boolean;
   isHost: boolean;
+  players: Player[];
   gameSettings: GameSettings;
 }
 
@@ -31,8 +31,9 @@ interface GameStateType {
 type GameStateAction = 
   { type: 'RESET_ROOM'; }
   | { type: 'CREATE_ROOM'; }
+  | { type: 'SET_PLAYERS'; payload: Player[]; }
   | { type: 'RETURN_TO_ROOM'; }
-  | { type: 'START_MATCH'; payload: GameSettings };
+  | { type: 'START_MATCH'; payload: GameSettings; };
 
 export const GameStateContext = createContext<GameStateType | null>(null);
 
@@ -40,6 +41,7 @@ const getInitialGameState = (): GameState => (
   {
     matchStarted: false,
     isHost: false,
+    players: [],
     gameSettings: {
       options: getGameOptions()
     },
@@ -52,8 +54,10 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
       return getInitialGameState();
     case 'CREATE_ROOM':
       return { ...gameState, isHost: true };
+    case 'SET_PLAYERS':
+      return { ...gameState, players: action.payload };
     case 'START_MATCH':
-      return { ...gameState, matchStarted: true, gameSettings: action.payload };
+      return { ...gameState, matchStarted: true, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color } };
     case 'RETURN_TO_ROOM':
       return { ...gameState, matchStarted: false };
     default:

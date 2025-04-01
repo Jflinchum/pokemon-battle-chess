@@ -5,6 +5,12 @@
   background-size: 100% 100%;
   position: relative;
   border: solid black 4px;
+
+  @media (max-width: 650px) {
+    width: 300px;
+    height: 200px;
+    margin: auto;
+  }
 }
 
 .player1Pokemon {

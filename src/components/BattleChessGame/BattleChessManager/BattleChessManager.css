@@ -1,3 +1,7 @@
+.battleChessContainer {
+  padding-bottom: 70px;
+}
+
 .gameManagerBottomActions {
   position: fixed;
   bottom: 0;

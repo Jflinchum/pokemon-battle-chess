@@ -107,8 +107,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove }: ChessMana
   };
 
   return (
-    <div className='chessGameUI'>
-      <p>Turn: {chessManager.moveNumber()}</p>
+    <div>
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice
           color={requestedPawnPromotion.color}

@@ -11,6 +11,7 @@ import { getVerboseChessMove, mergeBoardAndPokemonState } from '../ChessManager/
 import { useModalState } from '../../../context/ModalStateContext';
 import { socket } from '../../../socket';
 import './BattleChessManager.css';
+import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
@@ -26,7 +27,6 @@ function BattleChessManager() {
    * TODO:
    * - Disable support pokemon from team generation
    * - Room Options
-   *    - Draft or Randoms
    *    - Preserve damage after battle
    *    - Preserve move usage after battle
    *    - Preserve item usage after battle
@@ -35,8 +35,10 @@ function BattleChessManager() {
    *    - Weather on random chess spaces
    *    - Change pokemon on piece promotion
    */
-  const player1Name = useMemo(() => gameState.gameSettings.player1Name!, [gameState]);
-  const player2Name = useMemo(() => gameState.gameSettings.player2Name!, [gameState]);
+  const player1 = useMemo(() => gameState.players.find((player) => player.isPlayer1), [gameState.players]);
+  const player2 = useMemo(() => gameState.players.find((player) => player.isPlayer2), [gameState.players]);
+  const whitePlayer = useMemo(() => gameState.players.find((player) => player.color === 'w'), [gameState.players]);
+  const blackPlayer = useMemo(() => gameState.players.find((player) => player.color === 'b'), [gameState.players]);
   const color = useMemo(() => gameState.gameSettings!.color, [gameState])
   const chessManager = useMemo(() => {
     return new Chess();
@@ -67,8 +69,8 @@ function BattleChessManager() {
 
       // TODO: Better logic handling this
       const moveSucceeds = getVerboseChessMove(fromSquare, toSquare, chessManager)?.color === gameState.gameSettings?.color ?
-        player1Name === victor :
-        player2Name === victor;
+        player1?.playerName === victor :
+        player2?.playerName === victor;
       if (moveSucceeds) {
         pokemonManager.getPokemonFromSquare(toSquare)!.square = null;
         chessManager.move({ from: fromSquare, to: toSquare, promotion });
@@ -122,12 +124,14 @@ function BattleChessManager() {
 
   return (
     <div className='battleChessContainer'>
+      <p>Turn: {chessManager.moveNumber()}</p>
+      <PlayerInGameDisplay player={color === 'w' ? blackPlayer : whitePlayer}/>
       {
         currentBattle &&
         (
           <PokemonBattleManager
-            p1Name={player1Name}
-            p2Name={player2Name}
+            p1Name={player1?.playerName!}
+            p2Name={player2?.playerName!}
             p1Pokemon={currentBattle.p1Pokemon.pkmn}
             p2Pokemon={currentBattle.p2Pokemon.pkmn}
             onVictory={handleVictory}
@@ -159,6 +163,7 @@ function BattleChessManager() {
           />
         )
       }
+      <PlayerInGameDisplay player={color === 'w' ? whitePlayer : blackPlayer}/>
       <div className='gameManagerBottomActions'>
         <button onClick={() => handleLeaveRoom()}>Forfeit and return to menu</button>
       </div>

@@ -12,19 +12,35 @@ const PokemonDetailsCard = ({ pokemon }: PokemonDetailsCard) => {
 
   return (
     <div className='pokemonDetailsContainer'>
-      {
-        pokemon ?
-        (
-          <>
-            <p>{pokemon.name}</p>
-            <img className='pokemonDetailsSprite' src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url}/>
-            <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
-            <p>Item: {pokemon.item}</p> 
-            <p>Ability: {pokemon.ability}</p>
-          </>
-        ) :
-        null
-      }
+      <div className='pokemonDetailsPadding'>
+        {
+          pokemon ?
+          (
+            <>
+              <p>{pokemon.name}</p>
+              <div className='pokemonDetailsCard'>
+                <img className='pokemonDetailsSprite' src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url}/>
+                <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
+                <ul>
+                  <li>
+                    <span>
+                      <b>Item: </b>
+                      {pokemon.item || 'None'}
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <b>Ability: </b>
+                      {pokemon.ability || 'None'}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </>
+          ) :
+          null
+        }
+      </div>
     </div>
   )
 }

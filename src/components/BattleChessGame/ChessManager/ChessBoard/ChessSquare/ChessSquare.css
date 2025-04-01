@@ -1,9 +1,21 @@
 .chessSquare {
-  width: 7vw;
-  height: 7vw;
-  max-width: 100px;
-  max-height: 100px;
+  width: 10vw;
+  height: 10vw;
+  max-width: 75px;
+  max-height: 77px;
   position: relative;
+  font-size: 10px;
+
+  @media (min-width: 800px) {
+    width: 7vw;
+    height: 7vw;
+    font-size: 16px;
+  }
+
+  @media (min-width: 1200px) {
+    width: 5vw;
+    height: 5vw;
+  }
 }
 
 .whiteChessSquare {

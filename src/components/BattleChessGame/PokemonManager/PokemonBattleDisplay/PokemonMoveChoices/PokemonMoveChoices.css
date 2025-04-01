@@ -15,7 +15,7 @@
 }
 
 .pokemonMoveName {
-  margin: 0;
+  margin: auto;
 }
 
 .pokemonMovePP {
@@ -25,7 +25,7 @@
 .pokemonMoveButton {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .pokemonMoveSubInfo {

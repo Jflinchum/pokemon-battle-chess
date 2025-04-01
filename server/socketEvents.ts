@@ -96,6 +96,7 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       }
 
       room.startGame();
+      io.to(roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
     socket.on('requestChessMove', ({ fromSquare, toSquare, promotion, roomId, playerId }) => {

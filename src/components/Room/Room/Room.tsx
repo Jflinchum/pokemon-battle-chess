@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
+import { Color } from "chess.js";
 import { useGameState, GameOptions } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import { socket } from "../../../socket";
-import './Room.css';
 import Button from "../../common/Button/Button";
 import { Sprites } from "@pkmn/img";
 import SpectatorList from "./SpectatorList/SpectatorList";
 import PlayerName from "./PlayerName/PlayerName";
 import RoomOptions from "./RoomOptions/RoomOptions";
+import './Room.css';
 
 export interface Player {
   playerName: string;
@@ -18,29 +19,15 @@ export interface Player {
   isHost: boolean;
   isPlayer1: boolean;
   isPlayer2: boolean;
+  color: Color | null;
   isSpectator: boolean;
-}
-
-const buildDefaultPlayer = (playerName: string, playerId: string, avatarId: string, isHost: boolean): Player => {
-  return {
-    playerName,
-    playerId,
-    avatarId,
-    transient: false,
-    viewingResults: false,
-    isHost,
-    isPlayer1: false,
-    isPlayer2: false,
-    isSpectator: false,
-  }
 }
 
 const Room = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
   const { gameState, dispatch } = useGameState();
-
-  const [connectedPlayers, setConnectedPlayers] = useState<Player[]>([buildDefaultPlayer(userState.name, userState.id, userState.avatarId, gameState.isHost)]);
-  const [gameOptions, setGameOptions] = useState<GameOptions>(gameState.gameSettings.options)
+  const [gameOptions, setGameOptions] = useState<GameOptions>(gameState.gameSettings.options);
+  const connectedPlayers = useMemo(() => gameState.players, [gameState.players]);
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -48,10 +35,6 @@ const Room = () => {
     });
     socket.on('disconnect', () => {
       console.log('disconnected');
-    });
-
-    socket.on('connectedPlayers', (players: Player[]) => {
-      setConnectedPlayers(players);
     });
 
     socket.on('changeGameOptions', (options: GameOptions) => {
@@ -67,7 +50,6 @@ const Room = () => {
     return () => {
       socket.off('connect');
       socket.off('disconnect');
-      socket.off('connectedPlayers');
       socket.off('changeGameOptions');
     }
   }, []);

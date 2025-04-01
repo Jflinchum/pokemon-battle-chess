@@ -1,10 +1,77 @@
 .pokemonDetailsContainer {
   background-color: #374151;
+  width: 80vw;
+  min-height: 20vh;
+  max-width: 600px;
+  font-size: 10px;
+
+
+  @media (max-width: 599px) {
+    button {
+      height: 40px;
+      width: 80px;
+      font-size: 10px;
+      .pokemonMoveSubInfo {
+        display: none;
+      }
+    }
+
+    .movesContainer {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .subMoveContainer {
+      flex-direction: column;
+    }
+  }
+
+  @media (min-width: 800px) {
+    width: 40vw;
+    height: inherit;
+    align-self: stretch;
+    font-size: 16px;
+  }
+}
+
+.pokemonDetailsPadding {
   padding: 8px;
-  width: 400px;
+}
+
+.pokemonDetailsCard {
+  display: flex;
+  flex-direction: row;
+
+
+  ul {
+    list-style: none;
+    padding: 0 0 0 20px;
+    margin: 0;
+    width: 150px;
+
+    b {
+      display: block;
+    }
+  }
+
+  @media (min-width: 800px) {
+    flex-direction: column;
+  }
 }
 
 .pokemonDetailsSprite {
   display: block;
   margin: auto;
+  max-width: 50px;
+  max-height: 50px;
+
+  @media (min-width: 600px) {
+    max-width: 70px;
+    max-height: 70px;
+  }
+
+  @media (min-width: 800px) {
+    max-width: 100px;
+    max-height: 100px;
+  }
 }

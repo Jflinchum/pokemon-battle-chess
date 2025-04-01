@@ -10,6 +10,11 @@
   &.simpleLogContainer {
     height: 80px;
     width: 600px;
+
+    @media (max-width: 650px) {
+      width: 300px;
+      margin: auto;
+    }
   }
   @media (min-width: 999px) {
     &.simpleLogContainer {

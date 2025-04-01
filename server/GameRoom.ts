@@ -74,6 +74,7 @@ export default class GameRoom {
       isHost: player.playerId === this.hostPlayer?.playerId,
       isPlayer1: player.playerId === this.player1?.playerId,
       isPlayer2: player.playerId === this.player2?.playerId,
+      color: player.playerId === this.whitePlayer?.playerId ? 'w' : player.playerId === this.blackPlayer?.playerId ? 'b' : null,
       isSpectator: player.playerId !== this.player1?.playerId && player.playerId !== this.player2?.playerId,
     })));
   }
@@ -151,8 +152,6 @@ export default class GameRoom {
     return {
       color,
       seed: this.roomSeed,
-      player1Name: this.whitePlayer.playerName,
-      player2Name: this.blackPlayer.playerName,
       options: this.roomGameOptions,
     };
   }
