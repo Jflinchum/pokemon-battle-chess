@@ -6,13 +6,14 @@ import './ChessBoard.css';
 import { useGameState } from '../../../../context/GameStateContext';
 
 interface ChessBoardProps {
-  boardState: PokemonChessBoardSquare[][],
-  onSquareClick: (arg0: Square) => void,
-  highlightedSquares: Square[],
-  selectedSquare: Square | null,
+  boardState: PokemonChessBoardSquare[][];
+  onSquareClick: (arg0: Square) => void;
+  highlightedSquares: Square[];
+  selectedSquare: Square | null;
+  mostRecentMove?: { from: Square, to: Square } | null;
 }
 
-const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, mostRecentMove }: ChessBoardProps) => {
   const { gameState } = useGameState();
 
   const boardColumnPerspective = (squares: PokemonChessBoardSquare[][]) => {
@@ -48,6 +49,8 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
                 highlighted={highlightedSquares.includes(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
                 pokemon={boardSquare?.pokemon}
+                mostRecentMoveFrom={mostRecentMove?.from === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
+                mostRecentMoveTo={mostRecentMove?.to === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
               />
             ))
           }

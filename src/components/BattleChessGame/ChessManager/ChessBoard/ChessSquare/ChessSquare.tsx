@@ -9,14 +9,19 @@ interface ChessSquareProps {
   onClick: (arg0: ChessBoardSquare) => void
   highlighted: boolean
   selected: boolean
+  mostRecentMoveFrom: boolean
+  mostRecentMoveTo: boolean
   pokemon?: PokemonSet
 }
 
 
-const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, pokemon }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, pokemon, mostRecentMoveFrom, mostRecentMoveTo }: ChessSquareProps) => {
 
   return (
-    <div className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''}`} onClick={() => { onClick(square) }}>
+    <div 
+      className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''} ${mostRecentMoveFrom ? 'mostRecentMoveFrom' : ''} ${mostRecentMoveTo ? 'mostRecentMoveTo' : ''}`}
+      onClick={() => { onClick(square) }}
+    >
       <PokemonChessPieceSprite type={square?.type} color={square?.color} pokemon={pokemon} />
       {
         square?.square[0] === 'a' &&

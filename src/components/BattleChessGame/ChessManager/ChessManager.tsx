@@ -13,12 +13,13 @@ import { socket } from '../../../socket';
 import { useUserState } from '../../../context/UserStateContext';
 
 interface ChessManagerProps {
-  chessManager: Chess,
-  pokemonManager: PokemonBattleChessManager,
+  chessManager: Chess;
+  pokemonManager: PokemonBattleChessManager;
   onAttemptMove: (attemptedMove: MoveAttempt) => void;
+  mostRecentMove: { from: Square, to: Square } | null;
 }
 
-const ChessManager = ({ chessManager, pokemonManager, onAttemptMove }: ChessManagerProps) => {
+const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentMove }: ChessManagerProps) => {
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
@@ -130,6 +131,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove }: ChessMana
           onSquareClick={handleSquareClick}
           highlightedSquares={highlightedSquares}
           selectedSquare={selectedSquare}
+          mostRecentMove={mostRecentMove}
         />
         <PokemonDetailsCard
           pokemon={

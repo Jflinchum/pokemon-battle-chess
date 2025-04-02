@@ -36,16 +36,23 @@
   background-color: blue;
 }
 
-.squareText {
-  position: absolute;
+.mostRecentMoveFrom {
+  background-color: greenyellow;
 }
+
+.mostRecentMoveTo {
+  background-color: green;
+}
+
 
 .squareNum {
   top: 0;
   left: 3px;
+  position: absolute;
 }
 
 .squareChar {
   bottom: 0;
   right: 3px;
+  position: absolute;
 }

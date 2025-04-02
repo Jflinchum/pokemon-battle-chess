@@ -51,6 +51,7 @@ function BattleChessManager() {
   const [currentBoard, setCurrentBoard] = useState(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
   const [isDrafting, setIsDrafting] = useState<boolean>(gameState.gameSettings.options.format === 'draft');
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
+  const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
 
   useEffect(() => {
     socket.on('startPokemonDraft', ({ square, draftPokemonIndex, socketColor }) => {
@@ -106,6 +107,7 @@ function BattleChessManager() {
       modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: chessManager.turn() === 'w' ? 'b' : 'w' } }});
       socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
     }
+    setMostRecentMove({ from: fromSquare, to: toSquare });
   }
 
   const handleLeaveRoom = () => {
@@ -141,7 +143,7 @@ function BattleChessManager() {
       {
         !currentBattle && !isDrafting &&
         (
-          <ChessManager onAttemptMove={handleAttemptMove} chessManager={chessManager} pokemonManager={pokemonManager} />
+          <ChessManager onAttemptMove={handleAttemptMove} chessManager={chessManager} pokemonManager={pokemonManager} mostRecentMove={mostRecentMove}/>
         )
       }
       {
