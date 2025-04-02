@@ -25,7 +25,6 @@ interface RoomOptionsProp {
 }
 
 const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
-  console.log(gameOptions);
   const [format, setFormat] = useState<FormatID>(gameOptions.format);
   const [offenseAdvantage, setOffenseAdvantage] = useState<BoostsTable>(gameOptions.offenseAdvantage);
 
