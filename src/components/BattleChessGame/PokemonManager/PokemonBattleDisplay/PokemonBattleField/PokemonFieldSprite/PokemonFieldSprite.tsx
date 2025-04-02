@@ -96,8 +96,8 @@ const PokemonFieldSprite = ({ pokemon, side }: PokemonFieldSpriteProps) => {
             null
           }
           {
-            Object.keys(pokemon.boosts).map((boost) => (
-              <span className={`boost ${(pokemon.boosts[boost as BoostID] || 0) > 0 ? 'positive' : 'negative'}`}>
+            Object.keys(pokemon.boosts).map((boost, index) => (
+              <span key={index} className={`boost ${(pokemon.boosts[boost as BoostID] || 0) > 0 ? 'positive' : 'negative'}`}>
                 {mapBoostStageToMultiplier(pokemon.boosts[boost as BoostID])} x {boostToLabel[boost as BoostID]}
               </span>
             ))

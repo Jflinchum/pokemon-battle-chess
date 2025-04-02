@@ -20,6 +20,7 @@
     "@pkmn/data": "^0.9.32",
     "@pkmn/dex": "^0.9.32",
     "@pkmn/img": "^0.2.37",
+    "@pkmn/mods": "^0.9.32",
     "@pkmn/protocol": "^0.6.32",
     "@pkmn/randoms": "^0.9.32",
     "@pkmn/view": "^0.6.32",

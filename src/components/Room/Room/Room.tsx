@@ -51,6 +51,7 @@ const Room = () => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('changeGameOptions');
+      socket.off('startGame');
     }
   }, []);
 

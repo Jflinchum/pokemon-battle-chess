@@ -19,7 +19,7 @@ const ChessSquare = ({ square, backgroundColor, onClick, highlighted, selected, 
 
   return (
     <div 
-      className={`chessSquare ${backgroundColor}ChessSquare ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''} ${mostRecentMoveFrom ? 'mostRecentMoveFrom' : ''} ${mostRecentMoveTo ? 'mostRecentMoveTo' : ''}`}
+      className={`chessSquare ${backgroundColor}ChessSquare ${mostRecentMoveFrom ? 'mostRecentMoveFrom' : ''} ${mostRecentMoveTo ? 'mostRecentMoveTo' : ''} ${highlighted ? 'highlighted' : ''} ${selected ? 'selected' : ''}`}
       onClick={() => { onClick(square) }}
     >
       <PokemonChessPieceSprite type={square?.type} color={square?.color} pokemon={pokemon} />

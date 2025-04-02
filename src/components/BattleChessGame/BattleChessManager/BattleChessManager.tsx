@@ -12,11 +12,13 @@ import { useModalState } from '../../../context/ModalStateContext';
 import { socket } from '../../../socket';
 import './BattleChessManager.css';
 import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
+import { SideID } from '@pkmn/data';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
   p2Pokemon: PokemonPiece;
   attemptedMove: MoveAttempt;
+  offensivePlayer: SideID;
 }
 
 function BattleChessManager() {
@@ -93,6 +95,7 @@ function BattleChessManager() {
         p1Pokemon: pokemonManager.getPlayer1PokemonFromMoveAndColor(fromSquare, toSquare, gameState.gameSettings?.color)!,
         p2Pokemon: pokemonManager.getPlayer2PokemonFromMoveAndColor(fromSquare, toSquare, gameState.gameSettings?.color)!,
         attemptedMove: { fromSquare, toSquare, capturedPieceSquare, promotion },
+        offensivePlayer: color === chessManager.get(fromSquare)?.color ? 'p1' : 'p2',
       });
     } else {
       chessManager.move({ from: fromSquare, to: toSquare, promotion });
@@ -137,6 +140,7 @@ function BattleChessManager() {
             p1Pokemon={currentBattle.p1Pokemon.pkmn}
             p2Pokemon={currentBattle.p2Pokemon.pkmn}
             onVictory={handleVictory}
+            pokemonAdvantage={[{ side: currentBattle.offensivePlayer, boost: gameState.gameSettings.options.offenseAdvantage }]}
           />
         )
       }

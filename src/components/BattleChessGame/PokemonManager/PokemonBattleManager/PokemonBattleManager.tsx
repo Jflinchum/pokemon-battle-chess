@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { BattleStreams, Teams } from '@pkmn/sim';
-import { PokemonSet, Generations } from "@pkmn/data";
 import { Dex } from '@pkmn/dex';
+import { Dex as SimDex, BattleStreams, Teams } from '@pkmn/sim';
+import { PokemonSet, Generations, BoostsTable, SideID, BoostID } from "@pkmn/data";
 import { ArgType, BattleArgsKWArgType, Protocol } from '@pkmn/protocol';
 import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
@@ -10,11 +10,12 @@ import { useUserState } from '../../../../context/UserStateContext';
 import { useGameState } from '../../../../context/GameStateContext';
 
 interface PokemonBattleManagerProps {
-  p1Name: string,
-  p2Name: string,
-  p1Pokemon: PokemonSet,
-  p2Pokemon: PokemonSet,
-  onVictory: (victor: string) => void,
+  p1Name: string;
+  p2Name: string;
+  p1Pokemon: PokemonSet;
+  p2Pokemon: PokemonSet;
+  onVictory: (victor: string) => void;
+  pokemonAdvantage?: { side: SideID, boost: BoostsTable }[];
 }
 
 const wait = async (ms: number) => {
@@ -33,19 +34,30 @@ const shouldDelayBeforeContinuing = (logType: string) => {
   return false;
 }
 
-const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory }: PokemonBattleManagerProps) => {
-  /**
-   * TODO:
-   * - UI show status on pokemon
-   * - On Hover in battle, show pokemon in depth details
-   * - Pokemon Details Card
-   * - Choice items disabling move changing
-   */
+const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory, pokemonAdvantage }: PokemonBattleManagerProps) => {
   const { userState } = useUserState();
   const { gameState } = useGameState();
-  const battleStream = useMemo(() => (BattleStreams.getPlayerStreams(new BattleStreams.BattleStream())), []);
+  const battleStream = useMemo(() => {
+    const pokemonBattleChessMod = SimDex.mod('pokemonbattlechess', { Formats: [{
+        name: 'pbc',
+        mod: 'gen9',
+        onSwitchIn(pokemon) {
+          const adv = pokemonAdvantage?.find((buff) => buff.side === pokemon.side.id);
+          if (adv) {
+            pokemon.boostBy(adv.boost);
+            for (let stat in adv.boost) {
+              if (adv.boost) {
+                this.add('-boost', pokemon.fullname.replace(/(p[1-2])/g, '$1a'), stat, `${adv.boost[stat as BoostID]}`);
+              }
+            }
+          }
+        },
+    }] });
+    return BattleStreams.getPlayerStreams(new BattleStreams.BattleStream({}, pokemonBattleChessMod))
+  }, []);
+
   const battle = useMemo(() => (new Battle(new Generations(Dex))), []);
-  const spec = { formatid: 'gen9customgame', seed: gameState.gameSettings!.seed };
+  const spec = { formatid: 'pbc', seed: gameState.gameSettings!.seed };
   const p1spec = { name: p1Name, team: Teams.pack([p1Pokemon]) };
   const p2spec = { name: p2Name, team: Teams.pack([p2Pokemon]) };
 

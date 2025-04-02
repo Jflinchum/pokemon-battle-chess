@@ -19,7 +19,6 @@ const RoomManager = () => {
       dispatch({ type: 'RETURN_TO_ROOM' });
     });
     socket.on('connectedPlayers', (players: Player[]) => {
-      console.log(players);
       dispatch({ type: 'SET_PLAYERS', payload: players });
     });
 

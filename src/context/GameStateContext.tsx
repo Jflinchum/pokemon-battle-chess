@@ -3,9 +3,11 @@ import { useReducer, createContext, useContext, ReactElement, type Dispatch } fr
 import { PRNGSeed } from '@pkmn/sim';
 import { getGameOptions } from "../utils";
 import { Player } from "../components/Room/Room/Room";
+import { BoostsTable } from "@pkmn/data";
 
 export interface GameOptions {
   format: FormatID;
+  offenseAdvantage: BoostsTable;
 }
 
 export type FormatID = 'random' | 'draft';
@@ -57,7 +59,7 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
     case 'SET_PLAYERS':
       return { ...gameState, players: action.payload };
     case 'START_MATCH':
-      return { ...gameState, matchStarted: true, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color } };
+      return { ...gameState, matchStarted: true, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color, options: action.payload.options } };
     case 'RETURN_TO_ROOM':
       return { ...gameState, matchStarted: false };
     default:

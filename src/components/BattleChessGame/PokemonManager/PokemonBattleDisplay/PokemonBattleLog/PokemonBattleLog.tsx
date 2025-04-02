@@ -10,7 +10,6 @@ interface PokemonBattleLogProps {
 }
 
 const getClassnameFromBattleArg = (args: ArgType) => {
-  console.log(args);
   if (args[0] === 'turn') {
     return 'turnLog';
   }

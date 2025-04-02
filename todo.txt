@@ -2,6 +2,7 @@ TODO:
 /api/getRooms pagination
 On Hover in battle, show pokemon in depth details
 Battle Timers
+Text Speed on pokemon battles
 Matchmaking
 Host controls
   - Set player color
@@ -14,13 +15,30 @@ Rejoining a game in progress
   - Could also store state of game clientside?
     - Current board state
     - Current pokemon battle state
+      - ^ May be tricky. Could do history of commands for this one
 
 Disable support pokemon from team generation
 Room Options
- - Buff on chess piece attack
+ - Open and closed team sheets
  - Preserve damage after battle
- - Preserve move usage after battle
- - Preserve item usage after battle
+ - (maybe) Preserve item usage after battle
  - Custom Teams
  - Weather on random chess spaces
- - Change pokemon on piece promotion
+ - (maybe) Change pokemon on piece promotion
+ - Level Up Progression
+    - piece starts out weak, but gains levels/evolutions as you beat other pieces
+
+Easy
+- Hover in depth details
+- Text speed on pokemon battles (skip to end button)
+- Host controls
+- Matchmaking
+
+Medium
+- Open/Closed Team Sheets
+- Preserve Damage After battle
+
+Hard
+- Custom teams
+- Rejoining a game
+- Battle timers

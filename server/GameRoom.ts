@@ -145,6 +145,15 @@ export default class GameRoom {
   public setOptions(options: GameOptions) {
     this.roomGameOptions = {
       format: options.format || 'random',
+      offenseAdvantage: options.offenseAdvantage || {
+        atk: 0,
+        def: 0,
+        spa: 0,
+        spd: 0,
+        spe: 0,
+        accuracy: 0,
+        evasion: 0,
+      }
     };
   }
 
