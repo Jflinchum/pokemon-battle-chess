@@ -29,9 +29,9 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Easy
+- Host controls
 - Hover in depth details
 - Text speed on pokemon battles (skip to end button)
-- Host controls
 - Matchmaking
 
 Medium

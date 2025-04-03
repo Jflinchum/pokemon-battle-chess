@@ -27,7 +27,7 @@ const EndGameModal = () => {
   return (
     <div className='endGameModalContainer'>
       <h2 className='endGameTitle'>{currentColor === victorColor ? 'You Win!' : 'You Lose...'}</h2>
-      <p>{gameState.gameSettings?.player1Name} vs {gameState.gameSettings?.player2Name}</p>
+      <p>{gameState.players.find((player) => player.isPlayer1)?.playerName} vs {gameState.players.find((player) => player.isPlayer2)?.playerName}</p>
       <div className='endGameBottomActions'>
         <Button colorPrimary='brown' onClick={handleBackToMenu}>Back To Main Menu</Button>
         <Button className='endGameRematch' colorPrimary='green' onClick={handleRematch}>Rematch</Button>
