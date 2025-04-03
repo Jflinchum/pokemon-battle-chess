@@ -42,11 +42,11 @@ app.use(cors({
   optionsSuccessStatus: 204,
 }));
 
-const server = https.createServer(options, app).listen(httpsPort, () => {
-  console.log(`App listening on ${httpsPort}`);
+https.createServer(options, app).listen(httpsPort, () => {
+  console.log(`HTTPS is listening on ${httpsPort}`);
 });
-http.createServer(app).listen(httpPort, () => {
-  console.log(`App listening on ${httpPort}`);
+const server = http.createServer(app).listen(httpPort, () => {
+  console.log(`HTTP is listening on ${httpPort}`);
 });
 const io = new Server(server, {
   cors: {

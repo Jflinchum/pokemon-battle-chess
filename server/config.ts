@@ -11,7 +11,7 @@ export const config = {
     keyLocation: 'private-key.pem',
     certLocation: 'certificate.pem',
     allowedOrigins: [],
-    httpPort: 3000,
+    httpPort: process.env.PORT || 3000,
     httpsPort: 3001,
   }
 };
