@@ -21,10 +21,15 @@ const serverPort = 3000;
 const allowedOrigins = ['https://localhost:5173'];
 
 const app = express();
-const options = {
-  key: fs.readFileSync(keyLocation),
-  cert: fs.readFileSync(certLocation),
+const options: { key?: any; cert?: any } = {}
+
+try {
+  options.key = fs.readFileSync(keyLocation);
+  options.cert = fs.readFileSync(certLocation);
+} catch (err) {
+  console.log(err);
 }
+
 app.use(cors({
   origin: allowedOrigins,
   methods: 'GET,PUT,POST,OPTIONS',
