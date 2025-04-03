@@ -241,13 +241,13 @@ export default class GameRoom {
       this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonMove',
         {
           move: `>p1 move ${this.whitePlayerPokemonMove}`,
-          playerId: this.whitePlayer.playerId
+          playerId: spectator.playerId
         }
       ))
       this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonMove',
         {
           move: `>p2 move ${this.blackPlayerPokemonMove}`,
-          playerId: this.whitePlayer.playerId
+          playerId: spectator.playerId
         }
       ))
       this.whitePlayerPokemonMove = null;

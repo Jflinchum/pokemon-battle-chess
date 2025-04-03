@@ -11,10 +11,11 @@ interface PokemonBattleDisplayProps {
   fullBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[],
   delayedBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[], 
   onMoveSelect: (move: string) => void,
+  isSpectator?: boolean;
 }
 
 
-const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, onMoveSelect }: PokemonBattleDisplayProps) => {
+const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, onMoveSelect, isSpectator }: PokemonBattleDisplayProps) => {
   const [moveChosen, setMoveChosen] = useState<string>();
 
   useEffect(() => {
@@ -55,7 +56,8 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
                   onMoveSelect={onMoveSelect}
                   setMoveChosen={setMoveChosen}
                   moves={moves}
-                  />
+                  isSpectator={isSpectator}
+                />
               </div>
             </span>
             <PokemonBattleLog battleHistory={delayedBattleLog}/>
@@ -69,14 +71,15 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
 interface BattleMoveContainerProps {
   moveChosen?: string;
   waitForDelay: boolean;
+  isSpectator?: boolean;
   setMoveChosen: (move?: string) => void;
   onMoveSelect: (move: string) => void;
   moves: PokemonMoveChoice[];
 }
 
-const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, waitForDelay }: BattleMoveContainerProps) => {
+const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, waitForDelay, isSpectator }: BattleMoveContainerProps) => {
 
-  if (waitForDelay) {
+  if (waitForDelay || isSpectator) {
     return (
       <div></div>
     );

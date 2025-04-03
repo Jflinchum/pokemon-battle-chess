@@ -6,6 +6,16 @@ import Button from "../../../Button/Button";
 import { socket } from "../../../../../socket";
 import { Sprites } from "@pkmn/img";
 
+const getEndGameTitle = (isSpectator: boolean, playerVictory: boolean) => {
+  if (isSpectator) {
+    return 'End Game';
+  } else if (playerVictory) {
+    return 'You Win!';
+  } else {
+    return 'You Lose...';
+  }
+}
+
 const EndGameModal = () => {
   const { modalState, dispatch } = useModalState();
   const { userState, dispatch: userStateDispatch } = useUserState();
@@ -27,7 +37,7 @@ const EndGameModal = () => {
   
   return (
     <div className='endGameModalContainer'>
-      <h2 className='endGameTitle'>{currentColor === victorColor ? 'You Win!' : 'You Lose...'}</h2>
+      <h2 className='endGameTitle'>{getEndGameTitle(!!gameState.players.find((player) => player.playerId === userState.id)?.isSpectator, currentColor === victorColor)}</h2>
       <div className='endGamePlayerList'>
         <div className='endGamePlayer'>
           <p>{gameState.players.find((player) => player.isPlayer1)?.playerName}</p>

@@ -46,11 +46,11 @@ Hard
 - Battle timers
 
 Issues:
-- Spectator in pokemon battle not moving on
 - Clarity on who's turn it is
 - Color coding on tiles
 - Draggable pieces
 - Chat room in game/room
+- Player disconnecting at end game modal clears their name
 
 Filter out moves:
 - Sticky webs

@@ -123,6 +123,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
         onMoveSelect={(move) => {
           socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
         }}
+        isSpectator={gameState.players.find((player) => player.playerId === userState.id)?.isSpectator}
       />
     </>
   )
