@@ -9,7 +9,6 @@ Host controls
   - Update settings
   - Kick player
   - Promote to host
-Responsive design in game
 Pre-move chess pieces
 Rejoining a game in progress
   - Would have to track history of game and send it back to client
@@ -17,6 +16,7 @@ Rejoining a game in progress
     - Current board state
     - Current pokemon battle state
       - ^ May be tricky. Could do history of commands for this one
+Battle Animation when pieces attack
 
 Disable support pokemon from team generation
 Room Options
@@ -29,25 +29,11 @@ Room Options
  - Level Up Progression
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
-Easy
-- Host controls
-- Hover in depth details
-- Text speed on pokemon battles (skip to end button)
-- Matchmaking
-- Store last used room options as default on local storage
-
-Medium
-- Open/Closed Team Sheets
-- Preserve Damage After battle
-
-Hard
-- Custom teams
-- Rejoining a game
-- Battle timers
+Priority:
+- Battle Animation between pieces when a battle is beginning and ending
 
 Issues:
 - Clarity on who's turn it is
-- Chat room in game/room
 - Player disconnecting at end game modal clears their name
 
 Filter out moves:

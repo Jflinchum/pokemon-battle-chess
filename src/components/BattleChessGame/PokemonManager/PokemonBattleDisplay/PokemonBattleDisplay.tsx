@@ -5,6 +5,7 @@ import PokemonMoveChoices, { PokemonMoveChoice } from "./PokemonMoveChoices/Poke
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
 import './PokemonBattleDisplay.css';
 import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
+import { PokemonSet } from "@pkmn/data";
 
 interface PokemonBattleDisplayProps {
   battleState: Battle | null,
@@ -12,10 +13,11 @@ interface PokemonBattleDisplayProps {
   delayedBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[], 
   onMoveSelect: (move: string) => void,
   isSpectator?: boolean;
+  p1Pokemon: PokemonSet;
+  p2Pokemon: PokemonSet;
 }
 
-
-const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, onMoveSelect, isSpectator }: PokemonBattleDisplayProps) => {
+const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, onMoveSelect, isSpectator, p1Pokemon, p2Pokemon }: PokemonBattleDisplayProps) => {
   const [moveChosen, setMoveChosen] = useState<string>();
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
         <>
           <div className='battlefieldAndLog'>
             <span>
-              <PokemonBattleField battleHistory={delayedBattleLog} battleState={battleState}/>
+              <PokemonBattleField battleHistory={delayedBattleLog} battleState={battleState} p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon}/>
               <PokemonBattleLog battleHistory={delayedBattleLog} simple={true}/>
               <div className='battleMoveContainer'>
                 <BattleMoveContainer

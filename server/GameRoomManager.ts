@@ -69,6 +69,7 @@ export default class GameRoomManager{
 
       if (room.isOngoing && isActivePlayer) {
         this.io.to(room.roomId).emit('endGameFromDisconnect', player?.playerName);
+        room.resetRoomForRematch();
       } 
       if (room.hostPlayer?.playerId === playerId) {
         this.io.to(room.roomId).emit('hostDisconnected');

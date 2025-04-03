@@ -97,12 +97,15 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
   }, [parsedBattleLog])
 
   useEffect(() => {
+    let isMounted = true;
     beginBattleStreamHandler();
-    battleStream.omniscient.write(`>start ${JSON.stringify(spec)}`);
-    battleStream.omniscient.write(`>player p1 ${JSON.stringify(p1spec)}`);
-    battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2spec)}`);
-    battleStream.omniscient.write(`>p1 team 1`);
-    battleStream.omniscient.write(`>p2 team 1`);
+    if (isMounted) {
+      battleStream.omniscient.write(`>start ${JSON.stringify(spec)}`);
+      battleStream.omniscient.write(`>player p1 ${JSON.stringify(p1spec)}`);
+      battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2spec)}`);
+      battleStream.omniscient.write(`>p1 team 1`);
+      battleStream.omniscient.write(`>p2 team 1`);
+    }
 
     socket.on('startPokemonMove', ({ move, playerId }) => {
       if (playerId === userState.id) {
@@ -111,6 +114,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
     });
     return () => {
       socket.off('startPokemonMove');
+      isMounted = false;
     };
   }, []);
 
@@ -124,6 +128,8 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
           socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
         }}
         isSpectator={gameState.players.find((player) => player.playerId === userState.id)?.isSpectator}
+        p1Pokemon={p1Pokemon}
+        p2Pokemon={p2Pokemon}
       />
     </>
   )

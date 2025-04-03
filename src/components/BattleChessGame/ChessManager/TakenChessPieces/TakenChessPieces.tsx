@@ -11,8 +11,8 @@ const TakenChessPieces = ({ takenPieces }: TakenChessPiecesProps) => {
     <div className='takenChessPiecesContainer'>
       {
         takenPieces.map((piece, index) => (
-          <div className='pieceContainer'>
-            <PokemonChessPieceSprite key={index} type={piece.type} color={piece.color} pokemon={piece.pkmn} />
+          <div className='pieceContainer' key={index}>
+            <PokemonChessPieceSprite type={piece.type} color={piece.color} pokemon={piece.pkmn} />
           </div>
         ))
       }
