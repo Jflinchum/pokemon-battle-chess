@@ -22,21 +22,10 @@ export interface CurrentBattle {
 }
 
 function BattleChessManager() {
-  const { userState, dispatch } = useUserState();
+  const { userState } = useUserState();
   const { dispatch: modalStateDispatch } = useModalState();
   const { gameState } = useGameState();
-  /**
-   * TODO:
-   * - Disable support pokemon from team generation
-   * - Room Options
-   *    - Preserve damage after battle
-   *    - Preserve move usage after battle
-   *    - Preserve item usage after battle
-   *    - Custom Teams
-   *    - Buff on chess piece attack
-   *    - Weather on random chess spaces
-   *    - Change pokemon on piece promotion
-   */
+
   const player1 = useMemo(() => gameState.players.find((player) => player.isPlayer1), [gameState.players]);
   const player2 = useMemo(() => gameState.players.find((player) => player.isPlayer2), [gameState.players]);
   const whitePlayer = useMemo(() => gameState.players.find((player) => player.color === 'w'), [gameState.players]);
@@ -119,10 +108,6 @@ function BattleChessManager() {
     setMostRecentMove({ from: fromSquare, to: toSquare });
   }
 
-  const handleLeaveRoom = () => {
-    dispatch({ type: 'LEAVE_ROOM' });
-  };
-
   const handleDraftPick = ((square: Square, draftPokemonIndex: number, draftColor: Color) => {
     const chessSquare = chessManager.get(square);
     if (chessSquare && chessSquare.color === draftColor && chessSquare.type && !pokemonManager.getPokemonFromSquare(square)) {
@@ -176,9 +161,6 @@ function BattleChessManager() {
         )
       }
       <PlayerInGameDisplay player={color === 'w' ? whitePlayer : blackPlayer}/>
-      <div className='gameManagerBottomActions'>
-        <button onClick={() => handleLeaveRoom()}>Forfeit and return to menu</button>
-      </div>
     </div>
   )
 }

@@ -1,11 +1,3 @@
 .battleChessContainer {
   padding-bottom: 70px;
 }
-
-.gameManagerBottomActions {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  padding: 20px;
-  background-color: rgb(70, 70, 70);
-}

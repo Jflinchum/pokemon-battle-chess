@@ -138,5 +138,14 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       room.getPlayer(playerId)?.setViewingResults(!!viewingResults);
       io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
+
+    socket.on('sendChatMessage', ({ roomId, playerId, message }) => {
+      const room = gameRoomManager.getRoom(roomId);
+      if (!room || !playerId || !room.getPlayer(playerId)) {
+        return socket.disconnect();
+      }
+
+      socket.broadcast.emit('chatMessage', { playerName: room.getPlayer(playerId)?.playerName, message })
+    });
   });
 }

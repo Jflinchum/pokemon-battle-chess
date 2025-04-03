@@ -1,10 +1,10 @@
+import { useEffect } from "react";
 import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
 import { useGameState } from "../../context/GameStateContext";
-import Room from "./Room/Room";
-import { useEffect } from "react";
 import { useUserState } from "../../context/UserStateContext";
 import { socket } from "../../socket";
-import { Player } from "./Room/Room";
+import Room, { Player } from "./Room/Room";
+import GameManagerActions from "./GameManagerActions/GameManagerActions";
 
 const RoomManager = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
@@ -48,6 +48,7 @@ const RoomManager = () => {
         (<BattleChessManager />) :
         (<Room />)
       }
+      <GameManagerActions />
     </>
   );
 };
