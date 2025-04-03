@@ -50,6 +50,7 @@ Issues:
 - Clarity on who's turn it is
 - Color coding on tiles
 - Draggable pieces
+- Chat room in game/room
 
 Filter out moves:
 - Sticky webs
