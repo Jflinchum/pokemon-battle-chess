@@ -5,6 +5,7 @@
   flex-wrap: wrap;
   padding: 0;
   width: 56vw;
+  margin: 10px auto;
 
   button {
     background: rgb(70, 70, 70);

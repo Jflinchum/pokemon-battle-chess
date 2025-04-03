@@ -46,7 +46,7 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
                 onClick={(square) => {
                   onSquareClick(square?.square || getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex));
                 }}
-                highlighted={highlightedSquares.includes(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))}
+                possibleMove={highlightedSquares.includes(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
                 pokemon={boardSquare?.pokemon}
                 mostRecentMoveFrom={mostRecentMove?.from === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RoomCodeModalProps, useModalState } from "../../../../../context/ModalStateContext";
 import PasscodeInput from "../../../PasscodeInput/PasscodeInput";
 import Button from "../../../Button/Button";
@@ -13,7 +13,8 @@ const RoomCodeModal = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [errorText, setErrorText] = useState('')
 
-  const handleJoinRoomClick = async () => {
+  const handleJoinRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
     setErrorText('');
     const roomId = (modalState.modalProps as RoomCodeModalProps)?.roomId;
     const roomCode = inputRef.current?.value || '';
@@ -29,14 +30,18 @@ const RoomCodeModal = () => {
     dispatch({ type: 'CLOSE_MODAL' });
   }
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <div className='roomCodeModalContainer'>
       <h2 className='roomCodeTitle'>Enter Room Code</h2>
       <ErrorMessage display='block'>{errorText}</ErrorMessage>
-      <div className='roomCodeActions'>
+      <form onSubmit={handleJoinRoom} className='roomCodeActions'>
         <PasscodeInput label="Room Code: " onFocus={() => errorText === 'Invalid Password' && setErrorText('')} ref={inputRef}/>
-        <Button colorPrimary="green" onClick={handleJoinRoomClick}>Submit</Button>
-      </div>
+        <Button type='submit' colorPrimary="green">Submit</Button>
+      </form>
     </div>
   )
 };

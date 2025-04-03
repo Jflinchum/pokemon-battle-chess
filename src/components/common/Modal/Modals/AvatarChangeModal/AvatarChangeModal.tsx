@@ -19,9 +19,9 @@ const AvatarChangeModal = () => {
       <div className='avatarChangeBody'>
         {
           Object.keys(avatarIdMapping).map((id) => (
-            <div className='avatarButton' key={id} onClick={() => handleAvatarSelect(id)}>
+            <button className='avatarButton' key={id} onClick={() => handleAvatarSelect(id)}>
               <img src={Sprites.getAvatar(id)} />
-            </div>
+            </button>
           ))
         }
       </div>

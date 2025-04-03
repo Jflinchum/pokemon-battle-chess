@@ -1,6 +1,7 @@
 .draftGameContainer {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 
   @media (min-width: 800px) {
     flex-direction: row; 

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Button from "../../../../Button/Button";
 import './CreateRoomForm.css'
 import PasscodeInput from "../../../../PasscodeInput/PasscodeInput";
@@ -17,13 +17,17 @@ const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation, createRoom
     handleCreateRoom({ password: inputRef?.current?.value || '' });
   };
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   return (
     <form autoComplete="off" onSubmit={handleSubmit}>
       <div className='roomFormOptions'>
         <PasscodeInput label="Room Code:" ref={inputRef} />
       </div>
       <div className='roomFormActions'>
-        <Button colorPrimary='brown' onClick={handleCancelRoomCreation}>Cancel</Button>
+        <Button type='button' colorPrimary='brown' onClick={handleCancelRoomCreation}>Cancel</Button>
         <Button disabled={createRoomLoading} colorPrimary='green' type='submit'>Create Room</Button>
       </div>
     </form>

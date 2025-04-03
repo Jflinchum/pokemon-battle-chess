@@ -7,6 +7,7 @@ import AvatarChangeModal from "./Modals/AvatarChangeModal/AvatarChangeModal";
 import CreateRoomModal from "./Modals/CreateRoomModal/CreateRoomModal";
 import EndGameModal from "./Modals/EndGameModal/EndGameModal";
 import './Modal.css';
+import { useEffect } from "react";
 
 const renderModal = (currentModal: string) => {
   switch (currentModal) {
@@ -33,6 +34,18 @@ const Modal = () => {
       dispatch({ type: 'CLOSE_MODAL' });
     }
   };
+
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      }
+    };
+
+    document.addEventListener('keydown', listener);
+
+    return () => document.removeEventListener('keydown', listener);
+  }, []);
 
   return (
     <>

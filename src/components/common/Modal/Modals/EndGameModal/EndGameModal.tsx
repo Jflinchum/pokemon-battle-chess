@@ -18,7 +18,7 @@ const EndGameModal = () => {
     dispatch({ type: 'CLOSE_MODAL' });
   }
 
-  const handleRematch = () => {
+  const handleReturn = () => {
     gameStateDispatch({ type: 'RETURN_TO_ROOM' });
     socket.emit('setViewingResults', userState.currentRoomId, userState.id, false);
     dispatch({ type: 'CLOSE_MODAL' });
@@ -30,7 +30,7 @@ const EndGameModal = () => {
       <p>{gameState.players.find((player) => player.isPlayer1)?.playerName} vs {gameState.players.find((player) => player.isPlayer2)?.playerName}</p>
       <div className='endGameBottomActions'>
         <Button colorPrimary='brown' onClick={handleBackToMenu}>Back To Main Menu</Button>
-        <Button className='endGameRematch' colorPrimary='green' onClick={handleRematch}>Rematch</Button>
+        <Button className='endGameRematch' colorPrimary='green' onClick={handleReturn}>Return to Room</Button>
       </div>
     </div>
   )

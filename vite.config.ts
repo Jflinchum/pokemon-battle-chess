@@ -20,9 +20,9 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'https://localhost:3000',
+        target: 'http://localhost:3000',
         secure: false,
-      }
+      },
     }
   },
 })

@@ -10,6 +10,7 @@ Host controls
   - Kick player
   - Promote to host
 Responsive design in game
+Pre-move chess pieces
 Rejoining a game in progress
   - Would have to track history of game and send it back to client
   - Could also store state of game clientside?
@@ -33,6 +34,7 @@ Easy
 - Hover in depth details
 - Text speed on pokemon battles (skip to end button)
 - Matchmaking
+- Store last used room options as default on local storage
 
 Medium
 - Open/Closed Team Sheets
@@ -42,3 +44,9 @@ Hard
 - Custom teams
 - Rejoining a game
 - Battle timers
+
+Issues:
+- Spectator in pokemon battle not moving on
+- Clarity on who's turn it is
+- Color coding on tiles
+- Draggable pieces

@@ -48,9 +48,10 @@ https.createServer(options, app).listen(httpsPort, () => {
 const server = http.createServer(app).listen(httpPort, () => {
   console.log(`HTTP is listening on ${httpPort}`);
 });
+
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins
+    origin: allowedOrigins,
   }
 });
 

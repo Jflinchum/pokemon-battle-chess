@@ -93,7 +93,7 @@ const Room = () => {
           <Button
             colorPrimary='green'
             onClick={handleStartGame}
-            disabled={!gameState.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
+            disabled={!thisPlayer?.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
           >
               Start Game
           </Button>
