@@ -19,10 +19,8 @@ const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostR
     return 'selected';
   } else if (possibleMove) {
     return 'highlighted';
-  } else if (mostRecentMoveFrom) {
-    return 'mostRecentMoveFrom';
-  } else if (mostRecentMoveTo) {
-    return 'mostRecentMoveTo';
+  } else if (mostRecentMoveFrom || mostRecentMoveTo) {
+    return 'mostRecentMove';
   }
   return ''
 }
@@ -31,15 +29,16 @@ const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostR
 const ChessSquare = ({ square, backgroundColor, onClick, possibleMove, selected, pokemon, mostRecentMoveFrom, mostRecentMoveTo }: ChessSquareProps) => {
   return (
     <div 
-      className={`chessSquare ${backgroundColor}ChessSquare ${getSquareHighlightClass(selected, possibleMove, mostRecentMoveFrom, mostRecentMoveTo)}`}
+      className={`chessSquare ${backgroundColor}ChessSquare`}
       onClick={() => { onClick(square); }}
-      onDrop={(e) => {
+      onDrop={() => {
         onClick(square);
       }}
       onDragOver={(e) => {
         e.preventDefault();
       }}
     >
+      <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMoveFrom, mostRecentMoveTo)}`} />
       <PokemonChessPieceSprite
         type={square?.type}
         color={square?.color}

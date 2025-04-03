@@ -47,7 +47,6 @@ Hard
 
 Issues:
 - Clarity on who's turn it is
-- Color coding on tiles
 - Chat room in game/room
 - Player disconnecting at end game modal clears their name
 
