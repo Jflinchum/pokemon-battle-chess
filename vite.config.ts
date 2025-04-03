@@ -1,13 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'fs';
-import { keyLocation, certLocation } from './server/config';
+import { config } from './server/config';
 
 const httpsOptions: { key?: any; cert?: any } = {}
 
 try {
-  httpsOptions.key = fs.readFileSync(keyLocation);
-  httpsOptions.cert = fs.readFileSync(certLocation);
+  httpsOptions.key = fs.readFileSync(config.devConfig.keyLocation);
+  httpsOptions.cert = fs.readFileSync(config.devConfig.certLocation);
 } catch (err) {
   console.log(err);
 }

@@ -2,12 +2,13 @@ import express from 'express';
 import path from 'path';
 import { Server } from 'socket.io'
 import cors from 'cors';
+import http from 'http';
 import https from 'https';
 import fs from 'fs';
 import User from './User';
 import GameRoomManager from './GameRoomManager';
 import GameRoom from './GameRoom';
-import { keyLocation, certLocation } from './config';
+import { config } from './config';
 import { assignSocketEvents } from './socketEvents';
 
 interface APIResponse<Data> {
@@ -17,15 +18,19 @@ interface APIResponse<Data> {
 
 interface Empty {}
 
-const serverPort = 3000;
-const allowedOrigins = ['https://localhost:5173'];
+const configSettings = process.env.NODE_ENV === 'production' ? config.prodConfig : config.devConfig;
+
+const httpPort = configSettings.httpPort;
+const httpsPort = configSettings.httpsPort;
+const allowedOrigins = configSettings.allowedOrigins;
 
 const app = express();
-const options: { key?: any; cert?: any } = {}
+
+const options: { key?: any; cert?: any; } = {};
 
 try {
-  options.key = fs.readFileSync(keyLocation);
-  options.cert = fs.readFileSync(certLocation);
+  options.key = fs.readFileSync(configSettings.keyLocation);
+  options.cert = fs.readFileSync(configSettings.certLocation);
 } catch (err) {
   console.log(err);
 }
@@ -37,8 +42,11 @@ app.use(cors({
   optionsSuccessStatus: 204,
 }));
 
-const server = https.createServer(options, app).listen(serverPort, () => {
-  console.log(`App listening on ${serverPort}`);
+const server = https.createServer(options, app).listen(httpsPort, () => {
+  console.log(`App listening on ${httpsPort}`);
+});
+http.createServer(app).listen(httpPort, () => {
+  console.log(`App listening on ${httpPort}`);
 });
 const io = new Server(server, {
   cors: {
@@ -55,6 +63,10 @@ assignSocketEvents(io, gameRoomManager);
 
 app.get('/', (_, res) => {
   res.sendFile(path.join(path.resolve(), './dist/index.html'))
+});
+
+app.get('/healthz', (_, res) => {
+  res.status(200).send('Ok');
 });
 
 /**

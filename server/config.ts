@@ -1,3 +1,17 @@
+export const config = {
+  devConfig: {
+    keyLocation: 'private-key.pem',
+    certLocation: 'certificate.pem',
+    allowedOrigins: ['https://localhost:5173'],
+    httpPort: 3000,
+    httpsPort: 3001,
+  },
 
-export const keyLocation = 'private-key.pem';
-export const certLocation = 'certificate.pem';
+  prodConfig: {
+    keyLocation: 'private-key.pem',
+    certLocation: 'certificate.pem',
+    allowedOrigins: [],
+    httpPort: 3000,
+    httpsPort: 3001,
+  }
+};
