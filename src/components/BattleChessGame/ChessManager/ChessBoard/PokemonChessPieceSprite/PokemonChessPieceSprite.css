@@ -8,13 +8,15 @@
   height: 100%;
   width: 100%;
   position: absolute;
+  background-size: contain;
 }
 
 .pokemonPieceSprite {
-  max-height: 50%;
-  max-width: 50%;
   position: absolute;
-  left: 50%;
+  height: 50%;
+  width: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom;
   bottom: 0;
-  transform: translateX(-50%) translateY(-10%);
 }

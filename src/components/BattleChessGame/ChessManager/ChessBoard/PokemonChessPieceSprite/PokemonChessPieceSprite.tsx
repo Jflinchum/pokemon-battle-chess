@@ -9,12 +9,20 @@ interface PokemonChessPieceSpriteProps {
   type?: PieceSymbol
   color?: Color
   pokemon?: PokemonSet
+  onDragStart?: (e: React.DragEvent) => void
 }
 
-const PokemonChessPieceSprite = ({ type, color, pokemon }: PokemonChessPieceSpriteProps) => {
+const PokemonChessPieceSprite = ({ type, color, pokemon, onDragStart }: PokemonChessPieceSpriteProps) => {
+  if (!type || !color) {
+    return null;
+  }
 
   return (
-    <div className='pieceSpriteContainer'>
+    <div
+      draggable
+      className='pieceSpriteContainer'
+      onDragStart={onDragStart}
+    >
       {
         type && color && (
           <ChessPieceSprite type={type} color={color} className='chessPiece' />
@@ -22,7 +30,10 @@ const PokemonChessPieceSprite = ({ type, color, pokemon }: PokemonChessPieceSpri
       }
       {
         pokemon && (
-          <img src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url} className='pokemonPieceSprite'/>
+          <div
+            style={{ 'backgroundImage': `url(${Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url})`}}
+            className='pokemonPieceSprite'
+          />
         )
       }
     </div>

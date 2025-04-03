@@ -43,7 +43,7 @@ interface ChessPieceSpriteProps {
 const ChessPieceSprite = ({ color, type, className }: ChessPieceSpriteProps) => {
 
   return (
-    <img src={getPieceImage(type, color)} className={className} />
+    <div style={{ backgroundImage: `url(${getPieceImage(type, color)})` }} className={className} />
   );
 };
 

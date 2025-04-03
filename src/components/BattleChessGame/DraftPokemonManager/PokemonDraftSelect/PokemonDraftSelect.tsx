@@ -16,7 +16,12 @@ const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftab
         draftablePokemon.map((pokemon, index) => (
           <li key={index}>
             <button className={selectedDraftablePokemon === index ? 'selectedDraft' : ''} onClick={() => { onPokemonSelect(index); }}>
-              <img src={Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url}/>
+              <div
+                draggable
+                onDragStart={() => onPokemonSelect(index)}
+                className='pokemonDraftSprite'
+                style={{ backgroundImage: `url(${Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url})` }}
+              />
             </button>
           </li>
         ))

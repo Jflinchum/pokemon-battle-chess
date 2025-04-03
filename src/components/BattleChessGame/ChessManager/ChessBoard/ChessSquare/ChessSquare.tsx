@@ -32,9 +32,22 @@ const ChessSquare = ({ square, backgroundColor, onClick, possibleMove, selected,
   return (
     <div 
       className={`chessSquare ${backgroundColor}ChessSquare ${getSquareHighlightClass(selected, possibleMove, mostRecentMoveFrom, mostRecentMoveTo)}`}
-      onClick={() => { onClick(square) }}
+      onClick={() => { onClick(square); }}
+      onDrop={(e) => {
+        onClick(square);
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+      }}
     >
-      <PokemonChessPieceSprite type={square?.type} color={square?.color} pokemon={pokemon} />
+      <PokemonChessPieceSprite
+        type={square?.type}
+        color={square?.color}
+        pokemon={pokemon}
+        onDragStart={() => {
+          onClick(square);
+        }}
+      />
       {
         square?.square[0] === 'a' &&
         (
