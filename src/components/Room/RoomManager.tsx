@@ -19,6 +19,15 @@ const RoomManager = () => {
       dispatch({ type: 'RETURN_TO_ROOM' });
     });
     socket.on('connectedPlayers', (players: Player[]) => {
+      players.forEach((player) => {
+        if (player.playerId === userState.id) {
+          if (player.isHost && !gameState.isHost) {
+            dispatch({ type: 'SET_HOST', payload: true });
+          } else if (!player.isHost && gameState.isHost) {
+            dispatch({ type: 'SET_HOST', payload: false });
+          }
+        }
+      })
       dispatch({ type: 'SET_PLAYERS', payload: players });
     });
 

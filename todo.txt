@@ -50,3 +50,9 @@ Issues:
 - Clarity on who's turn it is
 - Color coding on tiles
 - Draggable pieces
+
+Filter out moves:
+- Sticky webs
+- Stealth rocks
+- Spikes
+- Toxic Spikes

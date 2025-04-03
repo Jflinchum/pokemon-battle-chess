@@ -46,7 +46,8 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
           if (adv) {
             pokemon.boostBy(adv.boost);
             for (let stat in adv.boost) {
-              if (adv.boost) {
+              if (adv.boost[stat as BoostID]) {
+                this.add('message', `${pokemon.name} receives a stat boost from starting the battle!`);
                 this.add('-boost', pokemon.fullname.replace(/(p[1-2])/g, '$1a'), stat, `${adv.boost[stat as BoostID]}`);
               }
             }

@@ -79,11 +79,17 @@ function BattleChessManager() {
         chessManager.move({ from: fromSquare, to: toSquare, promotion });
         pokemonManager.movePokemonToSquare(fromSquare, toSquare, promotion);
       } else {
+        const lostPiece = chessManager.get(fromSquare);
         pokemonManager.getPokemonFromSquare(fromSquare)!.square = null;
         const tempPiece = chessManager.get(toSquare);
         chessManager.move({ from: fromSquare, to: toSquare, promotion });
         chessManager.remove(currentBattle.attemptedMove.fromSquare);
         chessManager.put(tempPiece!, toSquare)
+
+        if (lostPiece?.type === 'k') {
+          modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: lostPiece.color === 'w' ? 'b' : 'w' } }});
+          socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
+        }
       }
       setCurrentBattle(null);
     }

@@ -4,6 +4,7 @@ import { useGameState } from "../../../../../context/GameStateContext";
 import './EndGameModal.css';
 import Button from "../../../Button/Button";
 import { socket } from "../../../../../socket";
+import { Sprites } from "@pkmn/img";
 
 const EndGameModal = () => {
   const { modalState, dispatch } = useModalState();
@@ -27,7 +28,17 @@ const EndGameModal = () => {
   return (
     <div className='endGameModalContainer'>
       <h2 className='endGameTitle'>{currentColor === victorColor ? 'You Win!' : 'You Lose...'}</h2>
-      <p>{gameState.players.find((player) => player.isPlayer1)?.playerName} vs {gameState.players.find((player) => player.isPlayer2)?.playerName}</p>
+      <div className='endGamePlayerList'>
+        <div className='endGamePlayer'>
+          <p>{gameState.players.find((player) => player.isPlayer1)?.playerName}</p>
+          <img src={Sprites.getAvatar(gameState.players.find((player) => player.isPlayer1)?.avatarId || 1)}/>
+        </div>
+        <p>vs</p>
+        <div className='endGamePlayer'>
+          <p>{gameState.players.find((player) => player.isPlayer2)?.playerName}</p>
+          <img src={Sprites.getAvatar(gameState.players.find((player) => player.isPlayer2)?.avatarId || 1)}/>
+        </div>
+      </div>
       <div className='endGameBottomActions'>
         <Button colorPrimary='brown' onClick={handleBackToMenu}>Back To Main Menu</Button>
         <Button className='endGameRematch' colorPrimary='green' onClick={handleReturn}>Return to Room</Button>

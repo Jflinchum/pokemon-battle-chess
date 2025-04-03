@@ -75,6 +75,7 @@ const boostToLabel: Record<BoostID, string> = {
 
 const PokemonFieldSprite = ({ pokemon, side }: PokemonFieldSpriteProps) => {
 
+  (window as any).pokemonTest = pokemon;
   return (
     <div className={`${side}Pokemon`}>
       <div className='pokemonSpriteInfo'>
@@ -104,7 +105,14 @@ const PokemonFieldSprite = ({ pokemon, side }: PokemonFieldSpriteProps) => {
           }
         </div>
       </div>
-      <img className={`pokemonSprite ${side}PokemonSprite`} src={Sprites.getPokemon(pokemon.baseSpeciesForme, { gender: pokemon.gender as GenderName, side }).url}/>
+      <img
+        className={`pokemonSprite ${side}PokemonSprite`}
+        src={
+          pokemon.volatiles['substitute'] ?
+          Sprites.getSubstitute({ side }).url :
+          Sprites.getPokemon(pokemon.baseSpeciesForme, { gender: pokemon.gender as GenderName, side }).url
+        }
+      />
     </div>
   );
 }

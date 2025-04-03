@@ -8,9 +8,25 @@
 
 .endGameBottomActions {
   display: flex;
-  padding: 0 50px;
+  justify-content: space-evenly;
+}
 
-  .endGameRematch {
-    margin-left: auto;
+.endGamePlayerList {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: space-evenly;
+
+  p {
+    margin: auto 0;
+  }
+}
+
+.endGamePlayer {
+  width: 200px;
+
+  @media (max-width: 499px) {
+    font-size: 10px;
+    width: 100px;
   }
 }

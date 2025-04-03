@@ -33,6 +33,7 @@ interface GameStateType {
 type GameStateAction = 
   { type: 'RESET_ROOM'; }
   | { type: 'CREATE_ROOM'; }
+  | { type: 'SET_HOST'; payload: boolean }
   | { type: 'SET_PLAYERS'; payload: Player[]; }
   | { type: 'RETURN_TO_ROOM'; }
   | { type: 'START_MATCH'; payload: GameSettings; };
@@ -58,6 +59,8 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
       return { ...gameState, isHost: true };
     case 'SET_PLAYERS':
       return { ...gameState, players: action.payload };
+    case 'SET_HOST': 
+      return { ...gameState, isHost: action.payload };
     case 'START_MATCH':
       return { ...gameState, matchStarted: true, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color, options: action.payload.options } };
     case 'RETURN_TO_ROOM':
