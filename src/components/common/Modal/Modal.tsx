@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useModalState } from "../../../context/ModalStateContext";
@@ -6,8 +7,8 @@ import NameChangeModal from "./Modals/NameChangeModal/NameChangeModal";
 import AvatarChangeModal from "./Modals/AvatarChangeModal/AvatarChangeModal";
 import CreateRoomModal from "./Modals/CreateRoomModal/CreateRoomModal";
 import EndGameModal from "./Modals/EndGameModal/EndGameModal";
+import HowToPlayModal from "./Modals/HowToPlayModal/HowToPlayModal";
 import './Modal.css';
-import { useEffect } from "react";
 
 const renderModal = (currentModal: string) => {
   switch (currentModal) {
@@ -19,6 +20,8 @@ const renderModal = (currentModal: string) => {
       return (<AvatarChangeModal />);
     case 'CREATE_ROOM':
         return (<CreateRoomModal />)
+    case 'HOW_TO_PLAY':
+        return (<HowToPlayModal />)
     case 'END_GAME':
         return (<EndGameModal />)
     default:

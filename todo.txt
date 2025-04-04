@@ -28,7 +28,6 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Quick How To Play modal
 - Return to room button
 - Host controls
 - Battle Animation between pieces when a battle is beginning and ending
@@ -37,7 +36,6 @@ Priority:
 - Robots.txt disable search engine crawling
 
 Issues:
-- Clarity on who's turn it is
 - Player disconnecting at end game modal clears their name
 - OG/Twitter meta tags do not support svg
 

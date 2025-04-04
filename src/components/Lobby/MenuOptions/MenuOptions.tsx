@@ -21,6 +21,10 @@ const MenuOptions = () => {
     dispatch({ type: 'OPEN_AVATAR_MODAL', payload: {} })
   }
 
+  const handleHowToPlay = () => {
+    dispatch({ type: 'OPEN_HOW_TO_PLAY_MODAL', payload: {} })
+  }
+
   return (
     <div className='menuOptions'>
       <ul>
@@ -50,7 +54,7 @@ const MenuOptions = () => {
           <Button colorPrimary="brown" onClick={handleChangeAvatar}>Change Avatar</Button>
         </li>
         <li>
-          <Button colorPrimary="darkblue" onClick={() => {}}>How to play (todo)</Button>
+          <Button colorPrimary="darkblue" onClick={handleHowToPlay}>How to play</Button>
         </li>
       </ul>
 
