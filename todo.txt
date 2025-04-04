@@ -1,5 +1,4 @@
 TODO:
-/api/getRooms pagination
 Battle Timers
 Text Speed on pokemon battles
 Matchmaking
@@ -35,8 +34,8 @@ Priority:
 - Better Room Options explanations/formatting
 - Draft & Ban
 - Rejoining
-- Social media meta tags
 - Fun background and logo?
+- Robots.txt disable search engine crawling
 
 Issues:
 - Clarity on who's turn it is
