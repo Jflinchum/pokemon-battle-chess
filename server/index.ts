@@ -144,14 +144,25 @@ app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: Us
   res.status(200).send();
 });
 
-// TODO - pagination
-app.get<Empty, Empty, { roomId: GameRoom['roomId'], hostName: User['playerName'] }[]>('/api/getRooms', (req, res) => {
-  const roomResponse = gameRoomManager.getAllRooms().map((id) => {
+app.get<Empty, APIResponse<{ rooms: { roomId: GameRoom['roomId'], hostName: User['playerName'], hasPassword: boolean }[], pageCount: number  }>, Empty, { page?: number, limit?: number, searchTerm?: string }>('/api/getRooms', (req, res) => {
+  const { page = 1, limit = 10, searchTerm = '' } = req.query || {};
+
+  const roomResponse = gameRoomManager.getAllRooms()
+  .filter((id) => {
+    const hostPlayerName = gameRoomManager.getRoom(id)?.hostPlayer?.playerName;
+    if (!hostPlayerName) {
+      return false;
+    }
+    return hostPlayerName.toLowerCase().includes(searchTerm.toLowerCase());
+  })
+  .map((id) => {
     return {
       roomId: id,
-      hostName: gameRoomManager.getRoom(id)?.hostPlayer?.playerName,
+      hostName: gameRoomManager.getRoom(id)!.hostPlayer!.playerName,
       hasPassword: !!gameRoomManager.getRoom(id)?.password,
     }
   })
-  res.status(200).send({ rooms: roomResponse });
+  .slice((page - 1) * limit, ((page - 1) * limit) + limit);
+
+  res.status(200).send({ data: { rooms: roomResponse, pageCount: Math.floor(roomResponse.length / limit) + 1 } });
 });

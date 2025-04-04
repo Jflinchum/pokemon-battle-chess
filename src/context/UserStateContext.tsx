@@ -1,5 +1,5 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { getAvatar, getName, getOrInitializeUUID } from "../utils";
+import { getAvatar, getName, getOrInitializeUUID } from "../utils.ts";
 import { leaveRoom } from "../service/lobby";
 
 interface UserState {

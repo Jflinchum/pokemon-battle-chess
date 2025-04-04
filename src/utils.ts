@@ -1,3 +1,4 @@
+import { RefObject, useRef } from "react";
 import { GameOptions } from "./context/GameStateContext";
 
 export const getOrInitializeUUID = () => {
@@ -37,4 +38,16 @@ export const getGameOptions = () => {
   };
   const localStorageGameOptions = localStorage.getItem('defaultGameOptions');
   return localStorageGameOptions ? JSON.parse(localStorageGameOptions ) : defaultGameOptions;
+}
+
+export const useDebounce = (cb: Function, delay: number) => {
+  let timer: RefObject<NodeJS.Timeout | null> = useRef(null);
+  return (...args: any) => {
+    if (timer?.current) {
+      clearTimeout(timer.current);
+    }
+    timer.current = setTimeout(() => {
+      cb.apply(this, args);
+    }, delay);
+  };
 }

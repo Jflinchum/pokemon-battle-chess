@@ -3,32 +3,21 @@ import RoomListItem from "./RoomListItem";
 import { useUserState } from "../../../context/UserStateContext";
 import { useModalState } from "../../../context/ModalStateContext";
 import { joinRoom } from "../../../service/lobby";
-import Button from "../../common/Button/Button";
 import './RoomList.css';
 import ErrorMessage from "../../common/ErrorMessage/ErrorMessage";
+import { useDebounce } from "../../../utils";
 
 interface RoomListProps {
   availableRooms: { roomId: string, hostName: string, hasPassword: boolean }[];
-  onRefresh: () => void;
   errorText?: string;
+  onSearch: (searchTerm: string) => void;
 }
 
-const RoomList = ({ availableRooms, onRefresh, errorText }: RoomListProps) => {
+const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
   const { dispatch, userState } = useUserState();
   const { dispatch: dispatchModalState } = useModalState();
   const [roomSearch, setRoomSearch] = useState('');
-  const [refreshDisabled, setRefreshDisabled] = useState(false);
   const [joinErrorText, setJoinErrorText] = useState('');
-
-  const handleRefreshRoom = () => {
-    setRefreshDisabled(true);
-
-    onRefresh();
-  
-    setTimeout(() => {
-      setRefreshDisabled(false);
-    }, 1000);
-  }
 
   const handleJoinRoom = async ({ roomId, hasPassword }: { roomId: string, hasPassword: boolean }) => {
     setJoinErrorText('');
@@ -44,26 +33,23 @@ const RoomList = ({ availableRooms, onRefresh, errorText }: RoomListProps) => {
     }
   }
 
+  const searchDebounce = useDebounce((searchTerm: string) => onSearch(searchTerm), 1000);
 
-  // TODO - Debounce room search and send to backend and pagination
   return (
-    <div className='roomListContainer'>
+    <div>
       <ErrorMessage display='block'>{errorText}</ErrorMessage>
       <ErrorMessage display='block'>{joinErrorText}</ErrorMessage>
       <div className='roomListTopActions'>
         <span>Rooms:</span>
-        <input value={roomSearch} onChange={(e) => setRoomSearch(e.target.value)} className='roomSearch' placeholder='Search for rooms'/>
+        <input value={roomSearch} onChange={(e) => {setRoomSearch(e.target.value); searchDebounce(e.target.value);}} className='roomSearch' placeholder='Search for rooms'/>
       </div>
       <ul className='roomList'>
         {
-          availableRooms.filter((room) => !roomSearch || room.hostName.toLowerCase().includes(roomSearch.toLowerCase())).map((room) => (
+          availableRooms.map((room) => (
             <RoomListItem key={room.roomId} name={room.hostName} locked={room.hasPassword} onClick={() => { handleJoinRoom(room) }} />
           ))
         } 
       </ul>
-      <div className='roomListBottomActions'>
-        <Button disabled={refreshDisabled} colorPrimary="brown" className='refreshButton' onClick={handleRefreshRoom}>Refresh Rooms</Button>
-      </div>
     </div>
   );
 };

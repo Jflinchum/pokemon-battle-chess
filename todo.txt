@@ -1,6 +1,5 @@
 TODO:
 /api/getRooms pagination
-On Hover in battle, show pokemon in depth details
 Battle Timers
 Text Speed on pokemon battles
 Matchmaking
@@ -21,6 +20,7 @@ Battle Animation when pieces attack
 Disable support pokemon from team generation
 Room Options
  - Open and closed team sheets
+ - Draft & Ban
  - Preserve damage after battle
  - (maybe) Preserve item usage after battle
  - Custom Teams
@@ -31,6 +31,13 @@ Room Options
 
 Priority:
 - Battle Animation between pieces when a battle is beginning and ending
+- Host controls
+- Better Room Options explanations/formatting
+- Draft & Ban
+- Rejoining
+- Clear out room if all players transient
+- Social media meta tags
+- Fun background and logo?
 
 Issues:
 - Clarity on who's turn it is
