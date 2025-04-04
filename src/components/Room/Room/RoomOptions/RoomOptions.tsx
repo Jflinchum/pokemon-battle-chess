@@ -38,9 +38,17 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
   return (
     <div className='roomOptionsContainer'>
       <h3>Room Options</h3>
-      <ul>
-        <li>
-          <label>Format:</label>
+      <ul className='roomOptionsList'>
+        <li className='roomOption'>
+          <div className='roomOptionLabel'>
+            <label htmlFor='format'>Format:</label>
+            <p>
+              Random will randomly assign a pokemon to each chess piece and then start the match.
+            </p>
+            <p>
+              Draft will give players the option to draft pokemon from a pool to each chess piece. 
+            </p>
+          </div>
           <select value={gameOptions.format} onChange={(e) => setFormat(e.target.value as FormatID)} name='format' disabled={!isHost}>
             {
               formatOptions.map((format) => (
@@ -49,19 +57,25 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
             }
           </select>
         </li>
-        <li>
-          <label>Offense Advantage:</label>
+        <hr></hr>
+        <li className='roomOption'>
+          <div className='roomOptionLabel'>
+            <label>Offense Advantage:</label>
+            <p>
+              If a chess piece attacks another, this will decide what buffs they get at the start of the match.
+            </p>
+          </div>
           <ul>
             {advantageOptions.map((adv) => (
               <li key={adv.stat}>
-                <label>{adv.label}</label>
-                <select disabled={!isHost} value={gameOptions.offenseAdvantage[adv.stat]} onChange={(e) => setOffenseAdvantage({ ...offenseAdvantage, [adv.stat]: parseInt(e.target.value) })}>
+                <select name={adv.stat} disabled={!isHost} value={gameOptions.offenseAdvantage[adv.stat]} onChange={(e) => setOffenseAdvantage({ ...offenseAdvantage, [adv.stat]: parseInt(e.target.value) })}>
                   {
                     Array.from({ length: 7 }).map((_, index) => (
                       <option value={index} key={index}>+{index}</option>
                     ))
                   }
                 </select>
+                <label htmlFor={adv.stat}>{adv.label}</label>
               </li>
             ))}
           </ul>

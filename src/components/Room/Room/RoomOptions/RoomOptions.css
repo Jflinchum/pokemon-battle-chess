@@ -5,7 +5,35 @@
     padding: 0 10px;
   }
 
-  label {
-    display: block;
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  select {
+    height: fit-content;
+  }
+}
+
+ul.roomOptionsList {
+  padding: 0 20px;
+}
+
+.roomOption {
+  display: flex;
+  flex-direction: row;
+
+
+  select {
+    margin-right: 4px;
+  }
+}
+
+.roomOptionLabel {
+  width: 200px;
+  margin-right: 8px;
+
+  p {
+    font-size: 12px;
   }
 }
