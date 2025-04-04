@@ -125,6 +125,13 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentM
       <TakenChessPieces
         takenPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color!)}
       />
+      <div className='turnNotification'>
+        {
+          chessManager.turn() === gameState.gameSettings.color ?
+          (<strong>Your turn to move!</strong>) :
+          (<strong>Waiting for opponent...</strong>)
+        }
+      </div>
       <div className='chessGameContainer'>
         <ChessBoard
           boardState={mergeBoardAndPokemonState(board, pokemonManager)}

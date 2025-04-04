@@ -4,11 +4,12 @@ import './PokemonDraftSelect.css'
 
 interface PokemonDraftSelectProps {
   draftablePokemon: PokemonSet[];
+  bannedPokemon: PokemonSet[];
   onPokemonSelect: (index: number) => void
   selectedDraftablePokemon?: number | null;
 }
 
-const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftablePokemon }: PokemonDraftSelectProps) => {
+const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftablePokemon, bannedPokemon }: PokemonDraftSelectProps) => {
 
   return (
     <ul className='pokemonDraftSelectContainer'>
@@ -19,6 +20,18 @@ const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftab
               <div
                 draggable
                 onDragStart={() => onPokemonSelect(index)}
+                className='pokemonDraftSprite'
+                style={{ backgroundImage: `url(${Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url})` }}
+              />
+            </button>
+          </li>
+        ))
+      }
+      {
+        bannedPokemon.map((pokemon, index) => (
+          <li key={index}>
+            <button disabled className={'bannedDraft'} onClick={() => { onPokemonSelect(index); }}>
+              <div
                 className='pokemonDraftSprite'
                 style={{ backgroundImage: `url(${Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url})` }}
               />

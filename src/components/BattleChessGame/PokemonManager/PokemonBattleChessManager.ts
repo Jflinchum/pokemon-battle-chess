@@ -22,8 +22,8 @@ export class PokemonBattleChessManager {
   public chessPieces: PokemonPiece[] = [];
   public board: ChessBoardSquare[][];
   public seed: PRNGSeed;
-  public whiteDraftPieces: PokemonSet[] = [];
-  public blackDraftPieces: PokemonSet[] = [];
+  public draftPieces: PokemonSet[] = [];
+  public banPieces: PokemonSet[] = [];
 
   constructor(board: ChessBoardSquare[][], seed: PRNGSeed, format: FormatID) {
     this.board = board;
@@ -61,26 +61,20 @@ export class PokemonBattleChessManager {
 
   public populateDraftWithRandomTeams() {
     const teamGen = this.teamRandomGenerator();
-    for (let i = 0; i < 16; i++) {
-      this.whiteDraftPieces.push(teamGen.next().value);
+    for (let i = 0; i < 38; i++) {
+      this.draftPieces.push(teamGen.next().value);
     }
-    for (let i = 0; i < 16; i++) {
-      this.blackDraftPieces.push(teamGen.next().value);
-    }
-  }
-
-  public getWhiteDraftPieces() {
-    return this.whiteDraftPieces;
-  }
-
-  public getBlackDraftPieces() {
-    return this.blackDraftPieces;
   }
 
   public assignPokemonToSquare(index: number | null, square: Square, type: PieceSymbol, color: Color) {
     if (index !== null) {
-      let draftPieces = color === 'w' ? this.whiteDraftPieces : this.blackDraftPieces;
-      this.chessPieces.push({ type, square, color, pkmn: draftPieces.splice(index, 1)[0] })
+      this.chessPieces.push({ type, square, color, pkmn: this.draftPieces.splice(index, 1)[0] })
+    }
+  }
+
+  public banDraftPiece(index: number | null) {
+    if (index !== null) {
+      this.banPieces.push(this.draftPieces.splice(index, 1)[0]);
     }
   }
 

@@ -4,7 +4,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   padding: 0;
-  width: 56vw;
+  width: 60vw;
   margin: 10px auto;
 
   button {
@@ -20,6 +20,10 @@
 
     &.selectedDraft {
       border: 1px solid blue;
+    }
+
+    &.bannedDraft {
+      background: brown;
     }
   }
 

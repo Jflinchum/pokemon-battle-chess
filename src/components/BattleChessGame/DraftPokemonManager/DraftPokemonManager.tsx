@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Chess, Color, Square } from "chess.js";
 import { useGameState } from "../../../context/GameStateContext";
 import PokemonDraftSelect from "./PokemonDraftSelect/PokemonDraftSelect";
@@ -7,22 +7,22 @@ import { PokemonBattleChessManager } from "../PokemonManager/PokemonBattleChessM
 import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
 import { PokemonChessBoardSquare } from "../ChessManager/types";
 import './DraftPokemonManager.css';
+import Button from "../../common/Button/Button";
 
 interface DraftPokemonManager {
   chessManager: Chess;
   pokemonManager: PokemonBattleChessManager;
   onDraftPokemon: (square: Square, draftPokemonIndex: number) => void;
+  onBanPokemon: (draftPokemonIndex: number) => void;
   boardState: PokemonChessBoardSquare[][];
   draftTurnPick: Color;
 }
 
-const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draftTurnPick }: DraftPokemonManager) => {
+const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draftTurnPick, onBanPokemon }: DraftPokemonManager) => {
   const { gameState } = useGameState();
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
-  const [draftPokemonSelected, setDraftPokemonSelected] = useState<number | null>(null)
-
-  const draftablePokemon = useMemo(() => gameState.gameSettings.color === 'w' ? pokemonManager.getWhiteDraftPieces() : pokemonManager.getBlackDraftPieces(), []);
+  const [draftPokemonSelected, setDraftPokemonSelected] = useState<number | null>(null);
 
   const cancelSelection = () => {
     setSelectedSquare(null);
@@ -34,7 +34,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
     } else {
       setSelectedSquare(square);
     }
-    if (draftPokemonSelected !== null) {
+    if (draftPokemonSelected !== null && pokemonManager.draftPieces.length <= 32) {
       // draft piece
       onDraftPokemon(square, draftPokemonSelected)
       setDraftPokemonSelected(null);
@@ -49,11 +49,6 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
 
   return (
     <div>
-      {
-        draftTurnPick === gameState.gameSettings.color ?
-        (<span>Your turn to pick!</span>) :
-        (<span>Waiting for opponent to pick.</span>)
-      }
       <div className='draftGameContainer'>
         <ChessBoard
           boardState={boardState}
@@ -63,13 +58,28 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
         />
         <PokemonDetailsCard
           pokemon={
-            pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn || (draftPokemonSelected !== null ? draftablePokemon[draftPokemonSelected] : null)
+            pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn || (draftPokemonSelected !== null ? pokemonManager.draftPieces[draftPokemonSelected] : null)
           }
         />
       </div>
+      <div className='draftNotification'>
+        {
+          draftTurnPick === gameState.gameSettings.color ?
+          (<strong>{ pokemonManager.draftPieces.length > 32 ? ('Select a pokemon that you want to ban, and the click "Ban Pokemon"!') : ('Select a pokemon you want to draft, and then select the chess piece to draft it!') }</strong>) :
+          (<strong>Waiting for opponent...</strong>)
+        }
+      </div>
+      <div className='banButton'>
+        {
+          draftPokemonSelected !== null && pokemonManager.draftPieces.length > 32 && draftTurnPick === gameState.gameSettings.color ?
+          (<Button colorPrimary='brown' onClick={() => onBanPokemon(draftPokemonSelected)}>Ban Pokemon</Button>) :
+          null
+        }
+      </div>
       <PokemonDraftSelect
         onPokemonSelect={handleDraftPokemonSelected}
-        draftablePokemon={draftablePokemon}
+        draftablePokemon={pokemonManager.draftPieces}
+        bannedPokemon={pokemonManager.banPieces}
         selectedDraftablePokemon={draftPokemonSelected}
       />
     </div>

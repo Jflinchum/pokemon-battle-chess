@@ -7,3 +7,15 @@
     flex-direction: row; 
   }
 }
+
+.draftNotification {
+  text-align: center;
+}
+
+.banButton {
+  display: flex;
+  margin-top: 6px;
+  button {
+    margin: 0 auto;
+  }
+}

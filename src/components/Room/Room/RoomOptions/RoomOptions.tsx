@@ -43,10 +43,11 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
           <div className='roomOptionLabel'>
             <label htmlFor='format'>Format:</label>
             <p>
-              Random will randomly assign a pokemon to each chess piece and then start the match.
+              Random will randomly assign a Pokemon to each chess piece and then start the match.
             </p>
             <p>
-              Draft will give players the option to draft pokemon from a pool to each chess piece. 
+              Draft will give players a shared pool of Pokemon to choose from.
+              After taking turns banning from the pool, players can then assign Pokemon to their piece of choice.
             </p>
           </div>
           <select value={gameOptions.format} onChange={(e) => setFormat(e.target.value as FormatID)} name='format' disabled={!isHost}>

@@ -122,13 +122,13 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       room.validateAndEmitPokemonMove({ pokemonMove, playerId });
     });
 
-    socket.on('requestDraftPokemon', ({ roomId, playerId, square, draftPokemonIndex }) => {
+    socket.on('requestDraftPokemon', ({ roomId, playerId, square, draftPokemonIndex, isBan }) => {
       const room = gameRoomManager.getRoom(roomId);
       if (!room || !playerId) {
         return socket.disconnect();
       }
 
-      room.validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId });
+      room.validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId, isBan });
     });
 
     socket.on('setViewingResults', (roomId, playerId, viewingResults: boolean) => {

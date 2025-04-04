@@ -255,13 +255,13 @@ export default class GameRoom {
     }
   };
 
-  public validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId }) {
+  public validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId, isBan }) {
     if (playerId === this.whitePlayer.playerId) {
-      this.blackPlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w' });
-      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w' }));
+      this.blackPlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w', isBan });
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w', isBan }));
     } else if (playerId === this.blackPlayer.playerId) {
-      this.whitePlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b' });
-      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b' }));
+      this.whitePlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b', isBan });
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b', isBan }));
     }
   };
 }

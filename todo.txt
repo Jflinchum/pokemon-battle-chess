@@ -19,7 +19,6 @@ Battle Animation when pieces attack
 Disable support pokemon from team generation
 Room Options
  - Open and closed team sheets
- - Draft & Ban
  - Preserve damage after battle
  - (maybe) Preserve item usage after battle
  - Custom Teams
@@ -29,10 +28,10 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Draft & Ban
+- Quick How To Play modal
+- Return to room button
 - Host controls
 - Battle Animation between pieces when a battle is beginning and ending
-- Quick How To Play modal
 - Rejoining
 - Fun background and logo?
 - Robots.txt disable search engine crawling

@@ -45,9 +45,14 @@ function BattleChessManager() {
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
 
   useEffect(() => {
-    socket.on('startPokemonDraft', ({ square, draftPokemonIndex, socketColor }) => {
-      handleDraftPick(square, draftPokemonIndex, socketColor);
-      setIsDrafting(!!pokemonManager.whiteDraftPieces.length || !!pokemonManager.blackDraftPieces.length)
+    socket.on('startPokemonDraft', ({ square, draftPokemonIndex, socketColor, isBan }) => {
+      if (isBan) {
+        pokemonManager.banDraftPiece(draftPokemonIndex);
+        setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
+      } else {
+        handleDraftPick(square, draftPokemonIndex, socketColor);
+        setIsDrafting(!!pokemonManager.draftPieces.length);
+      }
     });
 
     return () => {
@@ -154,8 +159,16 @@ function BattleChessManager() {
               }
               if (handleDraftPick(sq, pkmnIndex, color!)) {
                 socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, square: sq, draftPokemonIndex: pkmnIndex });
-                setIsDrafting(!!pokemonManager.whiteDraftPieces.length || !!pokemonManager.blackDraftPieces.length)
+                setIsDrafting(!!pokemonManager.draftPieces.length);
               }
+            }}
+            onBanPokemon={(pkmnIndex) => {
+              if (draftTurnPick !== color) {
+                return;
+              }
+              pokemonManager.banDraftPiece(pkmnIndex);
+              setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
+              socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
             }}
           />
         )

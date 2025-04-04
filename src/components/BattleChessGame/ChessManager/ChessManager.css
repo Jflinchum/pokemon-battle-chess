@@ -8,3 +8,8 @@
     flex-direction: row; 
   }
 }
+
+.turnNotification {
+  text-align: center;
+  margin: 6px;
+}
