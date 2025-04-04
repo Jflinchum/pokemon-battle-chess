@@ -37,6 +37,7 @@ const RoomManager = () => {
     return () => {
       socket.off('connectedPlayers');
       socket.off('hostDisconnected');
+      socket.off('endGameFromDisconnect');
     }
   }, []);
 

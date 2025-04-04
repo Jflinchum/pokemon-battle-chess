@@ -27,6 +27,7 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
         if (room.hostPlayer?.playerId === player.playerId) {
           console.log('Host disconnected. Closing room');
           room.leaveRoom(player.playerId);
+          io.to(room.roomId).emit('hostDisconnected');
         } else {
           console.log(`Preparing player for disconnect. ${player.playerId}`);
           room.preparePlayerDisconnect(player);
