@@ -11,15 +11,17 @@ import { getCastledRookSquare, getVerboseChessMove, mergeBoardAndPokemonState } 
 import { useGameState } from '../../../context/GameStateContext';
 import { socket } from '../../../socket';
 import { useUserState } from '../../../context/UserStateContext';
+import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 
 interface ChessManagerProps {
   chessManager: Chess;
   pokemonManager: PokemonBattleChessManager;
   onAttemptMove: (attemptedMove: MoveAttempt) => void;
   mostRecentMove: { from: Square, to: Square } | null;
+  currentBattle?: CurrentBattle | null;
 }
 
-const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentMove }: ChessManagerProps) => {
+const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentMove, currentBattle }: ChessManagerProps) => {
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
@@ -139,6 +141,7 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentM
           highlightedSquares={highlightedSquares}
           selectedSquare={selectedSquare}
           mostRecentMove={mostRecentMove}
+          currentBattle={currentBattle}
         />
         <PokemonDetailsCard
           pokemon={

@@ -30,7 +30,6 @@ Room Options
 Priority:
 - Return to room button
 - Host controls
-- Battle Animation between pieces when a battle is beginning and ending
 - Rejoining
 - Fun background and logo?
 - Robots.txt disable search engine crawling

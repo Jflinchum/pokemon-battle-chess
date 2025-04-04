@@ -9,24 +9,26 @@ interface ChessSquareProps {
   onClick: (arg0: ChessBoardSquare) => void
   possibleMove: boolean
   selected: boolean
-  mostRecentMoveFrom: boolean
-  mostRecentMoveTo: boolean
+  mostRecentMove: boolean
+  isBattleSquare: boolean;
   pokemon?: PokemonSet
 }
 
-const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostRecentMoveFrom: boolean, mostRecentMoveTo: boolean) => { 
+const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostRecentMove: boolean, isBattleSquare: boolean) => { 
   if (selected) {
     return 'selected';
+  } else if (isBattleSquare) {
+    return 'battleSquare'; 
   } else if (possibleMove) {
     return 'highlighted';
-  } else if (mostRecentMoveFrom || mostRecentMoveTo) {
+  } else if (mostRecentMove) {
     return 'mostRecentMove';
   }
   return ''
 }
 
 
-const ChessSquare = ({ square, backgroundColor, onClick, possibleMove, selected, pokemon, mostRecentMoveFrom, mostRecentMoveTo }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onClick, possibleMove, selected, pokemon, mostRecentMove, isBattleSquare }: ChessSquareProps) => {
   return (
     <div 
       className={`chessSquare ${backgroundColor}ChessSquare`}
@@ -38,7 +40,7 @@ const ChessSquare = ({ square, backgroundColor, onClick, possibleMove, selected,
         e.preventDefault();
       }}
     >
-      <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMoveFrom, mostRecentMoveTo)}`} />
+      <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare)}`} />
       <PokemonChessPieceSprite
         type={square?.type}
         color={square?.color}

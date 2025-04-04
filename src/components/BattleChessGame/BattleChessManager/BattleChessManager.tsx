@@ -39,6 +39,7 @@ function BattleChessManager() {
   }, []);
 
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(null);
+  const [battleStarted, setBattleStarted] = useState(false);
   const [currentBoard, setCurrentBoard] = useState(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
   const [isDrafting, setIsDrafting] = useState<boolean>(gameState.gameSettings.options.format === 'draft');
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
@@ -62,6 +63,11 @@ function BattleChessManager() {
 
   const handleVictory = (victor: string) => {
     if (currentBattle) {
+      setBattleStarted(false);
+      setTimeout(() => {
+        setCurrentBattle(null);
+      }, 2000);
+
       const { fromSquare, toSquare, promotion } = currentBattle.attemptedMove;
 
       // TODO: Better logic handling this
@@ -85,7 +91,6 @@ function BattleChessManager() {
           socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
         }
       }
-      setCurrentBattle(null);
     }
   };
 
@@ -97,6 +102,10 @@ function BattleChessManager() {
         attemptedMove: { fromSquare, toSquare, capturedPieceSquare, promotion },
         offensivePlayer: color === chessManager.get(fromSquare)?.color ? 'p1' : 'p2',
       });
+
+      setTimeout(() => {
+        setBattleStarted(true);
+      }, 2000);
     } else {
       chessManager.move({ from: fromSquare, to: toSquare, promotion });
       pokemonManager.movePokemonToSquare(fromSquare, toSquare);
@@ -128,7 +137,7 @@ function BattleChessManager() {
       <p>Turn: {chessManager.moveNumber()}</p>
       <PlayerInGameDisplay player={color === 'w' ? blackPlayer : whitePlayer}/>
       {
-        currentBattle &&
+        battleStarted && currentBattle &&
         (
           <PokemonBattleManager
             p1Name={player1?.playerName!}
@@ -141,9 +150,15 @@ function BattleChessManager() {
         )
       }
       {
-        !currentBattle && !isDrafting &&
+        !battleStarted && !isDrafting &&
         (
-          <ChessManager onAttemptMove={handleAttemptMove} chessManager={chessManager} pokemonManager={pokemonManager} mostRecentMove={mostRecentMove}/>
+          <ChessManager
+            onAttemptMove={handleAttemptMove}
+            chessManager={chessManager}
+            pokemonManager={pokemonManager}
+            mostRecentMove={mostRecentMove}
+            currentBattle={currentBattle}
+          />
         )
       }
       {

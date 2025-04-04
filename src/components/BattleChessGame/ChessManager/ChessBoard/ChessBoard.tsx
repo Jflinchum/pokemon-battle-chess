@@ -4,6 +4,7 @@ import { getSquareColor, getSquareFromIndices } from '../util';
 import ChessSquare from './ChessSquare/ChessSquare';
 import './ChessBoard.css';
 import { useGameState } from '../../../../context/GameStateContext';
+import { CurrentBattle } from '../../BattleChessManager/BattleChessManager';
 
 interface ChessBoardProps {
   boardState: PokemonChessBoardSquare[][];
@@ -11,9 +12,10 @@ interface ChessBoardProps {
   highlightedSquares: Square[];
   selectedSquare: Square | null;
   mostRecentMove?: { from: Square, to: Square } | null;
+  currentBattle?: CurrentBattle | null;
 }
 
-const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, mostRecentMove }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, mostRecentMove, currentBattle }: ChessBoardProps) => {
   const { gameState } = useGameState();
 
   const boardColumnPerspective = (squares: PokemonChessBoardSquare[][]) => {
@@ -49,8 +51,13 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
                 possibleMove={highlightedSquares.includes(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
                 pokemon={boardSquare?.pokemon}
-                mostRecentMoveFrom={mostRecentMove?.from === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
-                mostRecentMoveTo={mostRecentMove?.to === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}
+                mostRecentMove={
+                  mostRecentMove?.from === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex) ||
+                  mostRecentMove?.to === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)
+                }
+                isBattleSquare={
+                  (boardSquare && boardSquare.square === currentBattle?.attemptedMove?.capturedPieceSquare) || false
+                }
               />
             ))
           }

@@ -46,6 +46,30 @@
   background-color: rgba(255, 255, 51, 0.75);
 }
 
+@keyframes blinkColor {
+  0% {
+    background-color: rgba(255, 51, 51, 0.75);
+  }
+
+  50% {
+    background-color: rgba(255, 51, 51, 0);
+  }
+
+  100% {
+    background-color: rgba(255, 51, 51, 0.75);
+  }
+}
+
+.battleSquare {
+  background-color: rgba(255, 51, 51, 0.75);
+  background-image: url('/src/assets/versus.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: blinkColor;
+  animation-iteration-count: infinite;
+  animation-duration: 0.5s;
+}
+
 .squareNum {
   top: 0;
   left: 3px;
