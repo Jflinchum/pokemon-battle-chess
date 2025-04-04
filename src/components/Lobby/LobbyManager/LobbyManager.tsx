@@ -59,7 +59,7 @@ const LobbyManager = () => {
       <div className='lobbyContainer'>
         <MenuOptions />
         <div className='roomListLobbyContainer'>
-          <h1 className='mainMenuHeader'>Pokemon Battle Chess</h1>
+          <h1 className='mainMenuHeader'>Pokemon Chess Arena</h1>
           <div className='roomListContainer'>
             <RoomList availableRooms={availableRooms} errorText={errorText} onSearch={handleOnSearch}/>
             <div className='roomListBottomActions'>
