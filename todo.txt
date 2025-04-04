@@ -35,7 +35,6 @@ Priority:
 - Better Room Options explanations/formatting
 - Draft & Ban
 - Rejoining
-- Clear out room if all players transient
 - Social media meta tags
 - Fun background and logo?
 

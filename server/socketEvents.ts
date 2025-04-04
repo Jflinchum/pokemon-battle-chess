@@ -24,9 +24,14 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       const room = gameRoomManager.getGameFromUserSocket(socket);
       const player = room?.getPlayer(socket);
       if (room && player) {
-        console.log(`Preparing player for disconnect. ${player.playerId}`);
-        room.preparePlayerDisconnect(player);
-        io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
+        if (room.hostPlayer?.playerId === player.playerId) {
+          console.log('Host disconnected. Closing room');
+          room.leaveRoom(player.playerId);
+        } else {
+          console.log(`Preparing player for disconnect. ${player.playerId}`);
+          room.preparePlayerDisconnect(player);
+          io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
+        }
       }
     });
 
