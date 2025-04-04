@@ -43,7 +43,12 @@ export class PokemonBattleChessManager {
       if (team.length === 0) {
         team = generator.getTeam();
       }
-      yield team.pop()!;
+      const pokemon = team.pop()!;
+      // Ensure no duplicate species
+      if (this.chessPieces.find((piece) => piece.pkmn.species === pokemon.species)) {
+        continue;
+      }
+      yield pokemon!;
     }
   }
 
