@@ -10,8 +10,12 @@
   cursor: pointer;
 }
 
-.roomListLockIcon {
-  width: 25px;
-  height: 25px;
+.roomListIconContainer {
   float: right;
+
+  span {
+    width: 25px;
+    height: 25px;
+    margin-left: 6px;
+  }
 }

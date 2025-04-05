@@ -5,6 +5,7 @@ import { useUserState } from "../../context/UserStateContext";
 import { socket } from "../../socket";
 import Room, { Player } from "./Room/Room";
 import GameManagerActions from "./GameManagerActions/GameManagerActions";
+import './RoomManager.css';
 
 const RoomManager = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
@@ -44,11 +45,13 @@ const RoomManager = () => {
   return (
     <>
       <h1 className='mainMenuHeader'>Pokemon Chess Arena</h1>
-      {
-        gameState.matchStarted ?
-        (<BattleChessManager />) :
-        (<Room />)
-      }
+      <div className='roomManagerContainer'>
+        {
+          gameState.matchStarted ?
+          (<BattleChessManager />) :
+          (<Room />)
+        }
+      </div>
       <GameManagerActions />
     </>
   );

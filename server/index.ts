@@ -156,10 +156,13 @@ app.get<Empty, APIResponse<{ rooms: { roomId: GameRoom['roomId'], hostName: User
     return hostPlayerName.toLowerCase().includes(searchTerm.toLowerCase());
   })
   .map((id) => {
+    const room = gameRoomManager.getRoom(id);
     return {
       roomId: id,
-      hostName: gameRoomManager.getRoom(id)!.hostPlayer!.playerName,
-      hasPassword: !!gameRoomManager.getRoom(id)?.password,
+      hostName: room!.hostPlayer!.playerName,
+      hasPassword: !!room?.password,
+      playerCount: room?.getPlayers()?.length,
+      matchInProgress: room?.isOngoing,
     }
   })
   .slice((page - 1) * limit, ((page - 1) * limit) + limit);

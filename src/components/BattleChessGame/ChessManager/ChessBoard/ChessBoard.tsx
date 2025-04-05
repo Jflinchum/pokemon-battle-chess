@@ -9,13 +9,15 @@ import { CurrentBattle } from '../../BattleChessManager/BattleChessManager';
 interface ChessBoardProps {
   boardState: PokemonChessBoardSquare[][];
   onSquareClick: (arg0: Square) => void;
+  onPieceDrag: (arg0: Square) => void;
+  onPieceDrop: (arg0: Square) => void;
   highlightedSquares: Square[];
   selectedSquare: Square | null;
   mostRecentMove?: { from: Square, to: Square } | null;
   currentBattle?: CurrentBattle | null;
 }
 
-const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSquare, mostRecentMove, currentBattle }: ChessBoardProps) => {
+const ChessBoard = ({ boardState, onSquareClick, onPieceDrag, onPieceDrop, highlightedSquares, selectedSquare, mostRecentMove, currentBattle }: ChessBoardProps) => {
   const { gameState } = useGameState();
 
   const boardColumnPerspective = (squares: PokemonChessBoardSquare[][]) => {
@@ -47,6 +49,12 @@ const ChessBoard = ({ boardState, onSquareClick, highlightedSquares, selectedSqu
                 backgroundColor={getSquareColor(normalizedRowIndex(rowIndex), columnIndex)}
                 onClick={(square) => {
                   onSquareClick(square?.square || getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex));
+                }}
+                onPieceDrag={(square) => {
+                  onPieceDrag(square?.square || getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex));
+                }}
+                onPieceDrop={(square) => {
+                  onPieceDrop(square?.square || getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex));
                 }}
                 possibleMove={highlightedSquares.includes(getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex))}
                 selected={selectedSquare === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)}

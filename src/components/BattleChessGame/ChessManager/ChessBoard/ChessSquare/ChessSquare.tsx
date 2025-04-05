@@ -7,6 +7,8 @@ interface ChessSquareProps {
   square: ChessBoardSquare
   backgroundColor: 'white' | 'black'
   onClick: (arg0: ChessBoardSquare) => void
+  onPieceDrop: (arg0: ChessBoardSquare) => void
+  onPieceDrag: (arg0: ChessBoardSquare) => void
   possibleMove: boolean
   selected: boolean
   mostRecentMove: boolean
@@ -28,13 +30,13 @@ const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostR
 }
 
 
-const ChessSquare = ({ square, backgroundColor, onClick, possibleMove, selected, pokemon, mostRecentMove, isBattleSquare }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onPieceDrop, onPieceDrag, onClick, possibleMove, selected, pokemon, mostRecentMove, isBattleSquare }: ChessSquareProps) => {
   return (
     <div 
       className={`chessSquare ${backgroundColor}ChessSquare`}
       onClick={() => { onClick(square); }}
       onDrop={() => {
-        onClick(square);
+        onPieceDrop(square);
       }}
       onDragOver={(e) => {
         e.preventDefault();
@@ -46,7 +48,7 @@ const ChessSquare = ({ square, backgroundColor, onClick, possibleMove, selected,
         color={square?.color}
         pokemon={pokemon}
         onDragStart={() => {
-          onClick(square);
+          onPieceDrag(square);
         }}
       />
       {

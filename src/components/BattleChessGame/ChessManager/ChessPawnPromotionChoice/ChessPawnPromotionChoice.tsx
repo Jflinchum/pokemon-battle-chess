@@ -13,7 +13,7 @@ const ChessPawnPromotionChoice = ({ color, onPromotionChoice, onPromotionCancel 
   return (
     <div>
       {
-        allPieceTypes.filter((p) => p !== 'p').map((piece) => (
+        allPieceTypes.filter((p) => p !== 'p' && p !== 'k').map((piece) => (
           <button key={piece} className='chessPiecePromotionButton' onClick={() => onPromotionChoice(piece)}>
             <ChessPieceSprite type={piece} color={color} />
           </button>

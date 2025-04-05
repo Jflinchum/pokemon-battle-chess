@@ -93,21 +93,26 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentM
   const handleSquareClick = (square: Square) => {
     setRequestedPawnPromotion(null);
     // If there's no current selected square, or the clicked square isn't a valid move, then set the clicked square to the current selected square
-    if (!selectedSquare || !chessManager.moves({ square: selectedSquare, piece: chessManager.get(selectedSquare)?.type, verbose: true }).some((move) => (move.to === square && move.color === color))) {
-      if (selectedSquare === square) {
-        // Cancel the selection if it's the same as the already selected square
-        cancelSelection();
-      } else {
-        // Set the current square in state and highlight any potential moves for that square
-        updateSelection(square);
-      }
+    if (selectedSquare === square) {
+      // Cancel the selection if it's the same as the already selected square
+      cancelSelection();
     } else {
-      // Employ the move that the current player is trying to do
-      if (getVerboseChessMove(selectedSquare, square, chessManager)?.color === color) {
-        movePiece({ fromSquare: selectedSquare, toSquare: square });
-      }
+      // Set the current square in state and highlight any potential moves for that square
+      updateSelection(square);
     }
   };
+
+  const handlePieceDrop = (square: Square) => {
+    setRequestedPawnPromotion(null);
+    if (selectedSquare && getVerboseChessMove(selectedSquare, square, chessManager)?.color === color) {
+      movePiece({ fromSquare: selectedSquare, toSquare: square });
+    }
+  }
+
+  const handlePieceDrag = (square: Square) => {
+    setRequestedPawnPromotion(null);
+    updateSelection(square);
+  }
 
   return (
     <div>
@@ -138,6 +143,8 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentM
         <ChessBoard
           boardState={mergeBoardAndPokemonState(board, pokemonManager)}
           onSquareClick={handleSquareClick}
+          onPieceDrag={handlePieceDrag}
+          onPieceDrop={handlePieceDrop}
           highlightedSquares={highlightedSquares}
           selectedSquare={selectedSquare}
           mostRecentMove={mostRecentMove}

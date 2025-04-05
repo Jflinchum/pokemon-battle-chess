@@ -1,6 +1,7 @@
 import { GenderName, PokemonSet } from "@pkmn/data";
 import { Sprites } from "@pkmn/img";
 import './PokemonDraftSelect.css'
+import { speciesOverride } from "../../ChessManager/util";
 
 interface PokemonDraftSelectProps {
   draftablePokemon: PokemonSet[];
@@ -21,7 +22,7 @@ const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftab
                 draggable
                 onDragStart={() => onPokemonSelect(index)}
                 className='pokemonDraftSprite'
-                style={{ backgroundImage: `url(${Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url})` }}
+                style={{ backgroundImage: `url(${Sprites.getPokemon(speciesOverride(pokemon.species), { gender: pokemon.gender as GenderName }).url})` }}
               />
             </button>
           </li>
@@ -33,7 +34,7 @@ const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftab
             <button disabled className={'bannedDraft'} onClick={() => { onPokemonSelect(index); }}>
               <div
                 className='pokemonDraftSprite'
-                style={{ backgroundImage: `url(${Sprites.getPokemon(pokemon.species, { gender: pokemon.gender as GenderName }).url})` }}
+                style={{ backgroundImage: `url(${Sprites.getPokemon(speciesOverride(pokemon.species), { gender: pokemon.gender as GenderName }).url})` }}
               />
             </button>
           </li>

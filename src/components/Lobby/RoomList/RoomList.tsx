@@ -7,8 +7,16 @@ import './RoomList.css';
 import ErrorMessage from "../../common/ErrorMessage/ErrorMessage";
 import { useDebounce } from "../../../utils";
 
+export interface Room {
+  roomId: string,
+  hostName: string,
+  hasPassword: boolean,
+  playerCount: number,
+  matchInProgress: boolean
+}
+
 interface RoomListProps {
-  availableRooms: { roomId: string, hostName: string, hasPassword: boolean }[];
+  availableRooms: Room[];
   errorText?: string;
   onSearch: (searchTerm: string) => void;
 }
@@ -46,7 +54,8 @@ const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
       <ul className='roomList'>
         {
           availableRooms.map((room) => (
-            <RoomListItem key={room.roomId} name={room.hostName} locked={room.hasPassword} onClick={() => { handleJoinRoom(room) }} />
+            <RoomListItem
+              key={room.roomId} room={room} onClick={() => { handleJoinRoom(room) }} />
           ))
         } 
       </ul>

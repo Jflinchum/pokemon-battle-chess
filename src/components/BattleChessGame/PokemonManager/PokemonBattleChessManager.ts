@@ -45,7 +45,7 @@ export class PokemonBattleChessManager {
       }
       const pokemon = team.pop()!;
       // Ensure no duplicate species
-      if (this.chessPieces.find((piece) => piece.pkmn.species === pokemon.species)) {
+      if (this.chessPieces.find((piece) => piece.pkmn.species === pokemon.species) || this.draftPieces.find((piece) => piece.species === pokemon.species)) {
         continue;
       }
       yield pokemon!;

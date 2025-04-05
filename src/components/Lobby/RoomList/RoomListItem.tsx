@@ -1,18 +1,31 @@
 import './RoomListItem.css';
-import lockIcon from '../../../assets/lockIcon.png'
+import { Room } from './RoomList';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGamepad, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 
 interface RoomListItem {
-  name: string;
-  locked: boolean;
+  room: Room;
   onClick: () => void;
 }
 
-const RoomListItem = ({ name, onClick, locked }: RoomListItem) => {
+const RoomListItem = ({ room, onClick }: RoomListItem) => {
   return (
     <li>
       <button className='roomListItemButton' onClick={onClick}>
-        <span>{name}</span>
-        { locked && <img className='roomListLockIcon' src={lockIcon} /> }
+        <span>{room.hostName}</span>
+        <span className='roomListIconContainer'>
+          {
+            room.hasPassword &&
+            (<span title='Requires Passcode'><FontAwesomeIcon icon={faLock}/></span>) 
+          }
+          {
+            room.matchInProgress &&
+            (<span title='Game In Progress'><FontAwesomeIcon icon={faGamepad}/></span>) 
+          }
+          <span title='Total Player Count'>
+            <FontAwesomeIcon icon={faUser} /> {room.playerCount}
+          </span>
+        </span>
       </button>
     </li>
   );

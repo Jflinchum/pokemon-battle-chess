@@ -8,6 +8,7 @@ import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
 import { PokemonChessBoardSquare } from "../ChessManager/types";
 import './DraftPokemonManager.css';
 import Button from "../../common/Button/Button";
+import { useUserState } from "../../../context/UserStateContext";
 
 interface DraftPokemonManager {
   chessManager: Chess;
@@ -19,6 +20,7 @@ interface DraftPokemonManager {
 }
 
 const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draftTurnPick, onBanPokemon }: DraftPokemonManager) => {
+  const { userState } = useUserState();
   const { gameState } = useGameState();
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
@@ -53,6 +55,8 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
         <ChessBoard
           boardState={boardState}
           onSquareClick={handleSquareClick}
+          onPieceDrop={handleSquareClick}
+          onPieceDrag={handleSquareClick}
           highlightedSquares={[]}
           selectedSquare={selectedSquare}
         />
@@ -71,7 +75,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
       </div>
       <div className='banButton'>
         {
-          draftPokemonSelected !== null && pokemonManager.draftPieces.length > 32 && draftTurnPick === gameState.gameSettings.color ?
+          draftPokemonSelected !== null && pokemonManager.draftPieces.length > 32 && draftTurnPick === gameState.gameSettings.color && !gameState.players.find((player) => player.playerId === userState.id)?.isSpectator?
           (<Button colorPrimary='brown' onClick={() => onBanPokemon(draftPokemonSelected)}>Ban Pokemon</Button>) :
           null
         }

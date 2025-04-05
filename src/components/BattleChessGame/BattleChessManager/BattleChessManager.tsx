@@ -68,23 +68,23 @@ function BattleChessManager() {
         setCurrentBattle(null);
       }, 2000);
 
-      const { fromSquare, toSquare, promotion } = currentBattle.attemptedMove;
+      const { fromSquare, toSquare, capturedPieceSquare, promotion } = currentBattle.attemptedMove;
 
       // TODO: Better logic handling this
       const moveSucceeds = getVerboseChessMove(fromSquare, toSquare, chessManager)?.color === gameState.gameSettings?.color ?
         player1?.playerName === victor :
         player2?.playerName === victor;
       if (moveSucceeds) {
-        pokemonManager.getPokemonFromSquare(toSquare)!.square = null;
+        pokemonManager.getPokemonFromSquare(capturedPieceSquare)!.square = null;
         chessManager.move({ from: fromSquare, to: toSquare, promotion });
         pokemonManager.movePokemonToSquare(fromSquare, toSquare, promotion);
       } else {
         const lostPiece = chessManager.get(fromSquare);
         pokemonManager.getPokemonFromSquare(fromSquare)!.square = null;
-        const tempPiece = chessManager.get(toSquare);
+        const tempPiece = chessManager.get(capturedPieceSquare || toSquare);
         chessManager.move({ from: fromSquare, to: toSquare, promotion });
-        chessManager.remove(currentBattle.attemptedMove.fromSquare);
-        chessManager.put(tempPiece!, toSquare)
+        chessManager.remove(currentBattle.attemptedMove.toSquare);
+        chessManager.put(tempPiece!, capturedPieceSquare || toSquare)
 
         if (lostPiece?.type === 'k') {
           modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: lostPiece.color === 'w' ? 'b' : 'w' } }});
@@ -97,8 +97,8 @@ function BattleChessManager() {
   const handleAttemptMove = ({ fromSquare, toSquare, capturedPieceSquare, promotion, fromCastledRookSquare, toCastledRookSquare }: MoveAttempt) => {
     if (pokemonManager.getPokemonFromSquare(capturedPieceSquare)) {
       setCurrentBattle({
-        p1Pokemon: pokemonManager.getPlayer1PokemonFromMoveAndColor(fromSquare, toSquare, gameState.gameSettings?.color)!,
-        p2Pokemon: pokemonManager.getPlayer2PokemonFromMoveAndColor(fromSquare, toSquare, gameState.gameSettings?.color)!,
+        p1Pokemon: pokemonManager.getPlayer1PokemonFromMoveAndColor(fromSquare, capturedPieceSquare, gameState.gameSettings?.color)!,
+        p2Pokemon: pokemonManager.getPlayer2PokemonFromMoveAndColor(fromSquare, capturedPieceSquare, gameState.gameSettings?.color)!,
         attemptedMove: { fromSquare, toSquare, capturedPieceSquare, promotion },
         offensivePlayer: color === chessManager.get(fromSquare)?.color ? 'p1' : 'p2',
       });
