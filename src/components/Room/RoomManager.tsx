@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
 import { useGameState } from "../../context/GameStateContext";
 import { useUserState } from "../../context/UserStateContext";
@@ -7,18 +7,32 @@ import Room, { Player } from "./Room/Room";
 import GameManagerActions from "./GameManagerActions/GameManagerActions";
 import './RoomManager.css';
 
+export interface MatchHistory {
+  banHistory: number[];
+  chessMoveHistory: string[];
+  pokemonAssignments: string[];
+  pokemonBattleHistory: string[][];
+}
+
 const RoomManager = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
   const { gameState, dispatch } = useGameState();
+  const [matchHistory, setMatchHistory] = useState<MatchHistory>();
 
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
     }
     socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
+
+    socket.on('startSync', (matchHistory: MatchHistory) => {
+      setMatchHistory(matchHistory)
+    });
+
     socket.on('endGameFromDisconnect', () => {
       dispatch({ type: 'RETURN_TO_ROOM' });
     });
+
     socket.on('connectedPlayers', (players: Player[]) => {
       players.forEach((player) => {
         if (player.playerId === userState.id) {
@@ -29,6 +43,7 @@ const RoomManager = () => {
           }
         }
       })
+
       dispatch({ type: 'SET_PLAYERS', payload: players });
     });
 
@@ -39,6 +54,7 @@ const RoomManager = () => {
       socket.off('connectedPlayers');
       socket.off('hostDisconnected');
       socket.off('endGameFromDisconnect');
+      socket.off('startSync');
     }
   }, []);
 
@@ -48,7 +64,7 @@ const RoomManager = () => {
       <div className='roomManagerContainer'>
         {
           gameState.matchStarted ?
-          (<BattleChessManager />) :
+          (<BattleChessManager matchHistory={matchHistory} />) :
           (<Room />)
         }
       </div>

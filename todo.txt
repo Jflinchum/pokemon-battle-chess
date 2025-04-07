@@ -30,6 +30,11 @@ Room Options
 
 Priority:
 - Sync spectators when joining && Resync players rejoining
+  - Store game state server-side
+  - Array of chess moves
+  - Array of pokemon battles (array of player moves)
+  - Pokemon => chess piece mapping
+    - Maybe just a history of 'index w' 'index b' for initial assignments
 - Ban timer and random ban if failing the timer
 - Show ability/item descriptions on hover
 - Chat room works between multiple rooms

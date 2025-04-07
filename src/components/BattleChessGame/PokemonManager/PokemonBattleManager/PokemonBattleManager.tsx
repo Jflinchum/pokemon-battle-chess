@@ -8,6 +8,7 @@ import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
 import { socket } from '../../../../socket';
 import { useUserState } from '../../../../context/UserStateContext';
 import { useGameState } from '../../../../context/GameStateContext';
+import { timer } from './../../../../utils';
 
 interface PokemonBattleManagerProps {
   p1Name: string;
@@ -16,14 +17,8 @@ interface PokemonBattleManagerProps {
   p2Pokemon: PokemonSet;
   onVictory: (victor: string) => void;
   pokemonAdvantage?: { side: SideID, boost: BoostsTable }[];
-}
-
-const wait = async (ms: number) => {
-  return new Promise<void>((resolve) => {
-    setTimeout(() => {
-      return resolve();
-    }, ms)
-  });
+  currentPokemonMoveHistory: string[];
+  catchUpAnimationTimer: number;
 }
 
 const shouldDelayBeforeContinuing = (logType: string) => {
@@ -34,7 +29,7 @@ const shouldDelayBeforeContinuing = (logType: string) => {
   return false;
 }
 
-const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory, pokemonAdvantage }: PokemonBattleManagerProps) => {
+const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory, pokemonAdvantage, currentPokemonMoveHistory, catchUpAnimationTimer }: PokemonBattleManagerProps) => {
   const { userState } = useUserState();
   const { gameState } = useGameState();
   const battleStream = useMemo(() => {
@@ -56,6 +51,9 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
     }] });
     return BattleStreams.getPlayerStreams(new BattleStreams.BattleStream({}, pokemonBattleChessMod))
   }, []);
+  const currentPokemonMoveHistoryIndex = useRef(0);
+  const battleStarted = useRef(false);
+  const battleOver = useRef(false);
 
   const battle = useMemo(() => (new Battle(new Generations(Dex))), []);
   const spec = { formatid: 'pbc', seed: gameState.gameSettings!.seed };
@@ -63,28 +61,33 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
   const p2spec = { name: p2Name, team: Teams.pack([p2Pokemon]) };
 
   const [parsedBattleLog, setParsedBattleLog] = useState<{ args: ArgType, kwArgs: BattleArgsKWArgType }[]>([])
-  const [delayedBattleLog, setDelayedBattledLog] = useState<{ args: ArgType, kwArgs: BattleArgsKWArgType }[]>([])
+  const [delayedBattleLog, setDelayedBattleLog] = useState<{ args: ArgType, kwArgs: BattleArgsKWArgType }[]>([])
   const battleLogIndex = useRef(0);
 
   const beginBattleStreamHandler = async () => {
     for await (const chunk of battleStream.p1) {
       for (const { args, kwArgs } of Protocol.parse(chunk)) {
         console.log(args);
+        if (args[0] === 'win') {
+          battleOver.current = true;
+        }
         setParsedBattleLog((curr) => [...curr, { args, kwArgs }]);
       }
     }
   }
 
   useEffect(() => {
+    let delayTimer: { start: () => Promise<void>, stop: () => void } | undefined;
     const iterateOverLog = async () => {
       if (parsedBattleLog.length > 0) {
         while (battleLogIndex.current < parsedBattleLog.length) {
           const { args, kwArgs } = parsedBattleLog[battleLogIndex.current];
           battle?.add(args, kwArgs);
-          setDelayedBattledLog((curr) => [...curr, { args, kwArgs }]);
+          setDelayedBattleLog((curr) => [...curr, { args, kwArgs }]);
           battleLogIndex.current += 1;
           if (shouldDelayBeforeContinuing(args[0])) {
-            await wait(1000);
+            delayTimer = timer(1000 * catchUpAnimationTimer);
+            await delayTimer.start();
           }
           if (args[0] === 'win') {
             onVictory(args[1]);
@@ -94,29 +97,28 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
       }
     }
     iterateOverLog();
+
+    return () => {
+      delayTimer?.stop();
+    };
   }, [parsedBattleLog])
 
   useEffect(() => {
-    let isMounted = true;
-    beginBattleStreamHandler();
-    if (isMounted) {
+    console.log(currentPokemonMoveHistory);
+    if (!battleStarted.current) {
+      beginBattleStreamHandler();
+      battleStarted.current = true;
       battleStream.omniscient.write(`>start ${JSON.stringify(spec)}`);
       battleStream.omniscient.write(`>player p1 ${JSON.stringify(p1spec)}`);
       battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2spec)}`);
       battleStream.omniscient.write(`>p1 team 1`);
       battleStream.omniscient.write(`>p2 team 1`);
     }
+    for(; currentPokemonMoveHistoryIndex.current < currentPokemonMoveHistory.length; currentPokemonMoveHistoryIndex.current++) {
+      battleStream.omniscient.write(currentPokemonMoveHistory[currentPokemonMoveHistoryIndex.current]);
+    }
 
-    socket.on('startPokemonMove', ({ move, playerId }) => {
-      if (playerId === userState.id) {
-        battleStream.omniscient.write(move);
-      }
-    });
-    return () => {
-      socket.off('startPokemonMove');
-      isMounted = false;
-    };
-  }, []);
+  }, [currentPokemonMoveHistory]);
 
   return (
     <>

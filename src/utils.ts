@@ -22,7 +22,6 @@ export const getAvatar = () => {
   return localStorage.getItem('avatarId') || '1';
 }
 
-
 export const getGameOptions = () => {
   const defaultGameOptions: GameOptions = {
     format: 'random',
@@ -50,4 +49,30 @@ export const useDebounce = (cb: Function, delay: number) => {
       cb.apply(this, args);
     }, delay);
   };
+}
+
+export const wait = async (ms: number) => {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      return resolve();
+    }, ms)
+  });
+}
+
+export const timer = (ms: number) => {
+  let timerId: NodeJS.Timeout;
+
+  const start = () => new Promise<void>((resolve) => {
+    timerId = setTimeout(() => {
+      return resolve();
+    }, ms)
+  });
+
+  const stop = () => {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+  }
+
+  return { start, stop };
 }

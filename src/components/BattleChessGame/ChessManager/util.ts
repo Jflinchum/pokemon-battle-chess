@@ -1,4 +1,4 @@
-import { Chess, Color, Square } from "chess.js";
+import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { ChessBoardSquare, PokemonChessBoardSquare } from "./types";
 import { PokemonBattleChessManager } from "../PokemonManager/PokemonBattleChessManager";
 
@@ -17,8 +17,19 @@ export const getCastledRookSquare = (color: Color, isKingsideCastle: boolean): {
   };
 }
 
-export const getVerboseChessMove = (fromSquare: Square, toSquare: Square, chessManager: Chess) => {
-  return chessManager.moves({ square: fromSquare, piece: chessManager.get(fromSquare)?.type, verbose: true }).find((move) => move.to === toSquare);
+export const getVerboseChessMove = (fromSquare: Square, toSquare: Square, chessManager: Chess, promotion?: PieceSymbol) => {
+  return chessManager
+    .moves({ square: fromSquare, piece: chessManager.get(fromSquare)?.type, verbose: true })
+    .find((move) => {
+      if (promotion) {
+        return move.to === toSquare && move.promotion === promotion
+      }
+      return move.to === toSquare;
+    });
+}
+
+export const getVerboseSanChessMove = (sanMove: string, chessManager: Chess) => {
+  return chessManager.moves({ verbose: true }).find((move) => move.san === sanMove);
 }
 
 export const mergeBoardAndPokemonState = (chessBoard: ChessBoardSquare[][], pokemonManager: PokemonBattleChessManager): PokemonChessBoardSquare[][] => {

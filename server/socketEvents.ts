@@ -60,9 +60,16 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       socket.emit('changeGameOptions', room.roomGameOptions);
       console.log(`Player ${playerId} joined room ${roomId}`);
 
-      /**
-       * TODO - Send match history if game is ongoing
-       */
+      if (room.isOngoing) {
+        socket.emit('startSync', {
+          banHistory: room.banHistory,
+          pokemonAssignments: room.pokemonAssignments,
+          chessMoveHistory: room.chessMoveHistory,
+          pokemonBattleHistory: room.getPokemonBattleHistory(playerId),
+        });
+        // TODO - detect if socket/playerid belongs to active player and get their color
+        socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
+      }
     });
 
     socket.on('requestToggleSpectating', (roomId, playerId) => {
@@ -105,13 +112,13 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       io.to(roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
-    socket.on('requestChessMove', ({ fromSquare, toSquare, promotion, roomId, playerId }) => {
+    socket.on('requestChessMove', ({ sanMove, roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
       if (!room || !playerId) {
         return socket.disconnect();
       }
 
-      room.validateAndEmitChessMove({ fromSquare, toSquare, promotion, playerId });
+      room.validateAndEmitChessMove({ sanMove, playerId });
     });
 
     socket.on('requestPokemonMove', ({ pokemonMove, roomId, playerId }) => {

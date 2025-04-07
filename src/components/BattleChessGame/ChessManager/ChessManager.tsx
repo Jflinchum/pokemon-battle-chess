@@ -1,13 +1,13 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Chess, Square, Move } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
 import PokemonDetailsCard from '../PokemonManager/PokemonDetailsCard/PokemonDetailsCard';
 import './ChessManager.css';
-import { MoveAttempt } from './types';
+import { ChessBoardSquare, MoveAttempt } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
 import TakenChessPieces from './TakenChessPieces/TakenChessPieces';
-import { getCastledRookSquare, getVerboseChessMove, mergeBoardAndPokemonState } from './util';
+import { getVerboseChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
 import { socket } from '../../../socket';
 import { useUserState } from '../../../context/UserStateContext';
@@ -16,12 +16,12 @@ import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 interface ChessManagerProps {
   chessManager: Chess;
   pokemonManager: PokemonBattleChessManager;
-  onAttemptMove: (attemptedMove: MoveAttempt) => void;
   mostRecentMove: { from: Square, to: Square } | null;
   currentBattle?: CurrentBattle | null;
+  board: ChessBoardSquare[][];
 }
 
-const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentMove, currentBattle }: ChessManagerProps) => {
+const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBattle, board }: ChessManagerProps) => {
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
@@ -29,45 +29,10 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentM
   const { gameState } = useGameState();
   const { userState } = useUserState();
   const color = useMemo(() => gameState.gameSettings!.color, [gameState])
-  const [board, setBoard] = useState(chessManager.board());
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
   const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
-
-  useEffect(() => {
-    socket.on('startChessMove', ({ fromSquare, toSquare, promotion }) => {
-      let capturedPieceSquare;
-      let castledRookSquare;
-      const verboseChessMove = getVerboseChessMove(fromSquare, toSquare, chessManager);
-
-      if (verboseChessMove?.isEnPassant()) {
-        capturedPieceSquare = `${verboseChessMove.to[0] + (parseInt(verboseChessMove.to[1]) + (verboseChessMove.color === 'w' ? -1 : 1))}` as Square;
-      } else if (verboseChessMove?.isCapture()) {
-        capturedPieceSquare = toSquare;  
-      }
-
-      if (verboseChessMove?.isKingsideCastle() || verboseChessMove?.isQueensideCastle()) {
-        castledRookSquare = getCastledRookSquare(verboseChessMove.color, verboseChessMove?.isKingsideCastle());
-      }
-      onAttemptMove({
-        fromSquare,
-        toSquare,
-        promotion,
-        capturedPieceSquare,
-        fromCastledRookSquare: castledRookSquare?.from,
-        toCastledRookSquare: castledRookSquare?.to
-      });
-      setBoard(chessManager.board());
-      setHighlightedSquare([]);
-      setSelectedSquare(null);
-      setRequestedPawnPromotion(null);
-    });
-
-    return () => {
-      socket.off('startChessMove');
-    }
-  }, [])
 
   const cancelSelection = () => {
     setSelectedSquare(null);
@@ -81,13 +46,20 @@ const ChessManager = ({ chessManager, pokemonManager, onAttemptMove, mostRecentM
   }
 
   const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
-    const verboseChessMove = getVerboseChessMove(fromSquare, toSquare, chessManager);
+    const verboseChessMove = getVerboseChessMove(fromSquare, toSquare, chessManager, promotion);
     // Before attempting the move, ask the player for their pawn promotion choice
     if (verboseChessMove?.isPromotion() && !promotion) {
       setRequestedPawnPromotion(verboseChessMove);
       return;
     }
-    socket.emit('requestChessMove', { fromSquare, toSquare, promotion, roomId: userState.currentRoomId, playerId: userState.id });
+  
+    if (!verboseChessMove) {
+      return;
+    }
+
+    socket.emit('requestChessMove', { sanMove: verboseChessMove.san, roomId: userState.currentRoomId, playerId: userState.id });
+    setSelectedSquare(null);
+    setHighlightedSquare([]);
   }
 
   const handleSquareClick = (square: Square) => {

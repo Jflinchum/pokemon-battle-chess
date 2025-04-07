@@ -9,7 +9,6 @@ export default class GameRoom {
   public roomSeed: string;
   public password: string;
   public hostPlayer: User | null = null;
-  // Rename to player 1 and player 2, since host can spectate
   public player1: User | null = null;
   public player2: User | null = null;
   public playerList: User[];
@@ -19,11 +18,16 @@ export default class GameRoom {
   public isOngoing: boolean;
 
   private gameRoomManager: GameRoomManager;
-  private whitePlayer: User;
-  private blackPlayer: User;
+  public whitePlayer: User;
+  public blackPlayer: User;
   private currentTurnWhite: boolean = true;
   private whitePlayerPokemonMove: string | null = null;
   private blackPlayerPokemonMove: string | null = null;
+
+  public chessMoveHistory: string[] = [];
+  public banHistory: number[] = [];
+  public pokemonAssignments: string[] = [];
+  public pokemonBattleHistory: string[][] = [];
 
   constructor(roomId: string, hostPlayer: User, password: string, gameRoomManager: GameRoomManager) {
     this.roomId = roomId;
@@ -157,7 +161,7 @@ export default class GameRoom {
     };
   }
 
-  private buildStartGameArgs(color: 'w' | 'b') {
+  public buildStartGameArgs(color: 'w' | 'b') {
     return {
       color,
       seed: this.roomSeed,
@@ -177,15 +181,30 @@ export default class GameRoom {
       this.whitePlayer.socket?.emit('startGame', this.buildStartGameArgs('w'));
       this.blackPlayer.socket?.emit('startGame', this.buildStartGameArgs('b'));
       this.getSpectators().forEach((spectator) => spectator.socket?.emit('startGame', this.buildStartGameArgs('w')));
+
+      if (this.roomGameOptions.format === 'random') {
+        // Random formats generate pokemon from a8 -> h8, a7 -> h7, a2 -> h2, a1 -> h1
+        for (let i = 0; i < 16; i++) {
+          this.pokemonAssignments.push(`b ${i} ${String.fromCharCode(97 + Math.floor(i % 8))}${8 - Math.floor(i / 8)}`)
+        }
+        for (let i = 0; i < 16; i++) {
+          this.pokemonAssignments.push(`w ${i + 16} ${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}`)
+        }
+      }
     }
   }
 
-  public validateAndEmitChessMove({ fromSquare, toSquare, promotion, playerId }) {
+  public validateAndEmitChessMove({ sanMove, playerId }) {
     if ((this.currentTurnWhite && this.whitePlayer.playerId === playerId) || (!this.currentTurnWhite && this.blackPlayer.playerId === playerId)) {
       this.currentTurnWhite = !this.currentTurnWhite;
-      this.whitePlayer.socket?.emit('startChessMove', { fromSquare, toSquare, promotion });
-      this.blackPlayer.socket?.emit('startChessMove', { fromSquare, toSquare, promotion });
-      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startChessMove', { fromSquare, toSquare, promotion }))
+      this.chessMoveHistory.push(sanMove);
+      if (sanMove.includes('x')) {
+        this.pokemonBattleHistory.push([]);
+      }
+
+      this.whitePlayer.socket?.emit('startChessMove', { sanMove });
+      this.blackPlayer.socket?.emit('startChessMove', { sanMove });
+      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startChessMove', { sanMove }))
     }
   }
 
@@ -195,6 +214,10 @@ export default class GameRoom {
     this.currentTurnWhite = true;
     this.whitePlayerPokemonMove = null;
     this.blackPlayerPokemonMove = null;
+    this.chessMoveHistory = [];
+    this.pokemonBattleHistory = [];
+    this.banHistory = [];
+    this.pokemonAssignments = [];
   }
 
   public validateAndEmitPokemonMove({ pokemonMove, playerId }) {
@@ -250,18 +273,45 @@ export default class GameRoom {
           playerId: spectator.playerId
         }
       ))
+      this.pokemonBattleHistory[this.pokemonBattleHistory.length - 1].push(`>p1 move ${this.whitePlayerPokemonMove}`);
+      this.pokemonBattleHistory[this.pokemonBattleHistory.length - 1].push(`>p2 move ${this.blackPlayerPokemonMove}`);
       this.whitePlayerPokemonMove = null;
       this.blackPlayerPokemonMove = null;
     }
   };
 
   public validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId, isBan }) {
+    if (isBan) {
+      this.banHistory.push(draftPokemonIndex);
+    }
     if (playerId === this.whitePlayer.playerId) {
+      if (!isBan) {
+        this.pokemonAssignments.push(`w ${draftPokemonIndex} ${square}`);
+      }
       this.blackPlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w', isBan });
       this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w', isBan }));
     } else if (playerId === this.blackPlayer.playerId) {
+      if (!isBan) {
+        this.pokemonAssignments.push(`b ${draftPokemonIndex} ${square}`);
+      }
       this.whitePlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b', isBan });
       this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b', isBan }));
     }
   };
+
+  public getPokemonBattleHistory(playerId) {
+    if (playerId === this.blackPlayer.playerId) {
+      return this.pokemonBattleHistory.map((battle) => (
+        battle.map((move) => {
+          if (move.includes('p1')) {
+            return move.replace('p1', 'p2');
+          } else {
+            return move.replace('p2', 'p1');
+          }
+        })
+      ));
+    } else {
+      return this.pokemonBattleHistory;
+    }
+  }
 }
