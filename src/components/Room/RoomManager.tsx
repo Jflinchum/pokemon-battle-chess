@@ -26,7 +26,14 @@ const RoomManager = () => {
     socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
 
     socket.on('startSync', (matchHistory: MatchHistory) => {
+      console.log('starting sync');
+      console.log(matchHistory);
       setMatchHistory(matchHistory)
+    });
+
+    socket.io.on('reconnect', () => {
+      console.log('reconnecting -- attempting resync');
+      socket.emit('requestSync', userState.currentRoomId, userState.id);
     });
 
     socket.on('endGameFromDisconnect', () => {

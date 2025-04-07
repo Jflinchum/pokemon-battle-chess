@@ -96,6 +96,23 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       io.to(roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
+    socket.on('requestSync', (roomId, playerId) => {
+      const room = gameRoomManager.getRoom(roomId);
+      if (!room) {
+        return socket.disconnect();
+      }
+
+      if (room.isOngoing) {
+        socket.emit('startSync', {
+          banHistory: room.banHistory,
+          pokemonAssignments: room.pokemonAssignments,
+          chessMoveHistory: room.chessMoveHistory,
+          pokemonBattleHistory: room.getPokemonBattleHistory(playerId),
+        });
+        socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
+      }
+    });
+
     socket.on('requestChessMove', ({ sanMove, roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
       if (!room || !playerId) {

@@ -47,6 +47,13 @@ const useBattleHistory = ({
   const pokemonBattleHistoryIndex = useRef(0);
 
   useEffect(() => {
+    setBanHistoryState(matchHistory?.banHistory || []);
+    setDraftHistoryState(matchHistory?.pokemonAssignments || []);
+    setChessMoveHistory(matchHistory?.chessMoveHistory || []);
+    setPokemonBattleHistoryState(matchHistory?.pokemonBattleHistory || []);
+  }, [matchHistory]);
+
+  useEffect(() => {
     socket.on('startPokemonDraft', ({ square, draftPokemonIndex, socketColor, isBan }) => {
       if (isBan) {
         setBanHistoryState((curr) => [...curr, draftPokemonIndex]);
