@@ -2,10 +2,6 @@ import { Server } from "socket.io"
 import GameRoomManager from "./GameRoomManager";
 
 export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager) => {
-  io.on('reconnect', () => {
-
-  });
-
   io.on('connection', (socket) => {
     console.log('New User Connection');
 
@@ -97,19 +93,25 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
     });
 
     socket.on('requestSync', (roomId, playerId) => {
+      console.log('request sync received ' + roomId + ' ' + playerId);
       const room = gameRoomManager.getRoom(roomId);
       if (!room) {
+        console.log('no room detected');
         return socket.disconnect();
       }
 
       if (room.isOngoing) {
+        if (room.transientPlayerList[playerId]) {
+          clearTimeout(room.transientPlayerList[playerId]);
+          delete room.transientPlayerList[playerId];
+        }
         socket.emit('startSync', {
           banHistory: room.banHistory,
           pokemonAssignments: room.pokemonAssignments,
           chessMoveHistory: room.chessMoveHistory,
           pokemonBattleHistory: room.getPokemonBattleHistory(playerId),
         });
-        socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
+        io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
     });
 

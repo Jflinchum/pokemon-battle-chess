@@ -121,7 +121,7 @@ export default class GameRoom {
     const transientTimeout = setTimeout(() => {
       console.log('Player disconnection exceeded timeout. Forcing them out of the room.');
       this.gameRoomManager.playerLeaveRoom(this.roomId, player.playerId);
-    }, 1000 * 30);
+    }, 1000 * 60);
     this.transientPlayerList[player.playerId] = transientTimeout;
   }
 
