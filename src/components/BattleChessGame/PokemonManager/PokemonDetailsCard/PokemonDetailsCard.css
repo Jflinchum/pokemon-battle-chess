@@ -1,9 +1,9 @@
 .pokemonDetailsContainer {
   background-color: rgba(125, 125, 125, 0.5);
   backdrop-filter: blur(5px);
-  width: 80vw;
+  width: 96vw;
   min-height: 20vh;
-  max-width: 600px;
+  max-width: 800px;
   font-size: 10px;
 
 
@@ -18,17 +18,12 @@
     }
 
     .movesContainer {
-      flex-direction: column;
       gap: 0;
-    }
-
-    .subMoveContainer {
-      flex-direction: column;
     }
   }
 
   @media (min-width: 800px) {
-    width: 40vw;
+    max-width: 320px;
     height: inherit;
     align-self: stretch;
     font-size: 16px;

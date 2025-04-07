@@ -88,6 +88,7 @@ const Room = () => {
 
   return (
     <div className='roomContainer'>
+      <h1 className='mainMenuHeader'>Pokemon Chess Arena</h1>
       <div className="roomPlayerContainer">
         <div className='roomButtons'>
           <Button

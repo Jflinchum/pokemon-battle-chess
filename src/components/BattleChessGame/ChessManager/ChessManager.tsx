@@ -6,7 +6,6 @@ import PokemonDetailsCard from '../PokemonManager/PokemonDetailsCard/PokemonDeta
 import './ChessManager.css';
 import { ChessBoardSquare, MoveAttempt } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
-import TakenChessPieces from './TakenChessPieces/TakenChessPieces';
 import { getVerboseChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
@@ -99,9 +98,6 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
           }}
         />
       )}
-      <TakenChessPieces
-        takenPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color!)}
-      />
       <div className='turnNotification'>
         {
           chessManager.turn() === gameState.gameSettings.color ?
@@ -126,9 +122,6 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
           }
         />
       </div>
-      <TakenChessPieces
-        takenPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
-      />
     </div>
   )
 }

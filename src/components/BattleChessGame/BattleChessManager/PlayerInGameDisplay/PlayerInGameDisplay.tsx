@@ -2,13 +2,16 @@ import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { Player } from "../../../Room/Room/Room";
+import TakenChessPieces from "../../ChessManager/TakenChessPieces/TakenChessPieces";
+import { PokemonPiece } from "../../PokemonManager/PokemonBattleChessManager";
 import './PlayerInGameDisplay.css';
 
 interface PlayerInGameDisplayProps {
   player?: Player;
+  takenChessPieces: PokemonPiece[];
 }
 
-const PlayerInGameDisplay = ({ player }: PlayerInGameDisplayProps) => {
+const PlayerInGameDisplay = ({ player, takenChessPieces }: PlayerInGameDisplayProps) => {
   if (!player) {
     return null;
   }
@@ -23,6 +26,9 @@ const PlayerInGameDisplay = ({ player }: PlayerInGameDisplayProps) => {
         }
         {player?.playerName}
       </div>
+      <TakenChessPieces
+        takenPieces={takenChessPieces}
+      />
     </div>
   );
 };

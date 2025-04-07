@@ -67,7 +67,6 @@ const RoomManager = () => {
 
   return (
     <>
-      <h1 className='mainMenuHeader'>Pokemon Chess Arena</h1>
       <div className='roomManagerContainer'>
         {
           gameState.matchStarted ?
