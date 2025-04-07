@@ -18,7 +18,6 @@ interface PokemonBattleManagerProps {
   onVictory: (victor: string) => void;
   pokemonAdvantage?: { side: SideID, boost: BoostsTable }[];
   currentPokemonMoveHistory: string[];
-  catchUpAnimationTimer: number;
 }
 
 const shouldDelayBeforeContinuing = (logType: string) => {
@@ -29,7 +28,7 @@ const shouldDelayBeforeContinuing = (logType: string) => {
   return false;
 }
 
-const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory, pokemonAdvantage, currentPokemonMoveHistory, catchUpAnimationTimer }: PokemonBattleManagerProps) => {
+const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory, pokemonAdvantage, currentPokemonMoveHistory }: PokemonBattleManagerProps) => {
   const { userState } = useUserState();
   const { gameState } = useGameState();
   const battleStream = useMemo(() => {
@@ -86,7 +85,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
           setDelayedBattleLog((curr) => [...curr, { args, kwArgs }]);
           battleLogIndex.current += 1;
           if (shouldDelayBeforeContinuing(args[0])) {
-            delayTimer = timer(1000 * catchUpAnimationTimer);
+            delayTimer = timer(1000);
             await delayTimer.start();
           }
           if (args[0] === 'win') {
@@ -104,7 +103,6 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
   }, [parsedBattleLog])
 
   useEffect(() => {
-    console.log(currentPokemonMoveHistory);
     if (!battleStarted.current) {
       beginBattleStreamHandler();
       battleStarted.current = true;

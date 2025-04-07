@@ -1,20 +1,11 @@
 import { Server } from "socket.io"
 import GameRoomManager from "./GameRoomManager";
 
-/**
- * Custom Socket events
- * - joinRoom
- * - connectedPlayers
- * - requestStartGame
- * - startGame
- * - requestChessMove
- * - startChessMove
- * - requestPokemonMove
- * - startPokemonMove
- * - endGameFromDisconnect
- */
-
 export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager) => {
+  io.on('reconnect', () => {
+
+  });
+
   io.on('connection', (socket) => {
     console.log('New User Connection');
 
@@ -24,15 +15,9 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
       const room = gameRoomManager.getGameFromUserSocket(socket);
       const player = room?.getPlayer(socket);
       if (room && player) {
-        if (room.hostPlayer?.playerId === player.playerId) {
-          console.log('Host disconnected. Closing room');
-          room.leaveRoom(player.playerId);
-          io.to(room.roomId).emit('hostDisconnected');
-        } else {
-          console.log(`Preparing player for disconnect. ${player.playerId}`);
-          room.preparePlayerDisconnect(player);
-          io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
-        }
+        console.log(`Preparing player for disconnect. ${player.playerId}`);
+        room.preparePlayerDisconnect(player);
+        io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
     });
 
@@ -67,7 +52,6 @@ export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager)
           chessMoveHistory: room.chessMoveHistory,
           pokemonBattleHistory: room.getPokemonBattleHistory(playerId),
         });
-        // TODO - detect if socket/playerid belongs to active player and get their color
         socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
       }
     });

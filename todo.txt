@@ -48,6 +48,7 @@ Priority:
 - Create room closes previous room
 
 Issues:
+- Disable all spectator control hooks
 - Player disconnecting at end game modal clears their name
 - OG/Twitter meta tags do not support svg
 

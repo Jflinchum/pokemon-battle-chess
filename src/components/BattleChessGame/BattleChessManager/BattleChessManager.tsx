@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Chess, Color, Square } from 'chess.js';
 import { PokemonBattleChessManager, PokemonPiece } from '../PokemonManager/PokemonBattleChessManager';
 import ChessManager from '../ChessManager/ChessManager';
@@ -14,7 +14,7 @@ import './BattleChessManager.css';
 import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
 import { SideID } from '@pkmn/data';
 import { MatchHistory } from '../../Room/RoomManager';
-import { timer } from '../../../utils';
+import useBattleHistory from './useBattleHistory';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
@@ -47,124 +47,36 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   const [isDrafting, setIsDrafting] = useState<boolean>(gameState.gameSettings.options.format === 'draft');
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
-  const isCatchingUp = useRef(!!matchHistory);
-  const banHistoryRef = useRef(matchHistory?.banHistory || []);
-  const banHistoryIndex = useRef(0);
-  const draftHistoryRef = useRef(matchHistory?.pokemonAssignments || []);
-  const draftHistoryIndex = useRef(0);
-  const chessMoveHistoryRef = useRef(matchHistory?.chessMoveHistory || []);
-  const chessMoveHistoryIndex = useRef(0);
-  const pokemonBattleHistoryRef = useRef(matchHistory?.pokemonBattleHistory || []);
-  const pokemonBattleHistoryIndex = useRef(0);
-  const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<string[]>([]);
-  const [catchUpAnimationTimer, setCatchUpAnimationTimer] = useState(whitePlayer?.playerId === userState.id || blackPlayer?.playerId === userState.id ? 0 : 1);
 
-
-  useEffect(() => {
-    socket.on('startPokemonDraft', ({ square, draftPokemonIndex, socketColor, isBan }) => {
-      if (isBan) {
-        banHistoryRef.current.push(draftPokemonIndex);
-        if (!isCatchingUp.current) {
-          banHistoryIndex.current++;
-          pokemonManager.banDraftPiece(draftPokemonIndex);
-          setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
-        }
-      } else {
-        draftHistoryRef.current.push(`${socketColor} ${draftPokemonIndex} ${square}`)
-        if (!isCatchingUp.current) {
-          draftHistoryIndex.current++;
-          handleDraftPick(square, draftPokemonIndex, socketColor);
-          setIsDrafting(!!pokemonManager.draftPieces.length);
-        }
-      }
-    });
-
-    socket.on('startPokemonMove', ({ move }) => {
-      pokemonBattleHistoryRef.current[pokemonBattleHistoryRef.current.length - 1].push(move);
-      console.log('TEST');
-      console.log(move);
-      console.log(pokemonBattleHistoryIndex.current)
-      console.log(pokemonBattleHistoryRef.current)
-      if (pokemonBattleHistoryIndex.current === pokemonBattleHistoryRef.current.length) {
-        setCurrentPokemonMoveHistory((curr) => [...curr, move]);
-      }
-    });
-
-    socket.on('startChessMove', ({ sanMove }) => {
-      chessMoveHistoryRef.current.push(sanMove);
-      if (sanMove.includes('x')) {
-        pokemonBattleHistoryRef.current.push([]);
-      }
-      if (!isCatchingUp.current) {
-        chessMoveHistoryIndex.current++;
-        handleAttemptMove({ sanMove });
-      }
-    });
-
-    return () => {
-      socket.off('startChessMove');
-      socket.off('startPokemonDraft');
-      socket.off('startPokemonMove');
-    };
-  }, []);
-
-  useEffect(() => {
-    let catchUpTimer: { start: () => Promise<void>, stop: () => void } | undefined;
-    // On mount, start attempting to sync to the current match
-    const catchUpToCurrentState = async () => {
-      // Ban phase catchup
-      for (; banHistoryIndex.current < banHistoryRef.current.length; banHistoryIndex.current++) {
-        catchUpTimer = timer(1000 * catchUpAnimationTimer);
-        await catchUpTimer.start();
-        const banPiece = banHistoryRef.current[banHistoryIndex.current]!;
-        pokemonManager.banDraftPiece(banPiece);
-        setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
-      }
-      // Draft phase catchup
-      for (; draftHistoryIndex.current < draftHistoryRef.current.length; draftHistoryIndex.current++) {
-        const isRandomDraft = gameState.gameSettings.options.format === 'random' ? 0 : 1;
-        catchUpTimer = timer(1000 * isRandomDraft * catchUpAnimationTimer);
-        await catchUpTimer.start();
-        const draft = draftHistoryRef.current[draftHistoryIndex.current]!;
-        // Instant draft on random
-        const draftArgs = draft.split(' ');
-        const color = draftArgs[0] as Color;
-        const index = parseInt(draftArgs[1]);
-        const square = draftArgs[2] as Square;
-        handleDraftPick(square, index, color);
-        setIsDrafting(!!pokemonManager.draftPieces.length);
-      }
-
-      for (; chessMoveHistoryIndex.current < chessMoveHistoryRef.current.length; chessMoveHistoryIndex.current++) {
-        catchUpTimer = timer(1000 * catchUpAnimationTimer);
-
-        await catchUpTimer.start();
-        const sanMove = chessMoveHistoryRef.current[chessMoveHistoryIndex.current]!;
-        if (handleAttemptMove({ sanMove })) {
-          // If handle attempt move detects a pokemon battle, wait until the battle is resolved
-          chessMoveHistoryIndex.current++;
-          return;
-        }
-      }
-
-      isCatchingUp.current = false;
+  const { currentPokemonMoveHistory } = useBattleHistory({
+    matchHistory,
+    currentBattle,
+    onBan: (draftPokemonIndex) => {
+      pokemonManager.banDraftPiece(draftPokemonIndex);
+      setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
+    },
+    onDraft: (square, draftPokemonIndex, color) => {
+      handleDraftPick(square, draftPokemonIndex, color);
+      setIsDrafting(!!pokemonManager.draftPieces.length);
+    },
+    onMove: (sanMove) => {
+      return handleAttemptMove({ sanMove });
     }
-  
-    if (isCatchingUp.current && !currentBattle) {
-      catchUpToCurrentState();
-    }
+  });
 
-    return () => {
-      catchUpTimer?.stop();
-    }
-  }, [currentBattle]);
-
+  /**
+   * Action handlers for all the game events that change the higher level state.
+   * - Pokemon battle victory/loss
+   * - Moving a chess piece
+   * - Banning a pokemon
+   * - Drafting a pokemon 
+   */
   const handleVictory = (victor: string) => {
     if (currentBattle) {
       setBattleStarted(false);
       setTimeout(() => {
         setCurrentBattle(null);
-      }, 2000 * (isCatchingUp.current ? catchUpAnimationTimer : 1));
+      }, 2000);
 
       const { fromSquare, toSquare, capturedPieceSquare, promotion } = currentBattle.attemptedMove;
 
@@ -214,10 +126,6 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
     const toCastledRookSquare = castledRookSquare?.to;
 
     if (pokemonManager.getPokemonFromSquare(capturedPieceSquare)) {
-      console.log(pokemonBattleHistoryIndex.current);
-      console.log(pokemonBattleHistoryRef.current);
-      setCurrentPokemonMoveHistory(pokemonBattleHistoryIndex.current !== pokemonBattleHistoryRef.current.length ? pokemonBattleHistoryRef.current[pokemonBattleHistoryIndex.current] : []);
-      pokemonBattleHistoryIndex.current++;
       setCurrentBattle({
         p1Pokemon: pokemonManager.getPlayer1PokemonFromMoveAndColor(fromSquare, capturedPieceSquare, gameState.gameSettings?.color)!,
         p2Pokemon: pokemonManager.getPlayer2PokemonFromMoveAndColor(fromSquare, capturedPieceSquare, gameState.gameSettings?.color)!,
@@ -227,7 +135,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
 
       setTimeout(() => {
         setBattleStarted(true);
-      }, 2000 * (isCatchingUp.current  ? catchUpAnimationTimer : 1));
+      }, 2000);
       pokemonBattleInitiated = true;
     } else {
       chessManager.move({ from: fromSquare, to: toSquare, promotion });
@@ -265,6 +173,13 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
     setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
   }
 
+
+  /**
+   * Rendering the three different states of the game
+   * - Draft/ban phase
+   * - Chess phase
+   * - Pokemon battle phase
+   */
   return (
     <div className='battleChessContainer'>
       <p>Turn: {chessManager.moveNumber()}</p>
@@ -280,7 +195,6 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
             onVictory={handleVictory}
             pokemonAdvantage={[{ side: currentBattle.offensivePlayer, boost: gameState.gameSettings.options.offenseAdvantage }]}
             currentPokemonMoveHistory={currentPokemonMoveHistory}
-            catchUpAnimationTimer={isCatchingUp.current ? catchUpAnimationTimer : 1}
           />
         )
       }
