@@ -32,6 +32,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   const player2 = useMemo(() => gameState.players.find((player) => player.isPlayer2), [gameState.players]);
   const whitePlayer = useMemo(() => gameState.players.find((player) => player.color === 'w'), [gameState.players]);
   const blackPlayer = useMemo(() => gameState.players.find((player) => player.color === 'b'), [gameState.players]);
+  const thisPlayer = useMemo(() => gameState.players.find((player) => player.playerId === userState.id), [gameState.players])
   const color = useMemo(() => gameState.gameSettings!.color, [gameState])
   const chessManager = useMemo(() => {
     return new Chess();
@@ -218,6 +219,12 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
               mostRecentMove={mostRecentMove}
               currentBattle={currentBattle}
               board={board}
+              onMove={(san) => {
+                if (thisPlayer?.isSpectator) {
+                  return;
+                }
+                socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
+              }}
             />
           )
         }
@@ -229,7 +236,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
               pokemonManager={pokemonManager}
               boardState={currentBoard}
               onDraftPokemon={(sq, pkmnIndex) => {
-                if (draftTurnPick !== color) {
+                if (draftTurnPick !== color || thisPlayer?.isSpectator) {
                   return;
                 }
                 if (handleDraftPick(sq, pkmnIndex, color!)) {
@@ -238,6 +245,9 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
                 }
               }}
               onBanPokemon={(pkmnIndex) => {
+                if (thisPlayer?.isSpectator) {
+                  return;
+                }
                 handleBanPick(pkmnIndex);
                 socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
               }}

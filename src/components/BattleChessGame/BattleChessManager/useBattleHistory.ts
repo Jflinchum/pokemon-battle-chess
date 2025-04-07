@@ -87,7 +87,9 @@ const useBattleHistory = ({
 
   useEffect(() => {
     let catchUpTimer: { start: () => Promise<void>, stop: () => void } | undefined;
+    // TODO: Optimization for browser DOM rendering. Instead of setting a timeout of 0 and still updating the DOM in the background, we should simulate the chess moves and battle instead, then update the DOM after.
     const timeBetweenSteps = 1000 * (skipToEndOfSync ? 0 : 1);
+
     // On mount, start attempting to sync to the current match
     const catchUpToCurrentState = async () => {
       // Ban phase catchup

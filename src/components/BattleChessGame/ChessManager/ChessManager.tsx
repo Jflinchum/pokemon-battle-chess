@@ -9,8 +9,6 @@ import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromot
 import TakenChessPieces from './TakenChessPieces/TakenChessPieces';
 import { getVerboseChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
-import { socket } from '../../../socket';
-import { useUserState } from '../../../context/UserStateContext';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 
 interface ChessManagerProps {
@@ -19,15 +17,15 @@ interface ChessManagerProps {
   mostRecentMove: { from: Square, to: Square } | null;
   currentBattle?: CurrentBattle | null;
   board: ChessBoardSquare[][];
+  onMove: (san: string) => void;
 }
 
-const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBattle, board }: ChessManagerProps) => {
+const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBattle, board, onMove }: ChessManagerProps) => {
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
    */
   const { gameState } = useGameState();
-  const { userState } = useUserState();
   const color = useMemo(() => gameState.gameSettings!.color, [gameState])
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
@@ -57,7 +55,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
       return;
     }
 
-    socket.emit('requestChessMove', { sanMove: verboseChessMove.san, roomId: userState.currentRoomId, playerId: userState.id });
+    onMove(verboseChessMove.san)
     setSelectedSquare(null);
     setHighlightedSquare([]);
   }
