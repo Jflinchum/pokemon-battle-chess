@@ -18,6 +18,7 @@ interface PokemonBattleManagerProps {
   onVictory: (victor: string) => void;
   pokemonAdvantage?: { side: SideID, boost: BoostsTable }[];
   currentPokemonMoveHistory: string[];
+  skipToEndOfSync: boolean;
 }
 
 const shouldDelayBeforeContinuing = (logType: string) => {
@@ -28,7 +29,7 @@ const shouldDelayBeforeContinuing = (logType: string) => {
   return false;
 }
 
-const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory, pokemonAdvantage, currentPokemonMoveHistory }: PokemonBattleManagerProps) => {
+const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory, pokemonAdvantage, currentPokemonMoveHistory, skipToEndOfSync }: PokemonBattleManagerProps) => {
   const { userState } = useUserState();
   const { gameState } = useGameState();
   const battleStream = useMemo(() => {
@@ -50,6 +51,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
     }] });
     return BattleStreams.getPlayerStreams(new BattleStreams.BattleStream({}, pokemonBattleChessMod))
   }, []);
+
   const currentPokemonMoveHistoryIndex = useRef(0);
   const battleStarted = useRef(false);
   const battleOver = useRef(false);
@@ -85,7 +87,7 @@ const PokemonBattleManager = ({ p1Name, p2Name, p1Pokemon, p2Pokemon, onVictory,
           setDelayedBattleLog((curr) => [...curr, { args, kwArgs }]);
           battleLogIndex.current += 1;
           if (shouldDelayBeforeContinuing(args[0])) {
-            delayTimer = timer(1000);
+            delayTimer = timer(1000 * (skipToEndOfSync ? 0 : 1));
             await delayTimer.start();
           }
           if (args[0] === 'win') {

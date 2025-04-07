@@ -11,7 +11,8 @@ interface BattleHistoryProps {
   currentBattle?: CurrentBattle | null,
   onBan: (index: number) => void,
   onDraft: (square: Square, index: number, color: Color) => void,
-  onMove: (sanMove: string) => boolean
+  onMove: (sanMove: string) => boolean,
+  skipToEndOfSync: boolean,
 };
 
 /**
@@ -32,7 +33,8 @@ const useBattleHistory = ({
   currentBattle,
   onBan,
   onDraft,
-  onMove
+  onMove,
+  skipToEndOfSync
 }: BattleHistoryProps) => {
   // User state preferred animation speed and multiply the timers here based on it
   const { gameState } = useGameState();
@@ -45,6 +47,7 @@ const useBattleHistory = ({
   const chessMoveHistoryIndex = useRef(0);
   const [pokemonBattleHistoryState, setPokemonBattleHistoryState] = useState(matchHistory?.pokemonBattleHistory || []);
   const pokemonBattleHistoryIndex = useRef(0);
+  const [catchingUp, setCatchingUp] = useState(false);
 
   useEffect(() => {
     setBanHistoryState(matchHistory?.banHistory || []);
@@ -84,18 +87,25 @@ const useBattleHistory = ({
 
   useEffect(() => {
     let catchUpTimer: { start: () => Promise<void>, stop: () => void } | undefined;
+    const timeBetweenSteps = 1000 * (skipToEndOfSync ? 0 : 1);
     // On mount, start attempting to sync to the current match
     const catchUpToCurrentState = async () => {
       // Ban phase catchup
       while (banHistoryIndex.current < banHistory.length) {
+        if (banHistoryIndex.current < banHistory.length - 3 && !catchingUp) {
+          setCatchingUp(true);
+        }
         const banPiece = banHistory[banHistoryIndex.current]!;
         banHistoryIndex.current++
         onBan(banPiece);
-        catchUpTimer = timer(1000);
+        catchUpTimer = timer(timeBetweenSteps);
         await catchUpTimer.start();
       }
       // Draft phase catchup
       while(draftHistoryIndex.current < draftHistory.length) {
+        if (draftHistoryIndex.current < draftHistory.length - 3 && !catchingUp) {
+          setCatchingUp(true);
+        }
         // Instant draft on random
         const isRandomDraft = gameState.gameSettings.options.format === 'random' ? 0 : 1;
         const draft = draftHistory[draftHistoryIndex.current]!;
@@ -105,21 +115,29 @@ const useBattleHistory = ({
         const index = parseInt(draftArgs[1]);
         const square = draftArgs[2] as Square;
         onDraft(square, index, color);
-        catchUpTimer = timer(1000 * isRandomDraft);
+        catchUpTimer = timer(timeBetweenSteps * isRandomDraft);
         await catchUpTimer.start();
       }
 
       while(chessMoveHistoryIndex.current < chessMoveHistory.length) {
+        if (chessMoveHistoryIndex.current < chessMoveHistory.length - 3 && !catchingUp) {
+          setCatchingUp(true);
+        }
         const sanMove = chessMoveHistory[chessMoveHistoryIndex.current]!;
         chessMoveHistoryIndex.current++
         if (onMove(sanMove)) {
           // If handle attempt move detects a pokemon battle, wait until the battle is resolved
           pokemonBattleHistoryIndex.current++;
+          if (pokemonBattleHistoryIndex.current === pokemonBattleHistoryState.length && chessMoveHistoryIndex.current === chessMoveHistory.length) {
+            setCatchingUp(false);
+          }
           return;
         }
-        catchUpTimer = timer(1000);
+        catchUpTimer = timer(timeBetweenSteps);
         await catchUpTimer.start();
       }
+
+      setCatchingUp(false);
     }
   
     if (!currentBattle) {
@@ -130,9 +148,9 @@ const useBattleHistory = ({
     return () => {
       catchUpTimer?.stop();
     }
-  }, [currentBattle, banHistory, draftHistory, chessMoveHistory]);
+  }, [currentBattle, banHistory, draftHistory, chessMoveHistory, skipToEndOfSync]);
 
-  return { currentPokemonMoveHistory: pokemonBattleHistoryState[pokemonBattleHistoryIndex.current - 1] };
+  return { currentPokemonMoveHistory: pokemonBattleHistoryState[pokemonBattleHistoryIndex.current - 1], catchingUp };
 };
 
 export default useBattleHistory;

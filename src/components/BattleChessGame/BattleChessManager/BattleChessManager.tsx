@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Chess, Color, Square } from 'chess.js';
 import { PokemonBattleChessManager, PokemonPiece } from '../PokemonManager/PokemonBattleChessManager';
 import ChessManager from '../ChessManager/ChessManager';
@@ -48,7 +48,9 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
 
-  const { currentPokemonMoveHistory } = useBattleHistory({
+  const [skipToEndOfSync, setSkipToEndOfSync] = useState(false);
+
+  const { currentPokemonMoveHistory, catchingUp } = useBattleHistory({
     matchHistory,
     currentBattle,
     onBan: (draftPokemonIndex) => {
@@ -61,8 +63,15 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
     },
     onMove: (sanMove) => {
       return handleAttemptMove({ sanMove });
-    }
+    },
+    skipToEndOfSync,
   });
+
+  useEffect(() => {
+    if (!catchingUp && skipToEndOfSync) {
+      setSkipToEndOfSync(false);
+    }
+  }, [catchingUp, skipToEndOfSync]);
 
   /**
    * Action handlers for all the game events that change the higher level state.
@@ -76,7 +85,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
       setBattleStarted(false);
       setTimeout(() => {
         setCurrentBattle(null);
-      }, 2000);
+      }, 2000 * (skipToEndOfSync ? 0 : 1));
 
       const { fromSquare, toSquare, capturedPieceSquare, promotion } = currentBattle.attemptedMove;
 
@@ -135,7 +144,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
 
       setTimeout(() => {
         setBattleStarted(true);
-      }, 2000);
+      }, 2000 * (skipToEndOfSync ? 0 : 1));
       pokemonBattleInitiated = true;
     } else {
       chessManager.move({ from: fromSquare, to: toSquare, promotion });
@@ -184,53 +193,70 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
     <div className='battleChessContainer'>
       <p>Turn: {chessManager.moveNumber()}</p>
       <PlayerInGameDisplay player={color === 'w' ? blackPlayer : whitePlayer}/>
+      <div style={{ display: catchingUp && skipToEndOfSync ? 'none' : 'block' }}>
+        {
+          battleStarted && currentBattle &&
+          (
+            <PokemonBattleManager
+              p1Name={player1?.playerName!}
+              p2Name={player2?.playerName!}
+              p1Pokemon={currentBattle.p1Pokemon.pkmn}
+              p2Pokemon={currentBattle.p2Pokemon.pkmn}
+              onVictory={handleVictory}
+              pokemonAdvantage={[{ side: currentBattle.offensivePlayer, boost: gameState.gameSettings.options.offenseAdvantage }]}
+              currentPokemonMoveHistory={currentPokemonMoveHistory}
+              skipToEndOfSync={skipToEndOfSync}
+            />
+          )
+        }
+        {
+          !battleStarted && !isDrafting &&
+          (
+            <ChessManager
+              chessManager={chessManager}
+              pokemonManager={pokemonManager}
+              mostRecentMove={mostRecentMove}
+              currentBattle={currentBattle}
+              board={board}
+            />
+          )
+        }
+        {
+          isDrafting && (
+            <DraftPokemonManager
+              draftTurnPick={draftTurnPick}
+              chessManager={chessManager}
+              pokemonManager={pokemonManager}
+              boardState={currentBoard}
+              onDraftPokemon={(sq, pkmnIndex) => {
+                if (draftTurnPick !== color) {
+                  return;
+                }
+                if (handleDraftPick(sq, pkmnIndex, color!)) {
+                  socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, square: sq, draftPokemonIndex: pkmnIndex });
+                  setIsDrafting(!!pokemonManager.draftPieces.length);
+                }
+              }}
+              onBanPokemon={(pkmnIndex) => {
+                handleBanPick(pkmnIndex);
+                socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
+              }}
+            />
+          )
+        }
+      </div>
       {
-        battleStarted && currentBattle &&
-        (
-          <PokemonBattleManager
-            p1Name={player1?.playerName!}
-            p2Name={player2?.playerName!}
-            p1Pokemon={currentBattle.p1Pokemon.pkmn}
-            p2Pokemon={currentBattle.p2Pokemon.pkmn}
-            onVictory={handleVictory}
-            pokemonAdvantage={[{ side: currentBattle.offensivePlayer, boost: gameState.gameSettings.options.offenseAdvantage }]}
-            currentPokemonMoveHistory={currentPokemonMoveHistory}
-          />
+        catchingUp && skipToEndOfSync && (
+          <div>
+            Skipping ahead...
+          </div>
         )
       }
       {
-        !battleStarted && !isDrafting &&
-        (
-          <ChessManager
-            chessManager={chessManager}
-            pokemonManager={pokemonManager}
-            mostRecentMove={mostRecentMove}
-            currentBattle={currentBattle}
-            board={board}
-          />
-        )
-      }
-      {
-        isDrafting && (
-          <DraftPokemonManager
-            draftTurnPick={draftTurnPick}
-            chessManager={chessManager}
-            pokemonManager={pokemonManager}
-            boardState={currentBoard}
-            onDraftPokemon={(sq, pkmnIndex) => {
-              if (draftTurnPick !== color) {
-                return;
-              }
-              if (handleDraftPick(sq, pkmnIndex, color!)) {
-                socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, square: sq, draftPokemonIndex: pkmnIndex });
-                setIsDrafting(!!pokemonManager.draftPieces.length);
-              }
-            }}
-            onBanPokemon={(pkmnIndex) => {
-              handleBanPick(pkmnIndex);
-              socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
-            }}
-          />
+        catchingUp && !skipToEndOfSync && (
+          <button onClick={() => setSkipToEndOfSync(true)}>
+            Skip ahead...
+          </button>
         )
       }
       <PlayerInGameDisplay player={color === 'w' ? whitePlayer : blackPlayer}/>
