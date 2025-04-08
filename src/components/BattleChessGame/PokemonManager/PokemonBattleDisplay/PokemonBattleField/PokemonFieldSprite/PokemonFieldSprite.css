@@ -84,12 +84,6 @@
   flex-wrap: wrap;
   gap: 2px;
 
-  .status {
-    display: block;
-    height: 12px;
-    width: 30px;
-  }
-
   .boost {
     font-size: 10px;
     line-height: 12px;
@@ -156,4 +150,9 @@
   hr {
     margin: 2px 0px;
   }
+}
+
+.pokemonTooltipTyping {
+  max-width: 80px;
+  margin-right: 8px;
 }

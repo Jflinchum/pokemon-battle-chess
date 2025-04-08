@@ -1,15 +1,11 @@
 import { Pokemon } from "@pkmn/client";
 import { Sprites } from "@pkmn/img";
 import { Dex } from "@pkmn/dex";
-import { BoostID, GenderName, PokemonSet, StatusName } from "@pkmn/data";
-import burnStatus from '../../../../../../assets/pokemonAssets/burnStatus.png'
-import frozenStatus from '../../../../../../assets/pokemonAssets/frozenStatus.png'
-import paralyzeStatus from '../../../../../../assets/pokemonAssets/paralyzeStatus.png'
-import poisonStatus from '../../../../../../assets/pokemonAssets/poisonStatus.png'
-import sleepStatus from '../../../../../../assets/pokemonAssets/sleepStatus.png'
-import toxicStatus from '../../../../../../assets/pokemonAssets/toxicStatus.png'
+import { BoostID, GenderName, PokemonSet } from "@pkmn/data";
 import ProgressBar from "../../../../../common/ProgressBar/ProgressBar";
 import './PokemonFieldSprite.css';
+import PokemonStatus from "../../../../../common/Pokemon/PokemonStatus/PokemonStatus";
+import PokemonType from "../../../../../common/Pokemon/PokemonType/PokemonType";
 
 interface PokemonFieldSpriteProps {
   pokemon: Pokemon,
@@ -35,25 +31,6 @@ const getGenderSymbol = (gender: GenderName) => {
     case ('N'): return '';
   }
 }
-
-const getStatusSymbol = (status?: StatusName) => {
-  switch (status) {
-    case 'brn':
-      return burnStatus; 
-    case 'frz':
-      return frozenStatus; 
-    case 'par':
-      return paralyzeStatus; 
-    case 'psn':
-      return poisonStatus; 
-    case 'slp':
-      return sleepStatus; 
-    case 'tox':
-      return toxicStatus; 
-    default:
-      return burnStatus;
-  }
-};
 
 const mapBoostStageToMultiplier = (stage?: number) => {
   if (!stage) {
@@ -83,7 +60,9 @@ const PokemonTooltip = ({ pokemon, set }: { pokemon: Pokemon, set: PokemonSet })
         <span>{getGenderSymbol(pokemon.gender)} </span>
         <span>L{set.level}</span>
       </div>
-      <p>{pokemon.types.map((type, index) => (<span key={index}>{type} </span>))}</p>
+      <p>{pokemon.types.map((type, index) => (
+        <PokemonType className='pokemonTooltipTyping' key={index} type={type} />
+      ))}</p>
       <hr/>
       <div>
         <p><b>Ability:</b> {set.ability}</p>
@@ -109,13 +88,7 @@ const PokemonFieldSprite = ({ pokemon, side, set }: PokemonFieldSpriteProps) => 
           <span>{Math.round((pokemon.hp/pokemon.maxhp)*100)}%</span>
         </div>
         <div className='pokemonStatus'>
-          {
-            pokemon.status ?
-            (
-              <img className='status' src={getStatusSymbol(pokemon.status)}/>
-            ) :
-            null
-          }
+          <PokemonStatus status={pokemon.status} />
           {
             Object.keys(pokemon.boosts).map((boost, index) => (
               pokemon.boosts[boost as BoostID] ?

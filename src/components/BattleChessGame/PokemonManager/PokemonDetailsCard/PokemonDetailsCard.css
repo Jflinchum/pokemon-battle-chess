@@ -71,3 +71,8 @@
     max-height: 100px;
   }
 }
+
+.pokemonDetailsTyping {
+  max-width: 100px;
+  margin-right: 8px;
+}
