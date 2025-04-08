@@ -33,6 +33,7 @@ Priority:
 - Ban timer and random ban if failing the timer
 - Chat behind modal
 - Show ability/item descriptions on hover
+- Show whether chess move succeeded or failed in move history
 - Chat room works between multiple rooms
   - Global chat?
 - Return to room button
@@ -44,6 +45,7 @@ Priority:
 - Create room closes previous room
 
 Issues:
+- Skip ahead button does not work when in pokemon battle
 - Player disconnecting at end game modal clears their name
 - OG/Twitter meta tags do not support svg
 

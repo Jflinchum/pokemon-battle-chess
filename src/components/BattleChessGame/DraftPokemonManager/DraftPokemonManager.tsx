@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Chess, Color, Square } from "chess.js";
 import { useGameState } from "../../../context/GameStateContext";
 import PokemonDraftSelect from "./PokemonDraftSelect/PokemonDraftSelect";
-import PokemonDetailsCard from "../PokemonManager/PokemonDetailsCard/PokemonDetailsCard";
+import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
 import { PokemonBattleChessManager } from "../PokemonManager/PokemonBattleChessManager";
 import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
 import { PokemonChessBoardSquare } from "../ChessManager/types";
@@ -60,7 +60,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
           highlightedSquares={[]}
           selectedSquare={selectedSquare}
         />
-        <PokemonDetailsCard
+        <PokemonChessDetailsCard
           pokemon={
             pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn || (draftPokemonSelected !== null ? pokemonManager.draftPieces[draftPokemonSelected] : null)
           }

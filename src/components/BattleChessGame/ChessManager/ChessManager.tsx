@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Chess, Square, Move } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
-import PokemonDetailsCard from '../PokemonManager/PokemonDetailsCard/PokemonDetailsCard';
+import PokemonChessDetailsCard from '../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard';
 import './ChessManager.css';
 import { ChessBoardSquare, MoveAttempt } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
@@ -126,7 +126,8 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
           mostRecentMove={mostRecentMove}
           currentBattle={currentBattle}
         />
-        <PokemonDetailsCard
+        <PokemonChessDetailsCard
+          chessMoveHistory={chessManager.history({ verbose: true })}
           pokemon={
             hoveredPokemon ||
             pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn

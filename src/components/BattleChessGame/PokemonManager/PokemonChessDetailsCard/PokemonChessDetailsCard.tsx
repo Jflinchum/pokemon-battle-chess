@@ -1,17 +1,20 @@
 import { PokemonSet } from '@pkmn/data';
-import './PokemonDetailsCard.css';
+import { Dex } from '@pkmn/dex';
 import { Sprites } from "@pkmn/img";
 import { GenderName } from "@pkmn/data";
 import PokemonMoveChoices from '../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices';
-import { Dex } from '@pkmn/dex';
 import { speciesOverride } from '../../ChessManager/util';
 import PokemonType from '../../../common/Pokemon/PokemonType/PokemonType';
+import './PokemonChessDetailsCard.css';
+import { Move } from 'chess.js';
+import ChessMoveHistory from '../../ChessManager/ChessMoveHistory/ChessMoveHistory';
 
-interface PokemonDetailsCard {
-  pokemon?: PokemonSet | null,
+interface PokemonChessDetailsCardProps {
+  pokemon?: PokemonSet | null;
+  chessMoveHistory?: Move[];
 }
 
-const PokemonDetailsCard = ({ pokemon }: PokemonDetailsCard) => {
+const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory }: PokemonChessDetailsCardProps) => {
 
   return (
     <div className='pokemonDetailsContainer'>
@@ -47,12 +50,15 @@ const PokemonDetailsCard = ({ pokemon }: PokemonDetailsCard) => {
                 </ul>
               </div>
             </>
-          ) :
-          null
+          ) : (
+          <div className='pokemonDetailsChessMoveHistory'>
+            <ChessMoveHistory chessMoveHistory={chessMoveHistory} />
+          </div>
+          )
         }
       </div>
     </div>
   )
 }
 
-export default PokemonDetailsCard;
+export default PokemonChessDetailsCard;

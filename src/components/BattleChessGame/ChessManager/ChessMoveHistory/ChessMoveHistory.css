@@ -1,0 +1,33 @@
+
+.moveHistoryContainer {
+  list-style: none;
+  padding: 0;
+  font-weight: 700;
+  max-height: 150px;
+  overflow-y: scroll;
+
+  @media (min-width: 800px) {
+    max-height: 300px;
+  }
+
+  li {
+    margin-left: 4px;
+    padding: 4px;
+    background-color: rgb(70,70,70);
+
+    &:nth-child(odd) {
+      background-color: rgb(60,60,60);
+    }
+  }
+}
+
+.moveHistoryTurnLabel {
+  display: inline-block;
+  width: 50px;
+}
+
+.moveHistoryMoveLabel {
+  display: inline-block;
+  width: 100px;
+  margin-left: 20px;
+}

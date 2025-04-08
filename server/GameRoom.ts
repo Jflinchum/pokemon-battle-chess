@@ -44,7 +44,9 @@ export default class GameRoom {
     if (this.player2 === null) {
       this.player2 = player;
     }
-    this.playerList.push(player);
+    if (!this.playerList.some((roomPlayer) => roomPlayer.playerId === player.playerId)) {
+      this.playerList.push(player);
+    }
   }
 
   public leaveRoom(playerId?: string) {
