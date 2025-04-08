@@ -1,9 +1,11 @@
 import { Sprites } from "@pkmn/img";
 import { useModalState } from "../../../context/ModalStateContext";
 import { useUserState } from "../../../context/UserStateContext";
-import Button from "../../common/Button/Button";
 import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
 import './MenuOptions.css';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faChessKing, faDoorOpen, faFaceGrin, faNoteSticky, faPencil, faX } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 const MenuOptions = () => {
   const { dispatch } = useModalState();
@@ -25,41 +27,62 @@ const MenuOptions = () => {
     dispatch({ type: 'OPEN_HOW_TO_PLAY_MODAL', payload: {} })
   }
 
-  return (
-    <div className='menuOptions'>
-      <ul>
-        <li>
-          {userState.name && (
-            <div>
-              <p className='nameContainer'>
-                <b>Name: </b>
-                <span className='username'>{userState.name}</span>
-              </p>
-              <div className='avatarContainer'>
-                <img src={Sprites.getAvatar(parseInt(userState.avatarId))} />
-              </div>
-            </div>
-          )}
-        </li>
-        <li>
-          <Button colorPrimary="darkgoldenrod" onClick={() => {}}>Find Match (todo)</Button>
-        </li>
-        <li>
-          <Button colorPrimary="green" onClick={handleCreateRoom}>Create New Room</Button>
-        </li>
-        <li>
-          <Button colorPrimary="purple" onClick={handleChangeName}>Change Name</Button>
-        </li>
-        <li>
-          <Button colorPrimary="brown" onClick={handleChangeAvatar}>Change Avatar</Button>
-        </li>
-        <li>
-          <Button colorPrimary="darkblue" onClick={handleHowToPlay}>How to play</Button>
-        </li>
-      </ul>
+  const [open, setOpen] = useState(false);
 
-      <div className='pokemonOfTheDayContainer'>
-        <PokemonOfTheDay />
+  return (
+    <div>
+      <div className='menuMobileNav'>
+        <button onClick={() => setOpen(!open)} className='menuMobileButton'>
+          <span>
+            <FontAwesomeIcon size='2x' icon={open ? faX : faBars}/>
+          </span>
+        </button>
+      </div>
+      <div className={`menuOptions ${open ? 'menuOptionsOpen' : 'menuOptionsClose'}`}>
+        <ul>
+          <li>
+            {userState.name && (
+              <div>
+                <p className='nameContainer'>
+                  <b>Name: </b>
+                  <span className='username'>{userState.name}</span>
+                </p>
+                <div className='avatarContainer'>
+                  <img src={Sprites.getAvatar(parseInt(userState.avatarId))} />
+                </div>
+              </div>
+            )}
+          </li>
+          <li className='menuOptionButtonContainer'>
+            <button className='menuOptionButton' onClick={() => {}}>
+              <FontAwesomeIcon icon={faChessKing}/> Find Match (todo)
+            </button>
+          </li>
+          <li className='menuOptionButtonContainer'>
+            <button className="menuOptionButton" onClick={handleCreateRoom}>
+              <FontAwesomeIcon icon={faDoorOpen} /> Create New Room
+            </button>
+          </li>
+          <li className='menuOptionButtonContainer'>
+            <button className="menuOptionButton" onClick={handleChangeName}>
+              <FontAwesomeIcon icon={faPencil}/> Change Name
+            </button>
+          </li>
+          <li className='menuOptionButtonContainer'>
+            <button className="menuOptionButton" onClick={handleChangeAvatar}>
+              <FontAwesomeIcon icon={faFaceGrin} /> Change Avatar
+            </button>
+          </li>
+          <li className='menuOptionButtonContainer'>
+            <button className="menuOptionButton" onClick={handleHowToPlay}>
+              <FontAwesomeIcon icon={faNoteSticky}/> How to play
+            </button>
+          </li>
+        </ul>
+
+        <div className='pokemonOfTheDayContainer'>
+          <PokemonOfTheDay />
+        </div>
       </div>
     </div>
   );

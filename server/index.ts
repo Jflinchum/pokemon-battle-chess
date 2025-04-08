@@ -85,9 +85,9 @@ app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password
     return;
   }
   // Player already owns a room
-  if (gameRoomManager.getPlayer(playerId)) {
-    res.status(400).send();
-    return;
+  const { player, room } = gameRoomManager.getPlayer(playerId);
+  if (player || room) {
+    gameRoomManager.removeRoom(room);
   }
   const newRoomId = crypto.randomUUID();
 

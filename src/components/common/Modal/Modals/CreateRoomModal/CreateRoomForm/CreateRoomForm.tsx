@@ -14,6 +14,8 @@ const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation, createRoom
 
   const handleSubmit = (e: React.FormEvent) =>{ 
     e.preventDefault();
+    console.log(e);
+    console.log(inputRef?.current?.value);
     handleCreateRoom({ password: inputRef?.current?.value || '' });
   };
 
@@ -24,7 +26,7 @@ const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation, createRoom
   return (
     <form autoComplete="off" onSubmit={handleSubmit}>
       <div className='roomFormOptions'>
-        <PasscodeInput label="Room Code:" ref={inputRef} />
+        <PasscodeInput label="Room Code" ref={inputRef} />
       </div>
       <div className='roomFormActions'>
         <Button type='button' colorPrimary='brown' onClick={handleCancelRoomCreation}>Cancel</Button>

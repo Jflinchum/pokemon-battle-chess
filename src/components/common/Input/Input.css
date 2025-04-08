@@ -1,0 +1,45 @@
+.inputContainer {
+  background-color: rgb(75,75,75);
+  border-color: rgb(100,100,100);
+  border-radius: 5px;
+  cursor: text;
+  padding: 20px 8px 8px 8px;
+  display: flex;
+  align-items: center;
+
+  &.focused {
+    border-color: rgb(100, 100, 200);
+    label {
+      color: rgb(200, 200, 255);
+      transform: translate(-10%, -70%) scale(.75);
+    }
+  }
+
+  &.underline {
+    border-radius: 0px;
+    border-bottom-style: solid;
+  }
+
+  &.bordered {
+    border-style: solid;
+  }
+}
+
+.inputLabel {
+  cursor: text;
+  position: absolute;
+  transform: translate(0%, -25%) scale(1);
+  transition: transform .25s, color .25s;
+}
+
+.input {
+  background: none;
+  border: none;
+  height: 30px;
+  font-size: 16px;
+  width: 100%;
+  padding: 0;
+  outline: none;
+  color: white;
+  display: block;
+}

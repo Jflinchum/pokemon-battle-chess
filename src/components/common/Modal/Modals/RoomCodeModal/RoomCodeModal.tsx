@@ -39,7 +39,7 @@ const RoomCodeModal = () => {
       <h2 className='roomCodeTitle'>Enter Room Code</h2>
       <ErrorMessage display='block'>{errorText}</ErrorMessage>
       <form onSubmit={handleJoinRoom} className='roomCodeActions'>
-        <PasscodeInput label="Room Code: " onFocus={() => errorText === 'Invalid Password' && setErrorText('')} ref={inputRef}/>
+        <PasscodeInput label="Room Code" onFocus={() => errorText === 'Invalid Password' && setErrorText('')} ref={inputRef}/>
         <Button type='submit' colorPrimary="green">Submit</Button>
       </form>
     </div>

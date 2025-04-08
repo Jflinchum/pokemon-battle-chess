@@ -26,6 +26,7 @@ export default class GameRoomManager{
 
   public removeRoom(roomId) {
     console.log(`Cleaning up room ${roomId}`);
+    this.io.to(roomId).emit('roomClosed');
     delete this.currentRooms[roomId];
   }
 
@@ -46,13 +47,15 @@ export default class GameRoomManager{
 
   public getPlayer(playerId: string) {
     let player: User | null = null;
+    let gameRoom: GameRoom | null = null;
     for (let room in this.currentRooms) {
       if (this.currentRooms[room].getPlayer(playerId)) {
         player = this.currentRooms[room].getPlayer(playerId);
+        gameRoom = this.currentRooms[room];
         break;
       }
     }
-    return player;
+    return { player, room: gameRoom };
   }
   
   public playerLeaveRoom(roomId: string, playerId?: string) {
@@ -72,18 +75,16 @@ export default class GameRoomManager{
         room.resetRoomForRematch();
       } 
       if (room.hostPlayer?.playerId === playerId) {
-        this.io.to(room.roomId).emit('hostDisconnected');
-        console.log('Cleaning up unused room');
-        delete this.currentRooms[room.roomId];
+        this.removeRoom(room.roomId);
         return;
       }
 
       room.leaveRoom(player?.playerId);
-      this.io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
 
       if (!room.hasPlayers()) {
-        console.log('Cleaning up unused room');
-        delete this.currentRooms[room.roomId];
+        this.removeRoom(room.roomId);
+      } else {
+        this.io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
     }
   }

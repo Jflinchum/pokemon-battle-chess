@@ -3,10 +3,9 @@ import RoomList from "../RoomList/RoomList";
 import MenuOptions from "../MenuOptions/MenuOptions";
 import { getAvailableRooms } from "../../../service/lobby";
 import { useGameState } from "../../../context/GameStateContext";
-import Button from "../../common/Button/Button";
 import './LobbyManager.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretLeft, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { faCaretLeft, faCaretRight, faRefresh } from "@fortawesome/free-solid-svg-icons";
 
 const LobbyManager = () => {
   const [availableRooms, setAvailableRooms] = useState([]);
@@ -64,17 +63,19 @@ const LobbyManager = () => {
             <RoomList availableRooms={availableRooms} errorText={errorText} onSearch={handleOnSearch}/>
             <div className='roomListBottomActions'>
               <div className='paginationActions'>
-                <button className='paginationButton' onClick={() => setCurrentPage((curr => curr - 1 <= 0 ? curr : --curr))}>
+                <button aria-label='Page Left' className='paginationButton' onClick={() => setCurrentPage((curr => curr - 1 <= 0 ? curr : --curr))}>
                   <FontAwesomeIcon icon={faCaretLeft} />
                 </button>
                 <span className='paginationLabel'>
-                  Page: {currentPage} of {totalPages}
+                  Page: <span>{currentPage} of {totalPages}</span>
                 </span>
-                <button className='paginationButton' onClick={() => setCurrentPage((curr) => curr + 1 >= totalPages ? curr : ++curr)}>
+                <button aria-label='Page Right' className='paginationButton' onClick={() => setCurrentPage((curr) => curr + 1 >= totalPages ? curr : ++curr)}>
                   <FontAwesomeIcon icon={faCaretRight} />
                 </button>
               </div>
-              <Button disabled={refreshDisabled} colorPrimary="brown" className='refreshButton' onClick={handleRefreshRoom}>Refresh Rooms</Button>
+              <button aria-label='Refresh' disabled={refreshDisabled} className='refreshButton' onClick={() => handleRefreshRoom()}>
+                <FontAwesomeIcon size='2x' icon={faRefresh} />
+              </button>
             </div>
           </div>
         </div>

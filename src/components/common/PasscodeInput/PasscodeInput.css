@@ -1,5 +1,4 @@
 .passcodeInputContainer {
-  display: inline-block;
   label {
     display: block;
   }
@@ -8,12 +7,8 @@
 .passcodeInputWrapper {
   position: relative;
 
-  input {
-    height: 20px;
-    width: 95%;
-  }
-
   button {
+    color: white;
     position: absolute;
     top: 50%;
     right: 10px;

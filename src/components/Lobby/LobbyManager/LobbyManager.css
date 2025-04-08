@@ -1,7 +1,7 @@
 .lobbyContainer {
   display: flex;
 
-  @media (max-width: 500px) {
+  @media (max-width: 600px) {
     flex-direction: column;
   }
 }
@@ -10,7 +10,7 @@
   width: 100%;
   padding: 0px 60px; 
   
-  @media (max-width: 500px) {
+  @media (max-width: 600px) {
     padding: 0;
   }
 }
@@ -21,6 +21,15 @@
   box-shadow: 5px 5px 20px 5px black;
   border-radius: 8px;
   padding: 12px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .roomListBottomActions {
@@ -35,13 +44,28 @@
   .paginationButton {
     height: 30px;
     width: 30px;
+    cursor: pointer;
   }
 
   .paginationLabel {
     padding: 0 10px;
+    text-align: center;
+
+    span {
+      display: inline-block;
+    }
   }
 
   .refreshButton {
     margin-left: auto;
+    background: none;
+    color: white;
+    border: 0;
+    cursor: pointer;
+
+    &:disabled {
+      filter: brightness(50%);
+      animation: spin 0.5s infinite;
+    }
   }
 }

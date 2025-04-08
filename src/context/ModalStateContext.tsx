@@ -61,10 +61,10 @@ const ModalStateProvider = ({ children }: { children: ReactElement }) => {
   const [modalState, dispatch] = useReducer(modalStateReducer, { currentModal: '', required: false });
 
   return (
-    <ModalStateContext.Provider value={{ modalState, dispatch }}>
+    <ModalStateContext value={{ modalState, dispatch }}>
       <Modal />
       {children}
-    </ModalStateContext.Provider>
+    </ModalStateContext>
   );
 }
 

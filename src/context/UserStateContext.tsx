@@ -54,9 +54,9 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
   });
 
   return (
-    <UserStateContext.Provider value={{ userState, dispatch }}>
+    <UserStateContext value={{ userState, dispatch }}>
       {children}
-    </UserStateContext.Provider>
+    </UserStateContext>
   );
 }
 

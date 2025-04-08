@@ -8,14 +8,14 @@
   color: inherit;
   font-size: inherit;
   cursor: pointer;
+  display: flex;
 }
 
 .roomListIconContainer {
-  float: right;
+  margin-left: auto;
 
   span {
-    width: 25px;
-    height: 25px;
     margin-left: 6px;
+    display: inline-block;
   }
 }

@@ -51,6 +51,9 @@ export const joinRoom = async (roomId: string, password: string, playerId: strin
 export const getAvailableRooms = async (page = 1, limit = 10, searchTerm = '') => {
   const response = await fetch(`/api/getRooms?page=${page}&limit=${limit}${searchTerm.length ? `&searchTerm=${searchTerm}` : ''}`, {
     method: 'GET',
+    headers: {
+      'Cache-Control': 'no-cache'
+    }
   });
 
   return response;

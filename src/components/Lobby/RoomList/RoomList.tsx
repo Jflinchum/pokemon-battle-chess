@@ -6,6 +6,7 @@ import { joinRoom } from "../../../service/lobby";
 import './RoomList.css';
 import ErrorMessage from "../../common/ErrorMessage/ErrorMessage";
 import { useDebounce } from "../../../utils";
+import Input from "../../common/Input/Input";
 
 export interface Room {
   roomId: string,
@@ -49,7 +50,9 @@ const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
       <ErrorMessage display='block'>{joinErrorText}</ErrorMessage>
       <div className='roomListTopActions'>
         <span>Rooms:</span>
-        <input value={roomSearch} onChange={(e) => {setRoomSearch(e.target.value); searchDebounce(e.target.value);}} className='roomSearch' placeholder='Search for rooms'/>
+        <span className='roomSearchContainer'>
+          <Input containerType='underline' label='Room Search' value={roomSearch} onChange={(e) => {setRoomSearch(e.target.value); searchDebounce(e.target.value);}} className='roomSearch'/>
+        </span>
       </div>
       <ul className='roomList'>
         {

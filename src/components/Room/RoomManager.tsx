@@ -54,12 +54,12 @@ const RoomManager = () => {
       dispatch({ type: 'SET_PLAYERS', payload: players });
     });
 
-    socket.on('hostDisconnected', () => {
+    socket.on('roomClosed', () => {
       dispatchUserState({ type: 'LEAVE_ROOM' });
     });
     return () => {
       socket.off('connectedPlayers');
-      socket.off('hostDisconnected');
+      socket.off('roomClosed');
       socket.off('endGameFromDisconnect');
       socket.off('startSync');
     }

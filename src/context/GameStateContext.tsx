@@ -74,9 +74,9 @@ const GameStateProvider = ({ children }: { children: ReactElement }) => {
   const [gameState, dispatch] = useReducer(gameStateReducer, getInitialGameState());
 
   return (
-    <GameStateContext.Provider value={{ gameState, dispatch }}>
+    <GameStateContext value={{ gameState, dispatch }}>
       {children}
-    </GameStateContext.Provider>
+    </GameStateContext>
   );
 }
 

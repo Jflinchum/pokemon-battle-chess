@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useModalState } from "../../../../../context/ModalStateContext";
 import Button from "../../../Button/Button";
+import Input from "../../../Input/Input";
 import { useUserState } from "../../../../../context/UserStateContext";
 import './NameChangeModal.css';
 
@@ -34,8 +35,7 @@ const NameChangeModal = () => {
           )
         }
         <div>
-          <label>Name:</label>
-          <input ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} maxLength={30}/>
+          <Input label='Name' ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} maxLength={30}/>
         </div>
         <div>
 
