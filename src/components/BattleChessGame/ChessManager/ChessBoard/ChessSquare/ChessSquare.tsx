@@ -7,6 +7,7 @@ interface ChessSquareProps {
   square: ChessBoardSquare
   backgroundColor: 'white' | 'black'
   onClick: (arg0: ChessBoardSquare) => void
+  onPokemonHover: (arg0?: PokemonSet | null) => void
   onPieceDrop: (arg0: ChessBoardSquare) => void
   onPieceDrag: (arg0: ChessBoardSquare) => void
   possibleMove: boolean
@@ -30,10 +31,16 @@ const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostR
 }
 
 
-const ChessSquare = ({ square, backgroundColor, onPieceDrop, onPieceDrag, onClick, possibleMove, selected, pokemon, mostRecentMove, isBattleSquare }: ChessSquareProps) => {
+const ChessSquare = ({ square, backgroundColor, onPieceDrop, onPieceDrag, onClick, onPokemonHover, possibleMove, selected, pokemon, mostRecentMove, isBattleSquare }: ChessSquareProps) => {
   return (
     <div 
       className={`chessSquare ${backgroundColor}ChessSquare`}
+      onMouseEnter={() => {
+        onPokemonHover(pokemon);
+      }}
+      onMouseLeave={() => {
+        onPokemonHover(null);
+      }}
       onClick={() => { onClick(square); }}
       onDrop={() => {
         onPieceDrop(square);

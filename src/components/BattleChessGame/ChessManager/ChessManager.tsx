@@ -9,6 +9,7 @@ import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromot
 import { getVerboseChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
+import { PokemonSet } from '@pkmn/data';
 
 interface ChessManagerProps {
   chessManager: Chess;
@@ -28,6 +29,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
   const color = useMemo(() => gameState.gameSettings!.color, [gameState])
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
+  const [hoveredPokemon, setHoveredPokemon] = useState<PokemonSet | null | undefined>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
   const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
 
@@ -69,7 +71,14 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
       // Set the current square in state and highlight any potential moves for that square
       updateSelection(square);
     }
+    if (selectedSquare && getVerboseChessMove(selectedSquare, square, chessManager)?.color === color) {
+      movePiece({ fromSquare: selectedSquare, toSquare: square });
+    }
   };
+
+  const handlePokemonHover = (pkmn?: PokemonSet | null) => {
+    setHoveredPokemon(pkmn); 
+  }
 
   const handlePieceDrop = (square: Square) => {
     setRequestedPawnPromotion(null);
@@ -109,6 +118,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
         <ChessBoard
           boardState={mergeBoardAndPokemonState(board, pokemonManager)}
           onSquareClick={handleSquareClick}
+          onPokemonHover={handlePokemonHover}
           onPieceDrag={handlePieceDrag}
           onPieceDrop={handlePieceDrop}
           highlightedSquares={highlightedSquares}
@@ -118,6 +128,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
         />
         <PokemonDetailsCard
           pokemon={
+            hoveredPokemon ||
             pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn
           }
         />
