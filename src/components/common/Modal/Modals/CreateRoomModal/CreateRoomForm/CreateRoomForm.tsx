@@ -14,8 +14,6 @@ const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation, createRoom
 
   const handleSubmit = (e: React.FormEvent) =>{ 
     e.preventDefault();
-    console.log(e);
-    console.log(inputRef?.current?.value);
     handleCreateRoom({ password: inputRef?.current?.value || '' });
   };
 

@@ -1,7 +1,7 @@
 import { Server } from "socket.io"
-import GameRoomManager from "./GameRoomManager";
+import GameRoomManager from "../GameRoomManager";
 
-export const assignSocketEvents = (io: Server, gameRoomManager: GameRoomManager) => {
+export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManager) => {
   io.on('connection', (socket) => {
     console.log('New User Connection');
 

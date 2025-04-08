@@ -24,6 +24,7 @@
     "@pkmn/protocol": "^0.6.32",
     "@pkmn/randoms": "^0.9.32",
     "@pkmn/view": "^0.6.32",
+    "@socket.io/admin-ui": "^0.5.1",
     "@types/node": "^22.13.13",
     "chess.js": "^1.1.0",
     "cors": "^2.8.5",

@@ -17,6 +17,7 @@
   }
 
   @media (max-width: 600px) {
+    top: 0;
     position: fixed;
     box-shadow: none;
   }
@@ -32,6 +33,7 @@
 }
 
 .menuMobileNav {
+  z-index: 2;
   position: sticky;
   width: 100%;
   background-color: rgb(70, 70, 70);
