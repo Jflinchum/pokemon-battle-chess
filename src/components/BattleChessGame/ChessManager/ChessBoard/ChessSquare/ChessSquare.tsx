@@ -7,7 +7,7 @@ interface ChessSquareProps {
   square: ChessBoardSquare
   backgroundColor: 'white' | 'black'
   onClick: (arg0: ChessBoardSquare) => void
-  onPokemonHover: (arg0?: PokemonSet | null) => void
+  onPokemonHover?: (arg0?: PokemonSet | null) => void
   onPieceDrop: (arg0: ChessBoardSquare) => void
   onPieceDrag: (arg0: ChessBoardSquare) => void
   possibleMove: boolean
@@ -36,10 +36,10 @@ const ChessSquare = ({ square, backgroundColor, onPieceDrop, onPieceDrag, onClic
     <div 
       className={`chessSquare ${backgroundColor}ChessSquare`}
       onMouseEnter={() => {
-        onPokemonHover(pokemon);
+        onPokemonHover?.(pokemon);
       }}
       onMouseLeave={() => {
-        onPokemonHover(null);
+        onPokemonHover?.(null);
       }}
       onClick={() => { onClick(square); }}
       onDrop={() => {

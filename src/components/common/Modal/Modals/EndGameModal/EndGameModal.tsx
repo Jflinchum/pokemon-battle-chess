@@ -1,10 +1,10 @@
+import { Sprites } from "@pkmn/img";
 import { EndGameModalProps, useModalState } from "../../../../../context/ModalStateContext";
 import { useUserState } from "../../../../../context/UserStateContext";
 import { useGameState } from "../../../../../context/GameStateContext";
-import './EndGameModal.css';
-import Button from "../../../PokemonMoveButton/PokemonMoveButton";
 import { socket } from "../../../../../socket";
-import { Sprites } from "@pkmn/img";
+import Button from "../../../Button/Button";
+import './EndGameModal.css';
 
 const getEndGameTitle = (isSpectator: boolean, playerVictory: boolean) => {
   if (isSpectator) {
@@ -50,8 +50,8 @@ const EndGameModal = () => {
         </div>
       </div>
       <div className='endGameBottomActions'>
-        <Button colorPrimary='brown' onClick={handleBackToMenu}>Back To Main Menu</Button>
-        <Button className='endGameRematch' colorPrimary='green' onClick={handleReturn}>Return to Room</Button>
+        <Button onClick={handleBackToMenu}>Back To Main Menu</Button>
+        <Button className='endGameRematch' onClick={handleReturn} color='primary'>Return to Room</Button>
       </div>
     </div>
   )

@@ -1,9 +1,9 @@
 import { Dex } from "@pkmn/dex";
 import { Move } from "@pkmn/data";
-import Button from "../../../../common/PokemonMoveButton/PokemonMoveButton";
+import PokemonMoveButton from "../../../../common/PokemonMoveButton/PokemonMoveButton";
 import './PokemonMoveChoices.css';
 
-interface PokemonMoveButtonProps {
+interface PokemonMoveInfoButtonProps {
   move: string;
   disabled?: boolean;
   pp?: number;
@@ -35,11 +35,11 @@ const getMoveButtonColor = (moveType: Move['type']) => {
   }
 }
 
-const PokemonMoveButton = ({ move, pp, maxpp, disabled, onMoveSelect = () => {} }: PokemonMoveButtonProps) => {
+const PokemonMoveInfoButton = ({ move, pp, maxpp, disabled, onMoveSelect = () => {} }: PokemonMoveInfoButtonProps) => {
   const dexMoveInfo = Dex.moves.get(move);
 
   return (
-    <Button className={'pokemonMoveButton'} disabled={disabled} colorPrimary={getMoveButtonColor(dexMoveInfo.type)} onClick={() => { onMoveSelect(move) }} toolTip={PokemonMoveTooltip({ move })}>
+    <PokemonMoveButton className={'pokemonMoveButton'} disabled={disabled} colorPrimary={getMoveButtonColor(dexMoveInfo.type)} onClick={() => { onMoveSelect(move) }} toolTip={PokemonMoveTooltip({ move })}>
       <p className='pokemonMoveName'>{dexMoveInfo.name}</p>
 
       <div className='pokemonMoveSubInfo'>
@@ -59,7 +59,7 @@ const PokemonMoveButton = ({ move, pp, maxpp, disabled, onMoveSelect = () => {} 
           )
         }
       </div>
-    </Button>
+    </PokemonMoveButton>
   )
 }
 
@@ -96,4 +96,4 @@ const PokemonMoveTooltip = ({ move }: { move: string }) => {
   );
 }
 
-export default PokemonMoveButton;
+export default PokemonMoveInfoButton;

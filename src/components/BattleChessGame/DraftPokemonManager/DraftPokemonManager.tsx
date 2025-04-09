@@ -7,7 +7,7 @@ import { PokemonBattleChessManager } from "../PokemonManager/PokemonBattleChessM
 import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
 import { PokemonChessBoardSquare } from "../ChessManager/types";
 import './DraftPokemonManager.css';
-import Button from "../../common/PokemonMoveButton/PokemonMoveButton";
+import PokemonMoveButton from "../../common/PokemonMoveButton/PokemonMoveButton";
 import { useUserState } from "../../../context/UserStateContext";
 
 interface DraftPokemonManager {
@@ -76,7 +76,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
       <div className='banButton'>
         {
           draftPokemonSelected !== null && pokemonManager.draftPieces.length > 32 && draftTurnPick === gameState.gameSettings.color && !gameState.players.find((player) => player.playerId === userState.id)?.isSpectator?
-          (<Button colorPrimary='brown' onClick={() => onBanPokemon(draftPokemonSelected)}>Ban Pokemon</Button>) :
+          (<PokemonMoveButton colorPrimary='brown' onClick={() => onBanPokemon(draftPokemonSelected)}>Ban Pokemon</PokemonMoveButton>) :
           null
         }
       </div>

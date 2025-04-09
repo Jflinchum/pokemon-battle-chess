@@ -8,10 +8,11 @@
     flex-direction: column;
     gap: 20px;
   }
+}
 
-  button {
-    margin-right: 20px;
-  }
+.nameChangeBottomActions {
+  display: flex;
+  justify-content: space-between;
 }
 
 .nameChangeTitle {

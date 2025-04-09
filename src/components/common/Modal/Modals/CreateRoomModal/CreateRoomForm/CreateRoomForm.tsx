@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import Button from "../../../../PokemonMoveButton/PokemonMoveButton";
-import './CreateRoomForm.css'
+import Button from "../../../../Button/Button";
 import PasscodeInput from "../../../../PasscodeInput/PasscodeInput";
+import './CreateRoomForm.css'
 
 interface CreateRoomFormProps {
   createRoomLoading: boolean;
@@ -27,8 +27,8 @@ const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation, createRoom
         <PasscodeInput label="Room Code" ref={inputRef} />
       </div>
       <div className='roomFormActions'>
-        <Button type='button' colorPrimary='brown' onClick={handleCancelRoomCreation}>Cancel</Button>
-        <Button disabled={createRoomLoading} colorPrimary='green' type='submit'>Create Room</Button>
+        <Button  type='button' onClick={handleCancelRoomCreation}>Cancel</Button>
+        <Button disabled={createRoomLoading} type='submit' color='primary'>Create Room</Button>
       </div>
     </form>
   );

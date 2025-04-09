@@ -1,13 +1,32 @@
-.pokemonMoveButton {
+.button {
   position: relative;
   width: 140px;
   height: 50px;
   border-radius: 6px;
   cursor: pointer;
   box-shadow: 0 0 10px 0 black;
+  background-color: rgb(70, 70, 70);
+  border: 0;
+  color: white;
+  transition: filter 0.25s;
+
+  &.primary {
+    background-color: rgb(70, 150, 70);
+  }
+
+  &:active {
+    outline: rgb(100, 100, 200);
+  }
+  &:hover {
+    filter: brightness(110%);
+  }
+  &:disabled {
+    filter: grayscale(50%) brightness(70%);
+    cursor: default;
+  }
 }
 
-.pokemonMoveTooltip {
+.tooltip {
   width: 300px;
   text-align: left;
   padding: 3px;
@@ -36,13 +55,9 @@
   }
 }
 
-.pokemonMoveButton:hover {
-  .pokemonMoveTooltip {
+.button:hover {
+  .tooltip {
     visibility: visible;
     opacity: 1;
   }
-}
-
-.pokemonMoveButton:disabled {
-  filter: grayscale(30%);
 }

@@ -10,7 +10,7 @@ import { PokemonSet } from '@pkmn/data';
 interface ChessBoardProps {
   boardState: PokemonChessBoardSquare[][];
   onSquareClick: (arg0: Square) => void;
-  onPokemonHover: (arg0?: PokemonSet | null) => void;
+  onPokemonHover?: (arg0?: PokemonSet | null) => void;
   onPieceDrag: (arg0: Square) => void;
   onPieceDrop: (arg0: Square) => void;
   highlightedSquares: Square[];
@@ -53,7 +53,7 @@ const ChessBoard = ({ boardState, onSquareClick, onPokemonHover, onPieceDrag, on
                   onSquareClick(square?.square || getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex));
                 }}
                 onPokemonHover={(pokemon) => {
-                  onPokemonHover(pokemon);
+                  onPokemonHover?.(pokemon);
                 }}
                 onPieceDrag={(square) => {
                   onPieceDrag(square?.square || getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex));

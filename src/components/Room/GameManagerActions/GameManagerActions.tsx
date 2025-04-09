@@ -1,6 +1,6 @@
 import { useGameState } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
-import Button from "../../common/PokemonMoveButton/PokemonMoveButton";
+import PokemonMoveButton from "../../common/PokemonMoveButton/PokemonMoveButton";
 import ChatToggle from "./ChatToggle/ChatToggle";
 import './GameManagerActions.css';
 
@@ -16,7 +16,7 @@ const GameManagerActions = () => {
     <div className='gameManagerBottomActions'>
       {
         gameState.matchStarted && (
-          <Button className='gameManagerLeaveRoom' colorPrimary="brown" onClick={() => handleLeaveRoom()}>Return to Main Menu</Button>
+          <PokemonMoveButton className='gameManagerLeaveRoom' colorPrimary="brown" onClick={() => handleLeaveRoom()}>Return to Main Menu</PokemonMoveButton>
         )
       }
       <div className='gameManagerChatContainer'>

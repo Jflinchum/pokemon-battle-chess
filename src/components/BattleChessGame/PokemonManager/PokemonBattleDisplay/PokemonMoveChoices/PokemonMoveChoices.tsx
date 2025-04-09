@@ -1,4 +1,4 @@
-import PokemonMoveButton from "./PokemonMoveButton";
+import PokemonMoveInfoButton from "./PokemonMoveInfoButton";
 import './PokemonMoveChoices.css';
 
 export interface PokemonMoveChoice {
@@ -21,14 +21,14 @@ const PokemonMoveChoices = ({ moves, onMoveSelect = () => {} }: PokemonMoveChoic
       <div className='subMoveContainer'>
         {moves.slice(0, 2).map((move, index) => {
           return (
-            <PokemonMoveButton key={index} move={move.id} pp={move.pp} maxpp={move.maxpp} disabled={move.disabled} onMoveSelect={onMoveSelect}/>
+            <PokemonMoveInfoButton key={index} move={move.id} pp={move.pp} maxpp={move.maxpp} disabled={move.disabled} onMoveSelect={onMoveSelect}/>
           )
         })}
       </div>
       <div className='subMoveContainer'>
         {moves.slice(2, 4).map((move, index) => {
           return (
-            <PokemonMoveButton key={index} move={move.id} pp={move.pp} maxpp={move.maxpp} disabled={move.disabled} onMoveSelect={onMoveSelect}/>
+            <PokemonMoveInfoButton key={index} move={move.id} pp={move.pp} maxpp={move.maxpp} disabled={move.disabled} onMoveSelect={onMoveSelect}/>
           )
         })}
       </div>

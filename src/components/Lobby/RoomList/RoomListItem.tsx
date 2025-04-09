@@ -1,7 +1,7 @@
 import './RoomListItem.css';
 import { Room } from './RoomList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGamepad, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 
 interface RoomListItem {
   room: Room;
@@ -20,7 +20,7 @@ const RoomListItem = ({ room, onClick }: RoomListItem) => {
           }
           {
             room.matchInProgress &&
-            (<span title='Game In Progress'><FontAwesomeIcon icon={faGamepad}/></span>) 
+            (<span title='Game In Progress'><FontAwesomeIcon icon={faEllipsis}/></span>) 
           }
           <span title='Total Player Count'>
             <FontAwesomeIcon icon={faUser} /> {room.playerCount}

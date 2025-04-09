@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { RoomCodeModalProps, useModalState } from "../../../../../context/ModalStateContext";
 import PasscodeInput from "../../../PasscodeInput/PasscodeInput";
-import Button from "../../../PokemonMoveButton/PokemonMoveButton";
+import Button from "../../../Button/Button";
 import { useUserState } from "../../../../../context/UserStateContext";
 import { joinRoom } from "../../../../../service/lobby";
 import './RoomCodeModal.css';
@@ -40,7 +40,7 @@ const RoomCodeModal = () => {
       <ErrorMessage display='block'>{errorText}</ErrorMessage>
       <form onSubmit={handleJoinRoom} className='roomCodeActions'>
         <PasscodeInput label="Room Code" onFocus={() => errorText === 'Invalid Password' && setErrorText('')} ref={inputRef}/>
-        <Button type='submit' colorPrimary="green">Submit</Button>
+        <Button type='submit' color='primary'>Submit</Button>
       </form>
     </div>
   )

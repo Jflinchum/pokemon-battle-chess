@@ -5,7 +5,7 @@ import { useGameState, GameOptions } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import { socket } from "../../../socket";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
-import Button from "../../common/PokemonMoveButton/PokemonMoveButton";
+import Button from "../../common/Button/Button";
 import SpectatorList from "./SpectatorList/SpectatorList";
 import PlayerName from "./PlayerName/PlayerName";
 import RoomOptions from "./RoomOptions/RoomOptions";
@@ -56,7 +56,8 @@ const Room = () => {
     }
   }, []);
 
-  const handleStartGame = () => {
+  const handleStartGame = (e: React.MouseEvent) => {
+    e.preventDefault();
     socket.emit('requestStartGame', userState.currentRoomId, userState.id);
   }
 
@@ -88,57 +89,60 @@ const Room = () => {
   }, [connectedPlayers])
 
   return (
-    <div className='roomContainer'>
-      <AnimatedBackground />
+    <>
       <h1 className='mainMenuHeader'>Pokemon Chess Arena</h1>
-      <div className="roomPlayerContainer">
-        <div className='roomButtons'>
-          <Button
-            colorPrimary='green'
-            onClick={handleStartGame}
-            disabled={!thisPlayer?.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
-          >
-              Start Game
-          </Button>
-          <Button disabled={thisPlayer?.isSpectator ? (!!player1 && !!player2) : (false)} colorPrimary='blue' onClick={handleToggleSpectating}>
-            {
-              thisPlayer?.isSpectator ?
-              'Stop Spectating' :
-              'Move to Spectators'
-            }
-          </Button>
-          <Button colorPrimary='brown' onClick={handleLeaveGame}>Leave Game</Button>
-        </div>
 
-        <div className='playerContainer'>
-          <div className='player'>
-            {
-              player1 ? (
-                <>
-                  <img src={Sprites.getAvatar(player1?.avatarId || '1')} />
-                  <PlayerName player={player1}/>
-                </>
-              ) : null
-            }
+      <div className='roomContainer'>
+        <AnimatedBackground />
+        <div className="roomPlayerContainer">
+          <div className='roomButtons'>
+            <Button
+              color='primary'
+              onClick={handleStartGame}
+              disabled={!thisPlayer?.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
+            >
+                Start Game
+            </Button>
+            <Button disabled={thisPlayer?.isSpectator ? (!!player1 && !!player2) : (false)} onClick={handleToggleSpectating}>
+              {
+                thisPlayer?.isSpectator ?
+                'Stop Spectating' :
+                'Move to Spectators'
+              }
+            </Button>
+            <Button onClick={handleLeaveGame}>Leave Game</Button>
           </div>
-          <span>vs</span>
-          <div className='player'>
-            {
-              player2 ? (
-                <>
-                  <img src={Sprites.getAvatar(player2?.avatarId || '1')} />
-                  <PlayerName player={player2}/>
-                </>
-              ) : null
-            }
-          </div>
-        </div>
 
-        <SpectatorList players={connectedPlayers} />
+          <div className='playerContainer'>
+            <div className='player'>
+              {
+                player1 ? (
+                  <>
+                    <img src={Sprites.getAvatar(player1?.avatarId || '1')} />
+                    <PlayerName player={player1}/>
+                  </>
+                ) : null
+              }
+            </div>
+            <span>vs</span>
+            <div className='player'>
+              {
+                player2 ? (
+                  <>
+                    <img src={Sprites.getAvatar(player2?.avatarId || '1')} />
+                    <PlayerName player={player2}/>
+                  </>
+                ) : null
+              }
+            </div>
+          </div>
+
+          <SpectatorList players={connectedPlayers} />
+        </div>
+        <hr/>
+        <RoomOptions isHost={thisPlayer?.isHost} gameOptions={gameOptions} onChange={handleRoomOptionsChange} />
       </div>
-      <hr/>
-      <RoomOptions isHost={thisPlayer?.isHost} gameOptions={gameOptions} onChange={handleRoomOptionsChange} />
-    </div>
+    </>
   );
 };
 

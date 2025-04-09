@@ -17,7 +17,7 @@ const getRandomChessPiece = () => {
     color: randomColor,
     left: `${Math.random() * 95}%`,
     bottom: `${Math.floor((Math.random() * -300) - 300)}px`,
-    scale: (Math.random() * 4) + 0.5,
+    scale: (Math.random() * 2) + 1,
     rotation: `${(Math.random() > 0.5 ? 1 : -1) * ((Math.random() * 60) + 20)}deg`,
   };
 };
@@ -30,7 +30,7 @@ const getRandomBackgroundPokemon = (availablePokemon: string[]) => {
     shiny: Math.random() < 0.008,
     left: `${Math.random() * 95}%`,
     bottom: `${Math.floor((Math.random() * -300) - 300)}px`,
-    scale: (Math.random() * 4) + 0.5,
+    scale: (Math.random() * 2) + 1,
     rotation: `${(Math.random() > 0.5 ? 1 : -1) * ((Math.random() * 60) + 20)}deg`,
   };
 };
@@ -88,13 +88,13 @@ const AnimatedBackground = () => {
   return (
     <div className='backgroundContainer'>
       {
-        [...Array(10)].map((_, index) => (
-          <RandomPokemonBackground availablePokemon={availablePokemon} delay={-5 + (index * 2) - 1} key={index}/>
+        [...Array(6)].map((_, index) => (
+          <RandomPokemonBackground availablePokemon={availablePokemon} delay={-5 + (index * 3) - 1} key={index}/>
         ))
       }
       {
-        [...Array(10)].map((_, index) => (
-          <RandomChessPieceBackground delay={-5 + index * 2} key={index}/>
+        [...Array(6)].map((_, index) => (
+          <RandomChessPieceBackground delay={-5 + index * 3} key={index}/>
         ))
       }
     </div>

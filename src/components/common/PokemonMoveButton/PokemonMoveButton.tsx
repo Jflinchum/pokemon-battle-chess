@@ -13,7 +13,7 @@ const PokemonMoveButton = ({ onClick, colorPrimary = 'white', colorSecondary = '
   return (
     <button
       style={{ border: `${colorPrimary} solid 3px`, background: `linear-gradient(0deg, ${colorPrimary} 0%, ${colorSecondary} 100%)` }}
-      className={`button ${className}`}
+      className={`pokemonMoveButton ${className}`}
       onClick={onClick}
       disabled={disabled}
       type={type}
@@ -21,7 +21,7 @@ const PokemonMoveButton = ({ onClick, colorPrimary = 'white', colorSecondary = '
       {children}
       {
         toolTip && (
-          <div className='tooltip'>
+          <div className='pokemonMoveTooltip'>
             {toolTip}
           </div>
         )

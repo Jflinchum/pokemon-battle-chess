@@ -29,12 +29,12 @@
 
 .backgroundChess {
   display: inline-block; 
-  width: 7vw;
-  height: 7vw;
+  min-width: 5vw;
+  min-height: 5vw;
   background-size: contain;
 }
 
 .backgroundPokemon {
-  min-width: 5vw;
-  min-height: 5vw;
+  min-width: 7vw;
+  min-height: 7vw;
 }
