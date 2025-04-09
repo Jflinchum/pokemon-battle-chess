@@ -3,10 +3,10 @@ import './Button.css';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   toolTip?: ReactNode;
-  color?: 'primary' | 'secondary'
+  color?: 'primary' | 'secondary' | 'danger';
 };
 
-const Button = ({ children, toolTip, className = '', color, ...props }: ButtonProps) => {
+const Button = ({ children, toolTip, className = '', color = 'secondary', ...props }: ButtonProps) => {
 
   return (
     <button

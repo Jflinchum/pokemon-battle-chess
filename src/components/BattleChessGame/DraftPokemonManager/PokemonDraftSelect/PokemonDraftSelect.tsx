@@ -17,7 +17,7 @@ const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftab
       {
         draftablePokemon.map((pokemon, index) => (
           <li key={index}>
-            <button className={selectedDraftablePokemon === index ? 'selectedDraft' : ''} onClick={() => { onPokemonSelect(index); }}>
+            <button className={`pokemonDraftOption ${selectedDraftablePokemon === index ? 'selectedDraft' : ''}`} onClick={() => { onPokemonSelect(index); }}>
               <div
                 draggable
                 onDragStart={() => onPokemonSelect(index)}

@@ -6,9 +6,9 @@ import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/P
 import { PokemonBattleChessManager } from "../PokemonManager/PokemonBattleChessManager";
 import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
 import { PokemonChessBoardSquare } from "../ChessManager/types";
-import './DraftPokemonManager.css';
-import PokemonMoveButton from "../../common/PokemonMoveButton/PokemonMoveButton";
 import { useUserState } from "../../../context/UserStateContext";
+import Button from "../../common/Button/Button";
+import './DraftPokemonManager.css';
 
 interface DraftPokemonManager {
   chessManager: Chess;
@@ -50,7 +50,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
   }
 
   return (
-    <div>
+    <div className='draftManagerContainer'>
       <div className='draftGameContainer'>
         <ChessBoard
           boardState={boardState}
@@ -66,26 +66,28 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
           }
         />
       </div>
-      <div className='draftNotification'>
-        {
-          draftTurnPick === gameState.gameSettings.color ?
-          (<strong>{ pokemonManager.draftPieces.length > 32 ? ('Select a pokemon that you want to ban, and the click "Ban Pokemon"!') : ('Select a pokemon you want to draft, and then select the chess piece to draft it!') }</strong>) :
-          (<strong>Waiting for opponent...</strong>)
-        }
+      <div>
+        <div className='draftNotification'>
+          {
+            draftTurnPick === gameState.gameSettings.color ?
+            (<strong>{ pokemonManager.draftPieces.length > 32 ? ('Select a pokemon that you want to ban, and the click "Ban Pokemon"!') : ('Select a pokemon you want to draft, and then select the chess piece to draft it!') }</strong>) :
+            (<strong>Waiting for opponent...</strong>)
+          }
+        </div>
+        <div className='banButton'>
+          {
+            draftPokemonSelected !== null && pokemonManager.draftPieces.length > 32 && draftTurnPick === gameState.gameSettings.color && !gameState.players.find((player) => player.playerId === userState.id)?.isSpectator?
+            (<Button color='danger' onClick={() => onBanPokemon(draftPokemonSelected)}>Ban Pokemon</Button>) :
+            null
+          }
+        </div>
+        <PokemonDraftSelect
+          onPokemonSelect={handleDraftPokemonSelected}
+          draftablePokemon={pokemonManager.draftPieces}
+          bannedPokemon={pokemonManager.banPieces}
+          selectedDraftablePokemon={draftPokemonSelected}
+        />
       </div>
-      <div className='banButton'>
-        {
-          draftPokemonSelected !== null && pokemonManager.draftPieces.length > 32 && draftTurnPick === gameState.gameSettings.color && !gameState.players.find((player) => player.playerId === userState.id)?.isSpectator?
-          (<PokemonMoveButton colorPrimary='brown' onClick={() => onBanPokemon(draftPokemonSelected)}>Ban Pokemon</PokemonMoveButton>) :
-          null
-        }
-      </div>
-      <PokemonDraftSelect
-        onPokemonSelect={handleDraftPokemonSelected}
-        draftablePokemon={pokemonManager.draftPieces}
-        bannedPokemon={pokemonManager.banPieces}
-        selectedDraftablePokemon={draftPokemonSelected}
-      />
     </div>
   );
 }

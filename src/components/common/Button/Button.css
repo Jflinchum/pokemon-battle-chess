@@ -10,6 +10,9 @@
   color: white;
   transition: filter 0.25s;
 
+  &.danger {
+    background-color: rgb(150, 70, 70);
+  }
   &.primary {
     background-color: rgb(70, 150, 70);
   }
