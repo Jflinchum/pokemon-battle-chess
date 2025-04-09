@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Color } from "chess.js";
+import { Sprites } from "@pkmn/img";
 import { useGameState, GameOptions } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import { socket } from "../../../socket";
-import Button from "../../common/Button/Button";
-import { Sprites } from "@pkmn/img";
+import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
+import Button from "../../common/PokemonMoveButton/PokemonMoveButton";
 import SpectatorList from "./SpectatorList/SpectatorList";
 import PlayerName from "./PlayerName/PlayerName";
 import RoomOptions from "./RoomOptions/RoomOptions";
@@ -88,6 +89,7 @@ const Room = () => {
 
   return (
     <div className='roomContainer'>
+      <AnimatedBackground />
       <h1 className='mainMenuHeader'>Pokemon Chess Arena</h1>
       <div className="roomPlayerContainer">
         <div className='roomButtons'>

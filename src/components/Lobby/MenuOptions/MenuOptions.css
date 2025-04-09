@@ -7,8 +7,10 @@
   list-style: none;
   margin: 0;
   z-index: 1;
-  box-shadow: 0 0 10px 0 black;
   background-color: rgb(70, 70, 70);
+  top: 0;
+  position: fixed;
+  box-shadow: none;
 
   transition: left 0.5s;
 
@@ -16,10 +18,10 @@
     width: 300px;
   }
 
-  @media (max-width: 600px) {
-    top: 0;
-    position: fixed;
-    box-shadow: none;
+  @media (min-width: 600px) {
+    position: inherit;
+    box-shadow: 0 0 10px 0 black;
+    top: auto;
   }
 
   ul {
@@ -85,6 +87,11 @@
   width: 100%;
   padding: 20px;
   cursor: pointer;
+
+  span {
+    display: inline-block;
+    width: 150px;
+  }
 
   &:hover {
     background-color: rgb(50, 50, 50);

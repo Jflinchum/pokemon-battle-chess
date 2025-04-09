@@ -7,6 +7,12 @@ function generateDailyNumber(min: number, max: number) {
 }
 
 export const getRandomPokemon = () => {
+  const randomIndex = Math.floor(Math.random() * PokemonArray.length);
+
+  return PokemonArray[randomIndex];
+}
+
+export const getRandomPokemonOfTheDay = () => {
   return PokemonArray[generateDailyNumber(0, PokemonArray.length)];
 }
 

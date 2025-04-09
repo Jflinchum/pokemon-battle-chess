@@ -1,6 +1,6 @@
 import { useGameState } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
-import Button from "../../common/Button/Button";
+import Button from "../../common/PokemonMoveButton/PokemonMoveButton";
 import ChatToggle from "./ChatToggle/ChatToggle";
 import './GameManagerActions.css';
 

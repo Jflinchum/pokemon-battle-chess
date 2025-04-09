@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { RoomCodeModalProps, useModalState } from "../../../../../context/ModalStateContext";
 import PasscodeInput from "../../../PasscodeInput/PasscodeInput";
-import Button from "../../../Button/Button";
+import Button from "../../../PokemonMoveButton/PokemonMoveButton";
 import { useUserState } from "../../../../../context/UserStateContext";
 import { joinRoom } from "../../../../../service/lobby";
 import './RoomCodeModal.css';

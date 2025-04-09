@@ -7,7 +7,7 @@ import { PokemonBattleChessManager } from "../PokemonManager/PokemonBattleChessM
 import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
 import { PokemonChessBoardSquare } from "../ChessManager/types";
 import './DraftPokemonManager.css';
-import Button from "../../common/Button/Button";
+import Button from "../../common/PokemonMoveButton/PokemonMoveButton";
 import { useUserState } from "../../../context/UserStateContext";
 
 interface DraftPokemonManager {

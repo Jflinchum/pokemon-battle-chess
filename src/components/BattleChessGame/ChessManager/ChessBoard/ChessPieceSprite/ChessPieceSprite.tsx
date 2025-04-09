@@ -34,16 +34,16 @@ const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
   }
 };
 
-interface ChessPieceSpriteProps {
+interface ChessPieceSpriteProps extends React.HTMLAttributes<HTMLDivElement> {
   color: Color;
   type: PieceSymbol;
   className?: string;
 }
 
-const ChessPieceSprite = ({ color, type, className }: ChessPieceSpriteProps) => {
+const ChessPieceSprite = ({ color, type, className, ...props }: ChessPieceSpriteProps) => {
 
   return (
-    <div style={{ backgroundImage: `url(${getPieceImage(type, color)})` }} className={className} />
+    <img src={getPieceImage(type, color)} className={className} {...props} />
   );
 };
 

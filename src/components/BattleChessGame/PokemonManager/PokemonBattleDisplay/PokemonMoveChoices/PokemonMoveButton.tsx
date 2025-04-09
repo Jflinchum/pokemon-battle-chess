@@ -1,6 +1,6 @@
 import { Dex } from "@pkmn/dex";
 import { Move } from "@pkmn/data";
-import Button from "../../../../common/Button/Button";
+import Button from "../../../../common/PokemonMoveButton/PokemonMoveButton";
 import './PokemonMoveChoices.css';
 
 interface PokemonMoveButtonProps {

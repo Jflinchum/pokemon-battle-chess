@@ -55,27 +55,32 @@ const MenuOptions = () => {
           </li>
           <li className='menuOptionButtonContainer'>
             <button className='menuOptionButton' onClick={() => {}}>
-              <FontAwesomeIcon icon={faChessKing}/> Find Match (todo)
+              <FontAwesomeIcon size='2x' icon={faChessKing}/>
+              <span>Find Match (todo)</span>
             </button>
           </li>
           <li className='menuOptionButtonContainer'>
             <button className="menuOptionButton" onClick={handleCreateRoom}>
-              <FontAwesomeIcon icon={faDoorOpen} /> Create New Room
+              <FontAwesomeIcon size='2x' icon={faDoorOpen} />
+              <span>Create New Room</span>
             </button>
           </li>
           <li className='menuOptionButtonContainer'>
             <button className="menuOptionButton" onClick={handleChangeName}>
-              <FontAwesomeIcon icon={faPencil}/> Change Name
+              <FontAwesomeIcon size='2x' icon={faPencil}/>
+              <span>Change Name</span>
             </button>
           </li>
           <li className='menuOptionButtonContainer'>
             <button className="menuOptionButton" onClick={handleChangeAvatar}>
-              <FontAwesomeIcon icon={faFaceGrin} /> Change Avatar
+              <FontAwesomeIcon size='2x' icon={faFaceGrin} />
+              <span>Change Avatar</span>
             </button>
           </li>
           <li className='menuOptionButtonContainer'>
             <button className="menuOptionButton" onClick={handleHowToPlay}>
-              <FontAwesomeIcon icon={faNoteSticky}/> How to play
+              <FontAwesomeIcon size='2x' icon={faNoteSticky}/>
+              <span>How to play</span>
             </button>
           </li>
         </ul>

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import Button from "../../../../Button/Button";
+import Button from "../../../../PokemonMoveButton/PokemonMoveButton";
 import './CreateRoomForm.css'
 import PasscodeInput from "../../../../PasscodeInput/PasscodeInput";
 

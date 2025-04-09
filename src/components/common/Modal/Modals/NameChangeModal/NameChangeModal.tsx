@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useModalState } from "../../../../../context/ModalStateContext";
-import Button from "../../../Button/Button";
+import Button from "../../../PokemonMoveButton/PokemonMoveButton";
 import Input from "../../../Input/Input";
 import { useUserState } from "../../../../../context/UserStateContext";
 import './NameChangeModal.css';

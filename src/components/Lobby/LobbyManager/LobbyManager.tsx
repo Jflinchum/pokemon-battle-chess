@@ -6,6 +6,7 @@ import { useGameState } from "../../../context/GameStateContext";
 import './LobbyManager.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretLeft, faCaretRight, faRefresh } from "@fortawesome/free-solid-svg-icons";
+import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
 
 const LobbyManager = () => {
   const [availableRooms, setAvailableRooms] = useState([]);
@@ -55,6 +56,7 @@ const LobbyManager = () => {
 
   return (
     <>
+      <AnimatedBackground />
       <div className='lobbyContainer'>
         <MenuOptions />
         <div className='roomListLobbyContainer'>

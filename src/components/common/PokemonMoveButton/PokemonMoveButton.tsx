@@ -1,14 +1,14 @@
 import { ReactNode } from "react";
-import './Button.css';
+import './PokemonMoveButton.css';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface PokemonMoveButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick?: () => void;
   colorPrimary?: string;
   colorSecondary?: string;
   toolTip?: ReactNode;
 };
 
-const Button = ({ onClick, colorPrimary = 'white', colorSecondary = 'white', children, toolTip, className = '', disabled, type }: ButtonProps) => {
+const PokemonMoveButton = ({ onClick, colorPrimary = 'white', colorSecondary = 'white', children, toolTip, className = '', disabled, type }: PokemonMoveButtonProps) => {
 
   return (
     <button
@@ -30,4 +30,4 @@ const Button = ({ onClick, colorPrimary = 'white', colorSecondary = 'white', chi
   );
 }
 
-export default Button;
+export default PokemonMoveButton;

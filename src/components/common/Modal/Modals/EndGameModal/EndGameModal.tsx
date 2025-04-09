@@ -2,7 +2,7 @@ import { EndGameModalProps, useModalState } from "../../../../../context/ModalSt
 import { useUserState } from "../../../../../context/UserStateContext";
 import { useGameState } from "../../../../../context/GameStateContext";
 import './EndGameModal.css';
-import Button from "../../../Button/Button";
+import Button from "../../../PokemonMoveButton/PokemonMoveButton";
 import { socket } from "../../../../../socket";
 import { Sprites } from "@pkmn/img";
 

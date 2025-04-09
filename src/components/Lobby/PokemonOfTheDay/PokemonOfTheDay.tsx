@@ -1,10 +1,10 @@
 import { Sprites } from "@pkmn/img";
-import { getRandomPokemon } from './PokemonOfTheDayUtil';
+import { getRandomPokemonOfTheDay } from './PokemonOfTheDayUtil';
 import './PokemonOfTheDay.css';
 import { speciesOverride } from "../../BattleChessGame/ChessManager/util";
 
 const PokemonOfTheDay = ({ className = '' }: { className?: string }) => {
-  const randPokemon = getRandomPokemon();
+  const randPokemon = getRandomPokemonOfTheDay();
   return (
     randPokemon ?
     (
