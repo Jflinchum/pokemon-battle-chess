@@ -1,46 +1,14 @@
 .pokemonMoveButton {
-  position: relative;
   width: 140px;
   height: 50px;
   border-radius: 6px;
   cursor: pointer;
   box-shadow: 0 0 10px 0 black;
-}
-
-.pokemonMoveTooltip {
-  width: 300px;
-  text-align: left;
-  padding: 3px;
-  visibility: hidden;
-  background-color: rgba(125, 125, 125, 0.5);
-  backdrop-filter: blur(5px);
-  color: white;
-  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-
-  border-radius: 10px;
-
-  position: absolute;
-  z-index: 1;
-  bottom: 125%;
-  left: 65%;
-  margin-left: -150px;
-  
-  opacity: 0;
-  transition: opacity 0.3s;
-
-  p, strong {
-    margin: 0;
-  }
-  hr {
-    margin: 2px 0px;
-  }
+  transition: filter 0.25s;
 }
 
 .pokemonMoveButton:hover {
-  .pokemonMoveTooltip {
-    visibility: visible;
-    opacity: 1;
-  }
+  filter: brightness(105%);
 }
 
 .pokemonMoveButton:disabled {

@@ -6,6 +6,7 @@ import ProgressBar from "../../../../../common/ProgressBar/ProgressBar";
 import './PokemonFieldSprite.css';
 import PokemonStatus from "../../../../../common/Pokemon/PokemonStatus/PokemonStatus";
 import PokemonType from "../../../../../common/Pokemon/PokemonType/PokemonType";
+import Tooltip from "../../../../../common/Tooltip/Tooltip";
 
 interface PokemonFieldSpriteProps {
   pokemon: Pokemon,
@@ -52,9 +53,9 @@ const boostToLabel: Record<BoostID, string> = {
   'accuracy': 'Acc',
 };
 
-const PokemonTooltip = ({ pokemon, set }: { pokemon: Pokemon, set: PokemonSet }) => {
+const PokemonTooltip = ({ pokemon, set, side }: { pokemon: Pokemon, set: PokemonSet, side: 'p1' | 'p2' }) => {
   return (
-    <div className='pokemonTooltip'>
+    <Tooltip anchorSelect={`#${side}-${pokemon.name.split(' ').join('-')}`}>
       <div>
         <strong>{set.name} </strong>
         <span>{getGenderSymbol(pokemon.gender)} </span>
@@ -69,14 +70,14 @@ const PokemonTooltip = ({ pokemon, set }: { pokemon: Pokemon, set: PokemonSet })
         <p><b>Item:</b> {set.item}</p>
         <p><b>Moves:</b> {set.moves.map((move, index) => (<span key={index}>{Dex.moves.get(move).name}{index === set.moves.length - 1 ? ' ' : ', '}</span>))}</p>
       </div>
-    </div>
+    </Tooltip>
   );
 }
 
 const PokemonFieldSprite = ({ pokemon, side, set }: PokemonFieldSpriteProps) => {
 
   return (
-    <div className={`pokemonFieldSprite ${side}Pokemon`}>
+    <div id={`${side}-${pokemon.name.split(' ').join('-')}`} className={`pokemonFieldSprite ${side}Pokemon`}>
       <div className='pokemonSpriteInfo'>
         <div className='pokemonDetails'>
           <span>{pokemon.name}</span>
@@ -109,7 +110,7 @@ const PokemonFieldSprite = ({ pokemon, side, set }: PokemonFieldSpriteProps) => 
           Sprites.getPokemon(pokemon.baseSpeciesForme, { gender: pokemon.gender as GenderName, side }).url
         }
       />
-      <PokemonTooltip pokemon={pokemon} set={set} />
+      <PokemonTooltip side={side} pokemon={pokemon} set={set} />
     </div>
   );
 }

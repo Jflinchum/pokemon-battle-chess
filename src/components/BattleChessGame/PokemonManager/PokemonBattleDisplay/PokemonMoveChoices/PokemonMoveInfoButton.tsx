@@ -1,7 +1,8 @@
 import { Dex } from "@pkmn/dex";
 import { Move } from "@pkmn/data";
 import PokemonMoveButton from "../../../../common/PokemonMoveButton/PokemonMoveButton";
-import './PokemonMoveChoices.css';
+import PokemonType from "../../../../common/Pokemon/PokemonType/PokemonType";
+import './PokemonMoveInfoButton.css';
 
 interface PokemonMoveInfoButtonProps {
   move: string;
@@ -39,7 +40,7 @@ const PokemonMoveInfoButton = ({ move, pp, maxpp, disabled, onMoveSelect = () =>
   const dexMoveInfo = Dex.moves.get(move);
 
   return (
-    <PokemonMoveButton className={'pokemonMoveButton'} disabled={disabled} colorPrimary={getMoveButtonColor(dexMoveInfo.type)} onClick={() => { onMoveSelect(move) }} toolTip={PokemonMoveTooltip({ move })}>
+    <PokemonMoveButton id={move} disabled={disabled} colorPrimary={getMoveButtonColor(dexMoveInfo.type)} onClick={() => { onMoveSelect(move) }} toolTip={PokemonMoveTooltip({ move })}>
       <p className='pokemonMoveName'>{dexMoveInfo.name}</p>
 
       <div className='pokemonMoveSubInfo'>
@@ -69,7 +70,7 @@ const PokemonMoveTooltip = ({ move }: { move: string }) => {
     <div>
       <div>
         <strong>{dexMoveInfo.name}</strong>
-        <p>{dexMoveInfo.type} - {dexMoveInfo.category}</p>
+        <p><PokemonType type={dexMoveInfo.type} className='pokemonMoveType'/> - {dexMoveInfo.category}</p>
       </div>
       <hr/>
       <div>

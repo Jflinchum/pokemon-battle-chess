@@ -15,19 +15,18 @@ Room Options
  - (maybe) Preserve item usage after battle
  - Custom Teams
  - Weather on random chess spaces
- - Checkmate isn't the win condition, taking the king is
-    - Patch chess.js to include function to ignore check
  - (maybe) Change pokemon on piece promotion
  - Level Up Progression
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Pokemon moves details card causes tooltips to extend past body and cause scrolling
+- Checkmate isn't the win condition, taking the king is
+  - Patch chess.js to include function to ignore check
 - Show ability/item descriptions on hover
-- Ban timer and random ban if failing the timer
-- Show whether chess move succeeded or failed in move history
 - Chat room works between multiple rooms
   - Global chat?
+- Ban timer and random ban if failing the timer
+- Show whether chess move succeeded or failed in move history
 - Host controls
 - Robots.txt disable search engine crawling
 - Curate pokemon sets

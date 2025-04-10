@@ -32,6 +32,7 @@
     "express": "^4.21.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-tooltip": "^5.28.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "socketio": "^1.0.0",
