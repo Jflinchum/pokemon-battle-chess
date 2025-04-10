@@ -20,6 +20,11 @@ const HowToPlayModal = () => {
           battle!</b> If you win, you successfully take the piece. However, if you lose, <b>your
           Chess piece will be taken instead!</b>
         </p>
+        <p>
+          Additionally, Check and Checkmate work a little differently!
+          If you're in Check, you can still remain in Check after your next move. <b>You only lose once
+          your King piece gets taken!</b>
+        </p>
       </div>
     </div>
   )

@@ -40,7 +40,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
 
   const updateSelection = (square: Square) => {
     setSelectedSquare(square);
-    const selectedSquareMoves = chessManager.moves({ square, piece: chessManager.get(square)?.type, verbose: true }).filter((move) => move.color === color);
+    const selectedSquareMoves = chessManager.moves({ square, piece: chessManager.get(square)?.type, verbose: true, continueOnCheck: true }).filter((move) => move.color === color);
     setHighlightedSquare(selectedSquareMoves.map((squareMove) => squareMove.to) as Square[]);
   }
 

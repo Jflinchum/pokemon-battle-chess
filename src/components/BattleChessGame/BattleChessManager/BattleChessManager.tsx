@@ -98,14 +98,20 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
         player1?.playerName === victor :
         player2?.playerName === victor;
       if (moveSucceeds) {
+        const lostPiece = chessManager.get(toSquare);
         pokemonManager.getPokemonFromSquare(capturedPieceSquare)!.square = null;
-        chessManager.move({ from: fromSquare, to: toSquare, promotion });
+        chessManager.move({ from: fromSquare, to: toSquare, promotion }, { continueOnCheck: true });
         pokemonManager.movePokemonToSquare(fromSquare, toSquare, promotion);
+
+        if (lostPiece?.type === 'k') {
+          modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: lostPiece.color === 'w' ? 'b' : 'w' } }});
+          socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
+        }
       } else {
         const lostPiece = chessManager.get(fromSquare);
         pokemonManager.getPokemonFromSquare(fromSquare)!.square = null;
         const tempPiece = chessManager.get(capturedPieceSquare || toSquare);
-        chessManager.move({ from: fromSquare, to: toSquare, promotion });
+        chessManager.move({ from: fromSquare, to: toSquare, promotion }, { continueOnCheck: true });
         chessManager.remove(currentBattle.attemptedMove.toSquare);
         chessManager.put(tempPiece!, capturedPieceSquare || toSquare)
 
@@ -151,7 +157,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
       }, 2000 * (gameState.isSkippingAhead ? 0 : 1));
       pokemonBattleInitiated = true;
     } else {
-      chessManager.move({ from: fromSquare, to: toSquare, promotion });
+      chessManager.move({ from: fromSquare, to: toSquare, promotion }, { continueOnCheck: true });
       pokemonManager.movePokemonToSquare(fromSquare, toSquare);
     }
 
@@ -159,10 +165,6 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
       pokemonManager.movePokemonToSquare(fromCastledRookSquare, toCastledRookSquare);
     }
 
-    if (chessManager.isCheckmate()) {
-      modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: chessManager.turn() === 'w' ? 'b' : 'w' } }});
-      socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
-    }
     setMostRecentMove({ from: fromSquare, to: toSquare });
     setBoard(chessManager.board());
     return pokemonBattleInitiated;

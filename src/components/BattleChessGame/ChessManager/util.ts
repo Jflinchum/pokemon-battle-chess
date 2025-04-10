@@ -19,7 +19,7 @@ export const getCastledRookSquare = (color: Color, isKingsideCastle: boolean): {
 
 export const getVerboseChessMove = (fromSquare: Square, toSquare: Square, chessManager: Chess, promotion?: PieceSymbol) => {
   return chessManager
-    .moves({ square: fromSquare, piece: chessManager.get(fromSquare)?.type, verbose: true })
+    .moves({ square: fromSquare, piece: chessManager.get(fromSquare)?.type, verbose: true, continueOnCheck: true })
     .find((move) => {
       if (promotion) {
         return move.to === toSquare && move.promotion === promotion
@@ -29,7 +29,7 @@ export const getVerboseChessMove = (fromSquare: Square, toSquare: Square, chessM
 }
 
 export const getVerboseSanChessMove = (sanMove: string, chessManager: Chess) => {
-  return chessManager.moves({ verbose: true }).find((move) => move.san === sanMove);
+  return chessManager.moves({ verbose: true, continueOnCheck: true }).find((move) => move.san === sanMove);
 }
 
 export const mergeBoardAndPokemonState = (chessBoard: ChessBoardSquare[][], pokemonManager: PokemonBattleChessManager): PokemonChessBoardSquare[][] => {
