@@ -6,12 +6,11 @@ import PokemonMoveChoices from '../PokemonBattleDisplay/PokemonMoveChoices/Pokem
 import { speciesOverride } from '../../ChessManager/util';
 import PokemonType from '../../../common/Pokemon/PokemonType/PokemonType';
 import './PokemonChessDetailsCard.css';
-import { Move } from 'chess.js';
 import ChessMoveHistory from '../../ChessManager/ChessMoveHistory/ChessMoveHistory';
 
 interface PokemonChessDetailsCardProps {
   pokemon?: PokemonSet | null;
-  chessMoveHistory?: Move[];
+  chessMoveHistory: { sanMove: string, battleSuccess: boolean | null }[];
 }
 
 const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory }: PokemonChessDetailsCardProps) => {

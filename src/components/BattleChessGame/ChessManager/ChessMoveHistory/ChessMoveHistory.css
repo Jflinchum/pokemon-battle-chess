@@ -31,3 +31,11 @@
   width: 80px;
   margin-left: 20px;
 }
+
+.moveHistoryFail {
+  color: rgb(200, 130, 130);
+}
+
+.moveHistoryWin {
+  color: rgb(130, 200, 130);
+}

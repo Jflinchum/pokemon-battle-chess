@@ -18,9 +18,10 @@ interface ChessManagerProps {
   currentBattle?: CurrentBattle | null;
   board: ChessBoardSquare[][];
   onMove: (san: string) => void;
+  chessMoveHistoryDisplay: { sanMove: string, battleSuccess: boolean | null }[]
 }
 
-const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBattle, board, onMove }: ChessManagerProps) => {
+const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBattle, board, onMove, chessMoveHistoryDisplay }: ChessManagerProps) => {
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
@@ -127,7 +128,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
           currentBattle={currentBattle}
         />
         <PokemonChessDetailsCard
-          chessMoveHistory={chessManager.history({ verbose: true })}
+          chessMoveHistory={chessMoveHistoryDisplay}
           pokemon={
             hoveredPokemon ||
             pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn

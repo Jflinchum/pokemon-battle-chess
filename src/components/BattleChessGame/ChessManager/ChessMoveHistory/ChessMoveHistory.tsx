@@ -1,24 +1,23 @@
-import { Move } from "chess.js";
 import './ChessMoveHistory.css';
 import { useEffect, useRef } from "react";
 
-const ChessMoveHistoryItem = ({ turn, whiteMove, blackMove }: { turn: number; whiteMove?: Move; blackMove?: Move }) => {
+const ChessMoveHistoryItem = ({ turn, whiteMove, blackMove }: { turn: number; whiteMove?: { sanMove: string; battleSuccess: boolean | null }; blackMove?: { sanMove: string; battleSuccess: boolean | null } }) => {
   return (
     <li>
       <span className='moveHistoryTurnLabel'>
         {turn}.
       </span>
-      <span className='moveHistoryMoveLabel'>
-        {whiteMove?.san}
+      <span className={`moveHistoryMoveLabel ${whiteMove?.battleSuccess === false ? 'moveHistoryFail' : whiteMove?.battleSuccess === true ? 'moveHistoryWin' : ''}`}>
+        {whiteMove?.sanMove}
       </span>
-      <span className='moveHistoryMoveLabel'>
-        {blackMove?.san}
+      <span className={`moveHistoryMoveLabel ${blackMove?.battleSuccess === false ? 'moveHistoryFail' : blackMove?.battleSuccess === true ? 'moveHistoryWin' : ''}`}>
+        {blackMove?.sanMove}
       </span>
     </li>
   )
 };
 
-const ChessMoveHistory = ({ chessMoveHistory }: { chessMoveHistory?: Move[] }) => {
+const ChessMoveHistory = ({ chessMoveHistory }: { chessMoveHistory: { sanMove: string, battleSuccess: boolean | null }[] }) => {
   const containerRef = useRef<HTMLUListElement>(null);
   useEffect(() => {
     const element = containerRef.current;

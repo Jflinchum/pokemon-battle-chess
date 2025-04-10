@@ -49,6 +49,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   const [isDrafting, setIsDrafting] = useState<boolean>(gameState.gameSettings.options.format === 'draft');
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
+  const [chessMoveHistoryDisplay, setChessMoveHistoryDisplay] = useState<{ sanMove: string, battleSuccess: boolean | null }[]>([]);
 
   const { currentPokemonMoveHistory, catchingUp } = useBattleHistory({
     matchHistory,
@@ -93,11 +94,14 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
 
       const { fromSquare, toSquare, capturedPieceSquare, promotion } = currentBattle.attemptedMove;
 
+      const verboseChessMove = getVerboseChessMove(fromSquare, toSquare, chessManager)!;
+
       // TODO: Better logic handling this
-      const moveSucceeds = getVerboseChessMove(fromSquare, toSquare, chessManager)?.color === gameState.gameSettings?.color ?
+      const moveSucceeds = verboseChessMove?.color === gameState.gameSettings?.color ?
         player1?.playerName === victor :
         player2?.playerName === victor;
       if (moveSucceeds) {
+        setChessMoveHistoryDisplay((curr) => [...curr, { sanMove: verboseChessMove.san, battleSuccess: true }]);
         const lostPiece = chessManager.get(toSquare);
         pokemonManager.getPokemonFromSquare(capturedPieceSquare)!.square = null;
         chessManager.move({ from: fromSquare, to: toSquare, promotion }, { continueOnCheck: true });
@@ -108,6 +112,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
           socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
         }
       } else {
+        setChessMoveHistoryDisplay((curr) => [...curr, { sanMove: verboseChessMove.san, battleSuccess: false }]);
         const lostPiece = chessManager.get(fromSquare);
         pokemonManager.getPokemonFromSquare(fromSquare)!.square = null;
         const tempPiece = chessManager.get(capturedPieceSquare || toSquare);
@@ -163,6 +168,9 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
 
     if (fromCastledRookSquare && toCastledRookSquare) {
       pokemonManager.movePokemonToSquare(fromCastledRookSquare, toCastledRookSquare);
+    }
+    if (!pokemonBattleInitiated) {
+      setChessMoveHistoryDisplay((curr) => [...curr, { sanMove, battleSuccess: null }]);
     }
 
     setMostRecentMove({ from: fromSquare, to: toSquare });
@@ -223,6 +231,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
               pokemonManager={pokemonManager}
               mostRecentMove={mostRecentMove}
               currentBattle={currentBattle}
+              chessMoveHistoryDisplay={chessMoveHistoryDisplay}
               board={board}
               onMove={(san) => {
                 if (thisPlayer?.isSpectator) {
