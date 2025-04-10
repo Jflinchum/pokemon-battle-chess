@@ -96,7 +96,6 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       console.log('request sync received ' + roomId + ' ' + playerId);
       const room = gameRoomManager.getRoom(roomId);
       if (!room) {
-        console.log('no room detected');
         return socket.disconnect();
       }
 

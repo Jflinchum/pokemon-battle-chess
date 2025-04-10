@@ -31,6 +31,7 @@ const MenuOptions = () => {
 
   return (
     <div>
+      {open && <div className='menuBackdrop' onClick={() => setOpen(false)}/>}
       <div className='menuMobileNav'>
         <button onClick={() => setOpen(!open)} className='menuMobileButton'>
           <span>
@@ -55,31 +56,31 @@ const MenuOptions = () => {
           </li>
           <li className='menuOptionButtonContainer'>
             <button className='menuOptionButton' onClick={() => {}}>
-              <FontAwesomeIcon size='2x' icon={faChessKing}/>
+              <FontAwesomeIcon icon={faChessKing}/>
               <span>Find Match (todo)</span>
             </button>
           </li>
           <li className='menuOptionButtonContainer'>
             <button className="menuOptionButton" onClick={handleCreateRoom}>
-              <FontAwesomeIcon size='2x' icon={faDoorOpen} />
+              <FontAwesomeIcon icon={faDoorOpen} />
               <span>Create New Room</span>
             </button>
           </li>
           <li className='menuOptionButtonContainer'>
             <button className="menuOptionButton" onClick={handleChangeName}>
-              <FontAwesomeIcon size='2x' icon={faPencil}/>
+              <FontAwesomeIcon icon={faPencil}/>
               <span>Change Name</span>
             </button>
           </li>
           <li className='menuOptionButtonContainer'>
             <button className="menuOptionButton" onClick={handleChangeAvatar}>
-              <FontAwesomeIcon size='2x' icon={faFaceGrin} />
+              <FontAwesomeIcon icon={faFaceGrin} />
               <span>Change Avatar</span>
             </button>
           </li>
           <li className='menuOptionButtonContainer'>
             <button className="menuOptionButton" onClick={handleHowToPlay}>
-              <FontAwesomeIcon size='2x' icon={faNoteSticky}/>
+              <FontAwesomeIcon icon={faNoteSticky}/>
               <span>How to play</span>
             </button>
           </li>

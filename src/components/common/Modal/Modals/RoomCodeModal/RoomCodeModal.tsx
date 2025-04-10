@@ -30,6 +30,10 @@ const RoomCodeModal = () => {
     dispatch({ type: 'CLOSE_MODAL' });
   }
 
+  const handleCancelClick = () => {
+    dispatch({ type:'CLOSE_MODAL' });
+  }
+
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -38,9 +42,12 @@ const RoomCodeModal = () => {
     <div className='roomCodeModalContainer'>
       <h2 className='roomCodeTitle'>Enter Room Code</h2>
       <ErrorMessage display='block'>{errorText}</ErrorMessage>
-      <form onSubmit={handleJoinRoom} className='roomCodeActions'>
+      <form onSubmit={handleJoinRoom} className='roomCodeForm'>
         <PasscodeInput label="Room Code" onFocus={() => errorText === 'Invalid Password' && setErrorText('')} ref={inputRef}/>
-        <Button type='submit' color='primary'>Submit</Button>
+        <div className='roomCodeActions'>
+          <Button onClick={handleCancelClick}>Cancel</Button>
+          <Button type='submit' color='primary'>Submit</Button>
+        </div>
       </form>
     </div>
   )

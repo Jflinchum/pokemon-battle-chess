@@ -6,8 +6,13 @@
   margin-top: 0;
 }
 
-.roomCodeActions {
+.roomCodeForm {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.roomCodeActions {
+  display: flex;
+  justify-content: space-between;
 }

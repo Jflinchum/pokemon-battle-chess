@@ -26,6 +26,7 @@
     "@pkmn/view": "^0.6.32",
     "@socket.io/admin-ui": "^0.5.1",
     "@types/node": "^22.13.13",
+    "bcryptjs": "^3.0.2",
     "chess.js": "^1.1.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",

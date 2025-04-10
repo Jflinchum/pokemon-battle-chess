@@ -18,12 +18,12 @@ Battle Animation when pieces attack
 
 Disable support pokemon from team generation
 Room Options
- - Open and closed team sheets
  - Preserve damage after battle
  - (maybe) Preserve item usage after battle
  - Custom Teams
  - Weather on random chess spaces
  - Checkmate isn't the win condition, taking the king is
+    - Patch chess.js to include function to ignore check
  - (maybe) Change pokemon on piece promotion
  - Level Up Progression
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
@@ -38,8 +38,6 @@ Priority:
   - Global chat?
 - Return to room button
 - Host controls
-- Rejoining
-- Fun background and logo?
 - Robots.txt disable search engine crawling
 - Curate pokemon sets
 - Create room closes previous room
@@ -48,6 +46,10 @@ Issues:
 - Skip ahead button does not work when in pokemon battle
 - Player disconnecting at end game modal clears their name
 - OG/Twitter meta tags do not support svg
+
+Style issues:
+- (Potentially fixed) Disable dark mode from browser settting
+- Scale the chessboard based on height as well as width
 
 Filter out moves:
 - Sticky webs
