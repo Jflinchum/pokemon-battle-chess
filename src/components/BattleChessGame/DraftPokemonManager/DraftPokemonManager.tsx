@@ -24,7 +24,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
   const { gameState } = useGameState();
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
-  const [draftPokemonSelected, setDraftPokemonSelected] = useState<number | null>(null);
+  const [draftPokemonSelected, setDraftPokemonSelected] = useState<number | null>(0);
 
   const cancelSelection = () => {
     setSelectedSquare(null);

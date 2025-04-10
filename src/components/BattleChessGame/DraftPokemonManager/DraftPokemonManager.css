@@ -5,6 +5,7 @@
 
   @media (min-width: 1450px) {
     flex-direction: row-reverse;
+    justify-content: center;
   }
 }
 

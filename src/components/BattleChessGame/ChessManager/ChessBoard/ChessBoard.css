@@ -1,3 +1,23 @@
 .chessRow {
   display: flex;
+
+  &:nth-child(1) {
+    .chessSquare:nth-child(1) {
+      border-top-left-radius: 10px;
+    }
+
+    .chessSquare:nth-last-child(1) {
+      @media (max-width: 799px) {
+        border-top-right-radius: 10px;
+      }
+    }
+  }
+
+  &:nth-last-child(1) {
+    .chessSquare:nth-child(1) {
+      @media (min-width: 800px) {
+        border-bottom-left-radius: 10px;
+      }
+    }
+  }
 }

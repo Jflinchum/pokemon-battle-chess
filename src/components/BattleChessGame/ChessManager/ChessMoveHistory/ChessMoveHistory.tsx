@@ -31,7 +31,7 @@ const ChessMoveHistory = ({ chessMoveHistory }: { chessMoveHistory?: Move[] }) =
   if (chessMoveHistory) {
     for (let i = 0; i < (chessMoveHistory.length || 0); i += 2) {
       moveListItem.push(
-        <ChessMoveHistoryItem turn={Math.floor(i/2) + 1} whiteMove={chessMoveHistory[i]} blackMove={i + 1 < chessMoveHistory.length ? chessMoveHistory[i + 1] : undefined} />
+        <ChessMoveHistoryItem key={i} turn={Math.floor(i/2) + 1} whiteMove={chessMoveHistory[i]} blackMove={i + 1 < chessMoveHistory.length ? chessMoveHistory[i + 1] : undefined} />
       )
     }
   }

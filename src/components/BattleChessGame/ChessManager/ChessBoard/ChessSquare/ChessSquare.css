@@ -26,12 +26,12 @@
 
 .whiteChessSquare {
   color: black;
-  background-color: white;
+  background-color: #c7c7c7;
 }
 
 .blackChessSquare {
   color: white;
-  background-color: black;
+  background-color: #707070;
 }
 
 .highlighted {
