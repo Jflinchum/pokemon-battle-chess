@@ -192,7 +192,6 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
    */
   return (
     <div className='battleChessContainer'>
-      <h3 className='mainMenuHeader'>Pokemon Chess Arena</h3>
       <PlayerInGameDisplay player={color === 'w' ? blackPlayer : whitePlayer} takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}/>
       <div style={{ display: catchingUp && skipToEndOfSync ? 'none' : 'block' }}>
         {

@@ -1,7 +1,14 @@
 .chatToggleContainer {
-  position: absolute;
+  position: fixed;
+  top: 100%;
+  right: 0;
   width: 100%;
   transition: transform 0.2s ease-in-out;
+  z-index: 100;
+
+  @media (min-width: 600px) {
+    width: 40%;
+  }
 }
 
 .chatToggleButton {
@@ -23,7 +30,12 @@
 }
 
 .chatOpen {
-  transform: translateY(-85%);
+  transform: translateY(-100%);
+}
+
+.chatClosed {
+  /* Height of button */
+  transform: translateY(-70px);
 }
 
 .chatToggleNewMessageNum {

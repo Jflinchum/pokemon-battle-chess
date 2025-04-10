@@ -1,20 +1,18 @@
-.gameManagerBottomActions {
+.gameManagerContainer {
   display: flex;
   flex-direction: row;
-  position: fixed;
-  bottom: 0;
   height: 70px;
   width: 100%;
   background-color: rgb(70, 70, 70);
 }
 
-.gameManagerLeaveRoom {
-  display: block;
-  margin: 10px 20px;
+.gameManagerHeader {
+  text-align: left;
+  display: inline-block;
+  margin: auto 0 auto 12px;
 }
 
-.gameManagerChatContainer {
-  position: relative;
-  margin-left: auto;
-  width: 400px;
+.gameManagerLeaveRoom {
+  display: inline-block;
+  margin: 10px 12px 10px auto;
 }

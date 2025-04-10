@@ -1,11 +1,8 @@
-import { useGameState } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import Button from "../../common/Button/Button";
-import ChatToggle from "./ChatToggle/ChatToggle";
 import './GameManagerActions.css';
 
 const GameManagerActions = () => {
-  const { gameState } = useGameState();
   const { dispatch } = useUserState();
 
   const handleLeaveRoom = () => {
@@ -13,15 +10,9 @@ const GameManagerActions = () => {
   };
 
   return (
-    <div className='gameManagerBottomActions'>
-      {
-        gameState.matchStarted && (
-          <Button className='gameManagerLeaveRoom' color='danger' onClick={() => handleLeaveRoom()}>Return to Main Menu</Button>
-        )
-      }
-      <div className='gameManagerChatContainer'>
-        <ChatToggle className='chatToggleAction' />
-      </div>
+    <div className='gameManagerContainer'>
+      <h3 className='gameManagerHeader'>Pokemon Chess Arena</h3>
+      <Button className='gameManagerLeaveRoom' color='danger' onClick={() => handleLeaveRoom()}>Return to Main Menu</Button>
     </div>
   )
 };

@@ -30,7 +30,7 @@ const ChatToggle = ({ className }: ChatToggleProps) => {
   }, [open]);
 
   return (
-    <div className={`chatToggleContainer ${open ? 'chatOpen' : ''} ${className}`}>
+    <div className={`chatToggleContainer ${open ? 'chatOpen' : 'chatClosed'} ${className}`}>
       <button onClick={() => setOpen(!open)} className={'chatToggleButton'}>
         <span>
           <FontAwesomeIcon icon={open ? faCaretDown : faCaretUp}/> Chat

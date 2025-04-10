@@ -5,6 +5,7 @@ import { useUserState } from "../../context/UserStateContext";
 import { socket } from "../../socket";
 import Room, { Player } from "./Room/Room";
 import GameManagerActions from "./GameManagerActions/GameManagerActions";
+import ChatToggle from "./GameManagerActions/ChatToggle/ChatToggle";
 import './RoomManager.css';
 
 export interface MatchHistory {
@@ -67,6 +68,7 @@ const RoomManager = () => {
 
   return (
     <>
+      <GameManagerActions />
       <div className='roomManagerContainer'>
         {
           gameState.matchStarted ?
@@ -74,7 +76,7 @@ const RoomManager = () => {
           (<Room />)
         }
       </div>
-      <GameManagerActions />
+      <ChatToggle className='chatToggleAction' />
     </>
   );
 };

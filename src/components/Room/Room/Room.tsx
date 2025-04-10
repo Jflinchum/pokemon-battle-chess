@@ -25,7 +25,7 @@ export interface Player {
 }
 
 const Room = () => {
-  const { userState, dispatch: dispatchUserState } = useUserState();
+  const { userState } = useUserState();
   const { gameState, dispatch } = useGameState();
   const [gameOptions, setGameOptions] = useState<GameOptions>(gameState.gameSettings.options);
   const connectedPlayers = useMemo(() => gameState.players, [gameState.players]);
@@ -60,10 +60,6 @@ const Room = () => {
     e.preventDefault();
     socket.emit('requestStartGame', userState.currentRoomId, userState.id);
   }
-
-  const handleLeaveGame = () => {
-    dispatchUserState({ type: 'LEAVE_ROOM' });
-  }
   
   const handleToggleSpectating = () => {
     socket.emit('requestToggleSpectating', userState.currentRoomId, userState.id);
@@ -90,8 +86,6 @@ const Room = () => {
 
   return (
     <>
-      <h1 className='mainMenuHeader'>Pokemon Chess Arena</h1>
-
       <div className='roomContainer'>
         <AnimatedBackground />
         <div className="roomPlayerContainer">
@@ -110,7 +104,6 @@ const Room = () => {
                 'Move to Spectators'
               }
             </Button>
-            <Button onClick={handleLeaveGame}>Leave Game</Button>
           </div>
 
           <div className='playerContainer'>

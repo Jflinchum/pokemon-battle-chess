@@ -1,11 +1,11 @@
 .chatDisplayContainer {
   display: flex;
   flex-direction: column;
-  height: 400px;
   border-top: 3px solid rgb(50, 50, 50);
   border-left: 3px solid rgb(50, 50, 50);
   background-color: #eeeeee;
   color: black;
+  height: 30vh;
 }
 
 .chatLogActions {
