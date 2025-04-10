@@ -4,9 +4,11 @@ import './Tooltip.css';
 const Tooltip = ({ children, className = '', ...props }: ITooltip) => {
 
   return (
-    <ReactTooltip {...props} className={`tooltip ${className}`}>
-      {children}
-    </ReactTooltip>
+    <span className='tooltipContainer'>
+      <ReactTooltip {...props} className={`tooltip ${className}`}>
+        {children}
+      </ReactTooltip>
+    </span>
   );
 }
 
