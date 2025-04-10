@@ -4,6 +4,7 @@ import { useUserState } from '../../context/UserStateContext';
 import './MainMenu.css';
 import { useEffect } from 'react';
 import { useModalState } from '../../context/ModalStateContext';
+import ErrorBoundary from '../common/ErrorBoundary/ErrorBoundary';
 
 const MainMenu = () => {
   const { userState } = useUserState();
@@ -15,14 +16,15 @@ const MainMenu = () => {
       return;
     }
   }, [])
+
   return (
-    <>
+    <ErrorBoundary>
       {
         userState.currentRoomId ?
         (<RoomManager />) :
         (<LobbyManager />)
       }
-    </>
+    </ErrorBoundary>
   );
 }
 

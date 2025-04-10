@@ -24,14 +24,13 @@ Room Options
 Priority:
 - Show ability/item descriptions on hover
 - Ban timer and random ban if failing the timer
-- Error boundary
 - Show whether chess move succeeded or failed in move history
 - Chat room works between multiple rooms
   - Global chat?
 - Host controls
 - Robots.txt disable search engine crawling
 - Curate pokemon sets
-- Create room closes previous room
+- (better) Error boundary
 
 Issues:
 - Player disconnecting at end game modal clears their name

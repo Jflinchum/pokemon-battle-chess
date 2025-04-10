@@ -186,7 +186,6 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
     setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
   }
 
-
   /**
    * Rendering the three different states of the game
    * - Draft/ban phase
@@ -195,7 +194,10 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
    */
   return (
     <div className='battleChessContainer'>
-      <PlayerInGameDisplay player={color === 'w' ? blackPlayer : whitePlayer} takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}/>
+      <PlayerInGameDisplay
+        player={color === 'w' ? blackPlayer : whitePlayer}
+        takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}
+      />
       <div style={{ display: catchingUp && gameState.isSkippingAhead ? 'none' : 'block' }}>
         {
           battleStarted && currentBattle &&
@@ -264,7 +266,10 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
           </div>
         )
       }
-      <PlayerInGameDisplay player={color === 'w' ? whitePlayer : blackPlayer} takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}/>
+      <PlayerInGameDisplay
+        player={color === 'w' ? whitePlayer : blackPlayer}
+        takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
+      />
     </div>
   )
 }

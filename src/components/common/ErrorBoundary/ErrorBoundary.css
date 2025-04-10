@@ -1,0 +1,10 @@
+.errorBoundaryContainer {
+  margin: 80px auto;
+  width: 300px;
+  text-align: center;
+
+  img {
+    max-width: 300px;
+    max-height: 300px;
+  }
+}
