@@ -15,6 +15,7 @@ import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
 import { SideID } from '@pkmn/data';
 import { MatchHistory } from '../../Room/RoomManager';
 import useBattleHistory from './useBattleHistory';
+import Spinner from '../../common/Spinner/Spinner';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;
@@ -26,7 +27,7 @@ export interface CurrentBattle {
 function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   const { userState } = useUserState();
   const { dispatch: modalStateDispatch } = useModalState();
-  const { gameState } = useGameState();
+  const { gameState, dispatch } = useGameState();
 
   const player1 = useMemo(() => gameState.players.find((player) => player.isPlayer1), [gameState.players]);
   const player2 = useMemo(() => gameState.players.find((player) => player.isPlayer2), [gameState.players]);
@@ -49,8 +50,6 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
 
-  const [skipToEndOfSync, setSkipToEndOfSync] = useState(false);
-
   const { currentPokemonMoveHistory, catchingUp } = useBattleHistory({
     matchHistory,
     currentBattle,
@@ -65,14 +64,18 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
     onMove: (sanMove) => {
       return handleAttemptMove({ sanMove });
     },
-    skipToEndOfSync,
+    skipToEndOfSync: gameState.isSkippingAhead,
   });
 
   useEffect(() => {
-    if (!catchingUp && skipToEndOfSync) {
-      setSkipToEndOfSync(false);
+    if (!catchingUp && gameState.isSkippingAhead) {
+      dispatch({ type: 'SET_SKIPPING_AHEAD', payload: false });
     }
-  }, [catchingUp, skipToEndOfSync]);
+  }, [catchingUp]);
+
+  useEffect(() => {
+    dispatch({ type: 'SET_CATCHING_UP', payload: catchingUp });
+  }, [catchingUp]);
 
   /**
    * Action handlers for all the game events that change the higher level state.
@@ -86,7 +89,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
       setBattleStarted(false);
       setTimeout(() => {
         setCurrentBattle(null);
-      }, 2000 * (skipToEndOfSync ? 0 : 1));
+      }, 2000 * (gameState.isSkippingAhead ? 0 : 1));
 
       const { fromSquare, toSquare, capturedPieceSquare, promotion } = currentBattle.attemptedMove;
 
@@ -145,7 +148,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
 
       setTimeout(() => {
         setBattleStarted(true);
-      }, 2000 * (skipToEndOfSync ? 0 : 1));
+      }, 2000 * (gameState.isSkippingAhead ? 0 : 1));
       pokemonBattleInitiated = true;
     } else {
       chessManager.move({ from: fromSquare, to: toSquare, promotion });
@@ -193,7 +196,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   return (
     <div className='battleChessContainer'>
       <PlayerInGameDisplay player={color === 'w' ? blackPlayer : whitePlayer} takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}/>
-      <div style={{ display: catchingUp && skipToEndOfSync ? 'none' : 'block' }}>
+      <div style={{ display: catchingUp && gameState.isSkippingAhead ? 'none' : 'block' }}>
         {
           battleStarted && currentBattle &&
           (
@@ -205,7 +208,6 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
               onVictory={handleVictory}
               pokemonAdvantage={[{ side: currentBattle.offensivePlayer, boost: gameState.gameSettings.options.offenseAdvantage }]}
               currentPokemonMoveHistory={currentPokemonMoveHistory}
-              skipToEndOfSync={skipToEndOfSync}
             />
           )
         }
@@ -255,17 +257,11 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
         }
       </div>
       {
-        catchingUp && skipToEndOfSync && (
-          <div>
+        gameState.isCatchingUp && gameState.isSkippingAhead && (
+          <div className='skipSpinnerContainer'>
+            <Spinner />
             Skipping ahead...
           </div>
-        )
-      }
-      {
-        catchingUp && !skipToEndOfSync && (
-          <button onClick={() => setSkipToEndOfSync(true)}>
-            Skip ahead...
-          </button>
         )
       }
       <PlayerInGameDisplay player={color === 'w' ? whitePlayer : blackPlayer} takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}/>

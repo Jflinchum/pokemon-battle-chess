@@ -12,7 +12,8 @@
   margin: auto 0 auto 12px;
 }
 
-.gameManagerLeaveRoom {
-  display: inline-block;
+.gameManagerRightActions {
+  display: flex;
+  gap: 20px;
   margin: 10px 12px 10px auto;
 }

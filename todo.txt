@@ -8,13 +8,6 @@ Host controls
   - Kick player
   - Promote to host
 Pre-move chess pieces
-Rejoining a game in progress
-  - Would have to track history of game and send it back to client
-  - Could also store state of game clientside?
-    - Current board state
-    - Current pokemon battle state
-      - ^ May be tricky. Could do history of commands for this one
-Battle Animation when pieces attack
 
 Disable support pokemon from team generation
 Room Options
@@ -41,7 +34,6 @@ Priority:
 - Create room closes previous room
 
 Issues:
-- Skip ahead button does not work when in pokemon battle
 - Player disconnecting at end game modal clears their name
 - OG/Twitter meta tags do not support svg
 

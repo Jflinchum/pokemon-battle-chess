@@ -20,6 +20,8 @@ interface GameSettings {
 
 interface GameState {
   matchStarted: boolean;
+  isSkippingAhead: boolean;
+  isCatchingUp: boolean;
   isHost: boolean;
   players: Player[];
   gameSettings: GameSettings;
@@ -34,6 +36,8 @@ type GameStateAction =
   { type: 'RESET_ROOM'; }
   | { type: 'CREATE_ROOM'; }
   | { type: 'SET_HOST'; payload: boolean }
+  | { type: 'SET_SKIPPING_AHEAD'; payload: boolean }
+  | { type: 'SET_CATCHING_UP'; payload: boolean }
   | { type: 'SET_PLAYERS'; payload: Player[]; }
   | { type: 'RETURN_TO_ROOM'; }
   | { type: 'START_MATCH'; payload: GameSettings; };
@@ -44,6 +48,8 @@ const getInitialGameState = (): GameState => (
   {
     matchStarted: false,
     isHost: false,
+    isSkippingAhead: false,
+    isCatchingUp: false,
     players: [],
     gameSettings: {
       options: getGameOptions()
@@ -61,6 +67,10 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
       return { ...gameState, players: action.payload };
     case 'SET_HOST': 
       return { ...gameState, isHost: action.payload };
+    case 'SET_SKIPPING_AHEAD':
+      return { ...gameState, isSkippingAhead: action.payload };
+    case 'SET_CATCHING_UP':
+      return { ...gameState, isCatchingUp: action.payload };
     case 'START_MATCH':
       return { ...gameState, matchStarted: true, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color, options: action.payload.options } };
     case 'RETURN_TO_ROOM':
