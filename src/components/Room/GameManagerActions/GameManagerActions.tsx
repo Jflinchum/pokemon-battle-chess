@@ -1,14 +1,20 @@
 import { useGameState } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import Button from "../../common/Button/Button";
+import { socket } from "../../../socket";
 import './GameManagerActions.css';
 
 const GameManagerActions = () => {
-  const { dispatch } = useUserState();
+  const { userState, dispatch } = useUserState();
   const { gameState, dispatch: dispatchGameState } = useGameState();
 
   const handleLeaveRoom = () => {
     dispatch({ type: 'LEAVE_ROOM' });
+  };
+
+  const handleReturn = () => {
+    dispatchGameState({ type: 'RETURN_TO_ROOM' });
+    socket.emit('setViewingResults', userState.currentRoomId, userState.id, false);
   };
 
   return (
@@ -23,6 +29,9 @@ const GameManagerActions = () => {
           )
         }
         <Button color='danger' onClick={() => handleLeaveRoom()}>Return to Main Menu</Button>
+        {
+          gameState.inGame && gameState.matchEnded && (<Button color='primary' onClick={handleReturn}>Return to Room</Button>)
+        }
       </div>
     </div>
   )

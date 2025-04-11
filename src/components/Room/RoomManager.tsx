@@ -71,7 +71,7 @@ const RoomManager = () => {
       <GameManagerActions />
       <div className='roomManagerContainer'>
         {
-          gameState.matchStarted ?
+          gameState.inGame ?
           (<BattleChessManager matchHistory={matchHistory} />) :
           (<Room />)
         }

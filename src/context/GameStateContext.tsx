@@ -19,7 +19,8 @@ interface GameSettings {
 }
 
 interface GameState {
-  matchStarted: boolean;
+  inGame: boolean;
+  matchEnded: boolean;
   isSkippingAhead: boolean;
   isCatchingUp: boolean;
   isHost: boolean;
@@ -40,13 +41,15 @@ type GameStateAction =
   | { type: 'SET_CATCHING_UP'; payload: boolean }
   | { type: 'SET_PLAYERS'; payload: Player[]; }
   | { type: 'RETURN_TO_ROOM'; }
+  | { type: 'END_MATCH'; }
   | { type: 'START_MATCH'; payload: GameSettings; };
 
 export const GameStateContext = createContext<GameStateType | null>(null);
 
 const getInitialGameState = (): GameState => (
   {
-    matchStarted: false,
+    inGame: false,
+    matchEnded: false,
     isHost: false,
     isSkippingAhead: false,
     isCatchingUp: false,
@@ -62,7 +65,7 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
     case 'RESET_ROOM':
       return getInitialGameState();
     case 'CREATE_ROOM':
-      return { ...gameState, isHost: true };
+      return { ...gameState, isHost: true, matchEnded: false };
     case 'SET_PLAYERS':
       return { ...gameState, players: action.payload };
     case 'SET_HOST': 
@@ -71,10 +74,12 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
       return { ...gameState, isSkippingAhead: action.payload };
     case 'SET_CATCHING_UP':
       return { ...gameState, isCatchingUp: action.payload };
+    case 'END_MATCH':
+      return { ...gameState, matchEnded: true };
     case 'START_MATCH':
-      return { ...gameState, matchStarted: true, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color, options: action.payload.options } };
+      return { ...gameState, inGame: true, matchEnded: false, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color, options: action.payload.options } };
     case 'RETURN_TO_ROOM':
-      return { ...gameState, matchStarted: false };
+      return { ...gameState, inGame: false };
     default:
       return gameState;
   }

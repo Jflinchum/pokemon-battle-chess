@@ -31,6 +31,7 @@ Priority:
 Issues:
 - Need to reset move history on reset room
 - Player disconnecting at end game modal clears their name
+- Joining a room should clear viewing results status
 - OG/Twitter meta tags do not support svg
 
 Style issues:

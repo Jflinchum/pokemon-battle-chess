@@ -110,6 +110,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
         if (lostPiece?.type === 'k') {
           modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: lostPiece.color === 'w' ? 'b' : 'w' } }});
           socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
+          dispatch({ type: 'END_MATCH' });
         }
       } else {
         setChessMoveHistoryDisplay((curr) => [...curr, { sanMove: verboseChessMove.san, battleSuccess: false }]);
@@ -123,6 +124,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
         if (lostPiece?.type === 'k') {
           modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: lostPiece.color === 'w' ? 'b' : 'w' } }});
           socket.emit('setViewingResults', userState.currentRoomId, userState.id, true);
+          dispatch({ type: 'END_MATCH' });
         }
       }
       setBoard(chessManager.board());

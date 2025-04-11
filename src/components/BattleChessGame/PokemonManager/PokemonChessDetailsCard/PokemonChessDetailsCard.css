@@ -61,15 +61,15 @@
   }
 }
 
+.pokemonDetailsSpriteContainer {
+  height: 100px;
+}
+
 .pokemonDetailsSprite {
   display: block;
   margin: auto;
-  min-height: 100px;
-
-  @media (min-width: 600px) {
-    max-width: 70px;
-    max-height: 70px;
-  }
+  max-width: 70px;
+  max-height: 70px;
 
   @media (min-width: 800px) {
     max-width: 100px;

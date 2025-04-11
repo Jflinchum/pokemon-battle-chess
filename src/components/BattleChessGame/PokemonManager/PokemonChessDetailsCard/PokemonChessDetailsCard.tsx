@@ -32,7 +32,9 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory }: PokemonChessDeta
                 }
               </p>
               <div className='pokemonDetailsCard'>
-                <img className='pokemonDetailsSprite' src={Sprites.getPokemon(speciesOverride(pokemon.species), { gender: pokemon.gender as GenderName }).url}/>
+                <div className='pokemonDetailsSpriteContainer'>
+                  <img className='pokemonDetailsSprite' src={Sprites.getPokemon(speciesOverride(pokemon.species), { gender: pokemon.gender as GenderName }).url}/>
+                </div>
                 <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
                 <ul>
                   <li>
