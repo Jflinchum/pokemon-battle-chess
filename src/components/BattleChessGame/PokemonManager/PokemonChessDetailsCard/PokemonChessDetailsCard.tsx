@@ -11,10 +11,10 @@ import Tooltip from '../../../common/Tooltip/Tooltip';
 
 interface PokemonChessDetailsCardProps {
   pokemon?: PokemonSet | null;
-  chessMoveHistory: { sanMove: string, battleSuccess: boolean | null }[];
+  chessMoveHistory?: { sanMove: string, battleSuccess: boolean | null }[];
 }
 
-const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory }: PokemonChessDetailsCardProps) => {
+const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [] }: PokemonChessDetailsCardProps) => {
 
   return (
     <div className='pokemonDetailsContainer'>

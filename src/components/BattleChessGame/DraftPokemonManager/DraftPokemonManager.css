@@ -1,12 +1,27 @@
 .draftManagerContainer {
   display: flex;
   flex-direction: column;
-  padding: 12px;
+  margin: 0 auto;
+  width: 90%;
+
+  @media (orientation: landscape) {
+    width: 60vh;
+
+    @media (min-width: 800px) {
+      width: 90%;
+    }
+  }
 
   @media (min-width: 1450px) {
     flex-direction: row-reverse;
     justify-content: center;
   }
+}
+
+.draftActions {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .draftGameContainer {

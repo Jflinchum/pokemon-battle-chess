@@ -66,7 +66,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
           }
         />
       </div>
-      <div>
+      <div className='draftActions'>
         <div className='draftNotification'>
           {
             draftTurnPick === gameState.gameSettings.color ?
