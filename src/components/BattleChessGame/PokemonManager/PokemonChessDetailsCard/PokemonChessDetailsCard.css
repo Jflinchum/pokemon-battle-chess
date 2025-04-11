@@ -64,8 +64,7 @@
 .pokemonDetailsSprite {
   display: block;
   margin: auto;
-  max-width: 50px;
-  max-height: 50px;
+  min-height: 100px;
 
   @media (min-width: 600px) {
     max-width: 70px;
@@ -81,4 +80,10 @@
 .pokemonDetailsTyping {
   max-width: 100px;
   margin-right: 8px;
+}
+
+.pokemonDetailsItemContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }

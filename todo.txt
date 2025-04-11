@@ -11,20 +11,18 @@ Pre-move chess pieces
 
 Disable support pokemon from team generation
 Room Options
+ - Weather on random chess spaces
  - Preserve damage after battle
  - (maybe) Preserve item usage after battle
  - Custom Teams
- - Weather on random chess spaces
  - (maybe) Change pokemon on piece promotion
  - Level Up Progression
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Show ability/item descriptions on hover
 - Chat room works between multiple rooms
   - Global chat?
 - Ban timer and random ban if failing the timer
-- Show whether chess move succeeded or failed in move history
 - Host controls
 - Robots.txt disable search engine crawling
 - Curate pokemon sets

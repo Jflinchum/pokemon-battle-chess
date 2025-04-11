@@ -1,12 +1,13 @@
 import { PokemonSet } from '@pkmn/data';
 import { Dex } from '@pkmn/dex';
-import { Sprites } from "@pkmn/img";
+import { Sprites, Icons } from "@pkmn/img";
 import { GenderName } from "@pkmn/data";
 import PokemonMoveChoices from '../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices';
 import { speciesOverride } from '../../ChessManager/util';
 import PokemonType from '../../../common/Pokemon/PokemonType/PokemonType';
-import './PokemonChessDetailsCard.css';
 import ChessMoveHistory from '../../ChessManager/ChessMoveHistory/ChessMoveHistory';
+import './PokemonChessDetailsCard.css';
+import Tooltip from '../../../common/Tooltip/Tooltip';
 
 interface PokemonChessDetailsCardProps {
   pokemon?: PokemonSet | null;
@@ -37,13 +38,24 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory }: PokemonChessDeta
                   <li>
                     <span>
                       <b>Item: </b>
-                      {pokemon.item || 'None'}
+                      <div id={`${pokemon.item.split(' ').join('-')}`} className='pokemonDetailsItemContainer'>
+                        { pokemon.item && <img src={Icons.getItem(pokemon.item).url} style={Icons.getItem(pokemon.item).css} /> }
+                        <span>{pokemon.item || 'None'}</span>
+                        <Tooltip anchorSelect={`#${pokemon.item.split(' ').join('-')}`}>
+                          { Dex.items.get(pokemon.item).shortDesc }
+                        </Tooltip>
+                      </div>
                     </span>
                   </li>
                   <li>
                     <span>
                       <b>Ability: </b>
-                      {pokemon.ability || 'None'}
+                      <div id={`${pokemon.ability.split(' ').join('-')}`}>
+                        <span>{pokemon.ability || 'None'}</span>
+                        <Tooltip anchorSelect={`#${pokemon.ability.split(' ').join('-')}`}>
+                          { Dex.abilities.get(pokemon.ability).shortDesc }
+                        </Tooltip>
+                      </div>
                     </span>
                   </li>
                 </ul>
