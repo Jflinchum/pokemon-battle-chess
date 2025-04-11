@@ -1,5 +1,5 @@
 import * as React from 'react';
-import sadPikachu from '../../../assets/pokemonAssets/sadpikachu.png'
+import sadPikachu from '../../../assets/pokemonAssets/sadPikachu.png';
 import './ErrorBoundary.css';
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
