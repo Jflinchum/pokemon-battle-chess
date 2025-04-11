@@ -16,7 +16,7 @@
 }
 
 .backgroundContainer {
-  position: absolute;
+  position: fixed;
   overflow: hidden;
   height: 100vh;
   width: 100vw;

@@ -20,8 +20,8 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- width/height of chess square percentage based. Min-width/min-height of board based on vw/vh
 - Ban timer and random ban if failing the timer
+  - In order to keep server and client synced on the timer, set a UTC expiration time and send that to the client?
 - Host controls
 - Robots.txt disable search engine crawling (for now)
 - Toast notifications for errors and such
