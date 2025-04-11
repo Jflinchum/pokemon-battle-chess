@@ -10,6 +10,7 @@ import { getVerboseChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 import { PokemonSet } from '@pkmn/data';
+import { useDebounce } from '../../../utils';
 
 interface ChessManagerProps {
   chessManager: Chess;
@@ -77,9 +78,9 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
     }
   };
 
-  const handlePokemonHover = (pkmn?: PokemonSet | null) => {
-    setHoveredPokemon(pkmn); 
-  }
+  const handlePokemonHover = useDebounce((pkmn?: PokemonSet | null) => {
+    setHoveredPokemon(pkmn);
+  }, 100)
 
   const handlePieceDrop = (square: Square) => {
     setRequestedPawnPromotion(null);

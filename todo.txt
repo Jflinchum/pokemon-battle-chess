@@ -20,11 +20,11 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Chat room works between multiple rooms
-  - Global chat?
+- width/height of chess square percentage based. Min-width/min-height of board based on vw/vh
 - Ban timer and random ban if failing the timer
 - Host controls
-- Robots.txt disable search engine crawling
+- Robots.txt disable search engine crawling (for now)
+- Toast notifications for errors and such
 - Curate pokemon sets
 - (better) Error boundary
 
@@ -32,6 +32,7 @@ Issues:
 - Need to reset move history on reset room
 - Player disconnecting at end game modal clears their name
 - Joining a room should clear viewing results status
+- Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
 
 Style issues:
@@ -43,3 +44,9 @@ Filter out moves:
 - Stealth rocks
 - Spikes
 - Toxic Spikes
+
+Dropping features:
+- Global Chat
+  - Don't want to moderate
+  - Increases the websocket connections => more servers
+  - Discord exists, people can make that
