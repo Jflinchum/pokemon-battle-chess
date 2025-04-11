@@ -95,7 +95,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
   }
 
   return (
-    <div>
+    <div className='gameContainer'>
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice
           color={requestedPawnPromotion.color}

@@ -1,5 +1,23 @@
+.chessBoard {
+  @media (orientation: landscape) {
+    width: 60vh;
+    height: 60vh;
+  }
+
+  @media (orientation: portrait) {
+    width: 90vw;
+    height: 90vw;
+  
+    @media (min-width: 800px) {
+      width: 60vw;
+      height: 60vw;
+    }
+  }
+}
+
 .chessRow {
   display: flex;
+  height: 12.5%;
 
   &:nth-child(1) {
     .chessSquare:nth-child(1) {

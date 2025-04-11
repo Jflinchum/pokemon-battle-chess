@@ -1,3 +1,18 @@
+.gameContainer {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+
+  @media (orientation: landscape) {
+    width: 60vh;
+
+    @media (min-width: 800px) {
+      width: 90%;
+    }
+  }
+}
+
 .chessGameContainer {
   display: flex;
   justify-content: center;

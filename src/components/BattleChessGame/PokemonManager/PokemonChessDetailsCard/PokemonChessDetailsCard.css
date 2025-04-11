@@ -1,10 +1,10 @@
 .pokemonDetailsContainer {
   background-color: rgba(125, 125, 125, 0.5);
   backdrop-filter: blur(5px);
-  width: 96vw;
-  max-width: 800px;
   font-size: 10px;
   border-bottom-right-radius: 10px;
+  align-self: stretch;
+  height: 200px;
 
   @media (min-width: 800px) {
     border-top-right-radius: 10px;
@@ -13,7 +13,7 @@
     border-bottom-left-radius: 10px;
   }
 
-  @media (max-width: 599px) {
+  @media (max-width: 599px) or (max-height: 749px) {
     button {
       height: 40px;
       width: 80px;
@@ -29,9 +29,12 @@
   }
 
   @media (min-width: 800px) {
-    max-width: 320px;
+    width: 320px;
     height: inherit;
     align-self: stretch;
+  }
+  
+  @media (min-width: 800px) and (min-height: 750px) {
     font-size: 16px;
   }
 }
@@ -68,8 +71,8 @@
 .pokemonDetailsSprite {
   display: block;
   margin: auto;
-  max-width: 70px;
-  max-height: 70px;
+  max-width: 50px;
+  max-height: 50px;
 
   @media (min-width: 800px) {
     max-width: 100px;

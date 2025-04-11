@@ -39,7 +39,7 @@ const ChessBoard = ({ boardState, onSquareClick, onPokemonHover, onPieceDrag, on
   }
 
   return (
-    <div>
+    <div className='chessBoard'>
     {
       boardColumnPerspective(boardState).map((boardRow, rowIndex) => (
         <div className="chessRow" key={rowIndex}>
