@@ -8,6 +8,15 @@ import { BoostsTable } from "@pkmn/data";
 export interface GameOptions {
   format: FormatID;
   offenseAdvantage: BoostsTable;
+  timersEnabled: boolean,
+  // In seconds
+  banTimerDuration: number;
+  // In minutes
+  chessTimerDuration: number;
+  // In seconds
+  chessTimerIncrement: number;
+  // In seconds
+  pokemonTimerIncrement: number;
 }
 
 export type FormatID = 'random' | 'draft';

@@ -8,6 +8,7 @@ Host controls
   - Kick player
   - Promote to host
 Pre-move chess pieces
+Keyboard navigation and accessibility
 
 Disable support pokemon from team generation
 Room Options
@@ -22,6 +23,7 @@ Room Options
 Priority:
 - Ban timer and random ban if failing the timer
   - In order to keep server and client synced on the timer, set a UTC expiration time and send that to the client?
+  - Need to move pokemon engine over to server in order for this to work
 - Host controls
 - Robots.txt disable search engine crawling (for now)
 - Toast notifications for errors and such
@@ -29,7 +31,6 @@ Priority:
 - (better) Error boundary
 
 Issues:
-- Need to reset move history on reset room
 - Player disconnecting at end game modal clears their name
 - Joining a room should clear viewing results status
 - Chat rooms work between multiple rooms

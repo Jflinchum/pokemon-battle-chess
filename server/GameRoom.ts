@@ -24,6 +24,13 @@ export default class GameRoom {
   private whitePlayerPokemonMove: string | null = null;
   private blackPlayerPokemonMove: string | null = null;
 
+  private whitePlayerTimerExpiration: number;
+  private blackPlayerTimerExpiration: number;
+  private whitePlayerLastMoveTime: number;
+  private blackPlayerLastMoveTime: number;
+  private whitePlayerTimer: NodeJS.Timeout | null;
+  private blackPlayerTimer: NodeJS.Timeout | null;
+
   public chessMoveHistory: string[] = [];
   public banHistory: number[] = [];
   public pokemonAssignments: string[] = [];
@@ -155,11 +162,16 @@ export default class GameRoom {
         atk: 0,
         def: 0,
         spa: 0,
-        spd: 0,
+        spd: 1,
         spe: 0,
         accuracy: 0,
         evasion: 0,
-      }
+      },
+      timersEnabled: options.timersEnabled || true,
+      banTimerDuration: options.banTimerDuration || 15,
+      chessTimerDuration: options.chessTimerDuration || 15,
+      chessTimerIncrement: options.chessTimerIncrement || 5,
+      pokemonTimerIncrement: options.pokemonTimerIncrement || 1,
     };
   }
 
@@ -173,8 +185,8 @@ export default class GameRoom {
 
   public startGame() {
     if (this.hostPlayer && this.player1 && this.player2) {
+      this.resetRoomForRematch();
       this.isOngoing = true;
-      this.roomSeed = PRNG.generateSeed();
       const coinFlip = Math.random() > 0.5;
 
       this.whitePlayer = coinFlip ? this.player1 : this.player2;
@@ -192,22 +204,97 @@ export default class GameRoom {
         for (let i = 0; i < 16; i++) {
           this.pokemonAssignments.push(`w ${i + 16} ${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}`)
         }
+
+        if (this.roomGameOptions.timersEnabled) {
+          this.whitePlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.chessTimerDuration*60*1000;
+          this.whitePlayerLastMoveTime = new Date().getTime();
+          this.blackPlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.chessTimerDuration*60*1000;
+          this.blackPlayerLastMoveTime = new Date().getTime();
+
+          this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+          this.broadcastTimers();
+        }
+      } else {
+        if (this.roomGameOptions.timersEnabled) {
+          this.whitePlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.banTimerDuration*1000;
+          this.whitePlayerLastMoveTime = new Date().getTime();
+          this.blackPlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.banTimerDuration*1000;
+          this.blackPlayerLastMoveTime = new Date().getTime();
+
+          this.startTimer(() => this.randomDraftPick(), 'w');
+          this.broadcastTimers();
+        }
       }
     }
   }
 
+  private endGameDueToTimeout(color) {
+    this.isOngoing = false;
+    this.broadcastAllPlayers('endGameDueToTimeout', color);
+  }
+
+  private randomDraftPick() {
+    let possibleSquares: string[] = [];
+    let playerId;
+    if (this.currentTurnWhite) {
+      playerId = this.whitePlayer.playerId;
+      for (let i = 0; i < 16; i++) {
+        possibleSquares.push(`${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}`);
+      }
+    } else {
+      playerId = this.blackPlayer.playerId;
+      for (let i = 0; i < 16; i++) {
+        possibleSquares.push(`${String.fromCharCode(97 + Math.floor(i % 8))}${8 - Math.floor(i / 8)}`)
+      }
+    }
+    possibleSquares = possibleSquares.filter((square) => !this.pokemonAssignments.some((assigned) => assigned.includes(square)));
+    const randomSquareIndex = Math.floor(Math.random() * possibleSquares.length);
+    const randomPokemonIndex = Math.floor(Math.random() * (38 - this.banHistory.length - this.pokemonAssignments.length));
+
+    this.validateAndEmitPokemonDraft({
+      square: possibleSquares[randomSquareIndex],
+      draftPokemonIndex: randomPokemonIndex,
+      playerId,
+      isBan: this.banHistory.length < 6,
+    });
+  }
+
   public validateAndEmitChessMove({ sanMove, playerId }) {
-    if ((this.currentTurnWhite && this.whitePlayer.playerId === playerId) || (!this.currentTurnWhite && this.blackPlayer.playerId === playerId)) {
-      this.currentTurnWhite = !this.currentTurnWhite;
-      this.chessMoveHistory.push(sanMove);
+    if ((this.currentTurnWhite && this.whitePlayer.playerId !== playerId) || (!this.currentTurnWhite && this.blackPlayer.playerId !== playerId)) {
+      return;
+    }
+    this.chessMoveHistory.push(sanMove);
+    if (sanMove.includes('x')) {
+      this.pokemonBattleHistory.push([]);
+    }
+
+    this.broadcastAllPlayers('startChessMove', { sanMove });
+
+    if (this.roomGameOptions.timersEnabled) {
+      
+      // If sanMove includes an ('x'), start both timers for pokemon battle
       if (sanMove.includes('x')) {
-        this.pokemonBattleHistory.push([]);
+        this.whitePlayerLastMoveTime = new Date().getTime();
+        this.blackPlayerLastMoveTime = new Date().getTime();
+        this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+        this.startTimer(() => this.endGameDueToTimeout('b'), 'b');
+      } else {
+        this.stopTimer(this.currentTurnWhite ? 'w' : 'b');
+        if (this.currentTurnWhite) {
+          this.whitePlayerLastMoveTime = new Date().getTime();
+          this.whitePlayerTimerExpiration += this.roomGameOptions.chessTimerIncrement*1000;
+        } else {
+          this.blackPlayerLastMoveTime = new Date().getTime();
+          this.blackPlayerTimerExpiration += this.roomGameOptions.chessTimerIncrement*1000;
+        }
+
+        this.startTimer(() => this.endGameDueToTimeout(this.currentTurnWhite ? 'b' : 'w'), this.currentTurnWhite ? 'b' : 'w');
       }
 
-      this.whitePlayer.socket?.emit('startChessMove', { sanMove });
-      this.blackPlayer.socket?.emit('startChessMove', { sanMove });
-      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startChessMove', { sanMove }))
+      this.broadcastTimers();
     }
+
+    this.currentTurnWhite = !this.currentTurnWhite;
   }
 
   public resetRoomForRematch() {
@@ -227,14 +314,28 @@ export default class GameRoom {
     if (playerId === this.whitePlayer.playerId) {
       if (isUndo) {
         this.whitePlayerPokemonMove = null;
+        if (this.roomGameOptions.timersEnabled) {
+          this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+        }
       } else {
         this.whitePlayerPokemonMove = pokemonMove;
+        if (this.roomGameOptions.timersEnabled) {
+          this.whitePlayerLastMoveTime = new Date().getTime();
+          this.stopTimer('w');
+        }
       }
     } else if (playerId === this.blackPlayer.playerId) {
       if (isUndo) {
         this.blackPlayerPokemonMove = null;
+        if (this.roomGameOptions.timersEnabled) {
+          this.startTimer(() => this.endGameDueToTimeout('b'), 'b');
+        }
       } else {
         this.blackPlayerPokemonMove = pokemonMove;
+        if (this.roomGameOptions.timersEnabled) {
+          this.blackPlayerLastMoveTime = new Date().getTime();
+          this.stopTimer('w');
+        }
       }
     }
 
@@ -279,27 +380,107 @@ export default class GameRoom {
       this.pokemonBattleHistory[this.pokemonBattleHistory.length - 1].push(`>p2 move ${this.blackPlayerPokemonMove}`);
       this.whitePlayerPokemonMove = null;
       this.blackPlayerPokemonMove = null;
+
+      if (this.roomGameOptions.timersEnabled) {
+        this.whitePlayerTimerExpiration += this.roomGameOptions.pokemonTimerIncrement*1000;
+        this.blackPlayerTimerExpiration += this.roomGameOptions.pokemonTimerIncrement*1000;
+        this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+        this.startTimer(() => this.endGameDueToTimeout('b'), 'b');
+      }
+    }
+
+    if (this.roomGameOptions.timersEnabled) {
+      this.broadcastTimers();
     }
   };
 
   public validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId, isBan }) {
-    if (isBan) {
-      this.banHistory.push(draftPokemonIndex);
+    if (this.currentTurnWhite && playerId !== this.whitePlayer.playerId) {
+      return;
+    } else if (!this.currentTurnWhite && playerId !== this.blackPlayer.playerId) {
+      return;
     }
-    if (playerId === this.whitePlayer.playerId) {
-      if (!isBan) {
-        this.pokemonAssignments.push(`w ${draftPokemonIndex} ${square}`);
+
+    if (isBan || this.banHistory.length < 6) {
+      this.banHistory.push(draftPokemonIndex);
+    } else {
+      this.pokemonAssignments.push(`${this.currentTurnWhite ? 'w' : 'b'} ${draftPokemonIndex} ${square}`);
+    }
+    const packagedDraftPick = { square, draftPokemonIndex, socketColor: this.currentTurnWhite ? 'w' : 'b', isBan };
+    this.broadcastAllPlayers('startPokemonDraft', packagedDraftPick);
+
+    this.currentTurnWhite = !this.currentTurnWhite;
+
+    if (this.roomGameOptions.timersEnabled) {
+      // If it's white's turn, then black was the previous player and we need to stop their timer
+      this.stopTimer(this.currentTurnWhite ? 'b' : 'w');
+
+      if (this.pokemonAssignments.length < 32) {
+        // Continue draft
+        this.whitePlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.banTimerDuration*1000;
+        this.whitePlayerLastMoveTime = new Date().getTime();
+        this.blackPlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.banTimerDuration*1000;
+        this.blackPlayerLastMoveTime = new Date().getTime();
+        this.startTimer(() => this.randomDraftPick(), this.currentTurnWhite ? 'w' : 'b');
+        this.broadcastTimers();
+      } else {
+        // Start chess game + timers
+        this.whitePlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.chessTimerDuration*60*1000;
+        this.whitePlayerLastMoveTime = new Date().getTime();
+        this.blackPlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.chessTimerDuration*60*1000;
+        this.blackPlayerLastMoveTime = new Date().getTime();
+        this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+        this.broadcastTimers();
       }
-      this.blackPlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w', isBan });
-      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'w', isBan }));
-    } else if (playerId === this.blackPlayer.playerId) {
-      if (!isBan) {
-        this.pokemonAssignments.push(`b ${draftPokemonIndex} ${square}`);
-      }
-      this.whitePlayer.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b', isBan });
-      this.getSpectators().forEach((spectator) => spectator.socket?.emit('startPokemonDraft', { square, draftPokemonIndex, socketColor: 'b', isBan }));
     }
   };
+
+  public startTimer(cb, color) {
+    if (color === 'w') {
+      this.whitePlayerTimerExpiration += (new Date().getTime() - this.whitePlayerLastMoveTime);
+      if (this.whitePlayerTimer) {
+        clearTimeout(this.whitePlayerTimer);
+      }
+      this.whitePlayerTimer = setTimeout(cb, this.whitePlayerTimerExpiration - new Date().getTime());
+    } else {
+      this.blackPlayerTimerExpiration += (new Date().getTime() - this.blackPlayerLastMoveTime);
+      if (this.blackPlayerTimer) {
+        clearTimeout(this.blackPlayerTimer);
+      }
+      this.blackPlayerTimer = setTimeout(cb, this.blackPlayerTimerExpiration - new Date().getTime());
+    }
+  };
+
+  public stopTimer(color) {
+    if (color === 'w' && this.whitePlayerTimer) {
+      clearTimeout(this.whitePlayerTimer);
+      this.whitePlayerTimer = null;
+      this.whitePlayerLastMoveTime = new Date().getTime();
+    } else if (color === 'b' && this.blackPlayerTimer){
+      clearTimeout(this.blackPlayerTimer);
+      this.blackPlayerTimer = null;
+      this.blackPlayerLastMoveTime = new Date().getTime();
+    }
+  };
+
+  public broadcastTimers() {
+    this.broadcastAllPlayers('currentTimers', {
+      white: {
+        timerExpiration: this.whitePlayerTimerExpiration,
+        pause: !this.whitePlayerTimer,
+      },
+      black: {
+        timerExpiration: this.blackPlayerTimerExpiration,
+        pause: !this.blackPlayerTimer,
+      }
+    });
+  }
+
+  private broadcastAllPlayers(eventName, ...args) {
+    this.whitePlayer.socket?.emit(eventName, ...args);
+    this.blackPlayer.socket?.emit(eventName, ...args);
+    this.getSpectators().forEach((spectator) => spectator.socket?.emit(eventName, ...args));
+  }
 
   public getPokemonBattleHistory(playerId) {
     if (playerId === this.blackPlayer.playerId) {
