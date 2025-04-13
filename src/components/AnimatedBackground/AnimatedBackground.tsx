@@ -27,7 +27,7 @@ const getRandomBackgroundPokemon = (availablePokemon: string[]) => {
 
   return {
     pkmn: randomPokemon,
-    shiny: Math.random() < 0.008,
+    shiny: Math.random() < 0.004096,
     left: `${Math.random() * 95}%`,
     bottom: `${Math.floor((Math.random() * -300) - 300)}px`,
     scale: (Math.random() * 2) + 1,

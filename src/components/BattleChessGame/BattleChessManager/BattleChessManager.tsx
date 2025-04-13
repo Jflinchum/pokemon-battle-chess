@@ -10,12 +10,12 @@ import { useGameState } from '../../../context/GameStateContext';
 import { getCastledRookSquare, getVerboseChessMove, getVerboseSanChessMove, mergeBoardAndPokemonState } from '../ChessManager/util';
 import { useModalState } from '../../../context/ModalStateContext';
 import { socket } from '../../../socket';
-import './BattleChessManager.css';
 import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
 import { SideID } from '@pkmn/data';
 import { MatchHistory } from '../../Room/RoomManager';
 import useBattleHistory from './useBattleHistory';
 import Spinner from '../../common/Spinner/Spinner';
+import './BattleChessManager.css';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonPiece;

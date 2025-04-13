@@ -1,4 +1,4 @@
-import { Server } from "socket.io"
+import { Server } from "socket.io";
 import GameRoomManager from "../GameRoomManager";
 
 export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManager) => {

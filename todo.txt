@@ -8,6 +8,8 @@ Host controls
   - Kick player
   - Promote to host
 Pre-move chess pieces
+Queue up your draft and bans
+Break out the draft into phases
 
 Disable support pokemon from team generation
 Room Options
@@ -20,8 +22,10 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Ban timer and random ban if failing the timer
-  - In order to keep server and client synced on the timer, set a UTC expiration time and send that to the client?
+- Move pokemon engine to server
+  - Blocks game timer features below
+  - Ban timer and random ban if failing the timer
+    - In order to keep server and client synced on the timer, set a UTC expiration time and send that to the client?
 - Host controls
 - Robots.txt disable search engine crawling (for now)
 - Toast notifications for errors and such
@@ -30,6 +34,9 @@ Priority:
 
 Issues:
 - Need to reset move history on reset room
+- Form submissions
+- Pawn promotion form should go away after choosing
+- Show pokemon level on details screen
 - Player disconnecting at end game modal clears their name
 - Joining a room should clear viewing results status
 - Chat rooms work between multiple rooms

@@ -1,10 +1,4 @@
-function generateDailyNumber(min: number, max: number) {
-  const now = new Date();
-  const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
-  const random = Math.sin(seed) * 10000;
-  const number = Math.floor((random - Math.floor(random)) * (max - min + 1)) + min;
-  return number;
-}
+import { generateDailyNumber } from "../../../utils";
 
 export const getRandomPokemon = () => {
   const randomIndex = Math.floor(Math.random() * PokemonArray.length);
