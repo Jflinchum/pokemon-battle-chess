@@ -11,6 +11,11 @@ Pre-move chess pieces
 Queue up your draft and bans
 Break out the draft into phases
 
+Game Name Ideas:
+- Pokemon Chess Arena
+- Pokemon Gambit
+- Pokemon Chess Gambit
+
 Disable support pokemon from team generation
 Room Options
  - Weather on random chess spaces
@@ -26,6 +31,7 @@ Priority:
   - Blocks game timer features below
   - Ban timer and random ban if failing the timer
     - In order to keep server and client synced on the timer, set a UTC expiration time and send that to the client?
+- Refactor
 - Host controls
 - Robots.txt disable search engine crawling (for now)
 - Toast notifications for errors and such
@@ -33,7 +39,6 @@ Priority:
 - (better) Error boundary
 
 Issues:
-- Need to reset move history on reset room
 - Form submissions
 - Pawn promotion form should go away after choosing
 - Show pokemon level on details screen
