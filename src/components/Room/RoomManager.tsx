@@ -6,14 +6,8 @@ import { socket } from "../../socket";
 import Room, { Player } from "./Room/Room";
 import GameManagerActions from "./GameManagerActions/GameManagerActions";
 import ChatToggle from "./GameManagerActions/ChatToggle/ChatToggle";
+import { MatchHistory } from "../../../shared/types/game";
 import './RoomManager.css';
-
-export interface MatchHistory {
-  banHistory: number[];
-  chessMoveHistory: string[];
-  pokemonAssignments: string[];
-  pokemonBattleHistory: string[][];
-}
 
 const RoomManager = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
@@ -26,10 +20,10 @@ const RoomManager = () => {
     }
     socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
 
-    socket.on('startSync', (matchHistory: MatchHistory) => {
+    socket.on('startSync', ({ history }: { history: MatchHistory }) => {
       console.log('starting sync');
-      console.log(matchHistory);
-      setMatchHistory(matchHistory)
+      console.log(history);
+      setMatchHistory(history)
     });
 
     socket.io.on('reconnect', () => {

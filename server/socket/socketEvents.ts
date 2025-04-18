@@ -42,12 +42,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       console.log(`Player ${playerId} joined room ${roomId}`);
 
       if (room.isOngoing) {
-        socket.emit('startSync', {
-          banHistory: room.banHistory,
-          pokemonAssignments: room.pokemonAssignments,
-          chessMoveHistory: room.chessMoveHistory,
-          pokemonBattleHistory: room.getPokemonBattleHistory(playerId),
-        });
+        socket.emit('startSync', { history: room.getHistory(playerId) });
         socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
       }
     });
@@ -104,12 +99,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
           clearTimeout(room.transientPlayerList[playerId]);
           delete room.transientPlayerList[playerId];
         }
-        socket.emit('startSync', {
-          banHistory: room.banHistory,
-          pokemonAssignments: room.pokemonAssignments,
-          chessMoveHistory: room.chessMoveHistory,
-          pokemonBattleHistory: room.getPokemonBattleHistory(playerId),
-        });
+        socket.emit('startSync', { history: room.getHistory(playerId) });
         io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
     });

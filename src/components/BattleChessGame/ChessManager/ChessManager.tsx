@@ -11,6 +11,7 @@ import { useGameState } from '../../../context/GameStateContext';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 import { PokemonSet } from '@pkmn/data';
 import { useDebounce } from '../../../utils';
+import { ChessData } from '../../../../shared/types/game';
 
 interface ChessManagerProps {
   chessManager: Chess;
@@ -19,10 +20,11 @@ interface ChessManagerProps {
   currentBattle?: CurrentBattle | null;
   board: ChessBoardSquare[][];
   onMove: (san: string) => void;
-  chessMoveHistoryDisplay: { sanMove: string, battleSuccess: boolean | null }[]
+  chessMoveHistoryDisplay: ChessData[];
+  battleSquare?: Square;
 }
 
-const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBattle, board, onMove, chessMoveHistoryDisplay }: ChessManagerProps) => {
+const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSquare, board, onMove, chessMoveHistoryDisplay }: ChessManagerProps) => {
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
@@ -126,7 +128,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, currentBat
           highlightedSquares={highlightedSquares}
           selectedSquare={selectedSquare}
           mostRecentMove={mostRecentMove}
-          currentBattle={currentBattle}
+          battleSquare={battleSquare}
         />
         <PokemonChessDetailsCard
           chessMoveHistory={chessMoveHistoryDisplay}

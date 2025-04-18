@@ -6,7 +6,7 @@ interface GameRoomList {
   [roomId: string]: GameRoom
 }
 
-export default class GameRoomManager{
+export default class GameRoomManager {
   public currentRooms: GameRoomList;
   private io: Server;
 

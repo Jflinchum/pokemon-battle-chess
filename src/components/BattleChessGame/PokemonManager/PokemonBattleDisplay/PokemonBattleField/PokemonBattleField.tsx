@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import pokemonBattleBackgroundImage from '../../../../../assets/pokemonBattleBackground.png';
-import './PokemonBattleField.css';
 import { Battle } from "@pkmn/client";
-import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";
 import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet } from '@pkmn/data';
+import pokemonBattleBackgroundImage from '../../../../../assets/pokemonBattleBackground.png';
+import './PokemonBattleField.css';
+import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";
 
 interface PokemonBattleFieldProps {
   battleState: Battle,
