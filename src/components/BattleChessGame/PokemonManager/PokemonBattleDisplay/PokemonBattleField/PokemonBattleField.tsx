@@ -5,6 +5,7 @@ import { PokemonSet } from '@pkmn/data';
 import pokemonBattleBackgroundImage from '../../../../../assets/pokemonBattleBackground.png';
 import './PokemonBattleField.css';
 import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";
+import { useGameState } from '../../../../../context/GameStateContext';
 
 interface PokemonBattleFieldProps {
   battleState: Battle,
@@ -14,8 +15,10 @@ interface PokemonBattleFieldProps {
 }
 
 const PokemonBattleField = ({ battleState, battleHistory, p1PokemonSet, p2PokemonSet }: PokemonBattleFieldProps) => {
-  const p1Pokemon = useMemo(() => battleState.p1.active[0], [battleHistory]);
-  const p2Pokemon = useMemo(() => battleState.p2.active[0], [battleHistory]);
+  const { gameState } = useGameState();
+  const p1Pokemon = useMemo(() => gameState.gameSettings.color === 'w' ? battleState.p1.active[0] : battleState.p2.active[0], [battleHistory]);
+  const p2Pokemon = useMemo(() => gameState.gameSettings.color === 'w' ? battleState.p2.active[0] : battleState.p1.active[0], [battleHistory]);
+
   return (
     <div className='pokemonBattleBackground' style={{
       backgroundImage: `url(${pokemonBattleBackgroundImage})`

@@ -10,14 +10,13 @@ import { PokemonSet } from "@pkmn/data";
 interface PokemonBattleDisplayProps {
   battleState: Battle | null,
   fullBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[],
-  delayedBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[], 
   onMoveSelect: (move: string) => void,
   isSpectator?: boolean;
   p1Pokemon: PokemonSet;
   p2Pokemon: PokemonSet;
 }
 
-const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, onMoveSelect, isSpectator, p1Pokemon, p2Pokemon }: PokemonBattleDisplayProps) => {
+const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpectator, p1Pokemon, p2Pokemon }: PokemonBattleDisplayProps) => {
   const [moveChosen, setMoveChosen] = useState<string>();
 
   useEffect(() => {
@@ -38,7 +37,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
       }) || [];
     }
     return [];
-  }, [battleState?.request]);
+  }, [battleState?.request, fullBattleLog]);
 
   return (
     <div>
@@ -46,13 +45,12 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
         <>
           <div className='battlefieldAndLog'>
             <span>
-              <PokemonBattleField battleHistory={delayedBattleLog} battleState={battleState} p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon}/>
-              <PokemonBattleLog battleHistory={delayedBattleLog} simple={true}/>
+              <PokemonBattleField battleHistory={fullBattleLog} battleState={battleState} p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon}/>
+              <PokemonBattleLog battleHistory={fullBattleLog} simple={true}/>
               <div className='battleMoveContainer'>
                 <BattleMoveContainer
-                  waitForDelay={
-                    (delayedBattleLog.length !== fullBattleLog.length) ||
-                    fullBattleLog.some((log) => log.args[0] === 'win')
+                  hideMoves={
+                    fullBattleLog[fullBattleLog.length - 1]?.args?.[0] !== 'turn' || fullBattleLog.some((log) => log.args[0] === 'win')
                   }
                   moveChosen={moveChosen}
                   onMoveSelect={onMoveSelect}
@@ -62,7 +60,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
                 />
               </div>
             </span>
-            <PokemonBattleLog battleHistory={delayedBattleLog}/>
+            <PokemonBattleLog battleHistory={fullBattleLog}/>
           </div>
         </>
       )}
@@ -72,16 +70,16 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, delayedBattleLog, on
 
 interface BattleMoveContainerProps {
   moveChosen?: string;
-  waitForDelay: boolean;
+  hideMoves: boolean;
   isSpectator?: boolean;
   setMoveChosen: (move?: string) => void;
   onMoveSelect: (move: string) => void;
   moves: PokemonMoveChoice[];
 }
 
-const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, waitForDelay, isSpectator }: BattleMoveContainerProps) => {
+const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, hideMoves, isSpectator }: BattleMoveContainerProps) => {
 
-  if (waitForDelay || isSpectator) {
+  if (hideMoves || isSpectator) {
     return (
       <div></div>
     );

@@ -12,10 +12,11 @@ interface BattleHistoryProps {
   currentBattle?: CurrentBattle | null,
   onBan: (index: number) => void,
   onDraft: (square: Square, index: number, color: Color) => void,
-  onMove: (sanMove: string) => void,
+  onMove: (sanMove: string, moveFailed?: boolean) => void,
   onPokemonBattleStart: (p1Pokemon: PokemonBeginBattleData['p1Pokemon'], p2Pokemon: PokemonBeginBattleData['p2Pokemon'], attemptedMove: PokemonBeginBattleData['attemptedMove']) => void,
   onPokemonBattleOutput: ({ args, kwArgs }: { args: ArgType; kwArgs: KWArgType }) => void,
-  onPokemonBattleEnd: (victor: Color) => void,
+  onPokemonBattleEnd?: (victor: Color) => void,
+  onGameEnd: (victor: Color) => void,
   skipToEndOfSync: boolean,
 };
 
@@ -40,14 +41,17 @@ const useBattleHistory = ({
   onMove,
   onPokemonBattleStart,
   onPokemonBattleOutput,
-  onPokemonBattleEnd,
+  onPokemonBattleEnd = () => {},
+  onGameEnd,
   skipToEndOfSync
 }: BattleHistoryProps) => {
-  // User state preferred animation speed and multiply the timers here based on it
+  // User state preferred animation speed and multiply the timers here based on it TODO
   const { gameState } = useGameState();
 
   const [matchLog, setCurrentMatchLog] = useState(matchHistory || []);
+
   const matchLogIndex = useRef(0);
+  const pokemonLogIndex = useRef(0);
 
   useEffect(() => {
     socket.on('gameOutput', (log: MatchLog) => {
@@ -60,10 +64,10 @@ const useBattleHistory = ({
   }, []);
 
   const [catchingUp, setCatchingUp] = useState(false);
+
   useEffect(() => {
     setCurrentMatchLog(matchHistory || matchLog);
   }, [matchHistory]);
-
 
   useEffect(() => {
     let catchUpTimer: { start: () => Promise<void>, stop: () => void } | undefined;
@@ -78,49 +82,66 @@ const useBattleHistory = ({
         }
 
         const currentLog = matchLog[matchLogIndex.current];
-        matchLogIndex.current++;
         switch (currentLog.type) {
+          case 'generic':
+            switch (currentLog.data.event) {
+              case 'gameEnd':
+                onGameEnd(currentLog.data.color);
+                matchLogIndex.current++;
+            }
+            break;
           case 'ban':
             onBan(currentLog.data.index);
+            matchLogIndex.current++;
             catchUpTimer = timer(timeBetweenSteps);
             await catchUpTimer.start();
             break;
           case 'draft':
             const isRandomDraft = gameState.gameSettings.options.format === 'random' ? 0 : 1;
             onDraft(currentLog.data.square, currentLog.data.index, currentLog.data.color);
+            matchLogIndex.current++;
             catchUpTimer = timer(timeBetweenSteps * isRandomDraft);
             await catchUpTimer.start();
             break;
           case 'chess':
-            onMove(currentLog.data.san);
+            onMove(currentLog.data.san, currentLog.data.failed);
+            matchLogIndex.current++;
             catchUpTimer = timer(timeBetweenSteps);
             await catchUpTimer.start();
             break;
           case 'pokemon':
             switch (currentLog.data.event) {
               case 'battleStart':
+                pokemonLogIndex.current = 0;
                 onPokemonBattleStart(currentLog.data.p1Pokemon, currentLog.data.p2Pokemon, currentLog.data.attemptedMove);
+                matchLogIndex.current++;
                 catchUpTimer = timer(timeBetweenSteps);
                 await catchUpTimer.start();
                 break;
               case 'streamOutput':
-                // Save current index of chunk in case reconnecting TODO
-                for (const { args, kwArgs } of Protocol.parse(currentLog.data.chunk)) {
-                  console.log(args);
+                const parsedChunk = Protocol.parse(currentLog.data.chunk);
+                const currentPokemonLog = [];
+                for (const { args, kwArgs } of parsedChunk) {
+                  currentPokemonLog.push({ args, kwArgs });
+                }
+
+                while (pokemonLogIndex.current < currentPokemonLog.length) {
+                  const { args, kwArgs } = currentPokemonLog[pokemonLogIndex.current];
                   onPokemonBattleOutput({ args, kwArgs });
+
+                  pokemonLogIndex.current++;
                   if (shouldDelayBeforeContinuing(args[0])) {
-                    catchUpTimer = timer(timeBetweenSteps);
+                    catchUpTimer = timer(1000 * (skipToEndOfSync ? 0 : 1));
                     await catchUpTimer.start();
                   }
                 }
-                if (catchingUp) {
-                  catchUpTimer = timer(timeBetweenSteps);
-                  await catchUpTimer.start();
-                }
 
+                pokemonLogIndex.current = 0;
+                matchLogIndex.current++;
                 break;
               case 'victory':
                 onPokemonBattleEnd(currentLog.data.color);
+                matchLogIndex.current++;
                 catchUpTimer = timer(timeBetweenSteps);
                 await catchUpTimer.start();
                 break;
@@ -142,7 +163,7 @@ const useBattleHistory = ({
 };
 
 const shouldDelayBeforeContinuing = (logType: string) => {
-  const delayLogs = ['move', '-damage', '-heal', 'win'];
+  const delayLogs = ['move', '-damage', '-heal'];
   if (delayLogs.includes(logType)) {
     return true;
   }

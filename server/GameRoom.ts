@@ -1,14 +1,14 @@
 import { Socket } from "socket.io";
-import { BoostID } from "@pkmn/data";
-import { Dex as SimDex, BattleStreams, Teams, PRNGSeed } from '@pkmn/sim';
-import { PRNG } from '@pkmn/sim'
 import { Chess } from "chess.js";
+import { Dex as SimDex, BattleStreams, Teams, PRNGSeed } from '@pkmn/sim';
+import { BoostID } from "@pkmn/data";
+import { PRNG } from '@pkmn/sim'
+import { Protocol } from '@pkmn/protocol';
+import { ObjectReadWriteStream } from "@pkmn/streams";
 import User from "./User";
 import { GameOptions } from './GameOptions';
 import GameRoomManager from "./GameRoomManager";
 import { PokemonBattleChessManager } from "./PokemonBattleChessManager";
-import { Protocol } from '@pkmn/protocol';
-import { ObjectReadWriteStream } from "@pkmn/streams";
 import { MatchHistory, MatchLog } from "../shared/types/game";
 
 export default class GameRoom {
@@ -185,10 +185,9 @@ export default class GameRoom {
 
   public startGame() {
     if (this.hostPlayer && this.player1 && this.player2) {
+      this.resetRoomForRematch();
       this.isOngoing = true;
-      this.roomSeed = PRNG.generateSeed();
-      this.pokemonGameManager = new PokemonBattleChessManager(this.roomSeed, this.roomGameOptions.format)
-      this.chessManager = new Chess();
+
       const coinFlip = Math.random() > 0.5;
 
       this.whitePlayer = coinFlip ? this.player1 : this.player2;
@@ -236,16 +235,14 @@ export default class GameRoom {
           chessMove.to,
           chessMove.promotion
         );
-        this.chessManager.move(sanMove);
+        this.chessManager.move(sanMove, { continueOnCheck: true });
 
         const chessData: MatchLog = { type: 'chess', data: { color: this.currentTurnWhite ? 'w' : 'b', san: sanMove, failed: false } };
         this.pushHistory(chessData);
         this.broadcastAll('gameOutput', chessData);
         if (lostPiece?.type === 'k') {
           // Game ender
-          const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color: this.currentTurnWhite ? 'w' : 'b' } };
-          this.pushHistory(gameData);
-          this.broadcastAll('gameOutput', gameData);
+          this.endGame();
         }
       } else {
         const lostPiece = this.chessManager.get(chessMove.from);
@@ -260,9 +257,7 @@ export default class GameRoom {
         this.broadcastAll('gameOutput', chessData);
         if (lostPiece?.type === 'k') {
           // Game ender
-          const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color: this.currentTurnWhite ? 'b' : 'w' } };
-          this.pushHistory(gameData);
-          this.broadcastAll('gameOutput', gameData);
+          this.endGame();
         }
       }
     } else {
@@ -271,7 +266,7 @@ export default class GameRoom {
         chessMove.to,
         chessMove.promotion
       );
-      this.chessManager.move(sanMove);
+      this.chessManager.move(sanMove, { continueOnCheck: true });
       const chessData: MatchLog = { type: 'chess', data: { color: this.currentTurnWhite ? 'w' : 'b', san: sanMove } };
       this.pushHistory(chessData)
       this.broadcastAll('gameOutput', chessData)
@@ -280,12 +275,26 @@ export default class GameRoom {
     this.currentTurnWhite = !this.currentTurnWhite;
   }
 
+  public endGame() {
+    const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color: this.currentTurnWhite ? 'w' : 'b' } };
+    this.pushHistory(gameData);
+    this.broadcastAll('gameOutput', gameData);
+    this.playerList.forEach((player) => {
+      player.setViewingResults(true);
+    });
+    this.broadcastAll('connectedPlayers', this.getPublicPlayerList());
+  }
+
   public resetRoomForRematch() {
     this.isOngoing = false;
     this.roomSeed = PRNG.generateSeed();
+    this.chessManager = new Chess();
+    this.pokemonGameManager = new PokemonBattleChessManager(this.roomSeed, this.roomGameOptions.format)
     this.currentTurnWhite = true;
     this.whitePlayerPokemonMove = null;
     this.blackPlayerPokemonMove = null;
+    this.whiteMatchHistory = [];
+    this.blackMatchHistory = [];
   }
 
   public validateAndEmitPokemonMove({ pokemonMove, playerId }) {
@@ -313,11 +322,19 @@ export default class GameRoom {
   };
 
   public validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId, isBan }) {
+    const chessSquare = this.chessManager.get(square);
+    if (!isBan && !chessSquare) {
+      return;
+    }
     if (playerId === this.whitePlayer.playerId) {
       let matchLog: MatchLog;
       if (isBan) {
+        this.pokemonGameManager.banDraftPiece(draftPokemonIndex);
         matchLog = { type: 'ban', data: { index: draftPokemonIndex, color: 'w' } };
       } else {
+        this.pokemonGameManager.assignPokemonToSquare(
+          draftPokemonIndex, square, chessSquare!.type, 'w',
+        );
         matchLog = { type: 'draft', data: { square, index: draftPokemonIndex, color: 'w' } };
       }
       this.pushHistory(matchLog);
@@ -325,8 +342,12 @@ export default class GameRoom {
     } else if (playerId === this.blackPlayer.playerId) {
       let matchLog: MatchLog;
       if (isBan) {
+        this.pokemonGameManager.banDraftPiece(draftPokemonIndex);
         matchLog = { type: 'ban', data: { index: draftPokemonIndex, color: 'b' } };
       } else {
+        this.pokemonGameManager.assignPokemonToSquare(
+          draftPokemonIndex, square, chessSquare!.type, 'b',
+        );
         matchLog = { type: 'draft', data: { square, index: draftPokemonIndex, color: 'b' } }
       }
       this.pushHistory(matchLog)
@@ -337,7 +358,7 @@ export default class GameRoom {
   private broadcastAll(event: string, ...args) {
     this.whitePlayer.socket?.emit(event, ...args);
     this.blackPlayer.socket?.emit(event, ...args);
-    this.getSpectators().forEach((spectator) => spectator.socket?.emit(event, args));
+    this.getSpectators().forEach((spectator) => spectator.socket?.emit(event, ...args));
   };
 
   private pushHistory(log: MatchLog) {
@@ -385,8 +406,6 @@ export default class GameRoom {
       battleStream.omniscient.write(`>start ${JSON.stringify(spec)}`);
       battleStream.omniscient.write(`>player p1 ${JSON.stringify(p1Spec)}`);
       battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2Spec)}`);
-      battleStream.omniscient.write(`>p1 team 1`);
-      battleStream.omniscient.write(`>p2 team 1`);
       const whiteBattleStreamHandler = async () => {
         for await (const chunk of battleStream.p1) {
           const pokemonData: MatchLog = { type: 'pokemon', data: { event: 'streamOutput', chunk } };
