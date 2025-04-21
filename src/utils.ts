@@ -33,7 +33,12 @@ export const getGameOptions = () => {
       spe: 1,
       accuracy: 0,
       evasion: 0,
-    }
+    },
+    timersEnabled: true,
+    banTimerDuration: 15,
+    chessTimerDuration: 15,
+    pokemonTimerIncrement: 1,
+    chessTimerIncrement: 5,
   };
   const localStorageGameOptions = localStorage.getItem('defaultGameOptions');
   return localStorageGameOptions ? JSON.parse(localStorageGameOptions ) : defaultGameOptions;

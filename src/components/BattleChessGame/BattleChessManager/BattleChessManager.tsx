@@ -51,6 +51,17 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
   const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<{ args: ArgType, kwArgs: KWArgType }[]>([]);
+  const [timers, setTimers] = useState<{ white: { pause: boolean; timerExpiration: number }, black: { pause: boolean; timerExpiration: number } }>();
+
+  useEffect(() => {
+    socket.on('currentTimers', (timer) => {
+      setTimers(timer);
+    });
+
+    return () => {
+      socket.off('currentTimers');
+    }
+  }, []);
 
   const { catchingUp, currentMatchLog } = useBattleHistory({
     matchHistory,
@@ -190,6 +201,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
       <PlayerInGameDisplay
         player={color === 'w' ? blackPlayer : whitePlayer}
         takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}
+        timer={color === 'w' ? timers?.black : timers?.white}
       />
       <div style={{ display: catchingUp && gameState.isSkippingAhead ? 'none' : 'block' }}>
         {
@@ -258,6 +270,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
       <PlayerInGameDisplay
         player={color === 'w' ? whitePlayer : blackPlayer}
         takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
+        timer={color === 'w' ? timers?.white : timers?.black}
       />
     </div>
   )

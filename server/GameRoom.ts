@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import { Chess } from "chess.js";
+import { Chess, Square } from "chess.js";
 import { Dex as SimDex, BattleStreams, Teams, PRNGSeed } from '@pkmn/sim';
 import { BoostID } from "@pkmn/data";
 import { PRNG } from '@pkmn/sim'
@@ -40,6 +40,12 @@ export default class GameRoom {
   public chessManager: Chess;
   public whiteMatchHistory: MatchHistory = [];
   public blackMatchHistory: MatchHistory = [];
+  private whitePlayerTimerExpiration: number;
+  private blackPlayerTimerExpiration: number;
+  private whitePlayerLastMoveTime: number;
+  private blackPlayerLastMoveTime: number;
+  private whitePlayerTimer: NodeJS.Timeout | null;
+  private blackPlayerTimer: NodeJS.Timeout | null;
 
   constructor(roomId: string, hostPlayer: User, password: string, gameRoomManager: GameRoomManager) {
     this.roomId = roomId;
@@ -167,11 +173,16 @@ export default class GameRoom {
         atk: 0,
         def: 0,
         spa: 0,
-        spd: 0,
+        spd: 1,
         spe: 0,
         accuracy: 0,
         evasion: 0,
-      }
+      },
+      timersEnabled: options.timersEnabled || true,
+      banTimerDuration: options.banTimerDuration || 15,
+      chessTimerDuration: options.chessTimerDuration || 15,
+      chessTimerIncrement: options.chessTimerIncrement || 5,
+      pokemonTimerIncrement: options.pokemonTimerIncrement || 1,
     };
   }
 
@@ -187,7 +198,6 @@ export default class GameRoom {
     if (this.hostPlayer && this.player1 && this.player2) {
       this.resetRoomForRematch();
       this.isOngoing = true;
-
       const coinFlip = Math.random() > 0.5;
 
       this.whitePlayer = coinFlip ? this.player1 : this.player2;
@@ -196,6 +206,18 @@ export default class GameRoom {
       this.whitePlayer.socket?.emit('startGame', this.buildStartGameArgs('w'));
       this.getSpectators().forEach((spectator) => spectator.socket?.emit('startGame', this.buildStartGameArgs('w')));
       this.blackPlayer.socket?.emit('startGame', this.buildStartGameArgs('b'));
+
+      if (this.roomGameOptions.timersEnabled) {
+        const timerDuration = this.roomGameOptions.format === 'random' ? this.roomGameOptions.chessTimerDuration*60*1000 : this.roomGameOptions.banTimerDuration*1000;
+
+        this.whitePlayerTimerExpiration = new Date().getTime() + timerDuration;
+        this.whitePlayerLastMoveTime = new Date().getTime();
+        this.blackPlayerTimerExpiration = new Date().getTime() + timerDuration;
+        this.blackPlayerLastMoveTime = new Date().getTime();
+
+        this.startTimer(() => this.randomDraftPick(), 'w');
+        this.broadcastTimers();
+      }
     }
   }
 
@@ -242,7 +264,8 @@ export default class GameRoom {
         this.broadcastAll('gameOutput', chessData);
         if (lostPiece?.type === 'k') {
           // Game ender
-          this.endGame();
+          this.endGame(this.currentTurnWhite ? 'w' : 'b');
+          return;
         }
       } else {
         const lostPiece = this.chessManager.get(chessMove.from);
@@ -257,9 +280,10 @@ export default class GameRoom {
         this.broadcastAll('gameOutput', chessData);
         if (lostPiece?.type === 'k') {
           // Game ender
-          this.endGame();
+          this.endGame(this.currentTurnWhite ? 'w' : 'b');
+          return;
         }
-      }
+      } 
     } else {
       this.pokemonGameManager.movePokemonToSquare(
         chessMove.from,
@@ -272,17 +296,67 @@ export default class GameRoom {
       this.broadcastAll('gameOutput', chessData)
     }
 
+    if (this.roomGameOptions.timersEnabled) {
+      if (this.currentTurnWhite) {
+        this.whitePlayerLastMoveTime = new Date().getTime();
+        this.whitePlayerTimerExpiration += this.roomGameOptions.chessTimerIncrement*1000;
+      } else {
+        this.blackPlayerLastMoveTime = new Date().getTime();
+        this.blackPlayerTimerExpiration += this.roomGameOptions.chessTimerIncrement*1000;
+      }
+
+      this.stopTimer(this.currentTurnWhite ? 'w' : 'b');
+      this.startTimer(() => this.endGameDueToTimeout(this.currentTurnWhite ? 'b' : 'w'), this.currentTurnWhite ? 'b' : 'w');
+      this.broadcastTimers();
+    }
+
     this.currentTurnWhite = !this.currentTurnWhite;
   }
 
-  public endGame() {
-    const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color: this.currentTurnWhite ? 'w' : 'b' } };
+  private endGameDueToTimeout(color) {
+    this.endGame(color === 'w' ? 'b' : 'w');
+  }
+
+  private randomDraftPick() {
+    let possibleSquares: string[] = [];
+    let playerId;
+    if (this.currentTurnWhite) {
+      playerId = this.whitePlayer.playerId;
+      for (let i = 0; i < 16; i++) {
+        possibleSquares.push(`${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}`);
+      }
+    } else {
+      playerId = this.blackPlayer.playerId;
+      for (let i = 0; i < 16; i++) {
+        possibleSquares.push(`${String.fromCharCode(97 + Math.floor(i % 8))}${8 - Math.floor(i / 8)}`)
+      }
+    }
+
+    possibleSquares = possibleSquares.filter((square) => !this.pokemonGameManager.getPokemonFromSquare(square as Square));
+    const randomSquareIndex = Math.floor(Math.random() * possibleSquares.length);
+    const randomPokemonIndex = Math.floor(Math.random() * (38 - this.pokemonGameManager.banPieces.length - this.pokemonGameManager.chessPieces.length));
+
+    this.validateAndEmitPokemonDraft({
+      square: possibleSquares[randomSquareIndex],
+      draftPokemonIndex: randomPokemonIndex,
+      playerId,
+      isBan: this.pokemonGameManager.banPieces.length < 6,
+    });
+  }
+
+  public endGame(color) {
+    const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color } };
     this.pushHistory(gameData);
     this.broadcastAll('gameOutput', gameData);
     this.playerList.forEach((player) => {
       player.setViewingResults(true);
     });
     this.broadcastAll('connectedPlayers', this.getPublicPlayerList());
+    if (this.roomGameOptions.timersEnabled) {
+      this.stopTimer('w');
+      this.stopTimer('b');
+      this.broadcastTimers();
+    }
   }
 
   public resetRoomForRematch() {
@@ -295,6 +369,16 @@ export default class GameRoom {
     this.blackPlayerPokemonMove = null;
     this.whiteMatchHistory = [];
     this.blackMatchHistory = [];
+    this.whitePlayerTimerExpiration = new Date().getTime();
+    this.blackPlayerTimerExpiration = new Date().getTime();
+    if (this.whitePlayerTimer) {
+      clearTimeout(this.whitePlayerTimer);
+      this.whitePlayerTimer = null;
+    }
+    if (this.blackPlayerTimer) {
+      clearTimeout(this.blackPlayerTimer);
+      this.blackPlayerTimer = null;
+    }
   }
 
   public validateAndEmitPokemonMove({ pokemonMove, playerId }) {
@@ -302,14 +386,28 @@ export default class GameRoom {
     if (playerId === this.whitePlayer.playerId) {
       if (isUndo) {
         this.whitePlayerPokemonMove = null;
+        if (this.roomGameOptions.timersEnabled) {
+          this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+        }
       } else {
         this.whitePlayerPokemonMove = pokemonMove;
+        if (this.roomGameOptions.timersEnabled) {
+          this.whitePlayerLastMoveTime = new Date().getTime();
+          this.stopTimer('w');
+        }
       }
     } else if (playerId === this.blackPlayer.playerId) {
       if (isUndo) {
         this.blackPlayerPokemonMove = null;
+        if (this.roomGameOptions.timersEnabled) {
+          this.startTimer(() => this.endGameDueToTimeout('b'), 'b');
+        }
       } else {
         this.blackPlayerPokemonMove = pokemonMove;
+        if (this.roomGameOptions.timersEnabled) {
+          this.blackPlayerLastMoveTime = new Date().getTime();
+          this.stopTimer('b');
+        }
       }
     }
 
@@ -318,6 +416,19 @@ export default class GameRoom {
       this.currentPokemonBattleStream?.p2.write(`move ${this.blackPlayerPokemonMove}`);
       this.whitePlayerPokemonMove = null;
       this.blackPlayerPokemonMove = null;
+
+      if (this.roomGameOptions.timersEnabled) {
+        this.whitePlayerTimerExpiration += this.roomGameOptions.pokemonTimerIncrement*1000;
+        this.blackPlayerTimerExpiration += this.roomGameOptions.pokemonTimerIncrement*1000;
+        this.whitePlayerLastMoveTime = new Date().getTime();
+        this.blackPlayerLastMoveTime = new Date().getTime();
+        this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+        this.startTimer(() => this.endGameDueToTimeout('b'), 'b');
+      }
+    }
+
+    if (this.roomGameOptions.timersEnabled) {
+      this.broadcastTimers();
     }
   };
 
@@ -353,6 +464,29 @@ export default class GameRoom {
       this.pushHistory(matchLog)
       this.broadcastAll('gameOutput', matchLog);
     }
+
+    if (this.roomGameOptions.timersEnabled) {
+      this.stopTimer(this.currentTurnWhite ? 'w' : 'b');
+
+      if (this.pokemonGameManager.chessPieces.length < 32) {
+        // Continue draft
+        this.whitePlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.banTimerDuration*1000;
+        this.whitePlayerLastMoveTime = new Date().getTime();
+        this.blackPlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.banTimerDuration*1000;
+        this.blackPlayerLastMoveTime = new Date().getTime();
+        this.startTimer(() => this.randomDraftPick(), this.currentTurnWhite ? 'b' : 'w');
+        this.broadcastTimers();
+      } else {
+        // Start chess game + timers
+        this.whitePlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.chessTimerDuration*60*1000;
+        this.whitePlayerLastMoveTime = new Date().getTime();
+        this.blackPlayerTimerExpiration = new Date().getTime() + this.roomGameOptions.chessTimerDuration*60*1000;
+        this.blackPlayerLastMoveTime = new Date().getTime();
+        this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+        this.broadcastTimers();
+      }
+    }
+    this.currentTurnWhite = !this.currentTurnWhite;
   };
 
   private broadcastAll(event: string, ...args) {
@@ -374,12 +508,58 @@ export default class GameRoom {
     }
   };
 
+  public startTimer(cb, color) {
+    if (color === 'w') {
+      this.whitePlayerTimerExpiration += (new Date().getTime() - this.whitePlayerLastMoveTime);
+      if (this.whitePlayerTimer) {
+        clearTimeout(this.whitePlayerTimer);
+      }
+      this.whitePlayerTimer = setTimeout(cb, this.whitePlayerTimerExpiration - new Date().getTime());
+    } else {
+      this.blackPlayerTimerExpiration += (new Date().getTime() - this.blackPlayerLastMoveTime);
+      if (this.blackPlayerTimer) {
+        clearTimeout(this.blackPlayerTimer);
+      }
+      this.blackPlayerTimer = setTimeout(cb, this.blackPlayerTimerExpiration - new Date().getTime());
+    }
+  };
+
+  public stopTimer(color) {
+    if (color === 'w' && this.whitePlayerTimer) {
+      clearTimeout(this.whitePlayerTimer);
+      this.whitePlayerTimer = null;
+      this.whitePlayerLastMoveTime = new Date().getTime();
+    } else if (color === 'b' && this.blackPlayerTimer){
+      clearTimeout(this.blackPlayerTimer);
+      this.blackPlayerTimer = null;
+      this.blackPlayerLastMoveTime = new Date().getTime();
+    }
+  };
+
+  public broadcastTimers() {
+    this.broadcastAll('currentTimers', {
+      white: {
+        timerExpiration: this.whitePlayerTimerExpiration,
+        pause: !this.whitePlayerTimer,
+      },
+      black: {
+        timerExpiration: this.blackPlayerTimerExpiration,
+        pause: !this.blackPlayerTimer,
+      }
+    });
+  }
+
   private async createPokemonBattleStream({ p1Set, p2Set, attemptedMove }) {
     const p1Spec = { name: this.whitePlayer.playerId, team: Teams.pack([p1Set]) };
     const p2Spec = { name: this.blackPlayer.playerId, team: Teams.pack([p2Set]) };
     const battleStartData: MatchLog = { type: 'pokemon', data: { event: 'battleStart', p1Pokemon: p1Set, p2Pokemon: p2Set, attemptedMove } };
     this.broadcastAll('gameOutput', battleStartData);
     this.pushHistory(battleStartData);
+    if (this.roomGameOptions.timersEnabled) {
+      this.startTimer(() => this.endGameDueToTimeout('w'), 'w');
+      this.startTimer(() => this.endGameDueToTimeout('b'), 'b');
+      this.broadcastTimers();
+    }
 
     return new Promise((resolve) => {
       const offenseAdvantage = this.roomGameOptions.offenseAdvantage;
@@ -425,6 +605,10 @@ export default class GameRoom {
         for await (const chunk of battleStream.omniscient) {
           for (const { args } of Protocol.parse(chunk)) {
             if (args[0] === 'win') {
+              if (this.roomGameOptions.timersEnabled) {
+                this.stopTimer('w');
+                this.stopTimer('b');
+              }
               if ((this.currentTurnWhite && args[1] === this.whitePlayer.playerId) || (!this.currentTurnWhite && args[1] === this.blackPlayer.playerId)) {
                 const data: MatchLog = { type: 'pokemon', data: { event: 'victory', color: this.currentTurnWhite ? 'w' : 'b' } };
                 this.pushHistory(data);

@@ -19,10 +19,13 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('joinRoom', (roomId, playerId, playerName, password) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to join room ${roomId}`);
       if (!room || !playerId || !playerName) {
+        console.log(`${playerId} mismatch for ${roomId}`);
         return socket.disconnect();
       }
       if (room.password !== password) {
+        console.log(`${playerId} invalid password for ${roomId}`);
         return socket.disconnect();
       }
 
@@ -49,9 +52,10 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestToggleSpectating', (roomId, playerId) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to change to spectator for ${roomId}`);
 
       if (!room || !playerId) {
-        socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
       const player = room.getPlayer(playerId);
@@ -65,9 +69,10 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestChangeGameOptions', (roomId, playerId, gameOptions) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to change game options for ${roomId}`);
 
       if (!room || room.hostPlayer?.playerId !== playerId) {
-        socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
 
@@ -77,9 +82,10 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestStartGame', (roomId, playerId) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to start game for ${roomId}`);
 
       if (!room || room.hostPlayer?.playerId !== playerId) {
-        socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
 
@@ -91,7 +97,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       console.log('request sync received ' + roomId + ' ' + playerId);
       const room = gameRoomManager.getRoom(roomId);
       if (!room) {
-        return socket.disconnect();
+        return;
       }
 
       if (room.isOngoing) {
@@ -106,8 +112,10 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestChessMove', ({ sanMove, roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to chess move ${sanMove} for ${roomId}`);
       if (!room || !playerId) {
-        return socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}`);
+        return;
       }
 
       room.validateAndEmitChessMove({ sanMove, playerId });
@@ -115,8 +123,11 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestPokemonMove', ({ pokemonMove, roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to chess move ${pokemonMove} for ${roomId}`);
+
       if (!room || !playerId) {
-        return socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}`);
+        return;
       }
 
       room.validateAndEmitPokemonMove({ pokemonMove, playerId });
@@ -124,8 +135,11 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestDraftPokemon', ({ roomId, playerId, square, draftPokemonIndex, isBan }) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to ${isBan ? 'ban' : 'draft'} pokemon ${draftPokemonIndex} at ${square} for ${roomId}`);
+
       if (!room || !playerId) {
-        return socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}`);
+        return;
       }
 
       room.validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId, isBan });
