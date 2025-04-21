@@ -7,6 +7,7 @@ Host controls
   - Update settings
   - Kick player
   - Promote to host
+  - Return to room in-game
 Pre-move chess pieces
 Queue up your draft and bans
 Break out the draft into phases
@@ -27,6 +28,8 @@ Priority:
   - Ban timer and random ban if failing the timer
     - In order to keep server and client synced on the timer, set a UTC expiration time and send that to the client?
 - Host controls
+- More detailed modals in game
+  - Add server disconnect
 - Robots.txt disable search engine crawling (for now)
 - Toast notifications for errors and such
 - Curate pokemon sets
