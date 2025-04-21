@@ -50,7 +50,7 @@ const EndGameModal = () => {
         </div>
       </div>
       <div className='endGameBottomActions'>
-        <Button onClick={handleBackToMenu}>Back To Main Menu</Button>
+        <Button color='danger' onClick={handleBackToMenu}>Back To Main Menu</Button>
         <Button className='endGameRematch' onClick={handleReturn} color='primary'>Return to Room</Button>
       </div>
     </div>

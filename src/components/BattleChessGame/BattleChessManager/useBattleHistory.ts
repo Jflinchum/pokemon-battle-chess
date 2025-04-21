@@ -77,7 +77,7 @@ const useBattleHistory = ({
     // On mount, start attempting to sync to the current match
     const catchUpToCurrentState = async () => {
       while (matchLogIndex.current < matchLog.length) {
-        if (matchLogIndex.current < matchLog.length - 2 && !catchingUp) {
+        if (matchLogIndex.current < matchLog.length - 3 && !catchingUp) {
           setCatchingUp(true);
         }
 

@@ -47,7 +47,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       if (room.isOngoing) {
         socket.emit('startSync', { history: room.getHistory(playerId) });
         if (room.roomGameOptions.timersEnabled) {
-          socket.emit('currentTimers', room.getTimersWithLastMoveShift());
+          socket.emit('currentTimers', room.gameTimer.getTimersWithLastMoveShift());
         }
         socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
       }
@@ -110,7 +110,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
         }
         socket.emit('startSync', { history: room.getHistory(playerId) });
         if (room.roomGameOptions.timersEnabled) {
-          socket.emit('currentTimers', room.getTimersWithLastMoveShift());
+          socket.emit('currentTimers', room.gameTimer.getTimersWithLastMoveShift());
         }
         io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
