@@ -1,6 +1,7 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
 import Modal from "../components/common/Modal/Modal";
 import { Color } from "chess.js";
+import { EndGameReason } from "../../shared/types/game";
 
 type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'AVATAR_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | 'HOW_TO_PLAY' | '';
 
@@ -9,7 +10,9 @@ export interface RoomCodeModalProps {
 }
 
 export interface EndGameModalProps {
-  victor: Color;
+  reason: EndGameReason;
+  victor?: Color;
+  name?: string;
 }
 
 type ModalProps = RoomCodeModalProps | EndGameModalProps | undefined;

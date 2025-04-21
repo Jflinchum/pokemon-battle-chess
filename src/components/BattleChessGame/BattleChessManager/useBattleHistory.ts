@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Color, Square } from "chess.js";
 import { socket } from "../../../socket";
-import { MatchLog, PokemonBeginBattleData } from '../../../../shared/types/game';
+import { EndGameReason, MatchLog, PokemonBeginBattleData } from '../../../../shared/types/game';
 import { timer } from "../../../utils";
 import { CurrentBattle } from "./BattleChessManager";
 import { useGameState } from "../../../context/GameStateContext";
@@ -16,7 +16,7 @@ interface BattleHistoryProps {
   onPokemonBattleStart: (p1Pokemon: PokemonBeginBattleData['p1Pokemon'], p2Pokemon: PokemonBeginBattleData['p2Pokemon'], attemptedMove: PokemonBeginBattleData['attemptedMove']) => void,
   onPokemonBattleOutput: ({ args, kwArgs }: { args: ArgType; kwArgs: KWArgType }) => void,
   onPokemonBattleEnd?: (victor: Color) => void,
-  onGameEnd: (victor: Color) => void,
+  onGameEnd: (victor: Color, reason: EndGameReason) => void,
   skipToEndOfSync: boolean,
 };
 
@@ -86,7 +86,7 @@ const useBattleHistory = ({
           case 'generic':
             switch (currentLog.data.event) {
               case 'gameEnd':
-                onGameEnd(currentLog.data.color);
+                onGameEnd(currentLog.data.color, currentLog.data.reason);
                 matchLogIndex.current++;
             }
             break;

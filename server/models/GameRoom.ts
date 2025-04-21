@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import { Chess, Square } from "chess.js";
+import { Chess, Color, Square } from "chess.js";
 import { Dex as SimDex, BattleStreams, Teams, PRNGSeed } from '@pkmn/sim';
 import { BoostID } from "@pkmn/data";
 import { PRNG } from '@pkmn/sim'
@@ -8,7 +8,7 @@ import { ObjectReadWriteStream } from "@pkmn/streams";
 import User from "./User";
 import GameRoomManager from "./GameRoomManager";
 import { PokemonBattleChessManager } from "../../shared/models/PokemonBattleChessManager";
-import { MatchHistory, MatchLog } from "../../shared/types/game";
+import { EndGameReason, MatchHistory, MatchLog } from "../../shared/types/game";
 import { GameOptions } from "../../shared/types/GameOptions";
 import GameTimer from "./GameTimer";
 
@@ -249,7 +249,7 @@ export default class GameRoom {
         this.broadcastAll('gameOutput', chessData);
         if (lostPiece?.type === 'k') {
           // Game ender
-          this.endGame(this.currentTurnWhite ? 'w' : 'b');
+          this.endGame(this.currentTurnWhite ? 'w' : 'b', 'KING_CAPTURED');
           return;
         }
       } else {
@@ -265,7 +265,7 @@ export default class GameRoom {
         this.broadcastAll('gameOutput', chessData);
         if (lostPiece?.type === 'k') {
           // Game ender
-          this.endGame(this.currentTurnWhite ? 'w' : 'b');
+          this.endGame(this.currentTurnWhite ? 'w' : 'b', 'KING_CAPTURED');
           return;
         }
       } 
@@ -288,7 +288,7 @@ export default class GameRoom {
   }
 
   private endGameDueToTimeout(color) {
-    this.endGame(color === 'w' ? 'b' : 'w');
+    this.endGame(color === 'w' ? 'b' : 'w', 'TIMEOUT');
   }
 
   private randomDraftPick() {
@@ -318,8 +318,8 @@ export default class GameRoom {
     });
   }
 
-  public endGame(color) {
-    const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color } };
+  public endGame(color: Color, reason: EndGameReason) {
+    const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color, reason } };
     this.pushHistory(gameData);
     this.broadcastAll('gameOutput', gameData);
     this.playerList.forEach((player) => {

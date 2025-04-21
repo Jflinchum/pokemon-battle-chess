@@ -35,9 +35,9 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
       return;
     }
     // Player already owns a room
-    const { player, room } = gameRoomManager.getPlayer(playerId);
-    if (player || room) {
-      gameRoomManager.removeRoom(room);
+    const { room } = gameRoomManager.getPlayer(playerId);
+    if (room) {
+      gameRoomManager.removeRoom(room.roomId);
     }
     const newRoomId = crypto.randomUUID();
 

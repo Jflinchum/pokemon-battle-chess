@@ -38,8 +38,7 @@
     "react-tooltip": "^5.28.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "socketio": "^1.0.0",
-    "stockfish": "^16.0.0"
+    "socketio": "^1.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

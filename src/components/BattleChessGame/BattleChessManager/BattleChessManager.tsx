@@ -30,12 +30,13 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
   const { dispatch: modalStateDispatch } = useModalState();
   const { gameState, dispatch } = useGameState();
 
+  // TODO - these don't need to be recalc'd every time player list changes
   const player1 = useMemo(() => gameState.players.find((player) => player.isPlayer1), [gameState.players]);
   const player2 = useMemo(() => gameState.players.find((player) => player.isPlayer2), [gameState.players]);
   const whitePlayer = useMemo(() => gameState.players.find((player) => player.color === 'w'), [gameState.players]);
   const blackPlayer = useMemo(() => gameState.players.find((player) => player.color === 'b'), [gameState.players]);
   const thisPlayer = useMemo(() => gameState.players.find((player) => player.playerId === userState.id), [gameState.players])
-  const color = useMemo(() => gameState.gameSettings!.color, [gameState])
+  const color = useMemo(() => gameState.gameSettings!.color, [])
   const chessManager = useMemo(() => {
     return new Chess();
   }, []);
@@ -101,8 +102,8 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       }
       setCurrentPokemonMoveHistory((curr) => [...curr, parsedChunk]);
     },
-    onGameEnd: (color) => {
-      modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: color } } })
+    onGameEnd: (color, reason) => {
+      modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: color, reason } } })
       dispatch({ type: 'END_MATCH' });
     },
     skipToEndOfSync: gameState.isSkippingAhead,

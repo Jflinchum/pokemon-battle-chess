@@ -70,14 +70,15 @@ export default class GameRoomManager {
         delete room.transientPlayerList[playerId];
       }
 
-      if (room.isOngoing && isActivePlayer) {
-        this.io.to(room.roomId).emit('endGameFromDisconnect', player?.playerName);
-        room.resetRoomForRematch();
-      } 
       if (room.hostPlayer?.playerId === playerId) {
+        this.io.to(room.roomId).emit('endGameFromDisconnect', { name: player?.playerName, isHost: true });
         this.removeRoom(room.roomId);
         return;
       }
+      if (room.isOngoing && isActivePlayer) {
+        this.io.to(room.roomId).emit('endGameFromDisconnect', { name: player?.playerName, isHost: false });
+        room.resetRoomForRematch();
+      } 
 
       room.leaveRoom(player?.playerId);
 
