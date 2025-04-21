@@ -59,3 +59,8 @@ export type GenericData = {
     color: Color,
   }
 };
+
+export type Timer = {
+  white: { pause: boolean; timerExpiration: number };
+  black: { pause: boolean; timerExpiration: number };
+}

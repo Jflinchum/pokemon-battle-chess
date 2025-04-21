@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Chess, Color, Square } from 'chess.js';
 import { PokemonSet, SideID } from '@pkmn/data';
+import { ArgType, KWArgType } from '@pkmn/protocol';
 import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
 import ChessManager from '../ChessManager/ChessManager';
 import PokemonBattleManager from '../PokemonManager/PokemonBattleManager/PokemonBattleManager';
@@ -14,8 +15,8 @@ import { ChessData, MatchHistory } from '../../../../shared/types/game';
 import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
 import useBattleHistory from './useBattleHistory';
 import Spinner from '../../common/Spinner/Spinner';
+import { Timer } from '../../../../shared/types/game';
 import './BattleChessManager.css';
-import { ArgType, KWArgType } from '@pkmn/protocol';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;
@@ -24,7 +25,7 @@ export interface CurrentBattle {
   offensivePlayer: SideID;
 }
 
-function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
+function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHistory, timers?: Timer }) {
   const { userState } = useUserState();
   const { dispatch: modalStateDispatch } = useModalState();
   const { gameState, dispatch } = useGameState();
@@ -51,17 +52,6 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
   const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<{ args: ArgType, kwArgs: KWArgType }[]>([]);
-  const [timers, setTimers] = useState<{ white: { pause: boolean; timerExpiration: number }, black: { pause: boolean; timerExpiration: number } }>();
-
-  useEffect(() => {
-    socket.on('currentTimers', (timer) => {
-      setTimers(timer);
-    });
-
-    return () => {
-      socket.off('currentTimers');
-    }
-  }, []);
 
   const { catchingUp, currentMatchLog } = useBattleHistory({
     matchHistory,

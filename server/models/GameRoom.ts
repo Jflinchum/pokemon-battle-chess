@@ -536,8 +536,8 @@ export default class GameRoom {
     }
   };
 
-  public broadcastTimers() {
-    this.broadcastAll('currentTimers', {
+  public getTimers() {
+    return {
       white: {
         timerExpiration: this.whitePlayerTimerExpiration,
         pause: !this.whitePlayerTimer,
@@ -546,7 +546,24 @@ export default class GameRoom {
         timerExpiration: this.blackPlayerTimerExpiration,
         pause: !this.blackPlayerTimer,
       }
-    });
+    };
+  }
+
+  public getTimersWithLastMoveShift() {
+    return {
+      white: {
+        timerExpiration: this.whitePlayerTimerExpiration + (new Date().getTime() - this.whitePlayerLastMoveTime) * (this.whitePlayerTimer ? 0 : 1),
+        pause: !this.whitePlayerTimer,
+      },
+      black: {
+        timerExpiration: this.blackPlayerTimerExpiration  + (new Date().getTime() - this.blackPlayerLastMoveTime) * (this.blackPlayerTimer ? 0 : 1),
+        pause: !this.blackPlayerTimer,
+      }
+    };
+  }
+
+  public broadcastTimers() {
+    this.broadcastAll('currentTimers', this.getTimers());
   }
 
   private async createPokemonBattleStream({ p1Set, p2Set, attemptedMove }) {

@@ -6,13 +6,14 @@ import { socket } from "../../socket";
 import Room, { Player } from "./Room/Room";
 import GameManagerActions from "./GameManagerActions/GameManagerActions";
 import ChatToggle from "./GameManagerActions/ChatToggle/ChatToggle";
-import { MatchHistory } from "../../../shared/types/game";
+import { MatchHistory, Timer } from "../../../shared/types/game";
 import './RoomManager.css';
 
 const RoomManager = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
   const { gameState, dispatch } = useGameState();
   const [matchHistory, setMatchHistory] = useState<MatchHistory>();
+  const [timers, setTimers] = useState<Timer>();
 
   useEffect(() => {
     if (!socket.connected) {
@@ -52,11 +53,19 @@ const RoomManager = () => {
     socket.on('roomClosed', () => {
       dispatchUserState({ type: 'LEAVE_ROOM' });
     });
+
+    socket.on('currentTimers', (timer) => {
+      console.log('received timers');
+      console.log(timer);
+      setTimers(timer);
+    });
+
     return () => {
       socket.off('connectedPlayers');
       socket.off('roomClosed');
       socket.off('endGameFromDisconnect');
       socket.off('startSync');
+      socket.off('currentTimers');
     }
   }, []);
 
@@ -66,7 +75,7 @@ const RoomManager = () => {
       <div className='roomManagerContainer'>
         {
           gameState.inGame ?
-          (<BattleChessManager matchHistory={matchHistory} />) :
+          (<BattleChessManager matchHistory={matchHistory} timers={timers} />) :
           (<Room />)
         }
       </div>

@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import GameRoomManager from "../GameRoomManager";
+import GameRoomManager from "../models/GameRoomManager";
 
 export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManager) => {
   io.on('connection', (socket) => {
@@ -46,6 +46,9 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
       if (room.isOngoing) {
         socket.emit('startSync', { history: room.getHistory(playerId) });
+        if (room.roomGameOptions.timersEnabled) {
+          socket.emit('currentTimers', room.getTimersWithLastMoveShift());
+        }
         socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
       }
     });
@@ -106,6 +109,9 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
           delete room.transientPlayerList[playerId];
         }
         socket.emit('startSync', { history: room.getHistory(playerId) });
+        if (room.roomGameOptions.timersEnabled) {
+          socket.emit('currentTimers', room.getTimersWithLastMoveShift());
+        }
         io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
     });

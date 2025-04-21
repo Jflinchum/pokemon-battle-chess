@@ -90,7 +90,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               Amount of time (in seconds) that the player has to ban a pokemon.
             </p>
           </div>
-          <input value={gameOptions.banTimerDuration} type='input' onChange={(e) => setBanTimer(parseInt(e.target.value))} name='banTimer' disabled={!isHost}/>
+          <input value={gameOptions.banTimerDuration} type='input' onChange={(e) => setBanTimer(parseInt(e.target.value) || 0)} name='banTimer' disabled={!isHost}/>
         </li>
         <li className='roomOption'>
           <div className='roomOptionLabel'>
@@ -99,7 +99,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               Amount of time (in minutes) that the player has in the chess game.
             </p>
           </div>
-          <input value={gameOptions.chessTimerDuration} type='input' onChange={(e) => setChessTimer(parseInt(e.target.value))} name='chessTimer' disabled={!isHost}/>
+          <input value={gameOptions.chessTimerDuration} type='input' onChange={(e) => setChessTimer(parseInt(e.target.value) || 0)} name='chessTimer' disabled={!isHost}/>
         </li>
         <li className='roomOption'>
           <div className='roomOptionLabel'>
@@ -108,7 +108,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               Amount of time (in seconds) that the player gains in the chess game every time they move a piece.
             </p>
           </div>
-          <input value={gameOptions.chessTimerIncrement} type='input' onChange={(e) => setChessIncrement(parseInt(e.target.value))} name='chessIncrement' disabled={!isHost}/>
+          <input value={gameOptions.chessTimerIncrement} type='input' onChange={(e) => setChessIncrement(parseInt(e.target.value) || 0)} name='chessIncrement' disabled={!isHost}/>
         </li>
         <li className='roomOption'>
           <div className='roomOptionLabel'>
@@ -117,7 +117,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               Amount of time (in seconds) that the player gains in the chess game every time they select a move in a pokemon battle.
             </p>
           </div>
-          <input value={gameOptions.pokemonTimerIncrement} type='input' onChange={(e) => setPokemonIncrement(parseInt(e.target.value))} name='pokemonIncrement' disabled={!isHost}/>
+          <input value={gameOptions.pokemonTimerIncrement} type='input' onChange={(e) => setPokemonIncrement(parseInt(e.target.value) || 0)} name='pokemonIncrement' disabled={!isHost}/>
         </li>
         <hr></hr>
         <li className='roomOption'>
