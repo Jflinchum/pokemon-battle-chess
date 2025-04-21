@@ -3,12 +3,7 @@ import { useReducer, createContext, useContext, ReactElement, type Dispatch } fr
 import { PRNGSeed } from '@pkmn/sim';
 import { getGameOptions } from "../utils.ts";
 import { Player } from "../components/Room/Room/Room";
-import { BoostsTable } from "@pkmn/data";
-
-export interface GameOptions {
-  format: FormatID;
-  offenseAdvantage: BoostsTable;
-}
+import { GameOptions } from '../../shared/types/GameOptions';
 
 export type FormatID = 'random' | 'draft';
 

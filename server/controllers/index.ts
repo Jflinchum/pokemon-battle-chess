@@ -1,8 +1,8 @@
 import path from "path";
 import { Express } from 'express';
-import User from '../User';
-import GameRoom from '../GameRoom';
-import GameRoomManager from "../GameRoomManager";
+import User from '../models/User';
+import GameRoom from '../models/GameRoom';
+import GameRoomManager from "../models/GameRoomManager";
 
 interface APIResponse<Data> {
   data?: Data
@@ -35,9 +35,9 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
       return;
     }
     // Player already owns a room
-    const { player, room } = gameRoomManager.getPlayer(playerId);
-    if (player || room) {
-      gameRoomManager.removeRoom(room);
+    const { room } = gameRoomManager.getPlayer(playerId);
+    if (room) {
+      gameRoomManager.removeRoom(room.roomId);
     }
     const newRoomId = crypto.randomUUID();
 

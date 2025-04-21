@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import GameRoomManager from "../GameRoomManager";
+import GameRoomManager from "../models/GameRoomManager";
 
 export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManager) => {
   io.on('connection', (socket) => {
@@ -19,10 +19,13 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('joinRoom', (roomId, playerId, playerName, password) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to join room ${roomId}`);
       if (!room || !playerId || !playerName) {
+        console.log(`${playerId} mismatch for ${roomId}`);
         return socket.disconnect();
       }
       if (room.password !== password) {
+        console.log(`${playerId} invalid password for ${roomId}`);
         return socket.disconnect();
       }
 
@@ -42,21 +45,20 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       console.log(`Player ${playerId} joined room ${roomId}`);
 
       if (room.isOngoing) {
-        socket.emit('startSync', {
-          banHistory: room.banHistory,
-          pokemonAssignments: room.pokemonAssignments,
-          chessMoveHistory: room.chessMoveHistory,
-          pokemonBattleHistory: room.getPokemonBattleHistory(playerId),
-        });
+        socket.emit('startSync', { history: room.getHistory(playerId) });
+        if (room.roomGameOptions.timersEnabled) {
+          socket.emit('currentTimers', room.gameTimer.getTimersWithLastMoveShift());
+        }
         socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
       }
     });
 
     socket.on('requestToggleSpectating', (roomId, playerId) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to change to spectator for ${roomId}`);
 
       if (!room || !playerId) {
-        socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
       const player = room.getPlayer(playerId);
@@ -70,9 +72,10 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestChangeGameOptions', (roomId, playerId, gameOptions) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to change game options for ${roomId}`);
 
       if (!room || room.hostPlayer?.playerId !== playerId) {
-        socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
 
@@ -82,9 +85,10 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestStartGame', (roomId, playerId) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to start game for ${roomId}`);
 
       if (!room || room.hostPlayer?.playerId !== playerId) {
-        socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
 
@@ -96,7 +100,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       console.log('request sync received ' + roomId + ' ' + playerId);
       const room = gameRoomManager.getRoom(roomId);
       if (!room) {
-        return socket.disconnect();
+        return;
       }
 
       if (room.isOngoing) {
@@ -104,20 +108,20 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
           clearTimeout(room.transientPlayerList[playerId]);
           delete room.transientPlayerList[playerId];
         }
-        socket.emit('startSync', {
-          banHistory: room.banHistory,
-          pokemonAssignments: room.pokemonAssignments,
-          chessMoveHistory: room.chessMoveHistory,
-          pokemonBattleHistory: room.getPokemonBattleHistory(playerId),
-        });
+        socket.emit('startSync', { history: room.getHistory(playerId) });
+        if (room.roomGameOptions.timersEnabled) {
+          socket.emit('currentTimers', room.gameTimer.getTimersWithLastMoveShift());
+        }
         io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
     });
 
     socket.on('requestChessMove', ({ sanMove, roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to chess move ${sanMove} for ${roomId}`);
       if (!room || !playerId) {
-        return socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}`);
+        return;
       }
 
       room.validateAndEmitChessMove({ sanMove, playerId });
@@ -125,8 +129,11 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestPokemonMove', ({ pokemonMove, roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to chess move ${pokemonMove} for ${roomId}`);
+
       if (!room || !playerId) {
-        return socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}`);
+        return;
       }
 
       room.validateAndEmitPokemonMove({ pokemonMove, playerId });
@@ -134,8 +141,11 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('requestDraftPokemon', ({ roomId, playerId, square, draftPokemonIndex, isBan }) => {
       const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to ${isBan ? 'ban' : 'draft'} pokemon ${draftPokemonIndex} at ${square} for ${roomId}`);
+
       if (!room || !playerId) {
-        return socket.disconnect();
+        console.log(`${playerId} mismatch for ${roomId}`);
+        return;
       }
 
       room.validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId, isBan });

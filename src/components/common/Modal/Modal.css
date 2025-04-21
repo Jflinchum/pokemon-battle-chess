@@ -26,10 +26,16 @@
 .closeModalButton {
   height: 30px;
   width: 30px;
-  float: right;
   cursor: pointer;
 
   color: white;
   background: none;
   border: none;
+  border-radius: 50%;
+  position: absolute;
+  right: 25px;
+
+  &:hover {
+    background-color: rgb(75, 75, 75);
+  }
 }

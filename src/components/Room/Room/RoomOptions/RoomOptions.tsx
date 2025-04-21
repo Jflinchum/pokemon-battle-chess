@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import './RoomOptions.css';
-import { FormatID, GameOptions } from '../../../../context/GameStateContext';
 import { BoostID, BoostsTable } from '@pkmn/data';
+import './RoomOptions.css';
+import { FormatID } from '../../../../context/GameStateContext';
+import { GameOptions } from '../../../../../shared/types/GameOptions';
 
 const advantageOptions: { stat: BoostID, label: string }[] = [
   { stat: 'atk', label: 'Attack' },
@@ -27,13 +28,23 @@ interface RoomOptionsProp {
 const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
   const [format, setFormat] = useState<FormatID>(gameOptions.format);
   const [offenseAdvantage, setOffenseAdvantage] = useState<BoostsTable>(gameOptions.offenseAdvantage);
+  const [timersEnabled, setTimersEnabled] = useState<boolean>(gameOptions.timersEnabled);
+  const [banTimer, setBanTimer] = useState<number>(gameOptions.banTimerDuration);
+  const [chessTimer, setChessTimer] = useState<number>(gameOptions.chessTimerDuration);
+  const [chessIncrement, setChessIncrement] = useState<number>(gameOptions.chessTimerIncrement);
+  const [pokemonIncrement, setPokemonIncrement] = useState<number>(gameOptions.pokemonTimerIncrement);
 
   useEffect(() => {
     onChange({
       format,
       offenseAdvantage,
+      timersEnabled,
+      chessTimerDuration: chessTimer,
+      banTimerDuration: banTimer,
+      chessTimerIncrement: chessIncrement,
+      pokemonTimerIncrement: pokemonIncrement,
     });
-  }, [format, offenseAdvantage]);
+  }, [format, offenseAdvantage, timersEnabled, chessTimer, banTimer, chessIncrement, pokemonIncrement]);
 
   return (
     <div className='roomOptionsContainer'>
@@ -57,6 +68,56 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               ))
             }
           </select>
+        </li>
+        <hr></hr>
+        <li className='roomOption'>
+          <div className='roomOptionLabel'>
+            <label htmlFor='gameTimer'>Game timers:</label>
+            <p>
+              Timer countdowns in game. If players run out of time during the draft/ban phase, a random pokemon will be chosen and
+              randomly assigned. If players run out of time in chess/pokemon, then they will lose.
+            </p>
+            <p>
+              Increment times give the player that amount of time whenever they perform their turn.
+            </p>
+          </div>
+          <input checked={gameOptions.timersEnabled} type='checkbox' onChange={() => setTimersEnabled(!gameOptions.timersEnabled)} name='gameTimer' disabled={!isHost}/>
+        </li>
+        <li className='roomOption'>
+          <div className='roomOptionLabel'>
+            <label htmlFor='banTimer'>Ban Timer:</label>
+            <p>
+              Amount of time (in seconds) that the player has to ban a pokemon.
+            </p>
+          </div>
+          <input value={gameOptions.banTimerDuration} type='input' onChange={(e) => setBanTimer(parseInt(e.target.value) || 0)} name='banTimer' disabled={!isHost}/>
+        </li>
+        <li className='roomOption'>
+          <div className='roomOptionLabel'>
+            <label htmlFor='chessTimer'>Chess Timer:</label>
+            <p>
+              Amount of time (in minutes) that the player has in the chess game.
+            </p>
+          </div>
+          <input value={gameOptions.chessTimerDuration} type='input' onChange={(e) => setChessTimer(parseInt(e.target.value) || 0)} name='chessTimer' disabled={!isHost}/>
+        </li>
+        <li className='roomOption'>
+          <div className='roomOptionLabel'>
+            <label htmlFor='chessIncrement'>Chess Increment:</label>
+            <p>
+              Amount of time (in seconds) that the player gains in the chess game every time they move a piece.
+            </p>
+          </div>
+          <input value={gameOptions.chessTimerIncrement} type='input' onChange={(e) => setChessIncrement(parseInt(e.target.value) || 0)} name='chessIncrement' disabled={!isHost}/>
+        </li>
+        <li className='roomOption'>
+          <div className='roomOptionLabel'>
+            <label htmlFor='pokemonIncrement'>Pokemon Increment:</label>
+            <p>
+              Amount of time (in seconds) that the player gains in the chess game every time they select a move in a pokemon battle.
+            </p>
+          </div>
+          <input value={gameOptions.pokemonTimerIncrement} type='input' onChange={(e) => setPokemonIncrement(parseInt(e.target.value) || 0)} name='pokemonIncrement' disabled={!isHost}/>
         </li>
         <hr></hr>
         <li className='roomOption'>

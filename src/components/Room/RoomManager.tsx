@@ -2,34 +2,34 @@ import { useEffect, useState } from "react";
 import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
 import { useGameState } from "../../context/GameStateContext";
 import { useUserState } from "../../context/UserStateContext";
+import { useModalState } from "../../context/ModalStateContext";
 import { socket } from "../../socket";
 import Room, { Player } from "./Room/Room";
 import GameManagerActions from "./GameManagerActions/GameManagerActions";
 import ChatToggle from "./GameManagerActions/ChatToggle/ChatToggle";
+import { MatchHistory, Timer } from "../../../shared/types/game";
 import './RoomManager.css';
-
-export interface MatchHistory {
-  banHistory: number[];
-  chessMoveHistory: string[];
-  pokemonAssignments: string[];
-  pokemonBattleHistory: string[][];
-}
 
 const RoomManager = () => {
   const { userState, dispatch: dispatchUserState } = useUserState();
   const { gameState, dispatch } = useGameState();
+  const { dispatch: dispatchModalState } = useModalState();
   const [matchHistory, setMatchHistory] = useState<MatchHistory>();
+  const [timers, setTimers] = useState<Timer>();
+
+  useEffect(() => {
+    socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
+  }, []);
 
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
     }
-    socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
 
-    socket.on('startSync', (matchHistory: MatchHistory) => {
+    socket.on('startSync', ({ history }: { history: MatchHistory }) => {
       console.log('starting sync');
-      console.log(matchHistory);
-      setMatchHistory(matchHistory)
+      console.log(history);
+      setMatchHistory(history);
     });
 
     socket.io.on('reconnect', () => {
@@ -37,8 +37,16 @@ const RoomManager = () => {
       socket.emit('requestSync', userState.currentRoomId, userState.id);
     });
 
-    socket.on('endGameFromDisconnect', () => {
-      dispatch({ type: 'RETURN_TO_ROOM' });
+    socket.on('endGameFromDisconnect', ({ name, isHost }) => {
+      if (isHost || !gameState.matchEnded) {
+        dispatchModalState({
+          type: 'OPEN_END_GAME_MODAL',
+          payload: { modalProps: { reason: isHost ? 'HOST_DISCONNECTED' : 'PLAYER_DISCONNECTED', name } }
+        });
+      }
+      if (isHost) {
+        dispatchUserState({ type: 'LEAVE_ROOM' });
+      }
     });
 
     socket.on('connectedPlayers', (players: Player[]) => {
@@ -58,13 +66,21 @@ const RoomManager = () => {
     socket.on('roomClosed', () => {
       dispatchUserState({ type: 'LEAVE_ROOM' });
     });
+
+    socket.on('currentTimers', (timer) => {
+      console.log('received timers');
+      console.log(timer);
+      setTimers(timer);
+    });
+
     return () => {
       socket.off('connectedPlayers');
       socket.off('roomClosed');
       socket.off('endGameFromDisconnect');
       socket.off('startSync');
+      socket.off('currentTimers');
     }
-  }, []);
+  }, [gameState.matchEnded]);
 
   return (
     <>
@@ -72,7 +88,7 @@ const RoomManager = () => {
       <div className='roomManagerContainer'>
         {
           gameState.inGame ?
-          (<BattleChessManager matchHistory={matchHistory} />) :
+          (<BattleChessManager matchHistory={matchHistory} timers={timers} />) :
           (<Room />)
         }
       </div>

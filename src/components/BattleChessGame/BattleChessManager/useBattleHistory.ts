@@ -1,17 +1,22 @@
 import { useRef, useState, useEffect } from "react";
 import { Color, Square } from "chess.js";
 import { socket } from "../../../socket";
-import { MatchHistory } from "../../Room/RoomManager";
+import { EndGameReason, MatchLog, PokemonBeginBattleData } from '../../../../shared/types/game';
 import { timer } from "../../../utils";
 import { CurrentBattle } from "./BattleChessManager";
 import { useGameState } from "../../../context/GameStateContext";
+import { ArgType, KWArgType, Protocol } from "@pkmn/protocol";
 
 interface BattleHistoryProps {
-  matchHistory?: MatchHistory,
+  matchHistory?: MatchLog[],
   currentBattle?: CurrentBattle | null,
   onBan: (index: number) => void,
   onDraft: (square: Square, index: number, color: Color) => void,
-  onMove: (sanMove: string) => boolean,
+  onMove: (sanMove: string, moveFailed?: boolean) => void,
+  onPokemonBattleStart: (p1Pokemon: PokemonBeginBattleData['p1Pokemon'], p2Pokemon: PokemonBeginBattleData['p2Pokemon'], attemptedMove: PokemonBeginBattleData['attemptedMove']) => void,
+  onPokemonBattleOutput: ({ args, kwArgs }: { args: ArgType; kwArgs: KWArgType }) => void,
+  onPokemonBattleEnd?: (victor: Color) => void,
+  onGameEnd: (victor: Color, reason: EndGameReason) => void,
   skipToEndOfSync: boolean,
 };
 
@@ -34,56 +39,35 @@ const useBattleHistory = ({
   onBan,
   onDraft,
   onMove,
+  onPokemonBattleStart,
+  onPokemonBattleOutput,
+  onPokemonBattleEnd = () => {},
+  onGameEnd,
   skipToEndOfSync
 }: BattleHistoryProps) => {
-  // User state preferred animation speed and multiply the timers here based on it
+  // User state preferred animation speed and multiply the timers here based on it TODO
   const { gameState } = useGameState();
 
-  const [banHistory, setBanHistoryState] = useState(matchHistory?.banHistory || []);
-  const banHistoryIndex = useRef(0);
-  const [draftHistory, setDraftHistoryState] = useState(matchHistory?.pokemonAssignments || []);
-  const draftHistoryIndex = useRef(0);
-  const [chessMoveHistory, setChessMoveHistory] = useState(matchHistory?.chessMoveHistory || []);
-  const chessMoveHistoryIndex = useRef(0);
-  const [pokemonBattleHistoryState, setPokemonBattleHistoryState] = useState(matchHistory?.pokemonBattleHistory || []);
-  const pokemonBattleHistoryIndex = useRef(0);
-  const [catchingUp, setCatchingUp] = useState(false);
+  const [matchLog, setCurrentMatchLog] = useState(matchHistory || []);
+
+  const matchLogIndex = useRef(0);
+  const pokemonLogIndex = useRef(0);
 
   useEffect(() => {
-    setBanHistoryState(matchHistory?.banHistory || []);
-    setDraftHistoryState(matchHistory?.pokemonAssignments || []);
-    setChessMoveHistory(matchHistory?.chessMoveHistory || []);
-    setPokemonBattleHistoryState(matchHistory?.pokemonBattleHistory || []);
-  }, [matchHistory]);
-
-  useEffect(() => {
-    socket.on('startPokemonDraft', ({ square, draftPokemonIndex, socketColor, isBan }) => {
-      if (isBan) {
-        setBanHistoryState((curr) => [...curr, draftPokemonIndex]);
-      } else {
-        setDraftHistoryState((curr) => [...curr, `${socketColor} ${draftPokemonIndex} ${square}`]);
-      }
-    });
-
-    socket.on('startPokemonMove', ({ move }) => {
-      setPokemonBattleHistoryState((curr) => {
-        return [...curr.slice(0, -1), [...curr[curr.length - 1], move]];
-      });
-    });
-
-    socket.on('startChessMove', ({ sanMove }) => {
-      setChessMoveHistory((curr) => [...curr, sanMove])
-      if (sanMove.includes('x')) {
-        setPokemonBattleHistoryState((curr) => [...curr, []]);
-      }
+    socket.on('gameOutput', (log: MatchLog) => {
+      setCurrentMatchLog((curr) => [...curr, log]);
     });
 
     return () => {
-      socket.off('startChessMove');
-      socket.off('startPokemonDraft');
-      socket.off('startPokemonMove');
+      socket.off('gameOutput');
     };
   }, []);
+
+  const [catchingUp, setCatchingUp] = useState(false);
+
+  useEffect(() => {
+    setCurrentMatchLog(matchHistory || matchLog);
+  }, [matchHistory]);
 
   useEffect(() => {
     let catchUpTimer: { start: () => Promise<void>, stop: () => void } | undefined;
@@ -92,67 +76,98 @@ const useBattleHistory = ({
 
     // On mount, start attempting to sync to the current match
     const catchUpToCurrentState = async () => {
-      // Ban phase catchup
-      while (banHistoryIndex.current < banHistory.length) {
-        if (banHistoryIndex.current < banHistory.length - 3 && !catchingUp) {
+      while (matchLogIndex.current < matchLog.length) {
+        if (matchLogIndex.current < matchLog.length - 3 && !catchingUp) {
           setCatchingUp(true);
         }
-        const banPiece = banHistory[banHistoryIndex.current]!;
-        banHistoryIndex.current++
-        onBan(banPiece);
-        catchUpTimer = timer(timeBetweenSteps);
-        await catchUpTimer.start();
-      }
-      // Draft phase catchup
-      while(draftHistoryIndex.current < draftHistory.length) {
-        if (draftHistoryIndex.current < draftHistory.length - 3 && !catchingUp) {
-          setCatchingUp(true);
-        }
-        // Instant draft on random
-        const isRandomDraft = gameState.gameSettings.options.format === 'random' ? 0 : 1;
-        const draft = draftHistory[draftHistoryIndex.current]!;
-        draftHistoryIndex.current++
-        const draftArgs = draft.split(' ');
-        const color = draftArgs[0] as Color;
-        const index = parseInt(draftArgs[1]);
-        const square = draftArgs[2] as Square;
-        onDraft(square, index, color);
-        catchUpTimer = timer(timeBetweenSteps * isRandomDraft);
-        await catchUpTimer.start();
-      }
 
-      while(chessMoveHistoryIndex.current < chessMoveHistory.length) {
-        if (chessMoveHistoryIndex.current < chessMoveHistory.length - 3 && !catchingUp) {
-          setCatchingUp(true);
+        const currentLog = matchLog[matchLogIndex.current];
+        switch (currentLog.type) {
+          case 'generic':
+            switch (currentLog.data.event) {
+              case 'gameEnd':
+                onGameEnd(currentLog.data.color, currentLog.data.reason);
+                matchLogIndex.current++;
+            }
+            break;
+          case 'ban':
+            onBan(currentLog.data.index);
+            matchLogIndex.current++;
+            catchUpTimer = timer(timeBetweenSteps);
+            await catchUpTimer.start();
+            break;
+          case 'draft':
+            const isRandomDraft = gameState.gameSettings.options.format === 'random' ? 0 : 1;
+            onDraft(currentLog.data.square, currentLog.data.index, currentLog.data.color);
+            matchLogIndex.current++;
+            catchUpTimer = timer(timeBetweenSteps * isRandomDraft);
+            await catchUpTimer.start();
+            break;
+          case 'chess':
+            onMove(currentLog.data.san, currentLog.data.failed);
+            matchLogIndex.current++;
+            catchUpTimer = timer(timeBetweenSteps);
+            await catchUpTimer.start();
+            break;
+          case 'pokemon':
+            switch (currentLog.data.event) {
+              case 'battleStart':
+                pokemonLogIndex.current = 0;
+                onPokemonBattleStart(currentLog.data.p1Pokemon, currentLog.data.p2Pokemon, currentLog.data.attemptedMove);
+                matchLogIndex.current++;
+                catchUpTimer = timer(timeBetweenSteps);
+                await catchUpTimer.start();
+                break;
+              case 'streamOutput':
+                const parsedChunk = Protocol.parse(currentLog.data.chunk);
+                const currentPokemonLog = [];
+                for (const { args, kwArgs } of parsedChunk) {
+                  currentPokemonLog.push({ args, kwArgs });
+                }
+
+                while (pokemonLogIndex.current < currentPokemonLog.length) {
+                  const { args, kwArgs } = currentPokemonLog[pokemonLogIndex.current];
+                  onPokemonBattleOutput({ args, kwArgs });
+
+                  pokemonLogIndex.current++;
+                  if (shouldDelayBeforeContinuing(args[0])) {
+                    catchUpTimer = timer(1000 * (skipToEndOfSync ? 0 : 1));
+                    await catchUpTimer.start();
+                  }
+                }
+
+                pokemonLogIndex.current = 0;
+                matchLogIndex.current++;
+                break;
+              case 'victory':
+                onPokemonBattleEnd(currentLog.data.color);
+                matchLogIndex.current++;
+                catchUpTimer = timer(timeBetweenSteps);
+                await catchUpTimer.start();
+                break;
+            }
         }
-        const sanMove = chessMoveHistory[chessMoveHistoryIndex.current]!;
-        chessMoveHistoryIndex.current++
-        if (onMove(sanMove)) {
-          // If handle attempt move detects a pokemon battle, wait until the battle is resolved
-          pokemonBattleHistoryIndex.current++;
-          if (pokemonBattleHistoryIndex.current === pokemonBattleHistoryState.length && chessMoveHistoryIndex.current === chessMoveHistory.length) {
-            setCatchingUp(false);
-          }
-          return;
-        }
-        catchUpTimer = timer(timeBetweenSteps);
-        await catchUpTimer.start();
       }
 
       setCatchingUp(false);
     }
   
-    if (!currentBattle) {
-      catchUpToCurrentState();
-    }
+    catchUpToCurrentState();
     
-
     return () => {
       catchUpTimer?.stop();
     }
-  }, [currentBattle, banHistory, draftHistory, chessMoveHistory, skipToEndOfSync]);
+  }, [currentBattle, skipToEndOfSync, matchLog]);
 
-  return { currentPokemonMoveHistory: pokemonBattleHistoryState[pokemonBattleHistoryIndex.current - 1], catchingUp };
+  return { catchingUp, currentMatchLog: matchLog.slice(0, matchLogIndex.current) };
 };
+
+const shouldDelayBeforeContinuing = (logType: string) => {
+  const delayLogs = ['move', '-damage', '-heal'];
+  if (delayLogs.includes(logType)) {
+    return true;
+  }
+  return false;
+}
 
 export default useBattleHistory;

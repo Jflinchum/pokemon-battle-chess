@@ -1,23 +1,24 @@
+import { ChessData } from '../../../../../shared/types/game';
 import './ChessMoveHistory.css';
 import { useEffect, useRef } from "react";
 
-const ChessMoveHistoryItem = ({ turn, whiteMove, blackMove }: { turn: number; whiteMove?: { sanMove: string; battleSuccess: boolean | null }; blackMove?: { sanMove: string; battleSuccess: boolean | null } }) => {
+const ChessMoveHistoryItem = ({ turn, whiteMove, blackMove }: { turn: number; whiteMove?: ChessData; blackMove?: ChessData }) => {
   return (
     <li>
       <span className='moveHistoryTurnLabel'>
         {turn}.
       </span>
-      <span className={`moveHistoryMoveLabel ${whiteMove?.battleSuccess === false ? 'moveHistoryFail' : whiteMove?.battleSuccess === true ? 'moveHistoryWin' : ''}`}>
-        {whiteMove?.sanMove}
+      <span className={`moveHistoryMoveLabel ${whiteMove?.data.failed === true ? 'moveHistoryFail' : whiteMove?.data.failed === false ? 'moveHistoryWin' : ''}`}>
+        {whiteMove?.data.san}
       </span>
-      <span className={`moveHistoryMoveLabel ${blackMove?.battleSuccess === false ? 'moveHistoryFail' : blackMove?.battleSuccess === true ? 'moveHistoryWin' : ''}`}>
-        {blackMove?.sanMove}
+      <span className={`moveHistoryMoveLabel ${blackMove?.data.failed === true ? 'moveHistoryFail' : blackMove?.data.failed === false ? 'moveHistoryWin' : ''}`}>
+        {blackMove?.data.san}
       </span>
     </li>
   )
 };
 
-const ChessMoveHistory = ({ chessMoveHistory }: { chessMoveHistory: { sanMove: string, battleSuccess: boolean | null }[] }) => {
+const ChessMoveHistory = ({ chessMoveHistory }: { chessMoveHistory: ChessData[] }) => {
   const containerRef = useRef<HTMLUListElement>(null);
   useEffect(() => {
     const element = containerRef.current;

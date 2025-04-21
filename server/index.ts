@@ -5,7 +5,7 @@ import cors from 'cors';
 import http from 'http';
 import https from 'https';
 import fs from 'fs';
-import GameRoomManager from './GameRoomManager';
+import GameRoomManager from './models/GameRoomManager';
 import { config } from './config';
 import { registerSocketEvents } from './socket/socketEvents';
 import { registerRoutes } from './controllers';

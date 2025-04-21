@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Color } from "chess.js";
 import { Sprites } from "@pkmn/img";
-import { useGameState, GameOptions } from "../../../context/GameStateContext";
+import { useGameState } from "../../../context/GameStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import { socket } from "../../../socket";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
@@ -9,6 +9,7 @@ import Button from "../../common/Button/Button";
 import SpectatorList from "./SpectatorList/SpectatorList";
 import PlayerName from "./PlayerName/PlayerName";
 import RoomOptions from "./RoomOptions/RoomOptions";
+import { GameOptions } from "../../../../shared/types/GameOptions";
 import './Room.css';
 
 export interface Player {

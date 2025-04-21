@@ -1,9 +1,11 @@
-import { ChessBoardSquare } from "../ChessManager/types";
 import { PieceSymbol, Color, Square } from "chess.js";
 import { TeamGenerators } from '@pkmn/randoms';
 import { PokemonSet } from "@pkmn/data";
 import { PRNGSeed } from '@pkmn/sim'
-import { FormatID } from "../../../context/GameStateContext";
+
+export type FormatID = 'random' | 'draft';
+
+export type ChessBoardSquare = { square: Square; type: PieceSymbol; color: Color } | null;
 
 export interface PokemonPiece {
   type: PieceSymbol
@@ -20,13 +22,11 @@ export interface PokemonBattle {
 
 export class PokemonBattleChessManager {
   public chessPieces: PokemonPiece[] = [];
-  public board: ChessBoardSquare[][];
   public seed: PRNGSeed;
   public draftPieces: PokemonSet[] = [];
   public banPieces: PokemonSet[] = [];
 
-  constructor(board: ChessBoardSquare[][], seed: PRNGSeed, format: FormatID) {
-    this.board = board;
+  constructor(seed: PRNGSeed, format: FormatID) {
     this.seed = seed;
     
     if (format === 'random') {
@@ -54,13 +54,13 @@ export class PokemonBattleChessManager {
 
   public populateBoardWithRandomTeams() {
     const teamGen = this.teamRandomGenerator();
-    for (let row = 0; row < this.board.length; row++) {
-      for (let col = 0; col < this.board[row].length; col++) {
-        const sq = this.board[row][col];
-        if (sq !== null) {
-          this.chessPieces.push({ type: sq.type, square: sq.square, pkmn: teamGen.next().value, color: sq.color });
-        }
-      }
+    const bChessPieceArray = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r', ...Array(8).fill('p')];
+    const wChessPieceArray = [...Array(8).fill('p'), 'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
+    for (let i = 0; i < 16; i++) {
+      this.chessPieces.push({ type: bChessPieceArray[i], square: `${String.fromCharCode(97 + Math.floor(i % 8))}${8 - Math.floor(i / 8)}` as Square, pkmn: teamGen.next().value, color: 'b' })
+    }
+    for (let i = 0; i < 16; i++) {
+      this.chessPieces.push({ type: wChessPieceArray[i], square: `${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}` as Square, pkmn: teamGen.next().value, color: 'w' })
     }
   }
 

@@ -8,10 +8,11 @@ import PokemonType from '../../../common/Pokemon/PokemonType/PokemonType';
 import ChessMoveHistory from '../../ChessManager/ChessMoveHistory/ChessMoveHistory';
 import './PokemonChessDetailsCard.css';
 import Tooltip from '../../../common/Tooltip/Tooltip';
+import { ChessData } from '../../../../../shared/types/game';
 
 interface PokemonChessDetailsCardProps {
   pokemon?: PokemonSet | null;
-  chessMoveHistory?: { sanMove: string, battleSuccess: boolean | null }[];
+  chessMoveHistory?: ChessData[];
 }
 
 const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [] }: PokemonChessDetailsCardProps) => {
@@ -26,8 +27,8 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [] }: PokemonChes
               <p>{pokemon.name}</p>
               <p>
                 {
-                  Dex.species.get(pokemon.species).types.map((type, index) => (
-                    <PokemonType className='pokemonDetailsTyping' type={type} key={index} />
+                  Dex.species.get(pokemon.species).types.map((type) => (
+                    <PokemonType className='pokemonDetailsTyping' type={type} key={type} />
                   ))
                 }
               </p>
