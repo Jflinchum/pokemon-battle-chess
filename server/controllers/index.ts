@@ -1,8 +1,8 @@
 import path from "path";
 import { Express } from 'express';
-import User from '../User';
-import GameRoom from '../GameRoom';
-import GameRoomManager from "../GameRoomManager";
+import User from '../models/User';
+import GameRoom from '../models/GameRoom';
+import GameRoomManager from "../models/GameRoomManager";
 
 interface APIResponse<Data> {
   data?: Data

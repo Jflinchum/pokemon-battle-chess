@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Chess, Color, Square } from 'chess.js';
 import { PokemonSet, SideID } from '@pkmn/data';
-import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
+import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
 import ChessManager from '../ChessManager/ChessManager';
 import PokemonBattleManager from '../PokemonManager/PokemonBattleManager/PokemonBattleManager';
 import DraftPokemonManager from '../DraftPokemonManager/DraftPokemonManager';
@@ -39,7 +39,7 @@ function BattleChessManager({ matchHistory }: { matchHistory?: MatchHistory }) {
     return new Chess();
   }, []);
   const pokemonManager = useMemo(() => {
-    return new PokemonBattleChessManager(chessManager.board(), gameState.gameSettings.seed!, gameState.gameSettings.options.format);
+    return new PokemonBattleChessManager(gameState.gameSettings.seed!, gameState.gameSettings.options.format);
   }, []);
 
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(null);
