@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import './RoomOptions.css';
-import { FormatID, GameOptions } from '../../../../context/GameStateContext';
 import { BoostID, BoostsTable } from '@pkmn/data';
+import './RoomOptions.css';
+import { FormatID } from '../../../../context/GameStateContext';
+import { GameOptions } from '../../../../../shared/types/GameOptions';
 
 const advantageOptions: { stat: BoostID, label: string }[] = [
   { stat: 'atk', label: 'Attack' },

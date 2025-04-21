@@ -6,10 +6,10 @@ import { PRNG } from '@pkmn/sim'
 import { Protocol } from '@pkmn/protocol';
 import { ObjectReadWriteStream } from "@pkmn/streams";
 import User from "./User";
-import { GameOptions } from './GameOptions';
 import GameRoomManager from "./GameRoomManager";
 import { PokemonBattleChessManager } from "./PokemonBattleChessManager";
 import { MatchHistory, MatchLog } from "../shared/types/game";
+import { GameOptions } from "../shared/types/GameOptions";
 
 export default class GameRoom {
   public roomId: string;
