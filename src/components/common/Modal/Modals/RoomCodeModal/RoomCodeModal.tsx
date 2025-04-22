@@ -45,7 +45,7 @@ const RoomCodeModal = () => {
       <form onSubmit={handleJoinRoom} className='roomCodeForm'>
         <PasscodeInput label="Room Code" onFocus={() => errorText === 'Invalid Password' && setErrorText('')} ref={inputRef}/>
         <div className='roomCodeActions'>
-          <Button onClick={handleCancelClick}>Cancel</Button>
+          <Button type='button' onClick={handleCancelClick}>Cancel</Button>
           <Button type='submit' color='primary'>Submit</Button>
         </div>
       </form>

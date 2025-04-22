@@ -29,6 +29,7 @@ Priority:
 - Battle/animation speed
   - Necessary for battle timer
 - Host controls
+  - Redesign player list first, both in room and in game
 - More detailed modals in game
   - Add server disconnect
 - Robots.txt disable search engine crawling (for now)
@@ -42,13 +43,13 @@ Refactor TODOs:
 - Organize frontend types in a single dir and re-use more efficiently
 
 Issues:
-- Form submissions
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Pawn promotion form should go away after choosing
 - Disallow client controls when the match ends
 - Bigger turn indicator maybe by player details
-- Player disconnecting at end game modal clears their name
+  - Better indicator that time is ticking down in timer mode
+- Player disconnecting removes player nameplate in game
 - Joining a room should clear viewing results status
 - Some pokemon do not appear in image for background
 - Room options being user friendly (timer should be a dropdown of options, any required input should prevent form submission)
