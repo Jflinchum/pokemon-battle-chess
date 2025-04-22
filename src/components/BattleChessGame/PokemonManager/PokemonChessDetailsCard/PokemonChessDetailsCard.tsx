@@ -42,7 +42,7 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [] }: PokemonChes
                     <span>
                       <b>Item: </b>
                       <div id={`${pokemon.item.split(' ').join('-')}`} className='pokemonDetailsItemContainer'>
-                        { pokemon.item && <img src={Icons.getItem(pokemon.item).url} style={Icons.getItem(pokemon.item).css} /> }
+                        { pokemon.item && <div style={Icons.getItem(pokemon.item).css} /> }
                         <span>{pokemon.item || 'None'}</span>
                         <Tooltip anchorSelect={`#${pokemon.item.split(' ').join('-')}`}>
                           { Dex.items.get(pokemon.item).shortDesc }
