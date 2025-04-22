@@ -68,8 +68,6 @@ const RoomManager = () => {
     });
 
     socket.on('currentTimers', (timer) => {
-      console.log('received timers');
-      console.log(timer);
       setTimers(timer);
     });
 
@@ -88,7 +86,7 @@ const RoomManager = () => {
       <div className='roomManagerContainer'>
         {
           gameState.inGame ?
-          (<BattleChessManager matchHistory={matchHistory} timers={timers} />) :
+          (<BattleChessManager matchHistory={matchHistory} timers={gameState.gameSettings.options.timersEnabled ? timers : undefined} />) :
           (<Room />)
         }
       </div>

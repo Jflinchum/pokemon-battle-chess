@@ -344,20 +344,18 @@ export default class GameRoom {
     if (this.gameTimer) {
       this.gameTimer.clearTimeouts();
     }
-    if (this.roomGameOptions.timersEnabled) {
-      const timerDuration = this.roomGameOptions.format === 'random' ? this.roomGameOptions.chessTimerDuration*60*1000 : this.roomGameOptions.banTimerDuration*1000;
-      const callback = this.roomGameOptions.format === 'random' ? () => this.endGameDueToTimeout('w') : () => this.randomDraftPick();
+    const timerDuration = this.roomGameOptions.format === 'random' ? this.roomGameOptions.chessTimerDuration*60*1000 : this.roomGameOptions.banTimerDuration*1000;
+    const callback = this.roomGameOptions.format === 'random' ? () => this.endGameDueToTimeout('w') : () => this.randomDraftPick();
 
-      this.gameTimer = new GameTimer(
-        this.roomGameOptions.banTimerDuration,
-        this.roomGameOptions.chessTimerDuration,
-        this.roomGameOptions.chessTimerIncrement,
-        this.roomGameOptions.pokemonTimerIncrement,
-        this.roomGameOptions.timersEnabled,
-      );
-      this.gameTimer.initializeGameTimer(timerDuration);
-      this.gameTimer.startTimer(callback, 'w');
-    }
+    this.gameTimer = new GameTimer(
+      this.roomGameOptions.banTimerDuration,
+      this.roomGameOptions.chessTimerDuration,
+      this.roomGameOptions.chessTimerIncrement,
+      this.roomGameOptions.pokemonTimerIncrement,
+      this.roomGameOptions.timersEnabled,
+    );
+    this.gameTimer.initializeGameTimer(timerDuration);
+    this.gameTimer.startTimer(callback, 'w');
   }
 
   public validateAndEmitPokemonMove({ pokemonMove, playerId }) {

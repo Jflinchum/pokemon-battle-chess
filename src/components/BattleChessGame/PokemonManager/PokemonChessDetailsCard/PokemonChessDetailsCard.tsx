@@ -24,7 +24,7 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [] }: PokemonChes
           pokemon ?
           (
             <>
-              <p>{pokemon.name}</p>
+              <p>{pokemon.name} Lv{pokemon.level}</p>
               <p>
                 {
                   Dex.species.get(pokemon.species).types.map((type) => (
