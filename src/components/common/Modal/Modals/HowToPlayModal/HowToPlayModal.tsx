@@ -7,7 +7,7 @@ const HowToPlayModal = () => {
       <div>
         <i>Under construction.</i>
         <p>
-          Welcome to Pokemon Chess Arena!
+          Welcome to Pokemon Gambit!
         </p>
         <p>
           This game makes an attempt to merge both Pokemon's battle system and Chess together

@@ -19,7 +19,7 @@ const GameManagerActions = () => {
 
   return (
     <div className='gameManagerContainer'>
-      <h3 className='gameManagerHeader'>Pokemon Chess Arena</h3>
+      <h3 className='gameManagerHeader'>Pokemon Gambit</h3>
       <div className='gameManagerRightActions'>
         {
           gameState.isCatchingUp && !gameState.isSkippingAhead && (

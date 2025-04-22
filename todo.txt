@@ -9,14 +9,9 @@ Host controls
   - Return to room in-game
 Pre-move chess pieces
 Queue up your draft and bans
-Break out the draft into phases
 Save most recent game option loadout to localstorage
 Create formats to quick select game options in room
 
-Game Name Ideas:
-- Pokemon Chess Arena
-- Pokemon Gambit
-- Pokemon Chess Gambit
 Keyboard navigation and accessibility
 
 Disable support pokemon from team generation
@@ -59,10 +54,7 @@ Issues:
 - Room options being user friendly (timer should be a dropdown of options, any required input should prevent form submission)
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
-
-Style issues:
-- (Potentially fixed) Disable dark mode from browser settting
-- Scale the chessboard based on height as well as width
+- Better scaling for smaller screen sizes
 
 Filter out moves:
 - Sticky webs
@@ -75,3 +67,5 @@ Dropping features:
   - Don't want to moderate
   - Increases the websocket connections => more servers
   - Discord exists, people can make that
+- Break out the draft into multiple phases (i.e pawns, bishops&knights, rooks, queen&king)
+  - Could potentially be interesting as an option, but seems like it makes it a little too complicated for not much gain in regards to strategy

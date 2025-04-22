@@ -1,4 +1,4 @@
-# Pokemon Chess Arena
+# Pokemon Gambit
 A mixture between Pokemon and Chess! Each chess piece gets assigned a Pokemon, which you can then do battle with when you attempt to take a piece!
 
 
