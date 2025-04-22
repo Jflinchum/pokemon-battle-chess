@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { Player } from "../../../Room/Room/Room";
 import TakenChessPieces from "../../ChessManager/TakenChessPieces/TakenChessPieces";
-import { PokemonPiece } from "../../PokemonManager/PokemonBattleChessManager";
+import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessManager";
 import './PlayerInGameDisplay.css';
 import Timer from "../../../common/Timer/Timer";
 

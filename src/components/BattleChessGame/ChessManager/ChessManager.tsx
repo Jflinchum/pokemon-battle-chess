@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Chess, Square, Move } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
-import { PokemonBattleChessManager } from '../PokemonManager/PokemonBattleChessManager';
+import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
 import PokemonChessDetailsCard from '../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard';
 import './ChessManager.css';
 import { ChessBoardSquare, MoveAttempt } from './types';

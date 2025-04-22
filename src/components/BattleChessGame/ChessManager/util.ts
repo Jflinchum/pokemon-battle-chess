@@ -1,6 +1,6 @@
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
 import { ChessBoardSquare, PokemonChessBoardSquare } from "./types";
-import { PokemonBattleChessManager } from "../PokemonManager/PokemonBattleChessManager";
+import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 
 export const getSquareColor = (rowIndex: number, columnIndex: number): 'white' | 'black' => {
   return rowIndex % 2 ? columnIndex % 2 ? 'white' : 'black' : columnIndex % 2 ? 'black' : 'white';

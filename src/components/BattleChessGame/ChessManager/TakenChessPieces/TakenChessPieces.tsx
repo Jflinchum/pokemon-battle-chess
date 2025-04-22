@@ -1,4 +1,4 @@
-import { PokemonPiece } from "../../PokemonManager/PokemonBattleChessManager";
+import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessManager";
 import PokemonChessPieceSprite from "../ChessBoard/PokemonChessPieceSprite/PokemonChessPieceSprite";
 import './TakenChessPieces.css';
 
