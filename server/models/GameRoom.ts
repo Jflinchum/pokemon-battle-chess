@@ -255,10 +255,8 @@ export default class GameRoom {
       } else {
         const lostPiece = this.chessManager.get(chessMove.from);
         this.pokemonGameManager.getPokemonFromSquare(chessMove.from)!.square = null;
-        const tempPiece = this.chessManager.get(capturedPieceSquare);
-        this.chessManager.move(sanMove, { continueOnCheck: true });
-        this.chessManager.remove(chessMove.to);
-        this.chessManager.put(tempPiece!, capturedPieceSquare);
+        this.chessManager.remove(chessMove.from);
+        this.chessManager.forceAdvanceTurn();
 
         const chessData: MatchLog = { type: 'chess', data: { color: this.currentTurnWhite ? 'w' : 'b', san: sanMove, failed: true } };
         this.pushHistory(chessData);

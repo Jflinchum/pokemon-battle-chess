@@ -26,6 +26,23 @@ Room Options
 
 Priority:
 - Queueing up Drafts/Chess moves
+  - Queue up drafts but not bans? Bans seem tough to convey queues with
+  - Chess moves
+    - Premoving pushes the move onto an array
+    - When it is your turn to move, we first check if the premove array has any elements
+    - Then we check if the next move in the premove array is a valid one
+    - If it is, dequeue it and send that back to the server
+    - If it isn't, destroy the queue and wait for user input
+    - useEffect on the queue to simulate the board after the moves, as though it isn't the opponent's turn
+      - May need to patch the chess lib again to expose advanceTurn function
+      - Can use that advanceTurn function for the 'move fails' scenario for pokemon battles
+      - Would want to also highlight squares that the piece has moved through
+      - Need a cancel premoves action. 
+        - Right click? (not mobile friendly)
+        - Button pop up? (clutters screen)
+          - Only render it if premoves exist
+          - The pop up could let users know what happened, if they premove accidentally
+        - Double click piece?
 - Battle/animation speed
   - Necessary for battle timer
 - Host controls
@@ -45,6 +62,7 @@ Refactor TODOs:
 Issues:
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
+- Premoving should still cost .1 seconds, at a minimum
 - Pawn promotion form should go away after choosing
 - Disallow client controls when the match ends
 - Bigger turn indicator maybe by player details
@@ -56,6 +74,7 @@ Issues:
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
 - Better scaling for smaller screen sizes
+- Wrap pokemon statuses
 
 Filter out moves:
 - Sticky webs

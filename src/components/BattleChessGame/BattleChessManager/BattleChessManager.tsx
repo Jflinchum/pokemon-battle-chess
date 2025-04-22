@@ -142,10 +142,8 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     
     if (moveFailed && capturedPieceSquare) {
       pokemonManager.getPokemonFromSquare(verboseChessMove.from)!.square = null;
-      const tempPiece = chessManager.get(capturedPieceSquare);
-      chessManager.move(sanMove, { continueOnCheck: true });
-      chessManager.remove(verboseChessMove.to);
-      chessManager.put(tempPiece!, capturedPieceSquare);
+      chessManager.remove(verboseChessMove.from);
+      chessManager.forceAdvanceTurn();
     } else {
       chessManager.move({ from: fromSquare, to: toSquare, promotion }, { continueOnCheck: true });
       pokemonManager.movePokemonToSquare(fromSquare, toSquare);
