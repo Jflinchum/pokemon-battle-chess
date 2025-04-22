@@ -10,6 +10,8 @@ Host controls
 Pre-move chess pieces
 Queue up your draft and bans
 Break out the draft into phases
+Save most recent game option loadout to localstorage
+Create formats to quick select game options in room
 
 Game Name Ideas:
 - Pokemon Chess Arena
@@ -28,7 +30,7 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Resyncing right after a battle while fast forwarding
+- Queueing up Drafts/Chess moves
 - Battle/animation speed
   - Necessary for battle timer
 - Host controls
@@ -46,6 +48,8 @@ Refactor TODOs:
 
 Issues:
 - Form submissions
+- Resyncing right after a battle while fast forwarding
+  - This issue seems to come and go. Needs more investigation
 - Pawn promotion form should go away after choosing
 - Show pokemon level on details screen
 - Disallow client controls when the match ends

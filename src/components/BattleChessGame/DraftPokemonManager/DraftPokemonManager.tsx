@@ -3,7 +3,7 @@ import { Chess, Color, Square } from "chess.js";
 import { useGameState } from "../../../context/GameStateContext";
 import PokemonDraftSelect from "./PokemonDraftSelect/PokemonDraftSelect";
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
-import { PokemonBattleChessManager } from "../PokemonManager/PokemonBattleChessManager";
+import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
 import { PokemonChessBoardSquare } from "../ChessManager/types";
 import { useUserState } from "../../../context/UserStateContext";

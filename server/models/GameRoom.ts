@@ -174,7 +174,7 @@ export default class GameRoom {
         accuracy: 0,
         evasion: 0,
       },
-      timersEnabled: options.timersEnabled || true,
+      timersEnabled: options.timersEnabled !== undefined ? options.timersEnabled : true,
       banTimerDuration: options.banTimerDuration || 15,
       chessTimerDuration: options.chessTimerDuration || 15,
       chessTimerIncrement: options.chessTimerIncrement || 5,
