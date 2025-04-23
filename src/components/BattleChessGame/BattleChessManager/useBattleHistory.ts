@@ -6,6 +6,7 @@ import { timer } from "../../../utils";
 import { CurrentBattle } from "./BattleChessManager";
 import { useGameState } from "../../../context/GameStateContext";
 import { ArgType, KWArgType, Protocol } from "@pkmn/protocol";
+import { useUserState } from "../../../context/UserStateContext";
 
 interface BattleHistoryProps {
   matchHistory?: MatchLog[],
@@ -45,7 +46,7 @@ const useBattleHistory = ({
   onGameEnd,
   skipToEndOfSync
 }: BattleHistoryProps) => {
-  // User state preferred animation speed and multiply the timers here based on it TODO
+  const { userState } = useUserState();
   const { gameState } = useGameState();
 
   const [matchLog, setCurrentMatchLog] = useState(matchHistory || []);
@@ -72,7 +73,7 @@ const useBattleHistory = ({
   useEffect(() => {
     let catchUpTimer: { start: () => Promise<void>, stop: () => void } | undefined;
     // TODO: Optimization for browser DOM rendering. Instead of setting a timeout of 0 and still updating the DOM in the background, we should simulate the chess moves and battle instead, then update the DOM after.
-    const timeBetweenSteps = 1000 * (skipToEndOfSync ? 0 : 1);
+    const timeBetweenSteps = userState.animationSpeedPreference * (skipToEndOfSync ? 0 : 1);
 
     // On mount, start attempting to sync to the current match
     const catchUpToCurrentState = async () => {
@@ -131,7 +132,7 @@ const useBattleHistory = ({
 
                   pokemonLogIndex.current++;
                   if (shouldDelayBeforeContinuing(args[0])) {
-                    catchUpTimer = timer(1000 * (skipToEndOfSync ? 0 : 1));
+                    catchUpTimer = timer(timeBetweenSteps * (skipToEndOfSync ? 0 : 1));
                     await catchUpTimer.start();
                   }
                 }

@@ -14,6 +14,7 @@
 
 .gameManagerRightActions {
   display: flex;
+  align-items: center;
   gap: 20px;
   margin: 10px 12px 10px auto;
 }

@@ -1,5 +1,4 @@
 TODO:
-Text Speed on pokemon battles
 Matchmaking
 Host controls
   - Set player color
@@ -9,8 +8,9 @@ Host controls
   - Return to room in-game
 Queue up your draft and bans
 Add forfeit button to pokemon battle
-Save most recent game option loadout to localstorage
 Create formats to quick select game options in room
+Turn timer into second:millisecond timer once down below a minute left
+Write validation functions when writing/reading from localstorage and clear it out if failing validation
 
 Keyboard navigation and accessibility
 
@@ -29,15 +29,14 @@ Priority:
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Chess moves
     - Clear queue if most recent move of your color failed
-- Battle/animation speed
-  - Necessary for battle timer
 - Host controls
   - Redesign player list first, both in room and in game
+- Better logging
+- Curate pokemon sets
+- Toast notifications for errors and such
 - More detailed modals in game
   - Add server disconnect
 - Robots.txt disable search engine crawling (for now)
-- Toast notifications for errors and such
-- Curate pokemon sets
 - (better) Error boundary
 
 Refactor TODOs:
@@ -55,6 +54,7 @@ Issues:
 - Bigger turn indicator maybe by player details
   - Better indicator that time is ticking down in timer mode
 - Player disconnecting removes player nameplate in game
+- Pokemon details looks weird on mobile when pokemon only has one move (ditto)
 - Joining a room should clear viewing results status
 - Some pokemon do not appear in image for background
 - Room options being user friendly (timer should be a dropdown of options, any required input should prevent form submission)

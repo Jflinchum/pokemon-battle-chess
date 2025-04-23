@@ -59,6 +59,7 @@ const Room = () => {
 
   const handleStartGame = (e: React.MouseEvent) => {
     e.preventDefault();
+    localStorage.setItem('localStorageGameOptions', JSON.stringify(gameOptions));
     socket.emit('requestStartGame', userState.currentRoomId, userState.id);
   }
   

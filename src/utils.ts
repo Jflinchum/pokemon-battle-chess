@@ -1,5 +1,5 @@
 import { RefObject, useRef } from "react";
-import { GameOptions } from "./context/GameStateContext";
+import { GameOptions } from '../shared/types/GameOptions';
 
 export const getOrInitializeUUID = () => {
   const localStorageUUID = localStorage.getItem('uuid');
@@ -40,8 +40,12 @@ export const getGameOptions = () => {
     pokemonTimerIncrement: 1,
     chessTimerIncrement: 5,
   };
-  const localStorageGameOptions = localStorage.getItem('defaultGameOptions');
+  const localStorageGameOptions = localStorage.getItem('localStorageGameOptions');
   return localStorageGameOptions ? JSON.parse(localStorageGameOptions ) : defaultGameOptions;
+}
+
+export const getAnimationSpeedPreference = () => {
+  return parseInt(localStorage.getItem('animationSpeedPreference') || '1000');
 }
 
 export const useDebounce = (cb: Function, delay: number) => {

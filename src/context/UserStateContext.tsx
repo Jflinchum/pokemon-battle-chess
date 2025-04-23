@@ -1,11 +1,12 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { getAvatar, getName, getOrInitializeUUID } from "../utils.ts";
+import { getAnimationSpeedPreference, getAvatar, getName, getOrInitializeUUID } from "../utils.ts";
 import { leaveRoom } from "../service/lobby";
 
 interface UserState {
   name: string;
   avatarId: string;
   id: string;
+  animationSpeedPreference: number;
   currentRoomId: string;
   currentRoomCode: string;
 }
@@ -18,6 +19,7 @@ interface UserStateType {
 type UserStateAction = 
   { type: 'SET_NAME'; payload: string }
   | { type: 'SET_AVATAR'; payload: string }
+  | { type: 'SET_ANIMATION_SPEED_PREFERENCE'; payload: number }
   | { type: 'SET_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'JOIN_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'LEAVE_ROOM' };
@@ -32,6 +34,9 @@ export const userStateReducer = (userState: UserState, action: UserStateAction):
     case 'SET_AVATAR':
       localStorage.setItem('avatarId', `${action.payload}`);
       return { ...userState, avatarId: action.payload };
+    case 'SET_ANIMATION_SPEED_PREFERENCE':
+      localStorage.setItem('animationSpeedPreference', `${action.payload}`);
+      return { ...userState, animationSpeedPreference: action.payload };
     case 'SET_ROOM':
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode };
     case 'LEAVE_ROOM':
@@ -49,6 +54,7 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     name: getName(),
     avatarId: getAvatar(),
     id: getOrInitializeUUID(),
+    animationSpeedPreference: getAnimationSpeedPreference(),
     currentRoomId: '',
     currentRoomCode: '',
   });

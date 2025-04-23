@@ -84,7 +84,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       } else {
         setTimeout(() => {
           setBattleStarted(true);
-        }, 1000);
+        }, userState.animationSpeedPreference);
       }
     },
     onPokemonBattleOutput: (parsedChunk) => {
@@ -97,7 +97,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
         } else {
           setTimeout(() => {
             setCurrentBattle(null);
-          }, 1000);
+          }, userState.animationSpeedPreference);
         }
       }
       setCurrentPokemonMoveHistory((curr) => [...curr, parsedChunk]);

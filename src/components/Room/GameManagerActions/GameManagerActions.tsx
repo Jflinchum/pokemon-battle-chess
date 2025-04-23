@@ -17,10 +17,21 @@ const GameManagerActions = () => {
     socket.emit('setViewingResults', userState.currentRoomId, userState.id, false);
   };
 
+  const handleAnimationSpeedPreferenceChange = (animationSpeed: number) => {
+    dispatch({ type: 'SET_ANIMATION_SPEED_PREFERENCE', payload: animationSpeed })
+  };
+
   return (
     <div className='gameManagerContainer'>
       <h3 className='gameManagerHeader'>Pokemon Gambit</h3>
       <div className='gameManagerRightActions'>
+        <label htmlFor='animationSpeedPreference'>Game Animation Speed:</label>
+        <select id='animationSpeedPreference' value={userState.animationSpeedPreference} onChange={(e) => handleAnimationSpeedPreferenceChange(parseInt(e.target.value))}>
+          <option value={1500}>Slow</option>
+          <option value={1000}>Normal</option>
+          <option value={500}>Fast</option>
+          <option value={100}>Instant</option>
+        </select>
         {
           gameState.isCatchingUp && !gameState.isSkippingAhead && (
             <Button onClick={() => { dispatchGameState({ type: 'SET_SKIPPING_AHEAD', payload: !gameState.isSkippingAhead }) }}>
