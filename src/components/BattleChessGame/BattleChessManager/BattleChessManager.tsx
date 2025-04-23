@@ -205,26 +205,23 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
             />
           )
         }
-        {
-          !battleStarted && !isDrafting &&
-          (
-            <ChessManager
-              chessManager={chessManager}
-              pokemonManager={pokemonManager}
-              mostRecentMove={mostRecentMove}
-              currentBattle={currentBattle}
-              chessMoveHistoryDisplay={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
-              board={board}
-              battleSquare={battleSquare}
-              onMove={(san) => {
-                if (thisPlayer?.isSpectator) {
-                  return;
-                }
-                socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
-              }}
-            />
-          )
-        }
+        <div style={{ display: !battleStarted && !isDrafting ? 'block' : 'none' }}>
+          <ChessManager
+            chessManager={chessManager}
+            pokemonManager={pokemonManager}
+            mostRecentMove={mostRecentMove}
+            currentBattle={currentBattle}
+            chessMoveHistoryDisplay={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
+            board={board}
+            battleSquare={battleSquare}
+            onMove={(san) => {
+              if (thisPlayer?.isSpectator) {
+                return;
+              }
+              socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
+            }}
+          />
+        </div>
         {
           isDrafting && (
             <DraftPokemonManager

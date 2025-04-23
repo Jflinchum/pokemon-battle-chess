@@ -1,17 +1,17 @@
-import { useState, useMemo } from 'react'
-import { Chess, Square, Move } from 'chess.js';
+import { useState, useMemo, useEffect } from 'react'
+import { Chess, Square, Move, PieceSymbol } from 'chess.js';
+import { PokemonSet } from '@pkmn/data';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
 import PokemonChessDetailsCard from '../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard';
-import './ChessManager.css';
 import { ChessBoardSquare, MoveAttempt } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
 import { getVerboseChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
-import { PokemonSet } from '@pkmn/data';
 import { useDebounce } from '../../../utils';
 import { ChessData } from '../../../../shared/types/game';
+import './ChessManager.css';
 
 interface ChessManagerProps {
   chessManager: Chess;
@@ -24,7 +24,15 @@ interface ChessManagerProps {
   battleSquare?: Square;
 }
 
-const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSquare, board, onMove, chessMoveHistoryDisplay }: ChessManagerProps) => {
+const ChessManager = ({
+  chessManager,
+  pokemonManager,
+  mostRecentMove,
+  battleSquare,
+  board,
+  onMove,
+  chessMoveHistoryDisplay
+}: ChessManagerProps) => {
   /**
    * TODO: 
    *  - Set up context providers to handle pokemon manager state
@@ -36,6 +44,52 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSqua
   const [hoveredPokemon, setHoveredPokemon] = useState<PokemonSet | null | undefined>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
   const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
+  const [preMoveQueue, setPreMoveQueue] = useState<{ from: Square; to: Square; promotion?: PieceSymbol; }[]>([])
+
+  // Create a simulated copy of both managers to handle premoving
+  const { simulatedChessManager, simulatedPokemonManager } = useMemo(() => {
+    const chessManagerCopy = new Chess(chessManager.fen());
+    const pokemonManagerCopy = new PokemonBattleChessManager(null, null, JSON.parse(JSON.stringify(pokemonManager.getChessPieces())))
+
+    if (chessManagerCopy.turn() !== color) {
+      chessManagerCopy.forceAdvanceTurn();
+    }
+
+    let i = 0;
+    for (; i < preMoveQueue.length; i++) {
+      const preMove = preMoveQueue[i];
+      const verboseMove = getVerboseChessMove(preMove.from, preMove.to, chessManagerCopy, preMove.promotion);
+      if (verboseMove) {
+        chessManagerCopy.move(preMove);
+        pokemonManagerCopy.movePokemonToSquare(verboseMove.from, verboseMove.to, verboseMove.promotion);
+        chessManagerCopy.forceAdvanceTurn();
+      } else {
+        break;
+      }
+    }
+    // If we had to break early due to a move being invalid
+    if (i !== preMoveQueue.length) {
+      setPreMoveQueue((curr) => curr.slice(0, i));
+    }
+
+    return {
+      simulatedChessManager: chessManagerCopy,
+      simulatedPokemonManager: pokemonManagerCopy
+    };
+  }, [board, pokemonManager, preMoveQueue]);
+
+  useEffect(() => {
+    if (color === chessManager.turn() && preMoveQueue.length > 0) {
+      const { from, to, promotion } = preMoveQueue[0];
+      const verboseChessMove = getVerboseChessMove(from, to, chessManager, promotion);
+      if (verboseChessMove) {
+        setPreMoveQueue((curr) => curr.slice(1));
+        onMove(verboseChessMove.san)
+      } else {
+        setPreMoveQueue([]);
+      }
+    }
+  }, [board]);
 
   const cancelSelection = () => {
     setSelectedSquare(null);
@@ -44,11 +98,27 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSqua
 
   const updateSelection = (square: Square) => {
     setSelectedSquare(square);
-    const selectedSquareMoves = chessManager.moves({ square, piece: chessManager.get(square)?.type, verbose: true, continueOnCheck: true }).filter((move) => move.color === color);
+
+    const selectedSquareMoves = simulatedChessManager.moves({
+      square,
+      piece: simulatedChessManager.get(square)?.type,
+      verbose: true,
+      continueOnCheck: true
+    }).filter((move) => move.color === color);
     setHighlightedSquare(selectedSquareMoves.map((squareMove) => squareMove.to) as Square[]);
   }
 
   const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
+    if (chessManager.turn() !== color) {
+      const move = getVerboseChessMove(fromSquare, toSquare, simulatedChessManager, promotion);
+      if (move) {
+        setPreMoveQueue((curr) => [...curr, { from: move.from, to: move.to, promotion: move.promotion }]);
+        setSelectedSquare(null);
+        setHighlightedSquare([]);
+      } else {
+        return;
+      }
+    }
     const verboseChessMove = getVerboseChessMove(fromSquare, toSquare, chessManager, promotion);
     // Before attempting the move, ask the player for their pawn promotion choice
     if (verboseChessMove?.isPromotion() && !promotion) {
@@ -75,7 +145,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSqua
       // Set the current square in state and highlight any potential moves for that square
       updateSelection(square);
     }
-    if (selectedSquare && getVerboseChessMove(selectedSquare, square, chessManager)?.color === color) {
+    if (selectedSquare && getVerboseChessMove(selectedSquare, square, simulatedChessManager)?.color === color) {
       movePiece({ fromSquare: selectedSquare, toSquare: square });
     }
   };
@@ -86,7 +156,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSqua
 
   const handlePieceDrop = (square: Square) => {
     setRequestedPawnPromotion(null);
-    if (selectedSquare && getVerboseChessMove(selectedSquare, square, chessManager)?.color === color) {
+    if (selectedSquare && getVerboseChessMove(selectedSquare, square, simulatedChessManager)?.color === color) {
       movePiece({ fromSquare: selectedSquare, toSquare: square });
     }
   }
@@ -96,8 +166,14 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSqua
     updateSelection(square);
   }
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    setPreMoveQueue([]);
+  }
+
   return (
-    <div className='gameContainer'>
+    <div className='gameContainer' onContextMenu={handleContextMenu}>
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice
           color={requestedPawnPromotion.color}
@@ -120,7 +196,7 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSqua
       </div>
       <div className='chessGameContainer'>
         <ChessBoard
-          boardState={mergeBoardAndPokemonState(board, pokemonManager)}
+          boardState={mergeBoardAndPokemonState(simulatedChessManager.board(), simulatedPokemonManager)}
           onSquareClick={handleSquareClick}
           onPokemonHover={handlePokemonHover}
           onPieceDrag={handlePieceDrag}
@@ -129,12 +205,13 @@ const ChessManager = ({ chessManager, pokemonManager, mostRecentMove, battleSqua
           selectedSquare={selectedSquare}
           mostRecentMove={mostRecentMove}
           battleSquare={battleSquare}
+          preMoveQueue={preMoveQueue}
         />
         <PokemonChessDetailsCard
           chessMoveHistory={chessMoveHistoryDisplay}
           pokemon={
             hoveredPokemon ||
-            pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn
+            simulatedPokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn
           }
         />
       </div>

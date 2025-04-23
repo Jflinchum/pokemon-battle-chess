@@ -25,6 +25,22 @@
 }
 
 .highlighted {
+  border-radius: 50%;
+  border: 4px solid rgba(70, 70, 70, 0.5);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20%;
+  height: 20%;
+
+  &.pieceSquare {
+    width: 80%;
+    height: 80%;
+  }
+}
+
+.premove {
   background-color: rgba(255, 51, 51, 0.75);
 }
 

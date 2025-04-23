@@ -1,4 +1,4 @@
-import { Square } from 'chess.js';
+import { PieceSymbol, Square } from 'chess.js';
 import { PokemonChessBoardSquare } from '../types';
 import { getSquareColor, getSquareFromIndices } from '../util';
 import ChessSquare from './ChessSquare/ChessSquare';
@@ -15,10 +15,22 @@ interface ChessBoardProps {
   highlightedSquares: Square[];
   selectedSquare: Square | null;
   mostRecentMove?: { from: Square, to: Square } | null;
+  preMoveQueue?: { from: Square, to: Square, promotion?: PieceSymbol }[];
   battleSquare?: Square
 }
 
-const ChessBoard = ({ boardState, onSquareClick, onPokemonHover, onPieceDrag, onPieceDrop, highlightedSquares, selectedSquare, mostRecentMove, battleSquare }: ChessBoardProps) => {
+const ChessBoard = ({
+  boardState,
+  onSquareClick,
+  onPokemonHover,
+  onPieceDrag,
+  onPieceDrop,
+  highlightedSquares,
+  selectedSquare,
+  mostRecentMove,
+  preMoveQueue = [],
+  battleSquare
+}: ChessBoardProps) => {
   const { gameState } = useGameState();
 
   const boardColumnPerspective = (squares: PokemonChessBoardSquare[][]) => {
@@ -67,6 +79,11 @@ const ChessBoard = ({ boardState, onSquareClick, onPokemonHover, onPieceDrag, on
                   mostRecentMove?.from === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex) ||
                   mostRecentMove?.to === getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex)
                 }
+                isPreMove={
+                  !!preMoveQueue.find((premove) => 
+                    getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex) === premove.from ||
+                    getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex) === premove.to
+                )}
                 isBattleSquare={
                   (boardSquare && boardSquare.square === battleSquare) || false
                 }

@@ -4,34 +4,50 @@ import PokemonChessPieceSprite from '../PokemonChessPieceSprite/PokemonChessPiec
 import './ChessSquare.css';
 
 interface ChessSquareProps {
-  square: ChessBoardSquare
-  backgroundColor: 'white' | 'black'
-  onClick: (arg0: ChessBoardSquare) => void
-  onPokemonHover?: (arg0?: PokemonSet | null) => void
-  onPieceDrop: (arg0: ChessBoardSquare) => void
-  onPieceDrag: (arg0: ChessBoardSquare) => void
-  possibleMove: boolean
-  selected: boolean
-  mostRecentMove: boolean
+  square: ChessBoardSquare;
+  backgroundColor: 'white' | 'black';
+  onClick: (arg0: ChessBoardSquare) => void;
+  onPokemonHover?: (arg0?: PokemonSet | null) => void;
+  onPieceDrop: (arg0: ChessBoardSquare) => void;
+  onPieceDrag: (arg0: ChessBoardSquare) => void;
+  possibleMove: boolean;
+  selected: boolean;
+  mostRecentMove: boolean;
+  isPreMove: boolean;
   isBattleSquare: boolean;
   pokemon?: PokemonSet
 }
 
-const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostRecentMove: boolean, isBattleSquare: boolean) => { 
+const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostRecentMove: boolean, isBattleSquare: boolean, isPremove: boolean) => { 
   if (selected) {
     return 'selected';
   } else if (isBattleSquare) {
     return 'battleSquare'; 
   } else if (possibleMove) {
     return 'highlighted';
+  } else if (isPremove) {
+    return 'premove';
   } else if (mostRecentMove) {
     return 'mostRecentMove';
   }
-  return ''
+  return '';
 }
 
 
-const ChessSquare = ({ square, backgroundColor, onPieceDrop, onPieceDrag, onClick, onPokemonHover, possibleMove, selected, pokemon, mostRecentMove, isBattleSquare }: ChessSquareProps) => {
+const ChessSquare = ({
+  square,
+  backgroundColor,
+  onPieceDrop,
+  onPieceDrag,
+  onClick,
+  onPokemonHover,
+  possibleMove,
+  selected,
+  pokemon,
+  mostRecentMove,
+  isPreMove,
+  isBattleSquare
+}: ChessSquareProps) => {
   return (
     <div 
       className={`chessSquare ${backgroundColor}ChessSquare`}
@@ -49,7 +65,7 @@ const ChessSquare = ({ square, backgroundColor, onPieceDrop, onPieceDrag, onClic
         e.preventDefault();
       }}
     >
-      <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare)}`} />
+      <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${(pokemon || square?.type) ? 'pieceSquare' : ''}`} />
       <PokemonChessPieceSprite
         type={square?.type}
         color={square?.color}

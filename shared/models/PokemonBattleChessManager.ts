@@ -22,11 +22,15 @@ export interface PokemonBattle {
 
 export class PokemonBattleChessManager {
   public chessPieces: PokemonPiece[] = [];
-  public seed: PRNGSeed;
+  public seed?: PRNGSeed | null;
   public draftPieces: PokemonSet[] = [];
   public banPieces: PokemonSet[] = [];
 
-  constructor(seed: PRNGSeed, format: FormatID) {
+  constructor(seed: PRNGSeed | null, format: FormatID | null, chessPieces?: PokemonPiece[]) {
+    if (chessPieces) {
+      this.chessPieces = chessPieces;
+      return;
+    }
     this.seed = seed;
     
     if (format === 'random') {
@@ -84,6 +88,10 @@ export class PokemonBattleChessManager {
   }
 
   public getChessPieces = () => (this.chessPieces);
+
+  public setChessPieces = (chessPieces: PokemonPiece[]) => {
+    this.chessPieces = chessPieces;
+  };
 
   public getTakenChessPieces = (color?: Color) => {
     return this.chessPieces.filter((piece) => color ? (piece.color === color && piece.square === null) : true);
