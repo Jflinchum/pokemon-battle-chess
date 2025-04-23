@@ -6,9 +6,10 @@ import PokemonMoveChoices from '../PokemonBattleDisplay/PokemonMoveChoices/Pokem
 import { speciesOverride } from '../../ChessManager/util';
 import PokemonType from '../../../common/Pokemon/PokemonType/PokemonType';
 import ChessMoveHistory from '../../ChessManager/ChessMoveHistory/ChessMoveHistory';
-import './PokemonChessDetailsCard.css';
 import Tooltip from '../../../common/Tooltip/Tooltip';
 import { ChessData } from '../../../../../shared/types/game';
+import './PokemonChessDetailsCard.css';
+import { GenderIcon } from '../../../common/GenderIcon/GenderIcon';
 
 interface PokemonChessDetailsCardProps {
   pokemon?: PokemonSet | null;
@@ -24,7 +25,11 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [] }: PokemonChes
           pokemon ?
           (
             <>
-              <p>{pokemon.name} Lv{pokemon.level}</p>
+              <p className='pokemonDetailsIdentifier'>
+                <span>{pokemon.name}</span>
+                <GenderIcon gender={pokemon.gender} />
+                <span>Lv{pokemon.level}</span>
+              </p>
               <p>
                 {
                   Dex.species.get(pokemon.species).types.map((type) => (

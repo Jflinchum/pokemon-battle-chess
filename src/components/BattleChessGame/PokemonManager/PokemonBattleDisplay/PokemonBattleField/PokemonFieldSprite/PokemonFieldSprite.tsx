@@ -7,6 +7,7 @@ import './PokemonFieldSprite.css';
 import PokemonStatus from "../../../../../common/Pokemon/PokemonStatus/PokemonStatus";
 import PokemonType from "../../../../../common/Pokemon/PokemonType/PokemonType";
 import Tooltip from "../../../../../common/Tooltip/Tooltip";
+import { GenderIcon } from "../../../../../common/GenderIcon/GenderIcon";
 
 interface PokemonFieldSpriteProps {
   pokemon: Pokemon,
@@ -22,14 +23,6 @@ const getHealthBarColor = (maxHp: number, currentHp: number) => {
     return 'yellow';
   } else {
     return 'red';
-  }
-}
-
-const getGenderSymbol = (gender: GenderName) => {
-  switch (gender) {
-    case ('M'): return '♂️';
-    case ('F'): return '♀️';
-    case ('N'): return '';
   }
 }
 
@@ -58,7 +51,7 @@ const PokemonTooltip = ({ pokemon, set, side }: { pokemon: Pokemon, set: Pokemon
     <Tooltip anchorSelect={`#${side}-${pokemon.name.split(' ').join('-')}`}>
       <div>
         <strong>{set.name} </strong>
-        <span>{getGenderSymbol(pokemon.gender)} </span>
+        <GenderIcon gender={pokemon.gender} />
         <span>L{set.level}</span>
       </div>
       <p>{pokemon.types.map((type, index) => (
@@ -81,7 +74,7 @@ const PokemonFieldSprite = ({ pokemon, side, set }: PokemonFieldSpriteProps) => 
       <div className='pokemonSpriteInfo'>
         <div className='pokemonDetails'>
           <span>{pokemon.name}</span>
-          <span className="pokemonGender">{getGenderSymbol(pokemon.gender)}</span>
+          <span className="pokemonGender"><GenderIcon gender={pokemon.gender} /></span>
           <span className='pokemonLevel'>Lv{pokemon.level}</span>
         </div>
         <div className='pokemonHealth'>

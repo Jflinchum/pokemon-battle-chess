@@ -48,6 +48,7 @@ Issues:
 - Room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
+- Pokemon gender not generated always on chess screen (in battle, it does generate)
 - Premoving should still cost .1 seconds, at a minimum
 - Pawn promotion form should go away after choosing
 - Disallow client controls when the match ends

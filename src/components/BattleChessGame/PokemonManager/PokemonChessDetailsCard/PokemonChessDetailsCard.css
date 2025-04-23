@@ -64,6 +64,12 @@
   }
 }
 
+.pokemonDetailsIdentifier {
+  & > * {
+    margin-right: 6px;
+  }
+}
+
 .pokemonDetailsSpriteContainer {
   height: 100px;
 }
