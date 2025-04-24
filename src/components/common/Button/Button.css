@@ -4,8 +4,7 @@
   height: 50px;
   border-radius: 6px;
   cursor: pointer;
-  box-shadow: 0 0 10px 0 black;
-  background-color: rgb(70, 70, 70);
+  background-color: rgb(40, 40, 40);
   border: 0;
   color: white;
   transition: filter 0.25s;
@@ -26,5 +25,9 @@
   &:disabled {
     filter: grayscale(50%) brightness(70%);
     cursor: default;
+  }
+
+  &.highlightedButton {
+    border: 4px solid rgb(70, 150, 70);
   }
 }

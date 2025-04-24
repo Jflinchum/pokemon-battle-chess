@@ -164,7 +164,7 @@ export default class GameRoom {
 
   public setOptions(options: GameOptions) {
     this.roomGameOptions = {
-      format: options.format || 'random',
+      format: typeof options.format === 'string' ? options.format : 'random',
       offenseAdvantage: options.offenseAdvantage || {
         atk: 0,
         def: 0,
@@ -174,11 +174,11 @@ export default class GameRoom {
         accuracy: 0,
         evasion: 0,
       },
-      timersEnabled: options.timersEnabled !== undefined ? options.timersEnabled : true,
-      banTimerDuration: options.banTimerDuration || 15,
-      chessTimerDuration: options.chessTimerDuration || 15,
-      chessTimerIncrement: options.chessTimerIncrement || 5,
-      pokemonTimerIncrement: options.pokemonTimerIncrement || 1,
+      timersEnabled: typeof options.timersEnabled === 'boolean' ? options.timersEnabled : true,
+      banTimerDuration: typeof options.banTimerDuration === 'number' ? options.banTimerDuration : 15,
+      chessTimerDuration: typeof options.chessTimerDuration === 'number' ? options.chessTimerDuration : 15,
+      chessTimerIncrement: typeof options.chessTimerIncrement === 'number' ? options.chessTimerIncrement : 5,
+      pokemonTimerIncrement: typeof options.pokemonTimerIncrement === 'number' ? options.pokemonTimerIncrement : 1,
     };
   }
 

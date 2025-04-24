@@ -1,0 +1,14 @@
+.gameTimerContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 8px;
+}
+
+.gameTimerLabel {
+  margin-bottom: 0px;
+}
+
+.gameTimerButton {
+  margin-top: 8px;
+  margin-right: 8px;
+}

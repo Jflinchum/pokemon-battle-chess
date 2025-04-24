@@ -14,12 +14,11 @@ Write validation functions when writing/reading from localstorage and clear it o
 
 Keyboard navigation and accessibility
 
-Disable support pokemon from team generation
 Room Options
  - Weather on random chess spaces
  - Preserve damage after battle
- - (maybe) Preserve item usage after battle
  - Custom Teams
+ - (maybe) Preserve item usage after battle
  - (maybe) Change pokemon on piece promotion
  - Level Up Progression
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
@@ -32,7 +31,13 @@ Priority:
 - Host controls
   - Redesign player list first, both in room and in game
 - Better logging
+  - Use winston + prometheus + grafana?
 - Curate pokemon sets
+  - Filter out certain moves
+    - Sticky webs
+    - Stealth rocks
+    - Spikes
+    - Toxic Spikes
 - Toast notifications for errors and such
 - More detailed modals in game
   - Add server disconnect
@@ -58,17 +63,10 @@ Issues:
 - Pokemon details looks weird on mobile when pokemon only has one move (ditto)
 - Joining a room should clear viewing results status
 - Some pokemon do not appear in image for background
-- Room options being user friendly (timer should be a dropdown of options, any required input should prevent form submission)
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
 - Better scaling for smaller screen sizes
 - Wrap pokemon statuses
-
-Filter out moves:
-- Sticky webs
-- Stealth rocks
-- Spikes
-- Toxic Spikes
 
 Dropping features:
 - Global Chat
