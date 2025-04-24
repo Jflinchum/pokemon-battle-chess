@@ -24,20 +24,28 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Queueing up Drafts/Chess moves
-  - Queue up drafts but not bans? Bans seem tough to convey queues with
-  - Chess moves
-    - Clear queue if most recent move of your color failed
-- Host controls
-  - Redesign player list first, both in room and in game
-- Better logging
-  - Use winston + prometheus + grafana?
 - Curate pokemon sets
   - Filter out certain moves
     - Sticky webs
     - Stealth rocks
     - Spikes
     - Toxic Spikes
+- Queueing up Drafts/Chess moves
+  - Queue up drafts but not bans? Bans seem tough to convey queues with
+  - Drafts
+    - Instead of merging the board state within BattleChessManager, 
+      store state of current drafted pieces and merge the board state
+      within draft manager
+    - Store a queue of drafts within draft manager that you can the dequeue
+      when it is the player's turn to draft
+      - Be careful of index shifting. Pokemon are unique, so we could store the species.
+        However it may be nicer to shift the index of the queue when a pokemon is drafted
+  - Chess moves
+    - Clear queue if most recent move of your color failed
+- Host controls
+  - Redesign player list first, both in room and in game
+- Better logging
+  - Use winston + prometheus + grafana?
 - Toast notifications for errors and such
 - More detailed modals in game
   - Add server disconnect
@@ -48,6 +56,7 @@ Refactor TODOs:
 - Potentially lift game logic into new model
 - Put API request and response types in shared folder
 - Organize frontend types in a single dir and re-use more efficiently
+- Separate out draft/ban calls
 
 Issues:
 - Room not resetting fully when rematching sometimes
@@ -55,7 +64,8 @@ Issues:
   - This issue seems to come and go. Needs more investigation
 - Pokemon gender not generated always on chess screen (in battle, it does generate)
 - Premoving should still cost .1 seconds, at a minimum
-- Pawn promotion form should go away after choosing
+- Disallow premoving for spectators
+- Premove decide pawn promotion
 - Disallow client controls when the match ends
 - Bigger turn indicator maybe by player details
   - Better indicator that time is ticking down in timer mode

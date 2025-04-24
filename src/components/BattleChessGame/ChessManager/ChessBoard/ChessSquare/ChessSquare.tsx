@@ -50,6 +50,7 @@ const ChessSquare = ({
 }: ChessSquareProps) => {
   return (
     <div 
+      id={`chessSquare-${square?.square}`}
       className={`chessSquare ${backgroundColor}ChessSquare`}
       onMouseEnter={() => {
         onPokemonHover?.(pokemon);

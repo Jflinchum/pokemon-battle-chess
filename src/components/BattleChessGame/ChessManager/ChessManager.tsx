@@ -176,13 +176,14 @@ const ChessManager = ({
     <div className='gameContainer' onContextMenu={handleContextMenu}>
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice
-          color={requestedPawnPromotion.color}
+          pawnPromotionMove={requestedPawnPromotion}
           onPromotionCancel={() => {
             setRequestedPawnPromotion(null);
             setHighlightedSquare([]);
             setSelectedSquare(null);
           }}
           onPromotionChoice={(type) => {
+            setRequestedPawnPromotion(null);
             movePiece({ fromSquare: requestedPawnPromotion.from, toSquare: requestedPawnPromotion.to, promotion: type });
           }}
         />
