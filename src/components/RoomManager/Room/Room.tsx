@@ -10,6 +10,7 @@ import SpectatorList from "./SpectatorList/SpectatorList";
 import PlayerName from "./PlayerName/PlayerName";
 import RoomOptions from "./RoomOptions/RoomOptions";
 import { GameOptions } from "../../../../shared/types/GameOptions";
+import RoomActions from "./RoomActions/RoomActions";
 import './Room.css';
 
 export interface Player {
@@ -88,6 +89,7 @@ const Room = () => {
 
   return (
     <>
+      <RoomActions />
       <div className='roomContainer'>
         <AnimatedBackground />
         <div className="roomPlayerContainer">

@@ -5,8 +5,7 @@ import { useUserState } from "../../context/UserStateContext";
 import { useModalState } from "../../context/ModalStateContext";
 import { socket } from "../../socket";
 import Room, { Player } from "./Room/Room";
-import GameManagerActions from "./GameManagerActions/GameManagerActions";
-import ChatToggle from "./GameManagerActions/ChatToggle/ChatToggle";
+import ChatToggle from "./Chat/ChatToggle/ChatToggle";
 import { MatchHistory, Timer } from "../../../shared/types/game";
 import './RoomManager.css';
 
@@ -82,7 +81,6 @@ const RoomManager = () => {
 
   return (
     <>
-      <GameManagerActions />
       <div className='roomManagerContainer'>
         {
           gameState.inGame ?

@@ -1,7 +1,7 @@
-import { useGameState } from "../../../context/GameStateContext";
-import { useUserState } from "../../../context/UserStateContext";
-import Button from "../../common/Button/Button";
-import { socket } from "../../../socket";
+import { useGameState } from "../../../../context/GameStateContext";
+import { useUserState } from "../../../../context/UserStateContext";
+import Button from "../../../common/Button/Button";
+import { socket } from "../../../../socket";
 import './GameManagerActions.css';
 
 const GameManagerActions = () => {

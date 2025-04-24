@@ -1,7 +1,7 @@
 import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { Player } from "../../../Room/Room/Room";
+import { Player } from "../../../RoomManager/Room/Room";
 import TakenChessPieces from "../../ChessManager/TakenChessPieces/TakenChessPieces";
 import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessManager";
 import './PlayerInGameDisplay.css';

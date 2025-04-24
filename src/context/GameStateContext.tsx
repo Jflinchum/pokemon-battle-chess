@@ -2,7 +2,7 @@ import { Color } from "chess.js";
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
 import { PRNGSeed } from '@pkmn/sim';
 import { getGameOptions } from "../utils.ts";
-import { Player } from "../components/Room/Room/Room";
+import { Player } from "../components/RoomManager/Room/Room.tsx";
 import { GameOptions } from '../../shared/types/GameOptions';
 
 export type FormatID = 'random' | 'draft';

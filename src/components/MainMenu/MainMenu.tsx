@@ -1,5 +1,5 @@
 import LobbyManager from '../Lobby/LobbyManager/LobbyManager'
-import RoomManager from '../Room/RoomManager';
+import RoomManager from '../RoomManager/RoomManager';
 import { useUserState } from '../../context/UserStateContext';
 import './MainMenu.css';
 import { useEffect } from 'react';

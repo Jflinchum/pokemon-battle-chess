@@ -16,6 +16,7 @@ import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
 import useBattleHistory from './useBattleHistory';
 import Spinner from '../../common/Spinner/Spinner';
 import { Timer } from '../../../../shared/types/game';
+import GameManagerActions from './GameManagerActions/GameManagerActions';
 import './BattleChessManager.css';
 
 export interface CurrentBattle {
@@ -187,6 +188,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
    */
   return (
     <div className='battleChessContainer'>
+      <GameManagerActions />
       <PlayerInGameDisplay
         player={color === 'w' ? blackPlayer : whitePlayer}
         takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}
