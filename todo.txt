@@ -41,12 +41,6 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Curate pokemon sets
-  - Filter out certain moves
-    - Sticky webs
-    - Stealth rocks
-    - Spikes
-    - Toxic Spikes
 - Queueing up Drafts/Chess moves
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
@@ -76,11 +70,11 @@ Refactor TODOs:
 - Separate out draft/ban calls
 
 Issues:
+- Fix chess history styling
 - Room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves occassionally clearing
-- Pokemon gender not generated always on chess screen (in battle, it does generate)
 - Premoving should still cost .1 seconds, at a minimum
 - Disallow premoving for spectators
 - Premove decide pawn promotion
