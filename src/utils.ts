@@ -93,3 +93,19 @@ export function generateDailyNumber(min: number, max: number) {
   const number = Math.floor((random - Math.floor(random)) * (max - min + 1)) + min;
   return number;
 }
+
+/**
+ * Remove an element from an unsorted array significantly faster
+ * than .splice
+ */
+export const fastPop = (list: any[], index: number) => {
+  const length = list.length;
+  if (index < 0 || index >= list.length) {
+    throw new Error(`Index ${index} out of bounds for given array`);
+  }
+
+  const element = list[index];
+  list[index] = list[length - 1];
+  list.pop();
+  return element;
+}

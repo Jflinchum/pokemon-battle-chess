@@ -1,7 +1,7 @@
 import { PieceSymbol, Color, Square } from "chess.js";
-import { TeamGenerators } from '@pkmn/randoms';
 import { PokemonSet } from "@pkmn/data";
-import { PRNGSeed } from '@pkmn/sim'
+import { PRNG, PRNGSeed } from '@pkmn/sim'
+import { PokeSimRandomGen } from './PokeSimRandomGen';
 
 export type FormatID = 'random' | 'draft';
 
@@ -26,7 +26,10 @@ export class PokemonBattleChessManager {
   public draftPieces: PokemonSet[] = [];
   public banPieces: PokemonSet[] = [];
 
+  private pokeSimRandomGen: PokeSimRandomGen | null = null;
+
   constructor(seed: PRNGSeed | null, format: FormatID | null, chessPieces?: PokemonPiece[]) {
+    this.pokeSimRandomGen = new PokeSimRandomGen(new PRNG(seed));
     if (chessPieces) {
       this.chessPieces = chessPieces;
       return;
@@ -41,18 +44,8 @@ export class PokemonBattleChessManager {
   }
 
   private *teamRandomGenerator(): Generator<PokemonSet> {
-    const generator = TeamGenerators.getTeamGenerator('gen9randombattle', this.seed);
-    let team = generator.getTeam();
     while (true) {
-      if (team.length === 0) {
-        team = generator.getTeam();
-      }
-      const pokemon = team.pop()!;
-      // Ensure no duplicate species
-      if (this.chessPieces.find((piece) => piece.pkmn.species === pokemon.species) || this.draftPieces.find((piece) => piece.species === pokemon.species)) {
-        continue;
-      }
-      yield pokemon!;
+      yield this.pokeSimRandomGen!.buildRandomPokemon();
     }
   }
 
@@ -144,5 +137,5 @@ export class PokemonBattleChessManager {
       pokemonToRemove.square = null;
     }
     return pokemonToMove;
-  }
+  };
 }
