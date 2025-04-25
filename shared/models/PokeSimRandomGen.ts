@@ -107,13 +107,27 @@ export class PokeSimRandomGen {
     let finalSet: Record<string, RandomSet> = {};
     Object.keys(randomSets).forEach((species) => {
       const speciesSets = randomSets[species];
-      let filteredSets = speciesSets.sets.filter((set) => {
-        const hasHazard = set.movepool.some((moveName) => {
-          const move = this.dex.moves.get(moveName);
-          return HAZARDS.includes(move.id);
-        })
-        return !hasHazard;
+      let filteredSets = speciesSets.sets.map((set) => {
+        return {
+          ...set,
+          movepool: set.movepool.filter((moveName) => {
+            const move = this.dex.moves.get(moveName);
+            if (HAZARDS.includes(move.id)) {
+              return false;
+            }
+            if (move.forceSwitch || move.selfSwitch) {
+              return false;
+            }
+            return true;
+          })
+        };
+      }).filter((set) => {
+        if (set.movepool.length < 4 && species !== 'ditto') {
+          return false;
+        }
+        return true;
       });
+
       if (filteredSets.length > 0) {
         finalSet[species] = {
           ...speciesSets,
@@ -166,7 +180,9 @@ export class PokeSimRandomGen {
 			NUBL: 85,
 			NU: 86,
 			PUBL: 87,
-			PU: 88, "(PU)": 88, NFE: 88,
+			PU: 88,
+      "(PU)": 88,
+      NFE: 88,
 		};
 		return tierScale[tier] || 80;
 	}
