@@ -27,7 +27,6 @@ Download/upload replay (may make bug hunting easier)
   - Offer "Download Replay" button on Error Boundary if player was in game?
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
 Options Modal
-  - Put game speed options in there
   - Sound effects
 
 Keyboard navigation and accessibility
