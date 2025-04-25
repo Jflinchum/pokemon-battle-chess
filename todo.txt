@@ -88,6 +88,8 @@ Issues:
 - Disallow client controls when the match ends
 - Pokemon sprites occasionally disappearing
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
+- On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't
+  - Can test on mobile by turning off the screen and waiting for timeout to occur
 - Bigger turn indicator maybe by player details
   - Better indicator that time is ticking down in timer mode
 - Player disconnecting removes player nameplate in game

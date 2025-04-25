@@ -13,7 +13,7 @@
 
 .chatToggleButton {
   cursor: pointer;
-  height: 70px;
+  height: 50px;
   width: 100%;
 
   display: block;
@@ -35,7 +35,7 @@
 
 .chatClosed {
   /* Height of button */
-  transform: translateY(-70px);
+  transform: translateY(-50px);
 }
 
 .chatToggleNewMessageNum {

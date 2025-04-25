@@ -6,10 +6,18 @@
   align-self: stretch;
   height: 200px;
 
-  @media (min-width: 800px) {
+  @media (orientation: portrait) {
+    width: 90vw;
+  
+    @media (min-width: 600px) {
+      width: 60vw;
+    }
+  }
+
+  @media (min-width: 600px) {
     border-top-right-radius: 10px;
   }
-  @media (max-width: 799px) {
+  @media (max-width: 599px) {
     border-bottom-left-radius: 10px;
   }
 
@@ -28,13 +36,13 @@
     }
   }
 
-  @media (min-width: 800px) {
-    width: 320px;
+  @media (min-width: 600px) {
+    width: 200px;
     height: inherit;
     align-self: stretch;
   }
   
-  @media (min-width: 800px) and (min-height: 750px) {
+  @media (min-width: 600px) and (min-height: 750px) {
     font-size: 16px;
   }
 }
@@ -59,7 +67,7 @@
     }
   }
 
-  @media (min-width: 800px) {
+  @media (min-width: 600px) {
     flex-direction: column;
   }
 }
@@ -80,14 +88,14 @@
   max-width: 50px;
   max-height: 50px;
 
-  @media (min-width: 800px) {
+  @media (min-width: 600px) {
     max-width: 100px;
     max-height: 100px;
   }
 }
 
 .pokemonDetailsTyping {
-  max-width: 100px;
+  max-width: 70px;
   margin-right: 8px;
 }
 

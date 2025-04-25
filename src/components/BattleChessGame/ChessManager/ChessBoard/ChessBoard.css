@@ -8,7 +8,7 @@
     width: 90vw;
     height: 90vw;
   
-    @media (min-width: 800px) {
+    @media (min-width: 600px) {
       width: 60vw;
       height: 60vw;
     }
@@ -25,7 +25,7 @@
     }
 
     .chessSquare:nth-last-child(1) {
-      @media (max-width: 799px) {
+      @media (max-width: 599px) {
         border-top-right-radius: 10px;
       }
     }
@@ -33,7 +33,7 @@
 
   &:nth-last-child(1) {
     .chessSquare:nth-child(1) {
-      @media (min-width: 800px) {
+      @media (min-width: 600px) {
         border-bottom-left-radius: 10px;
       }
     }
