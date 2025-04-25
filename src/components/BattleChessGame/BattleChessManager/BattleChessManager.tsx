@@ -187,79 +187,81 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
    * - Pokemon battle phase
    */
   return (
-    <div className='battleChessContainer'>
+    <div className='battleChessAndActionContainer'>
       <GameManagerActions />
-      <PlayerInGameDisplay
-        player={color === 'w' ? blackPlayer : whitePlayer}
-        takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}
-        timer={color === 'w' ? timers?.black : timers?.white}
-      />
-      <div style={{ display: catchingUp && gameState.isSkippingAhead ? 'none' : 'block' }}>
-        {
-          battleStarted && currentBattle &&
-          (
-            <PokemonBattleManager
-              p1Name={player1?.playerName!}
-              p2Name={player2?.playerName!}
-              p1Pokemon={currentBattle.p1Pokemon}
-              p2Pokemon={currentBattle.p2Pokemon}
-              currentPokemonMoveHistory={currentPokemonMoveHistory}
-            />
-          )
-        }
-        <div style={{ display: !battleStarted && !isDrafting ? 'block' : 'none' }}>
-          <ChessManager
-            chessManager={chessManager}
-            pokemonManager={pokemonManager}
-            mostRecentMove={mostRecentMove}
-            currentBattle={currentBattle}
-            chessMoveHistoryDisplay={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
-            board={board}
-            battleSquare={battleSquare}
-            onMove={(san) => {
-              if (thisPlayer?.isSpectator) {
-                return;
-              }
-              socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
-            }}
-          />
-        </div>
-        {
-          isDrafting && (
-            <DraftPokemonManager
-              draftTurnPick={draftTurnPick}
+      <div className='battleChessContainer'>
+        <PlayerInGameDisplay
+          player={color === 'w' ? blackPlayer : whitePlayer}
+          takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}
+          timer={color === 'w' ? timers?.black : timers?.white}
+        />
+        <div style={{ display: catchingUp && gameState.isSkippingAhead ? 'none' : 'block' }}>
+          {
+            battleStarted && currentBattle &&
+            (
+              <PokemonBattleManager
+                p1Name={player1?.playerName!}
+                p2Name={player2?.playerName!}
+                p1Pokemon={currentBattle.p1Pokemon}
+                p2Pokemon={currentBattle.p2Pokemon}
+                currentPokemonMoveHistory={currentPokemonMoveHistory}
+              />
+            )
+          }
+          <div style={{ display: !battleStarted && !isDrafting ? 'block' : 'none' }}>
+            <ChessManager
               chessManager={chessManager}
               pokemonManager={pokemonManager}
-              boardState={currentBoard}
-              onDraftPokemon={(sq, pkmnIndex) => {
-                if (validateDraftPick(sq, color!)) {
-                  socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, square: sq, draftPokemonIndex: pkmnIndex });
-                  setIsDrafting(!!pokemonManager.draftPieces.length);
-                }
-              }}
-              onBanPokemon={(pkmnIndex) => {
+              mostRecentMove={mostRecentMove}
+              currentBattle={currentBattle}
+              chessMoveHistoryDisplay={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
+              board={board}
+              battleSquare={battleSquare}
+              onMove={(san) => {
                 if (thisPlayer?.isSpectator) {
                   return;
                 }
-                socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
+                socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
               }}
             />
+          </div>
+          {
+            isDrafting && (
+              <DraftPokemonManager
+                draftTurnPick={draftTurnPick}
+                chessManager={chessManager}
+                pokemonManager={pokemonManager}
+                boardState={currentBoard}
+                onDraftPokemon={(sq, pkmnIndex) => {
+                  if (validateDraftPick(sq, color!)) {
+                    socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, square: sq, draftPokemonIndex: pkmnIndex });
+                    setIsDrafting(!!pokemonManager.draftPieces.length);
+                  }
+                }}
+                onBanPokemon={(pkmnIndex) => {
+                  if (thisPlayer?.isSpectator) {
+                    return;
+                  }
+                  socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
+                }}
+              />
+            )
+          }
+        </div>
+        {
+          gameState.isCatchingUp && gameState.isSkippingAhead && (
+            <div className='skipSpinnerContainer'>
+              <Spinner />
+              Skipping ahead...
+            </div>
           )
         }
+        <PlayerInGameDisplay
+          player={color === 'w' ? whitePlayer : blackPlayer}
+          takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
+          timer={color === 'w' ? timers?.white : timers?.black}
+        />
       </div>
-      {
-        gameState.isCatchingUp && gameState.isSkippingAhead && (
-          <div className='skipSpinnerContainer'>
-            <Spinner />
-            Skipping ahead...
-          </div>
-        )
-      }
-      <PlayerInGameDisplay
-        player={color === 'w' ? whitePlayer : blackPlayer}
-        takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
-        timer={color === 'w' ? timers?.white : timers?.black}
-      />
     </div>
   )
 }

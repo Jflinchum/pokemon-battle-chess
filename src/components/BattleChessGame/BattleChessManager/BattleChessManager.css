@@ -1,5 +1,20 @@
+.battleChessAndActionContainer {
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+  }
+}
+
 .battleChessContainer {
   padding-bottom: 70px;
+  width: 100%;
+  padding-left: 0px;
+
+  @media (min-width: 600px) {
+    padding-left: 70px;
+  }
 }
 
 .skipSpinnerContainer {

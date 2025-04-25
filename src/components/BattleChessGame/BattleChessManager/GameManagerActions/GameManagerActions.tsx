@@ -1,15 +1,24 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCog, faDoorOpen, faFlag, faForwardFast } from "@fortawesome/free-solid-svg-icons";
 import { useGameState } from "../../../../context/GameStateContext";
 import { useUserState } from "../../../../context/UserStateContext";
-import Button from "../../../common/Button/Button";
 import { socket } from "../../../../socket";
+import NavOptions from "../../../common/NavOptions/NavOptions";
+import { NavOptionButton } from "../../../common/NavOptions/NavOptionButton/NavOptionButton";
+import { useModalState } from "../../../../context/ModalStateContext";
 import './GameManagerActions.css';
 
 const GameManagerActions = () => {
   const { userState, dispatch } = useUserState();
   const { gameState, dispatch: dispatchGameState } = useGameState();
+  const { dispatch: dispatchModalState } = useModalState();
 
   const handleLeaveRoom = () => {
     dispatch({ type: 'LEAVE_ROOM' });
+  };
+
+  const handleOptionsClick = () => {
+    dispatchModalState({ type: 'OPEN_OPTIONS_MODAL', payload: {} });
   };
 
   const handleReturn = () => {
@@ -17,34 +26,39 @@ const GameManagerActions = () => {
     socket.emit('setViewingResults', userState.currentRoomId, userState.id, false);
   };
 
-  const handleAnimationSpeedPreferenceChange = (animationSpeed: number) => {
-    dispatch({ type: 'SET_ANIMATION_SPEED_PREFERENCE', payload: animationSpeed })
-  };
-
   return (
-    <div className='gameManagerContainer'>
-      <h3 className='gameManagerHeader'>Pokemon Gambit</h3>
-      <div className='gameManagerRightActions'>
-        <label htmlFor='animationSpeedPreference'>Game Animation Speed:</label>
-        <select id='animationSpeedPreference' value={userState.animationSpeedPreference} onChange={(e) => handleAnimationSpeedPreferenceChange(parseInt(e.target.value))}>
-          <option value={1500}>Slow</option>
-          <option value={1000}>Normal</option>
-          <option value={500}>Fast</option>
-          <option value={100}>Instant</option>
-        </select>
+    <NavOptions minimal={true} className='gameManagerActionContainer'>
+      <div className='gameManagerActionHeaderContainer'>
+        <span className='gameManagerActionHeader'>Pokemon</span>
+        <span className='gameManagerActionHeader'>Gambit</span>
+      </div>
+      <div className='gameManagerActions'>
         {
           gameState.isCatchingUp && !gameState.isSkippingAhead && (
-            <Button onClick={() => { dispatchGameState({ type: 'SET_SKIPPING_AHEAD', payload: !gameState.isSkippingAhead }) }}>
-              Skip to Current Turn
-            </Button>
+            <NavOptionButton className='gameManagerAction' onClick={() => { dispatchGameState({ type: 'SET_SKIPPING_AHEAD', payload: !gameState.isSkippingAhead }) }}>
+              <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faForwardFast} /></span>
+              <span className='gameManagerActionLabel'>Skip to Current Turn</span>
+            </NavOptionButton>
           )
         }
-        <Button color='danger' onClick={() => handleLeaveRoom()}>Return to Main Menu</Button>
         {
-          gameState.inGame && gameState.matchEnded && (<Button color='primary' onClick={handleReturn}>Return to Room</Button>)
+          gameState.matchEnded && (
+            <NavOptionButton className='gameManagerAction' onClick={handleReturn}>
+              <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faDoorOpen} /></span>
+              <span className='gameManagerActionLabel'>Return to Room</span>
+            </NavOptionButton>
+          )
         }
+        <NavOptionButton className='gameManagerAction' onClick={() => handleLeaveRoom()}>
+          <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faFlag} /></span>
+          <span className='gameManagerActionLabel'>Return to Main Menu</span>
+        </NavOptionButton>
+        <NavOptionButton className='gameManagerAction' onClick={() => handleOptionsClick()}>
+          <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faCog} /></span>
+          <span className='gameManagerActionLabel'>Options</span>
+        </NavOptionButton>
       </div>
-    </div>
+    </NavOptions>
   )
 };
 

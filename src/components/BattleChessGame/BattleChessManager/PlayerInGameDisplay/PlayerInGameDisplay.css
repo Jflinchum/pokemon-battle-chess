@@ -1,6 +1,5 @@
 .playerGameDisplayContainer {
   display: flex;
-  margin: 5px 0;
   padding: 10px;
   background-color: rgb(70, 70, 70);
   font-size: 10px;

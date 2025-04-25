@@ -8,12 +8,15 @@ import AvatarChangeModal from "./Modals/AvatarChangeModal/AvatarChangeModal";
 import CreateRoomModal from "./Modals/CreateRoomModal/CreateRoomModal";
 import EndGameModal from "./Modals/EndGameModal/EndGameModal";
 import HowToPlayModal from "./Modals/HowToPlayModal/HowToPlayModal";
+import OptionsModal from "./Modals/OptionsModal/OptionsModal";
 import './Modal.css';
 
 const renderModal = (currentModal: string) => {
   switch (currentModal) {
     case 'ROOM_CODE':
       return (<RoomCodeModal />);
+    case 'OPTIONS':
+      return (<OptionsModal />);
     case 'NAME_CHANGE':
       return (<NameChangeModal />);
     case 'AVATAR_CHANGE':

@@ -1,11 +1,12 @@
 import { Sprites } from "@pkmn/img";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChessKing, faDoorOpen, faFaceGrin, faNoteSticky, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { useModalState } from "../../../context/ModalStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
+import NavOptions from "../../common/NavOptions/NavOptions";
+import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
 import './MenuOptions.css';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faChessKing, faDoorOpen, faFaceGrin, faNoteSticky, faPencil, faX } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
 
 const MenuOptions = () => {
   const { dispatch } = useModalState();
@@ -27,70 +28,46 @@ const MenuOptions = () => {
     dispatch({ type: 'OPEN_HOW_TO_PLAY_MODAL', payload: {} })
   }
 
-  const [open, setOpen] = useState(false);
-
   return (
-    <div>
-      {open && <div className='menuBackdrop' onClick={() => setOpen(false)}/>}
-      <div className='menuMobileNav'>
-        <button onClick={() => setOpen(!open)} className='menuMobileButton'>
-          <span>
-            <FontAwesomeIcon size='2x' icon={open ? faX : faBars}/>
-          </span>
-        </button>
+    <NavOptions>
+      <div className='menuOptions'>
+        {userState.name && (
+          <div>
+            <p className='nameContainer'>
+              <b>Name: </b>
+              <span className='username'>{userState.name}</span>
+            </p>
+            <div className='avatarContainer'>
+              <img src={Sprites.getAvatar(parseInt(userState.avatarId))} />
+            </div>
+          </div>
+        )}
+        <NavOptionButton className='menuOptionButtonContainer' onClick={() => {}}>
+          <FontAwesomeIcon icon={faChessKing}/>
+          <span>Find Match (todo)</span>
+        </NavOptionButton>
+        <NavOptionButton className='menuOptionButtonContainer' onClick={handleCreateRoom}>
+          <FontAwesomeIcon icon={faDoorOpen} />
+          <span>Create New Room</span>
+        </NavOptionButton>
+        <NavOptionButton className='menuOptionButtonContainer' onClick={handleChangeName}>
+          <FontAwesomeIcon icon={faPencil}/>
+          <span>Change Name</span>
+        </NavOptionButton>
+        <NavOptionButton className='menuOptionButtonContainer' onClick={handleChangeAvatar}>
+          <FontAwesomeIcon icon={faFaceGrin} />
+          <span>Change Avatar</span>
+        </NavOptionButton>
+        <NavOptionButton className='menuOptionButtonContainer' onClick={handleHowToPlay}>
+          <FontAwesomeIcon icon={faNoteSticky}/>
+          <span>How to play</span>
+        </NavOptionButton>
       </div>
-      <div className={`menuOptions ${open ? 'menuOptionsOpen' : 'menuOptionsClose'}`}>
-        <ul>
-          <li>
-            {userState.name && (
-              <div>
-                <p className='nameContainer'>
-                  <b>Name: </b>
-                  <span className='username'>{userState.name}</span>
-                </p>
-                <div className='avatarContainer'>
-                  <img src={Sprites.getAvatar(parseInt(userState.avatarId))} />
-                </div>
-              </div>
-            )}
-          </li>
-          <li className='menuOptionButtonContainer'>
-            <button className='menuOptionButton' onClick={() => {}}>
-              <FontAwesomeIcon icon={faChessKing}/>
-              <span>Find Match (todo)</span>
-            </button>
-          </li>
-          <li className='menuOptionButtonContainer'>
-            <button className="menuOptionButton" onClick={handleCreateRoom}>
-              <FontAwesomeIcon icon={faDoorOpen} />
-              <span>Create New Room</span>
-            </button>
-          </li>
-          <li className='menuOptionButtonContainer'>
-            <button className="menuOptionButton" onClick={handleChangeName}>
-              <FontAwesomeIcon icon={faPencil}/>
-              <span>Change Name</span>
-            </button>
-          </li>
-          <li className='menuOptionButtonContainer'>
-            <button className="menuOptionButton" onClick={handleChangeAvatar}>
-              <FontAwesomeIcon icon={faFaceGrin} />
-              <span>Change Avatar</span>
-            </button>
-          </li>
-          <li className='menuOptionButtonContainer'>
-            <button className="menuOptionButton" onClick={handleHowToPlay}>
-              <FontAwesomeIcon icon={faNoteSticky}/>
-              <span>How to play</span>
-            </button>
-          </li>
-        </ul>
 
-        <div className='pokemonOfTheDayContainer'>
-          <PokemonOfTheDay />
-        </div>
+      <div className='pokemonOfTheDayContainer'>
+        <PokemonOfTheDay />
       </div>
-    </div>
+    </NavOptions>
   );
 };
 

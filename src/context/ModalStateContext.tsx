@@ -3,7 +3,7 @@ import Modal from "../components/common/Modal/Modal";
 import { Color } from "chess.js";
 import { EndGameReason } from "../../shared/types/game";
 
-type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'AVATAR_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | 'HOW_TO_PLAY' | '';
+type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'AVATAR_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | 'HOW_TO_PLAY' | 'OPTIONS' | '';
 
 export interface RoomCodeModalProps {
   roomId: string;
@@ -20,6 +20,7 @@ type ModalProps = RoomCodeModalProps | EndGameModalProps | undefined;
 type ModalStateAction = 
   { type: 'OPEN_ROOM_MODAL'; payload: { required?: boolean, modalProps: ModalProps }; }
   | { type: 'OPEN_NAME_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
+  | { type: 'OPEN_OPTIONS_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_AVATAR_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_CREATE_ROOM_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_HOW_TO_PLAY_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
@@ -43,6 +44,8 @@ export const modalStateReducer = (modalState: ModalState, action: ModalStateActi
   switch (action.type) {
     case 'OPEN_ROOM_MODAL':
       return { ...modalState, currentModal: 'ROOM_CODE', required: action.payload.required, modalProps: action.payload.modalProps as RoomCodeModalProps };
+    case 'OPEN_OPTIONS_MODAL':
+      return { ...modalState, currentModal: 'OPTIONS', required: action.payload.required };
     case 'OPEN_NAME_MODAL':
       return { ...modalState, currentModal: 'NAME_CHANGE', required: action.payload.required };
     case 'OPEN_AVATAR_MODAL':
