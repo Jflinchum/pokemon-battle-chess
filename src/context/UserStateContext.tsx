@@ -1,12 +1,18 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { getAnimationSpeedPreference, getAvatar, getName, getOrInitializeUUID } from "../utils.ts";
+import { getAnimationSpeedPreference, getAvatar, getName, getOrInitializeUUID, getVolumePreference } from "../utils.ts";
 import { leaveRoom } from "../service/lobby";
+
+export interface VolumePreference {
+  pieceVolume: number;
+  musicVolume: number;
+}
 
 interface UserState {
   name: string;
   avatarId: string;
   id: string;
   animationSpeedPreference: number;
+  volumePreference: VolumePreference,
   currentRoomId: string;
   currentRoomCode: string;
 }
@@ -20,6 +26,7 @@ type UserStateAction =
   { type: 'SET_NAME'; payload: string }
   | { type: 'SET_AVATAR'; payload: string }
   | { type: 'SET_ANIMATION_SPEED_PREFERENCE'; payload: number }
+  | { type: 'SET_VOLUME_PREFERENCE'; payload: Partial<VolumePreference> }
   | { type: 'SET_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'JOIN_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'LEAVE_ROOM' };
@@ -37,6 +44,10 @@ export const userStateReducer = (userState: UserState, action: UserStateAction):
     case 'SET_ANIMATION_SPEED_PREFERENCE':
       localStorage.setItem('animationSpeedPreference', `${action.payload}`);
       return { ...userState, animationSpeedPreference: action.payload };
+    case 'SET_VOLUME_PREFERENCE':
+      const newVolumePreference = { ...userState.volumePreference, ...action.payload };
+      localStorage.setItem('volumePreference', JSON.stringify(newVolumePreference));
+      return { ...userState, volumePreference: newVolumePreference };
     case 'SET_ROOM':
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode };
     case 'LEAVE_ROOM':
@@ -55,6 +66,7 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     avatarId: getAvatar(),
     id: getOrInitializeUUID(),
     animationSpeedPreference: getAnimationSpeedPreference(),
+    volumePreference: getVolumePreference(),
     currentRoomId: '',
     currentRoomCode: '',
   });

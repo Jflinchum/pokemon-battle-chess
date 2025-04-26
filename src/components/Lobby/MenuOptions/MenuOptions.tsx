@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChessKing, faDoorOpen, faFaceGrin, faNoteSticky, faPencil, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faChessKing, faCog, faDoorOpen, faFaceGrin, faNoteSticky, faPencil, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useModalState } from "../../../context/ModalStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
@@ -17,26 +17,30 @@ const MenuOptions = () => {
   const { userState } = useUserState();
   const { dispatch: gameStateDispatch } = useGameState();
 
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChangeName = () => {
     dispatch({ type: 'OPEN_NAME_MODAL', payload: {} });
   };
 
   const handleCreateRoom = () => {
-    dispatch({ type: 'OPEN_CREATE_ROOM_MODAL', payload: {} })
+    dispatch({ type: 'OPEN_CREATE_ROOM_MODAL', payload: {} });
   };
 
   const handleChangeAvatar = () => {
-    dispatch({ type: 'OPEN_AVATAR_MODAL', payload: {} })
+    dispatch({ type: 'OPEN_AVATAR_MODAL', payload: {} });
   }
 
   const handleHowToPlay = () => {
-    dispatch({ type: 'OPEN_HOW_TO_PLAY_MODAL', payload: {} })
+    dispatch({ type: 'OPEN_HOW_TO_PLAY_MODAL', payload: {} });
   }
 
   const handleUploadReplayClick = () => {
     inputRef.current?.click();
+  }
+
+  const handleOptionsClick = () => {
+    dispatch({ type: 'OPEN_OPTIONS_MODAL', payload: {} });
   }
 
   const handleUploadReplay = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,6 +101,10 @@ const MenuOptions = () => {
         <NavOptionButton className='menuOptionButtonContainer' onClick={handleUploadReplayClick}>
           <FontAwesomeIcon icon={faUpload} />
           <span>Watch Replay</span>
+        </NavOptionButton>
+        <NavOptionButton className='menuOptionButtonContainer' onClick={handleOptionsClick}>
+          <FontAwesomeIcon icon={faCog} />
+          <span>Options</span>
         </NavOptionButton>
       </div>
       <input type='file' style={{ display: 'none' }} ref={inputRef} onChange={handleUploadReplay} accept=".replay" />

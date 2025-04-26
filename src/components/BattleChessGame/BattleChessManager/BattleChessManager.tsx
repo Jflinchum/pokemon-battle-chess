@@ -16,8 +16,11 @@ import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
 import useBattleHistory from './useBattleHistory';
 import Spinner from '../../common/Spinner/Spinner';
 import { Timer } from '../../../../shared/types/game';
+import movePieceMP3 from '../../../assets/chessAssets/audio/movePiece.mp3';
+import capturePieceMP3 from '../../../assets/chessAssets/audio/capturePiece.mp3';
 import GameManagerActions from './GameManagerActions/GameManagerActions';
 import './BattleChessManager.css';
+import { useMusicPlayer } from '../../../util/useMusicPlayer';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;
@@ -37,7 +40,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
   const whitePlayer = useMemo(() => gameState.players.find((player) => player.color === 'w'), [gameState.players]);
   const blackPlayer = useMemo(() => gameState.players.find((player) => player.color === 'b'), [gameState.players]);
   const thisPlayer = useMemo(() => gameState.players.find((player) => player.playerId === userState.id), [gameState.players])
-  const color = useMemo(() => gameState.gameSettings!.color, [])
+  const color = useMemo(() => gameState.gameSettings!.color, []);
   const chessManager = useMemo(() => {
     return new Chess();
   }, []);
@@ -54,6 +57,27 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
   const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<{ args: ArgType, kwArgs: KWArgType }[]>([]);
+
+  const { movePieceAudio, capturePieceAudio } = useMemo(() => {
+    const movePieceAudio = new Audio(movePieceMP3);
+    const capturePieceAudio = new Audio(capturePieceMP3);
+    movePieceAudio.volume = userState.volumePreference.pieceVolume;
+    capturePieceAudio.volume = userState.volumePreference.pieceVolume;
+    return {
+      movePieceAudio,
+      capturePieceAudio,
+    };
+  }, [userState.volumePreference.pieceVolume]);
+
+  const { playRandomGlobalSong, playRandomBattleSong } = useMusicPlayer();
+
+  useEffect(() => {
+    if (currentBattle && (!catchingUp || userState.animationSpeedPreference >= 1000) && !gameState.isSkippingAhead) {
+      playRandomBattleSong();
+    } else {
+      playRandomGlobalSong();
+    }
+  }, [currentBattle]);
 
   const { catchingUp, currentMatchLog } = useBattleHistory({
     matchHistory,
@@ -157,6 +181,11 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
 
     setMostRecentMove({ from: fromSquare, to: toSquare });
     setBoard(chessManager.board());
+    if (capturedPieceSquare) {
+      capturePieceAudio.play();
+    } else {
+      movePieceAudio.play();
+    }
   }
 
   const validateDraftPick = ((square: Square, draftColor: Color) => {

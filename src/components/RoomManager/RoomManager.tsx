@@ -7,6 +7,7 @@ import { socket } from "../../socket";
 import Room, { Player } from "./Room/Room";
 import ChatToggle from "./Chat/ChatToggle/ChatToggle";
 import { MatchHistory, Timer } from "../../../shared/types/game";
+import { useMusicPlayer } from "../../util/useMusicPlayer";
 import './RoomManager.css';
 
 const RoomManager = () => {
@@ -15,6 +16,11 @@ const RoomManager = () => {
   const { dispatch: dispatchModalState } = useModalState();
   const [matchHistory, setMatchHistory] = useState<MatchHistory>();
   const [timers, setTimers] = useState<Timer>();
+
+  const { stopSongs } = useMusicPlayer();
+  useEffect(() => {
+    stopSongs();
+  }, []);
 
   useEffect(() => {
     socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);

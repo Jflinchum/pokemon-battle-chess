@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretLeft, faCaretRight, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import RoomList from "../RoomList/RoomList";
 import MenuOptions from "../MenuOptions/MenuOptions";
 import { getAvailableRooms } from "../../../service/lobby";
 import { useGameState } from "../../../context/GameStateContext";
-import './LobbyManager.css';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretLeft, faCaretRight, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
+import { useMusicPlayer } from "../../../util/useMusicPlayer";
+import './LobbyManager.css';
 
 const LobbyManager = () => {
   const [availableRooms, setAvailableRooms] = useState([]);
@@ -15,6 +16,11 @@ const LobbyManager = () => {
   const [refreshDisabled, setRefreshDisabled] = useState(false);
   const { dispatch: dispatchGameState } = useGameState();
   const [errorText, setErrorText] = useState('');
+
+  const { stopSongs } = useMusicPlayer();
+  useEffect(() => {
+    stopSongs();
+  }, []);
 
   const handleRefreshRoom = (searchTerm = '') => {
     setRefreshDisabled(true);

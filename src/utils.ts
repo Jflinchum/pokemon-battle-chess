@@ -1,5 +1,6 @@
 import { RefObject, useRef } from "react";
 import { GameOptions } from '../shared/types/GameOptions';
+import { VolumePreference } from "./context/UserStateContext";
 
 export const getOrInitializeUUID = () => {
   const localStorageUUID = localStorage.getItem('uuid');
@@ -41,11 +42,20 @@ export const getGameOptions = () => {
     chessTimerIncrement: 5,
   };
   const localStorageGameOptions = localStorage.getItem('localStorageGameOptions');
-  return localStorageGameOptions ? JSON.parse(localStorageGameOptions ) : defaultGameOptions;
+  return localStorageGameOptions ? JSON.parse(localStorageGameOptions) : defaultGameOptions;
 }
 
 export const getAnimationSpeedPreference = () => {
   return parseInt(localStorage.getItem('animationSpeedPreference') || '1000');
+}
+
+export const getVolumePreference = () => {
+  const defaultVolumePreferences: VolumePreference = {
+    pieceVolume: 0.50,
+    musicVolume: 0.50,
+  };
+  const volumePreference = localStorage.getItem('volumePreference');
+  return (volumePreference ? JSON.parse(volumePreference) : defaultVolumePreferences) as VolumePreference;
 }
 
 export const useDebounce = (cb: Function, delay: number) => {

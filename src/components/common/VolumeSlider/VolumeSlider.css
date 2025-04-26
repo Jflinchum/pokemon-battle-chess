@@ -1,0 +1,13 @@
+.volumeSliderContainer {
+  display: grid;
+  grid-template: 1fr / 1fr 5fr;
+
+  svg {
+    margin: auto 0;
+    padding-right: 8px;
+    width: 20px;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

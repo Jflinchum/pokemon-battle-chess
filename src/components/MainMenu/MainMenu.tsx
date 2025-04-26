@@ -18,7 +18,7 @@ const MainMenu = () => {
       dispatch({ type: 'OPEN_NAME_MODAL', payload: { required: true } });
       return;
     }
-  }, [])
+  }, []);
 
   return (
     <ErrorBoundary>

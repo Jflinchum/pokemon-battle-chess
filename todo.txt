@@ -66,6 +66,7 @@ Refactor TODOs:
 
 Issues:
 - Serverside room not resetting fully when rematching sometimes
+- Move tooltips go behind left nav
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:
