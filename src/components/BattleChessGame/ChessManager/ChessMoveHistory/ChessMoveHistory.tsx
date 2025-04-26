@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 const ChessMoveHistoryItem = ({ turn, whiteMove, blackMove }: { turn: number; whiteMove?: ChessData; blackMove?: ChessData }) => {
   return (
-    <li>
+    <li className='moveHistoryRow'>
       <span className='moveHistoryTurnLabel'>
         {turn}.
       </span>

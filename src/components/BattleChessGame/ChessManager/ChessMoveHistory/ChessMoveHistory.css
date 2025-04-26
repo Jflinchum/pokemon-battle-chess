@@ -10,7 +10,9 @@
     max-height: 300px;
   }
 
-  li {
+  .moveHistoryRow {
+    display: grid;
+    grid-template: auto 1fr / 1fr 2fr 2fr;
     margin-left: 4px;
     padding: 4px;
     background-color: rgb(70,70,70);
@@ -23,12 +25,10 @@
 
 .moveHistoryTurnLabel {
   display: inline-block;
-  width: 50px;
 }
 
 .moveHistoryMoveLabel {
   display: inline-block;
-  width: 80px;
   margin-left: 20px;
 }
 
