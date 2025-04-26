@@ -23,7 +23,10 @@ export const downloadReplay = (gameState: GameState, matchHistory: MatchHistory)
   const replayData: ReplayData = {
     players: [whitePlayer, blackPlayer],
     seed,
-    options: gameState.gameSettings.options,
+    options: {
+      ...gameState.gameSettings.options,
+      timersEnabled: false,
+    },
     matchHistory,
   }
 
