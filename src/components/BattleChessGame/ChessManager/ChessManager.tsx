@@ -48,7 +48,7 @@ const ChessManager = ({
 
   // Create a simulated copy of both managers to handle premoving
   const { simulatedChessManager, simulatedPokemonManager } = useMemo(() => {
-    const chessManagerCopy = new Chess(chessManager.fen());
+    const chessManagerCopy = new Chess(chessManager.fen(), { skipValidation: true });
     const pokemonManagerCopy = new PokemonBattleChessManager(null, null, JSON.parse(JSON.stringify(pokemonManager.getChessPieces())))
 
     if (chessManagerCopy.turn() !== color) {
