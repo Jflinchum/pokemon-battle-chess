@@ -14,6 +14,7 @@ Write validation functions when writing/reading from localstorage and clear it o
 Download/upload replay (may make bug hunting easier)
   - Match history download. Maybe some inital data on the players.
     - Could potentially compress it if necessary
+    - Save the player names, player ids, seed, color assignments, and game options
   - Download button would be in Game, would need to move the game manager action bar to BattleChessManager
   - Match history upload. 
     - Could be in RoomOptions
@@ -28,12 +29,17 @@ Download/upload replay (may make bug hunting easier)
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
 Options Modal
   - Sound effects
+Player secret generation and handshake on move requests
+Balance pokemon generation based on BST in random mode
+Collapse Change Name and Change Avatar into Customize menu option
 
 Keyboard navigation and accessibility
 
 Room Options
  - Weather on random chess spaces
  - Preserve damage after battle
+ - Tera enabled
+  - A Pokemon can only tera once in a match, and then they can't tera again
  - Custom Teams
  - (maybe) Preserve item usage after battle
  - (maybe) Change pokemon on piece promotion
@@ -41,6 +47,7 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
+- Download/Upload Game History
 - Queueing up Drafts/Chess moves
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
@@ -85,13 +92,13 @@ Issues:
   - Can test on mobile by turning off the screen and waiting for timeout to occur
 - Bigger turn indicator maybe by player details
   - Better indicator that time is ticking down in timer mode
+- Make sure you can see timers in pokemon battles
 - Player disconnecting removes player nameplate in game
 - Pokemon details looks weird on mobile when pokemon only has one move (ditto)
 - Joining a room should clear viewing results status
 - Some pokemon do not appear in image for background
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
-- Better scaling for smaller screen sizes
 - Wrap pokemon statuses
 
 Dropping features:

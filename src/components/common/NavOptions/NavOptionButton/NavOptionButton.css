@@ -7,7 +7,7 @@
   padding: 20px;
   cursor: pointer;
   font-size: 12px;
-  border-top: 3px solid rgb(50, 50, 50);
+  border-top: 2px solid rgb(50, 50, 50);
 
   svg {
     font-size: 16px;
@@ -31,6 +31,6 @@
   }
 
   &:last-child {
-    border-bottom: 3px solid rgb(50, 50, 50);
+    border-bottom: 2px solid rgb(50, 50, 50);
   }
 }
