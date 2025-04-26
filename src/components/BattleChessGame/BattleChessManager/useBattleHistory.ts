@@ -158,7 +158,7 @@ const useBattleHistory = ({
     return () => {
       catchUpTimer?.stop();
     }
-  }, [currentBattle, skipToEndOfSync, matchLog]);
+  }, [currentBattle, skipToEndOfSync, matchLog, userState.animationSpeedPreference]);
 
   return { catchingUp, currentMatchLog: matchLog.slice(0, matchLogIndex.current) };
 };

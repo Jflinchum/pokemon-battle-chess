@@ -65,7 +65,6 @@ Refactor TODOs:
 - Separate out draft/ban calls
 
 Issues:
-- Fix chess history styling
 - Room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
@@ -73,7 +72,6 @@ Issues:
 - Premoving should still cost .1 seconds, at a minimum
 - Disallow premoving for spectators
 - Premove decide pawn promotion
-- Changing game speed doesn't come into affect until after you caught up from spectating
 - Side nav in game goes underneath pokemon healthbar ui
 - Error state on failing to upload replay
 - Split seed rng for pokemon generation and battle engine
