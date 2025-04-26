@@ -65,14 +65,13 @@ Refactor TODOs:
 - Separate out draft/ban calls
 
 Issues:
-- Room not resetting fully when rematching sometimes
+- Serverside room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves occassionally clearing
 - Premoving should still cost .1 seconds, at a minimum
-- Disallow premoving for spectators
 - Premove decide pawn promotion
-- Side nav in game goes underneath pokemon healthbar ui
+- Disallow premoving for spectators
 - Error state on failing to upload replay
 - Split seed rng for pokemon generation and battle engine
   - Keep battle engine seed secret
