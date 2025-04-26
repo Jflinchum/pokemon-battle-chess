@@ -11,20 +11,8 @@ Add forfeit button to pokemon battle
 Create formats to quick select game options in room
 Turn timer into second:millisecond timer once down below a minute left
 Write validation functions when writing/reading from localstorage and clear it out if failing validation
-Download/upload replay (may make bug hunting easier)
-  - Match history download. Maybe some inital data on the players.
-    - Could potentially compress it if necessary
-    - Save the player names, player ids, seed, color assignments, and game options
-  - Download button would be in Game, would need to move the game manager action bar to BattleChessManager
-  - Match history upload. 
-    - Could be in RoomOptions
-      - Clear button to remove any match history uploaded
-      - On start game, would send match history to server through socket to configure the game
-      - All spectators could watch, then
-    - Could be on Main Menu
-      - No need to sync to spectators in this case, or communicate with server
-      - Would likely need to manually set some gameState to work with this 
-      - Would likely need to hard render BattleChessManager after state changes
+Download/upload replay
+  - Store current user info as a spectator
   - Offer "Download Replay" button on Error Boundary if player was in game?
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
 Options Modal
@@ -47,7 +35,6 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Download/Upload Game History
 - Queueing up Drafts/Chess moves
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
@@ -60,6 +47,7 @@ Priority:
         However it may be nicer to shift the index of the queue when a pokemon is drafted
   - Chess moves
     - Clear queue if most recent move of your color failed
+    - Clear queue if valid move, but san different (opponent moves a piece into player's premove space)
 - Host controls
   - Redesign player list first, both in room and in game
 - Better logging
@@ -85,6 +73,11 @@ Issues:
 - Premoving should still cost .1 seconds, at a minimum
 - Disallow premoving for spectators
 - Premove decide pawn promotion
+- Changing game speed doesn't come into affect until after you caught up from spectating
+- Side nav in game goes underneath pokemon healthbar ui
+- Error state on failing to upload replay
+- Split seed rng for pokemon generation and battle engine
+  - Keep battle engine seed secret
 - Disallow client controls when the match ends
 - Pokemon sprites occasionally disappearing
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
@@ -94,6 +87,7 @@ Issues:
   - Better indicator that time is ticking down in timer mode
 - Make sure you can see timers in pokemon battles
 - Player disconnecting removes player nameplate in game
+  - On game start, store white player and black player details in separate state instead of fetching them from the connected players
 - Pokemon details looks weird on mobile when pokemon only has one move (ditto)
 - Joining a room should clear viewing results status
 - Some pokemon do not appear in image for background

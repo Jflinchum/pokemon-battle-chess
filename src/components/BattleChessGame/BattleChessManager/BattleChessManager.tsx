@@ -188,7 +188,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
    */
   return (
     <div className='battleChessAndActionContainer'>
-      <GameManagerActions />
+      <GameManagerActions matchHistory={currentMatchLog} />
       <div className='battleChessContainer'>
         <PlayerInGameDisplay
           player={color === 'w' ? blackPlayer : whitePlayer}

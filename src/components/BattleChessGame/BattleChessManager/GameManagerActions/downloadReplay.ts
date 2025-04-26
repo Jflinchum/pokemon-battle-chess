@@ -1,0 +1,43 @@
+import { PRNGSeed } from '@pkmn/sim';
+import { MatchHistory } from "../../../../../shared/types/game";
+import { GameState } from "../../../../context/GameStateContext";
+import { Player } from "../../../RoomManager/Room/Room";
+import { GameOptions } from '../../../../../shared/types/GameOptions';
+
+export interface ReplayData {
+  players: Player[];
+  seed: PRNGSeed;
+  options: GameOptions;
+  matchHistory: MatchHistory;
+}
+
+export const downloadReplay = (gameState: GameState, matchHistory: MatchHistory) => {
+  const whitePlayer = gameState.players.find(player => player.color === 'w');
+  const blackPlayer = gameState.players.find(player => player.color === 'b');
+  const seed = gameState.gameSettings.seed;
+
+  if (!whitePlayer || !blackPlayer || !seed) {
+    // TODO - better error state
+    return;
+  }
+  const replayData: ReplayData = {
+    players: [whitePlayer, blackPlayer],
+    seed,
+    options: gameState.gameSettings.options,
+    matchHistory,
+  }
+
+  const fileName = `${new Date().getFullYear()}-${new Date().getDate()}-${new Date().getDay()}-${new Date().getHours()}${new Date().getMinutes()}${new Date().getSeconds()}`;
+  const json = JSON.stringify(replayData, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const href = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = href;
+  link.download = fileName + ".replay";
+  document.body.appendChild(link);
+  link.click();
+
+  document.body.removeChild(link);
+  URL.revokeObjectURL(href);
+}

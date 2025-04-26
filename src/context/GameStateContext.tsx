@@ -4,6 +4,8 @@ import { PRNGSeed } from '@pkmn/sim';
 import { getGameOptions } from "../utils.ts";
 import { Player } from "../components/RoomManager/Room/Room.tsx";
 import { GameOptions } from '../../shared/types/GameOptions';
+import { ReplayData } from "../components/BattleChessGame/BattleChessManager/GameManagerActions/downloadReplay.ts";
+import { MatchHistory } from "../../shared/types/game.ts";
 
 export type FormatID = 'random' | 'draft';
 
@@ -13,12 +15,14 @@ interface GameSettings {
   options: GameOptions;
 }
 
-interface GameState {
+export interface GameState {
   inGame: boolean;
   matchEnded: boolean;
   isSkippingAhead: boolean;
   isCatchingUp: boolean;
   isHost: boolean;
+  isWatchingReplay: boolean;
+  replayHistory: MatchHistory;
   players: Player[];
   gameSettings: GameSettings;
 }
@@ -37,6 +41,7 @@ type GameStateAction =
   | { type: 'SET_PLAYERS'; payload: Player[]; }
   | { type: 'RETURN_TO_ROOM'; }
   | { type: 'END_MATCH'; }
+  | { type: 'START_REPLAY'; payload: ReplayData; }
   | { type: 'START_MATCH'; payload: GameSettings; };
 
 export const GameStateContext = createContext<GameStateType | null>(null);
@@ -48,6 +53,8 @@ const getInitialGameState = (): GameState => (
     isHost: false,
     isSkippingAhead: false,
     isCatchingUp: false,
+    isWatchingReplay: false,
+    replayHistory: [],
     players: [],
     gameSettings: {
       options: getGameOptions()
@@ -71,10 +78,23 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
       return { ...gameState, isCatchingUp: action.payload };
     case 'END_MATCH':
       return { ...gameState, matchEnded: true };
+    case 'START_REPLAY':
+      return {
+        ...gameState,
+        isWatchingReplay: true,
+        players: action.payload.players,
+        replayHistory: action.payload.matchHistory,
+        gameSettings: {
+          ...gameState.gameSettings,
+          seed: action.payload.seed,
+          color: 'w',
+          options: action.payload.options
+        }
+      };
     case 'START_MATCH':
       return { ...gameState, inGame: true, matchEnded: false, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color, options: action.payload.options } };
     case 'RETURN_TO_ROOM':
-      return { ...gameState, inGame: false };
+      return { ...gameState, inGame: false, replayHistory: [], isWatchingReplay: false, players: [] };
     default:
       return gameState;
   }

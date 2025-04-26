@@ -41,6 +41,7 @@ const EndGameModal = () => {
 
   const handleBackToMenu = () => {
     userStateDispatch({ type: 'LEAVE_ROOM' });
+    gameStateDispatch({ type: 'RESET_ROOM' });
     dispatch({ type: 'CLOSE_MODAL' });
   }
 
@@ -95,7 +96,11 @@ const EndGameModal = () => {
         reason !== 'HOST_DISCONNECTED' && (
           <div className='endGameBottomActions'>
             <Button color='danger' onClick={handleBackToMenu}>Back To Main Menu</Button>
-            <Button className='endGameRematch' onClick={handleReturn} color='primary'>Return to Room</Button>
+            {
+              !gameState.isWatchingReplay && (
+                <Button className='endGameRematch' onClick={handleReturn} color='primary'>Return to Room</Button>
+              )
+            }
           </div>
         )
       }
