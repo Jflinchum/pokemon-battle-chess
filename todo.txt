@@ -15,11 +15,12 @@ Download/upload replay
   - Store current user info as a spectator
   - Offer "Download Replay" button on Error Boundary if player was in game?
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
-Options Modal
-  - Sound effects
 Player secret generation and handshake on move requests
 Balance pokemon generation based on BST in random mode
-Collapse Change Name and Change Avatar into Customize menu option
+Make modal with tabs on side for different screens
+  - Collapse Change Name and Change Avatar into Customize menu option
+  - Options for Game, Sound, etc.
+Add more music and make music playlist w/ skip track button
 
 Keyboard navigation and accessibility
 
@@ -66,7 +67,6 @@ Refactor TODOs:
 
 Issues:
 - Serverside room not resetting fully when rematching sometimes
-- Move tooltips go behind left nav
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:
