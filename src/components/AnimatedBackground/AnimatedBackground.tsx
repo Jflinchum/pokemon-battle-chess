@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Sprites } from '@pkmn/img';
+import { Color, PieceSymbol } from 'chess.js';
 import ChessPieceSprite from '../BattleChessGame/ChessManager/ChessBoard/ChessPieceSprite/ChessPieceSprite';
 import { getRandomPokemon } from '../Lobby/PokemonOfTheDay/PokemonOfTheDayUtil';
 import './AnimatedBackground.css';
-import { Color, PieceSymbol } from 'chess.js';
 
 const getRandomChessPiece = () => {
   const chessPieces: PieceSymbol[] = ['p', 'b', 'n', 'r', 'k', 'q'];

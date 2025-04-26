@@ -1,18 +1,21 @@
+import { useMemo } from "react";
 import { Sprites } from "@pkmn/img";
+import { Dex } from "@pkmn/dex";
 import { getRandomPokemonOfTheDay } from './PokemonOfTheDayUtil';
 import { generateDailyNumber } from "../../../utils";
 import './PokemonOfTheDay.css';
-import { speciesOverride } from "../../BattleChessGame/ChessManager/util";
 
 const PokemonOfTheDay = ({ className = '' }: { className?: string }) => {
-  const randPokemon = getRandomPokemonOfTheDay();
+  const randPokemon = useMemo(() => getRandomPokemonOfTheDay(), []);
+  const dexPokemon = Dex.species.get(randPokemon);
+
   return (
     randPokemon ?
     (
       <div className={`${className} pokemonOfTheDay`}>
         <b>Pokemon of the day!</b>
-        <span>{randPokemon}</span>
-        <img src={Sprites.getPokemon(speciesOverride(randPokemon), { shiny: generateDailyNumber(1, 4096) === 1 }).url} />
+        <span>{dexPokemon.name}</span>
+        <img src={Sprites.getPokemon(dexPokemon.id, { shiny: generateDailyNumber(1, 4096) === 1 }).url} />
       </div>
     ) :
     (

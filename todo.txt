@@ -68,11 +68,11 @@ Issues:
 - Serverside room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
-- Premoves occassionally clearing
-- Premoving should still cost .1 seconds, at a minimum
-- Premove decide pawn promotion
-- Disallow premoving for spectators
-- Error state on failing to upload replay
+- Premoves:
+  - Premoves occassionally clearing
+  - Premoving should still cost .1 seconds, at a minimum
+  - Premove decide pawn promotion
+  - Disallow premoving for spectators or when the game has ended
 - Split seed rng for pokemon generation and battle engine
   - Keep battle engine seed secret
 - Disallow client controls when the match ends
@@ -87,7 +87,6 @@ Issues:
   - On game start, store white player and black player details in separate state instead of fetching them from the connected players
 - Pokemon details looks weird on mobile when pokemon only has one move (ditto)
 - Joining a room should clear viewing results status
-- Some pokemon do not appear in image for background
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
 - Wrap pokemon statuses
