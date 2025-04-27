@@ -39,7 +39,6 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Fix draft mode styling
 - Before starting battle, make sure both room and clients are ready
 - Queueing up Drafts/Chess moves
   - Queue up drafts but not bans? Bans seem tough to convey queues with
