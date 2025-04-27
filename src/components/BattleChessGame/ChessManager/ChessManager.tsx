@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Chess, Square, Move, PieceSymbol } from 'chess.js';
+import { Chess, Square, Move } from 'chess.js';
 import { PokemonSet } from '@pkmn/data';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
@@ -11,6 +11,7 @@ import { useGameState } from '../../../context/GameStateContext';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 import { useDebounce } from '../../../utils';
 import { ChessData } from '../../../../shared/types/game';
+import { usePremoves } from './usePremoves';
 import './ChessManager.css';
 
 interface ChessManagerProps {
@@ -44,39 +45,17 @@ const ChessManager = ({
   const [hoveredPokemon, setHoveredPokemon] = useState<PokemonSet | null | undefined>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
   const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
-  const [preMoveQueue, setPreMoveQueue] = useState<{ from: Square; to: Square; promotion?: PieceSymbol; }[]>([])
 
   // Create a simulated copy of both managers to handle premoving
-  const { simulatedChessManager, simulatedPokemonManager } = useMemo(() => {
-    const chessManagerCopy = new Chess(chessManager.fen(), { skipValidation: true });
-    const pokemonManagerCopy = new PokemonBattleChessManager(null, null, JSON.parse(JSON.stringify(pokemonManager.getChessPieces())))
-
-    if (chessManagerCopy.turn() !== color) {
-      chessManagerCopy.forceAdvanceTurn();
-    }
-
-    let i = 0;
-    for (; i < preMoveQueue.length; i++) {
-      const preMove = preMoveQueue[i];
-      const verboseMove = getVerboseChessMove(preMove.from, preMove.to, chessManagerCopy, preMove.promotion);
-      if (verboseMove) {
-        chessManagerCopy.move(preMove);
-        pokemonManagerCopy.movePokemonToSquare(verboseMove.from, verboseMove.to, verboseMove.promotion);
-        chessManagerCopy.forceAdvanceTurn();
-      } else {
-        break;
-      }
-    }
-    // If we had to break early due to a move being invalid
-    if (i !== preMoveQueue.length) {
-      setPreMoveQueue((curr) => curr.slice(0, i));
-    }
-
-    return {
-      simulatedChessManager: chessManagerCopy,
-      simulatedPokemonManager: pokemonManagerCopy
-    };
-  }, [board, pokemonManager, preMoveQueue]);
+  const {
+    simulatedChessManager,
+    simulatedPokemonManager,
+    preMoveQueue,
+    setPreMoveQueue,
+    resetSimulators,
+    simulateMove,
+    simulatedBoard,
+  } = usePremoves(board, chessManager, pokemonManager);
 
   useEffect(() => {
     if (color === chessManager.turn() && preMoveQueue.length > 0) {
@@ -86,6 +65,7 @@ const ChessManager = ({
         setPreMoveQueue((curr) => curr.slice(1));
         onMove(verboseChessMove.san)
       } else {
+        resetSimulators();
         setPreMoveQueue([]);
       }
     }
@@ -112,7 +92,8 @@ const ChessManager = ({
     if (chessManager.turn() !== color) {
       const move = getVerboseChessMove(fromSquare, toSquare, simulatedChessManager, promotion);
       if (move) {
-        setPreMoveQueue((curr) => [...curr, { from: move.from, to: move.to, promotion: move.promotion }]);
+        simulateMove(move);
+        setPreMoveQueue((curr) => [...curr, { from: move.from, to: move.to, promotion: move.promotion, san: move.san }]);
         setSelectedSquare(null);
         setHighlightedSquare([]);
       } else {
@@ -169,6 +150,7 @@ const ChessManager = ({
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
 
+    resetSimulators();
     setPreMoveQueue([]);
   }
 
@@ -197,7 +179,7 @@ const ChessManager = ({
       </div>
       <div className='chessGameContainer'>
         <ChessBoard
-          boardState={mergeBoardAndPokemonState(simulatedChessManager.board(), simulatedPokemonManager)}
+          boardState={mergeBoardAndPokemonState(simulatedBoard, simulatedPokemonManager)}
           onSquareClick={handleSquareClick}
           onPokemonHover={handlePokemonHover}
           onPieceDrag={handlePieceDrag}

@@ -1,3 +1,11 @@
+Immediate list:
+- Use grid to display pokemon moves
+- Use grid for pokemon battle field
+- Use grid for chess board
+- Move z index to variables at root
+- Resize left nav icons
+- Store white/black player, player 1/2 (<- maybe not this) on start game in reducer
+
 TODO:
 Matchmaking
 Host controls
@@ -21,6 +29,7 @@ Make modal with tabs on side for different screens
   - Collapse Change Name and Change Avatar into Customize menu option
   - Options for Game, Sound, etc.
 Add more music and make music playlist w/ skip track button
+Pokemon Cries
 
 Keyboard navigation and accessibility
 
@@ -66,11 +75,12 @@ Refactor TODOs:
 - Separate out draft/ban calls
 
 Issues:
+- Use rem for text sizes
+- Leverage left nav in Room
 - Serverside room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:
-  - Premoves occassionally clearing
   - Premoving should still cost .1 seconds, at a minimum
   - Premove decide pawn promotion
   - Disallow premoving for spectators or when the game has ended
