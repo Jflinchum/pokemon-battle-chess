@@ -76,8 +76,12 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
       return;
     }
 
-    if (room.getPlayer(playerId) && room.transientPlayerList[playerId]) {
-      clearTimeout(room.transientPlayerList[playerId]);
+    const existingPlayer = room.getPlayer(playerId);
+    if (existingPlayer) {
+      if (room.transientPlayerList[playerId]) {
+        clearTimeout(room.transientPlayerList[playerId]);
+      }
+      existingPlayer.setViewingResults(false);
     } else {
       room.joinRoom(new User(playerName, playerId, avatarId || '1'));
     }

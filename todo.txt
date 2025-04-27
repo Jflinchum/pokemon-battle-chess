@@ -62,9 +62,11 @@ Refactor TODOs:
 - Put API request and response types in shared folder
 - Organize frontend types in a single dir and re-use more efficiently
 - Separate out draft/ban calls
+- Move logic in controller/index into GameRoom
 
 Issues:
 - Make sure you can see timers in pokemon battles
+  - Completely redo pokemon battle css
 - Use em/rem for text sizes
 - Serverside room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
@@ -77,8 +79,6 @@ Issues:
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't
   - Can test on mobile by turning off the screen and waiting for timeout to occur
-- Completely redo pokemon battle css
-- Joining a room should clear viewing results status
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
 

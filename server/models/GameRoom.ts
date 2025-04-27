@@ -60,7 +60,8 @@ export default class GameRoom {
     if (this.player2 === null) {
       this.player2 = player;
     }
-    if (!this.playerList.some((roomPlayer) => roomPlayer.playerId === player.playerId)) {
+    const existingPlayer = this.getPlayer(player.playerId);
+    if (!existingPlayer) {
       this.playerList.push(player);
     }
   }
