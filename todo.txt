@@ -3,7 +3,6 @@ Immediate list:
 - Use grid for pokemon battle field
 - Use grid for chess board
 - Move z index to variables at root
-- Resize left nav icons
 - Replace player id in output chunks with player name
 
 TODO:
@@ -94,8 +93,6 @@ Issues:
 - Bigger turn indicator maybe by player details
   - Better indicator that time is ticking down in timer mode
 - Make sure you can see timers in pokemon battles
-- Player disconnecting removes player nameplate in game
-  - On game start, store white player and black player details in separate state instead of fetching them from the connected players
 - Pokemon details looks weird on mobile when pokemon only has one move (ditto)
 - Joining a room should clear viewing results status
 - Chat rooms work between multiple rooms

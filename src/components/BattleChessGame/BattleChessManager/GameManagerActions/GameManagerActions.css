@@ -66,5 +66,8 @@
   width: auto;
   @media (min-width: 600px) {
     width: 70px;
+    svg {
+      max-width: 20px;
+    }
   }
 }
