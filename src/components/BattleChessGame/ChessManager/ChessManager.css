@@ -25,7 +25,21 @@
   }
 }
 
+@keyframes highPriority {
+  from {
+    border-bottom: 1px solid white;
+  }
+
+  to {
+    border-bottom: none;
+  }
+}
+
 .turnNotification {
   text-align: center;
   margin: 6px;
+
+  .highPriorityNotification {
+    animation: highPriority 1s infinite steps(2);
+  }
 }

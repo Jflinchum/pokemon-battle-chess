@@ -177,7 +177,7 @@ const ChessManager = ({
       <div className='turnNotification'>
         {
           chessManager.turn() === gameState.gameSettings.color ?
-          (<strong>Your turn to move!</strong>) :
+          (<strong className='highPriorityNotification'>Your turn to move!</strong>) :
           (<strong>Waiting for opponent...</strong>)
         }
       </div>
