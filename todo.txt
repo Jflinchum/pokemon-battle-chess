@@ -1,10 +1,3 @@
-Immediate list:
-- Use grid to display pokemon moves
-- Use grid for pokemon battle field
-- Use grid for chess board
-- Move z index to variables at root
-- Replace player id in output chunks with player name
-
 TODO:
 Matchmaking
 Host controls
@@ -29,6 +22,8 @@ Make modal with tabs on side for different screens
   - Options for Game, Sound, etc.
 Add more music and make music playlist w/ skip track button
 Pokemon Cries
+Use grid for chess board
+Move z index to variables at root
 
 Keyboard navigation and accessibility
 

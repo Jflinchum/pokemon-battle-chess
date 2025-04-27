@@ -9,8 +9,6 @@ import { useUserState } from '../../../../context/UserStateContext';
 import { useGameState } from '../../../../context/GameStateContext';
 
 interface PokemonBattleManagerProps {
-  p1Name: string;
-  p2Name: string;
   p1Pokemon: PokemonSet;
   p2Pokemon: PokemonSet;
   currentPokemonMoveHistory: { args: ArgType; kwArgs: KWArgType }[];

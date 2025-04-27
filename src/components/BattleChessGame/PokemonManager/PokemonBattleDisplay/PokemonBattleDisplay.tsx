@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { Battle } from "@pkmn/client";
+import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
+import { PokemonSet } from "@pkmn/data";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
 import PokemonMoveChoices, { PokemonMoveChoice } from "./PokemonMoveChoices/PokemonMoveChoices";
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
 import './PokemonBattleDisplay.css';
-import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
-import { PokemonSet } from "@pkmn/data";
 
 interface PokemonBattleDisplayProps {
   battleState: Battle | null,

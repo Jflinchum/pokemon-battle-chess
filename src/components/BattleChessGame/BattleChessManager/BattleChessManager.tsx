@@ -226,8 +226,6 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
             battleStarted && currentBattle &&
             (
               <PokemonBattleManager
-                p1Name={color === 'w' ? whitePlayer!.playerName : blackPlayer!.playerName}
-                p2Name={color === 'w' ? blackPlayer!.playerName : whitePlayer!.playerName}
                 p1Pokemon={currentBattle.p1Pokemon}
                 p2Pokemon={currentBattle.p2Pokemon}
                 currentPokemonMoveHistory={currentPokemonMoveHistory}

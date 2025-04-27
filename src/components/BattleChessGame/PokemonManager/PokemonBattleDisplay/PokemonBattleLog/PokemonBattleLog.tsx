@@ -3,6 +3,7 @@ import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
 import { LogFormatter } from "@pkmn/view";
 import StylizedText from "../../../../common/StylizedText/StylizedText";
 import './PokemonBattleLog.css';
+import { useGameState } from "../../../../../context/GameStateContext";
 
 interface PokemonBattleLogProps {
   battleHistory: { args: ArgType, kwArgs: BattleArgsKWArgType }[];
@@ -24,6 +25,7 @@ const formatTextFromBattleArg = (text: string, args: ArgType) => {
 }
 
 const PokemonBattleLog = ({ battleHistory, simple }: PokemonBattleLogProps) => {
+  const { gameState } = useGameState();
   const formatter = useMemo(() => (new LogFormatter()), []);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +41,15 @@ const PokemonBattleLog = ({ battleHistory, simple }: PokemonBattleLogProps) => {
       {
         battleHistory.map(({ args, kwArgs }, index) => {
           let totalLog: { text: string, args: string[]  }[] = [];
-          const formattedText = formatter.formatText(args, kwArgs);
+          let formattedText = formatter.formatText(args, kwArgs);
+
+          if (gameState.gameSettings.whitePlayer?.playerId) {
+            formattedText = formattedText.replace(gameState.gameSettings.whitePlayer.playerId, gameState.gameSettings.whitePlayer?.playerName);
+          }
+          if (gameState.gameSettings.blackPlayer?.playerId) {
+            formattedText = formattedText.replace(gameState.gameSettings.blackPlayer.playerId, gameState.gameSettings.blackPlayer?.playerName);
+          }
+          
           if (formattedText) {
             totalLog.push({ text: formattedText, args: (args as string[]) });
           }
