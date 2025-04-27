@@ -10,6 +10,8 @@ import { MatchHistory } from "../../shared/types/game.ts";
 export type FormatID = 'random' | 'draft';
 
 interface GameSettings {
+  whitePlayer?: Player;
+  blackPlayer?: Player;
   seed?: PRNGSeed;
   color?: Color;
   options: GameOptions;
@@ -92,7 +94,19 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
         }
       };
     case 'START_MATCH':
-      return { ...gameState, inGame: true, matchEnded: false, gameSettings: { ...gameState.gameSettings, seed: action.payload.seed, color: action.payload.color, options: action.payload.options } };
+      return {
+        ...gameState,
+        inGame: true,
+        matchEnded: false,
+        gameSettings: {
+          ...gameState.gameSettings,
+          whitePlayer: gameState.players.find((player) => player.color == 'w'),
+          blackPlayer: gameState.players.find((player) => player.color == 'b'),
+          seed: action.payload.seed,
+          color: action.payload.color,
+          options: action.payload.options
+        }
+      };
     case 'RETURN_TO_ROOM':
       return { ...gameState, inGame: false, replayHistory: [], isWatchingReplay: false, players: [] };
     default:

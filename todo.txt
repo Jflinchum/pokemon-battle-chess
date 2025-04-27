@@ -4,7 +4,7 @@ Immediate list:
 - Use grid for chess board
 - Move z index to variables at root
 - Resize left nav icons
-- Store white/black player, player 1/2 (<- maybe not this) on start game in reducer
+- Replace player id in output chunks with player name
 
 TODO:
 Matchmaking

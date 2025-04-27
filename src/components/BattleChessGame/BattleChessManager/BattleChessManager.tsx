@@ -34,11 +34,8 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
   const { dispatch: modalStateDispatch } = useModalState();
   const { gameState, dispatch } = useGameState();
 
-  // TODO - these don't need to be recalc'd every time player list changes
-  const player1 = useMemo(() => gameState.players.find((player) => player.isPlayer1), [gameState.players]);
-  const player2 = useMemo(() => gameState.players.find((player) => player.isPlayer2), [gameState.players]);
-  const whitePlayer = useMemo(() => gameState.players.find((player) => player.color === 'w'), [gameState.players]);
-  const blackPlayer = useMemo(() => gameState.players.find((player) => player.color === 'b'), [gameState.players]);
+  const whitePlayer = gameState.gameSettings.whitePlayer;
+  const blackPlayer = gameState.gameSettings.blackPlayer;
   const thisPlayer = useMemo(() => gameState.players.find((player) => player.playerId === userState.id), [gameState.players])
   const color = useMemo(() => gameState.gameSettings!.color, []);
   const chessManager = useMemo(() => {
@@ -229,8 +226,8 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
             battleStarted && currentBattle &&
             (
               <PokemonBattleManager
-                p1Name={player1?.playerName!}
-                p2Name={player2?.playerName!}
+                p1Name={color === 'w' ? whitePlayer!.playerName : blackPlayer!.playerName}
+                p2Name={color === 'w' ? blackPlayer!.playerName : whitePlayer!.playerName}
                 p1Pokemon={currentBattle.p1Pokemon}
                 p2Pokemon={currentBattle.p2Pokemon}
                 currentPokemonMoveHistory={currentPokemonMoveHistory}

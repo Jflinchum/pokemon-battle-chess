@@ -12,8 +12,8 @@ export interface ReplayData {
 }
 
 export const downloadReplay = (gameState: GameState, matchHistory: MatchHistory) => {
-  const whitePlayer = gameState.players.find(player => player.color === 'w');
-  const blackPlayer = gameState.players.find(player => player.color === 'b');
+  const whitePlayer = gameState.gameSettings.whitePlayer;
+  const blackPlayer = gameState.gameSettings.blackPlayer;
   const seed = gameState.gameSettings.seed;
 
   if (!whitePlayer || !blackPlayer || !seed) {
