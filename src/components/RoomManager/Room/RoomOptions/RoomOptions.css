@@ -1,5 +1,5 @@
 .roomOptionsContainer {
-  padding: 0 50px;
+  padding: 0 20px;
 
   @media (max-width: 800px) {
     padding: 0 10px;
@@ -26,7 +26,6 @@ ul.roomOptionsList {
   display: flex;
   flex-direction: row;
 
-
   select {
     margin-right: 4px;
   }
@@ -34,7 +33,6 @@ ul.roomOptionsList {
 
 .roomOptionLabel {
   max-width: 200px;
-  min-width: 200px;
   margin-right: 8px;
 
   p {

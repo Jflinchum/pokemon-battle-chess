@@ -10,7 +10,7 @@ import SpectatorList from "./SpectatorList/SpectatorList";
 import PlayerName from "./PlayerName/PlayerName";
 import RoomOptions from "./RoomOptions/RoomOptions";
 import { GameOptions } from "../../../../shared/types/GameOptions";
-import RoomActions from "./RoomActions/RoomActions";
+import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameManagerActions/GameManagerActions";
 import './Room.css';
 
 export interface Player {
@@ -89,55 +89,57 @@ const Room = () => {
 
   return (
     <>
-      <RoomActions />
+      <GameManagerActions />
+      <AnimatedBackground />
       <div className='roomContainer'>
-        <AnimatedBackground />
-        <div className="roomPlayerContainer">
-          <div className='roomButtons'>
-            <Button
-              color='primary'
-              onClick={handleStartGame}
-              disabled={!thisPlayer?.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
-            >
-                Start Game
-            </Button>
-            <Button disabled={thisPlayer?.isSpectator ? (!!player1 && !!player2) : (false)} onClick={handleToggleSpectating}>
-              {
-                thisPlayer?.isSpectator ?
-                'Stop Spectating' :
-                'Move to Spectators'
-              }
-            </Button>
-          </div>
-
-          <div className='playerContainer'>
-            <div className='player'>
-              {
-                player1 ? (
-                  <>
-                    <img src={Sprites.getAvatar(player1?.avatarId || '1')} />
-                    <PlayerName player={player1}/>
-                  </>
-                ) : null
-              }
+        <div className='roomForm'>
+          <div className="roomPlayerContainer">
+            <div className='roomButtons'>
+              <Button
+                color='primary'
+                onClick={handleStartGame}
+                disabled={!thisPlayer?.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
+              >
+                  Start Game
+              </Button>
+              <Button disabled={thisPlayer?.isSpectator ? (!!player1 && !!player2) : (false)} onClick={handleToggleSpectating}>
+                {
+                  thisPlayer?.isSpectator ?
+                  'Stop Spectating' :
+                  'Move to Spectators'
+                }
+              </Button>
             </div>
-            <span>vs</span>
-            <div className='player'>
-              {
-                player2 ? (
-                  <>
-                    <img src={Sprites.getAvatar(player2?.avatarId || '1')} />
-                    <PlayerName player={player2}/>
-                  </>
-                ) : null
-              }
-            </div>
-          </div>
 
-          <SpectatorList players={connectedPlayers} />
+            <div className='playerContainer'>
+              <div className='player'>
+                {
+                  player1 ? (
+                    <>
+                      <img src={Sprites.getAvatar(player1?.avatarId || '1')} />
+                      <PlayerName player={player1}/>
+                    </>
+                  ) : null
+                }
+              </div>
+              <span>vs</span>
+              <div className='player'>
+                {
+                  player2 ? (
+                    <>
+                      <img src={Sprites.getAvatar(player2?.avatarId || '1')} />
+                      <PlayerName player={player2}/>
+                    </>
+                  ) : null
+                }
+              </div>
+            </div>
+
+            <SpectatorList players={connectedPlayers} />
+          </div>
+          <hr/>
+          <RoomOptions isHost={thisPlayer?.isHost} gameOptions={gameOptions} onChange={handleRoomOptionsChange} />
         </div>
-        <hr/>
-        <RoomOptions isHost={thisPlayer?.isHost} gameOptions={gameOptions} onChange={handleRoomOptionsChange} />
       </div>
     </>
   );

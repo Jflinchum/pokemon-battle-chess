@@ -1,14 +1,18 @@
 .roomContainer {
-  margin: 50px 100px 100px 100px;
+  margin: 0px 20px 100px 20px;
+  padding-top: 20px;
 
+  @media (min-width: 600px) {
+    margin: 0px 50px 100px 120px;
+    padding-top: 20px;
+  }
+}
+
+.roomForm {
   background-color: rgb(70, 70, 70);
   box-shadow: 0 0 10px 0 black;
   border-radius: 4px;
   padding: 20px;
-
-  @media (max-width: 800px) {
-    margin: 0 0 100px 0;
-  }
 }
 
 .roomPlayerContainer {

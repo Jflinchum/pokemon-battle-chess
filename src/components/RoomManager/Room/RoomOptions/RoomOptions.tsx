@@ -82,7 +82,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
             </p>
           </div>
           <ul>
-            {advantageOptions.map((adv) => (
+            {advantageOptions.filter(({ stat }) => stat !== 'accuracy' && stat !== 'evasion').map((adv) => (
               <li key={adv.stat}>
                 <select name={adv.stat} disabled={!isHost} value={gameOptions.offenseAdvantage[adv.stat]} onChange={(e) => setOffenseAdvantage({ ...offenseAdvantage, [adv.stat]: parseInt(e.target.value) })}>
                   {

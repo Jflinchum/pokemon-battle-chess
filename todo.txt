@@ -71,7 +71,6 @@ Refactor TODOs:
 
 Issues:
 - Use rem for text sizes
-- Leverage left nav in Room
 - Serverside room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation

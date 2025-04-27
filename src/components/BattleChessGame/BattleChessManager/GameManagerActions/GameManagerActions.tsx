@@ -10,7 +10,7 @@ import { MatchHistory } from "../../../../../shared/types/game";
 import './GameManagerActions.css';
 import { downloadReplay } from "./downloadReplay";
 
-const GameManagerActions = ({ matchHistory }: { matchHistory: MatchHistory }) => {
+const GameManagerActions = ({ matchHistory }: { matchHistory?: MatchHistory }) => {
   const { userState, dispatch } = useUserState();
   const { gameState, dispatch: dispatchGameState } = useGameState();
   const { dispatch: dispatchModalState } = useModalState();
@@ -30,7 +30,9 @@ const GameManagerActions = ({ matchHistory }: { matchHistory: MatchHistory }) =>
   };
 
   const handleDownloadReplay = () => {
-    downloadReplay(gameState, matchHistory);
+    if (matchHistory) {
+      downloadReplay(gameState, matchHistory);
+    }
   }
 
   return (
@@ -65,7 +67,7 @@ const GameManagerActions = ({ matchHistory }: { matchHistory: MatchHistory }) =>
           <span className='gameManagerActionLabel'>Options</span>
         </NavOptionButton>
         {
-          !gameState.isWatchingReplay && (
+          !gameState.isWatchingReplay && matchHistory && (
             <NavOptionButton className='gameManagerAction' onClick={() => handleDownloadReplay()}>
               <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faDownload} /></span>
               <span className='gameManagerActionLabel'>Download Replay</span>
