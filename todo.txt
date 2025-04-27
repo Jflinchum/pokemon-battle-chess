@@ -47,7 +47,6 @@ Priority:
         However it may be nicer to shift the index of the queue when a pokemon is drafted
   - Chess moves
     - Clear queue if most recent move of your color failed
-    - Clear queue if valid move, but san different (opponent moves a piece into player's premove space)
 - Host controls
   - Redesign player list first, both in room and in game
 - Better logging

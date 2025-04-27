@@ -238,7 +238,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
               pokemonManager={pokemonManager}
               mostRecentMove={mostRecentMove}
               currentBattle={currentBattle}
-              chessMoveHistoryDisplay={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
+              chessMoveHistory={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
               board={board}
               battleSquare={battleSquare}
               onMove={(san) => {

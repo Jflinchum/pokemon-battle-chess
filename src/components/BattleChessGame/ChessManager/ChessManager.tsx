@@ -21,7 +21,7 @@ interface ChessManagerProps {
   currentBattle?: CurrentBattle | null;
   board: ChessBoardSquare[][];
   onMove: (san: string) => void;
-  chessMoveHistoryDisplay: ChessData[];
+  chessMoveHistory: ChessData[];
   battleSquare?: Square;
 }
 
@@ -32,7 +32,7 @@ const ChessManager = ({
   battleSquare,
   board,
   onMove,
-  chessMoveHistoryDisplay
+  chessMoveHistory
 }: ChessManagerProps) => {
   /**
    * TODO: 
@@ -70,6 +70,14 @@ const ChessManager = ({
       }
     }
   }, [board]);
+
+  useEffect(() => {
+    const previousMove = chessMoveHistory[chessMoveHistory.length - 1];
+    if (previousMove && previousMove.data.color === color && previousMove.data.failed) {
+      resetSimulators();
+      setPreMoveQueue([]);
+    }
+  }, [chessMoveHistory]);
 
   const cancelSelection = () => {
     setSelectedSquare(null);
@@ -195,7 +203,7 @@ const ChessManager = ({
           preMoveQueue={preMoveQueue}
         />
         <PokemonChessDetailsCard
-          chessMoveHistory={chessMoveHistoryDisplay}
+          chessMoveHistory={chessMoveHistory}
           pokemon={
             hoveredPokemon ||
             simulatedPokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn
