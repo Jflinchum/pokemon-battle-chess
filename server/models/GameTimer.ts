@@ -1,3 +1,4 @@
+import { Timer } from "../../shared/types/game";
 
 
 export default class GameTimer {
@@ -7,18 +8,19 @@ export default class GameTimer {
   private blackPlayerLastMoveTime: number;
   private whitePlayerTimer: NodeJS.Timeout | null;
   private blackPlayerTimer: NodeJS.Timeout | null;
-  private banTimerDuration: number;
-  private chessTimerDuration: number;
   private chessTimerIncrement: number;
   private pokemonTimerIncrement: number;
   private timersEnabled: boolean;
+  private whiteTimerStarted: boolean;
+  private blackTimerStarted: boolean;
 
-  constructor(banTimerDuration: number, chessTimerDuration: number, chessTimerIncrement: number, pokemonTimerIncrement: number, timersEnabled: boolean) {
-    this.banTimerDuration = banTimerDuration;
-    this.chessTimerDuration = chessTimerDuration;
+  constructor(chessTimerIncrement: number, pokemonTimerIncrement: number, timersEnabled: boolean) {
     this.chessTimerIncrement = chessTimerIncrement;
     this.pokemonTimerIncrement = pokemonTimerIncrement;
     this.timersEnabled = timersEnabled;
+
+    this.whiteTimerStarted = false;
+    this.blackTimerStarted = false;
   }
 
   public initializeGameTimer(timeDuration: number) {
@@ -49,12 +51,14 @@ export default class GameTimer {
 					clearTimeout(this.whitePlayerTimer);
 				}
 				this.whitePlayerTimer = setTimeout(cb, this.whitePlayerTimerExpiration - new Date().getTime());
+        this.whiteTimerStarted = true;
 			} else {
 				this.blackPlayerTimerExpiration += (new Date().getTime() - this.blackPlayerLastMoveTime);
 				if (this.blackPlayerTimer) {
 					clearTimeout(this.blackPlayerTimer);
 				}
 				this.blackPlayerTimer = setTimeout(cb, this.blackPlayerTimerExpiration - new Date().getTime());
+        this.blackTimerStarted = true;
 			}
 		}
   };
@@ -73,15 +77,17 @@ export default class GameTimer {
 		}
   };
 
-  public getTimers() {
+  public getTimers(): Timer {
     return {
       white: {
         timerExpiration: this.whitePlayerTimerExpiration,
         pause: !this.whitePlayerTimer,
+        hasStarted: this.whiteTimerStarted,
       },
       black: {
         timerExpiration: this.blackPlayerTimerExpiration,
         pause: !this.blackPlayerTimer,
+        hasStarted: this.blackTimerStarted,
       }
     };
   }
@@ -105,15 +111,17 @@ export default class GameTimer {
 		}
 	}
 
-  public getTimersWithLastMoveShift() {
+  public getTimersWithLastMoveShift(): Timer {
     return {
       white: {
         timerExpiration: this.whitePlayerTimerExpiration + (new Date().getTime() - this.whitePlayerLastMoveTime) * (this.whitePlayerTimer ? 0 : 1),
         pause: !this.whitePlayerTimer,
+        hasStarted: this.whiteTimerStarted,
       },
       black: {
         timerExpiration: this.blackPlayerTimerExpiration  + (new Date().getTime() - this.blackPlayerLastMoveTime) * (this.blackPlayerTimer ? 0 : 1),
         pause: !this.blackPlayerTimer,
+        hasStarted: this.blackTimerStarted,
       }
     };
   }
@@ -121,10 +129,12 @@ export default class GameTimer {
   public processChessMove(currentTurnWhite: boolean, cb: Function) {
 		if (this.timersEnabled) {
       if (currentTurnWhite) {
-        this.whitePlayerLastMoveTime = new Date().getTime();
+        const diff = new Date().getTime() - this.whitePlayerLastMoveTime;
+        this.whitePlayerLastMoveTime += diff < 100 ? 100 : diff;
         this.whitePlayerTimerExpiration += this.chessTimerIncrement*1000;
       } else {
-        this.blackPlayerLastMoveTime = new Date().getTime();
+        const diff = new Date().getTime() - this.blackPlayerLastMoveTime;
+        this.blackPlayerLastMoveTime += diff < 100 ? 100 : diff;
         this.blackPlayerTimerExpiration += this.chessTimerIncrement*1000;
       }
 
@@ -141,8 +151,10 @@ export default class GameTimer {
 			this.startTimer(() => cb('w'), 'w');
 			this.startTimer(() => cb('b'), 'b');
 		
-			this.whitePlayerLastMoveTime = new Date().getTime();
-			this.blackPlayerLastMoveTime = new Date().getTime();
+      const wDiff = new Date().getTime() - this.whitePlayerLastMoveTime;
+      this.whitePlayerLastMoveTime += wDiff < 100 ? 100 : wDiff;
+      const bDiff = new Date().getTime() - this.blackPlayerLastMoveTime;
+      this.blackPlayerLastMoveTime += bDiff < 100 ? 100 : bDiff;
 		}
 	}
 }

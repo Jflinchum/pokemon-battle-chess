@@ -100,11 +100,7 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
         matchEnded: false,
         gameSettings: {
           ...gameState.gameSettings,
-          whitePlayer: gameState.players.find((player) => player.color == 'w'),
-          blackPlayer: gameState.players.find((player) => player.color == 'b'),
-          seed: action.payload.seed,
-          color: action.payload.color,
-          options: action.payload.options
+          ...action.payload,
         }
       };
     case 'RETURN_TO_ROOM':

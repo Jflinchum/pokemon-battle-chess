@@ -28,7 +28,7 @@ export interface Player {
 
 const Room = () => {
   const { userState } = useUserState();
-  const { gameState, dispatch } = useGameState();
+  const { gameState } = useGameState();
   const [gameOptions, setGameOptions] = useState<GameOptions>(gameState.gameSettings.options);
   const connectedPlayers = useMemo(() => gameState.players, [gameState.players]);
 
@@ -46,15 +46,10 @@ const Room = () => {
       }
     });
 
-    socket.on('startGame', (settings) => {
-      dispatch({ type: 'START_MATCH', payload: settings });
-    });
-
     return () => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('changeGameOptions');
-      socket.off('startGame');
     }
   }, []);
 

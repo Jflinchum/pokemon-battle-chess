@@ -62,8 +62,8 @@ export type GenericData = {
 };
 
 export type Timer = {
-  white: { pause: boolean; timerExpiration: number };
-  black: { pause: boolean; timerExpiration: number };
+  white: { pause: boolean; timerExpiration: number; hasStarted: boolean };
+  black: { pause: boolean; timerExpiration: number; hasStarted: boolean };
 }
 
 export type EndGameReason = 'KING_CAPTURED' | 'TIMEOUT' | 'PLAYER_DISCONNECTED' | 'HOST_DISCONNECTED' | 'HOST_ENDED_GAME';

@@ -84,19 +84,23 @@ export default class GameRoom {
     return this.playerList;
   }
 
+  private convertUserToPlayer(user: User) {
+    return {
+      playerName: user.playerName,
+      playerId: user.playerId,
+      avatarId: user.avatarId,
+      transient: !!this.transientPlayerList[user.playerId],
+      viewingResults: user.viewingResults,
+      isHost: user.playerId === this.hostPlayer?.playerId,
+      isPlayer1: user.playerId === this.player1?.playerId,
+      isPlayer2: user.playerId === this.player2?.playerId,
+      color: user.playerId === this.whitePlayer?.playerId ? 'w' : user.playerId === this.blackPlayer?.playerId ? 'b' : null,
+      isSpectator: user.playerId !== this.player1?.playerId && user.playerId !== this.player2?.playerId,
+    }
+  }
+
   public getPublicPlayerList() {
-    return (this.playerList.map((player) => ({
-      playerName: player.playerName,
-      playerId: player.playerId,
-      avatarId: player.avatarId,
-      transient: !!this.transientPlayerList[player.playerId],
-      viewingResults: player.viewingResults,
-      isHost: player.playerId === this.hostPlayer?.playerId,
-      isPlayer1: player.playerId === this.player1?.playerId,
-      isPlayer2: player.playerId === this.player2?.playerId,
-      color: player.playerId === this.whitePlayer?.playerId ? 'w' : player.playerId === this.blackPlayer?.playerId ? 'b' : null,
-      isSpectator: player.playerId !== this.player1?.playerId && player.playerId !== this.player2?.playerId,
-    })));
+    return this.playerList.map((user) => this.convertUserToPlayer(user));
   }
 
   /**
@@ -187,6 +191,8 @@ export default class GameRoom {
       color,
       seed: this.roomSeed,
       options: this.roomGameOptions,
+      whitePlayer: this.convertUserToPlayer(this.whitePlayer),
+      blackPlayer: this.convertUserToPlayer(this.blackPlayer),
     };
   }
 
@@ -346,8 +352,6 @@ export default class GameRoom {
     const callback = this.roomGameOptions.format === 'random' ? () => this.endGameDueToTimeout('w') : () => this.randomDraftPick();
 
     this.gameTimer = new GameTimer(
-      this.roomGameOptions.banTimerDuration,
-      this.roomGameOptions.chessTimerDuration,
       this.roomGameOptions.chessTimerIncrement,
       this.roomGameOptions.pokemonTimerIncrement,
       this.roomGameOptions.timersEnabled,

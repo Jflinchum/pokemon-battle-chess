@@ -4,16 +4,19 @@ import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { Player } from "../../../RoomManager/Room/Room";
 import TakenChessPieces from "../../ChessManager/TakenChessPieces/TakenChessPieces";
 import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessManager";
-import './PlayerInGameDisplay.css';
+import { Timer as TimerType } from "../../../../../shared/types/game";
 import Timer from "../../../common/Timer/Timer";
+import { useGameState } from "../../../../context/GameStateContext";
+import './PlayerInGameDisplay.css';
 
 interface PlayerInGameDisplayProps {
   player?: Player;
   takenChessPieces: PokemonPiece[];
-  timer?: { timerExpiration: number; pause: boolean; };
+  timer?: TimerType['white'] | TimerType['black'];
 }
 
 const PlayerInGameDisplay = ({ player, takenChessPieces, timer }: PlayerInGameDisplayProps) => {
+  const { gameState } = useGameState();
   if (!player) {
     return null;
   }
@@ -33,7 +36,13 @@ const PlayerInGameDisplay = ({ player, takenChessPieces, timer }: PlayerInGameDi
       />
       {
         timer && (
-          <Timer timerExpiration={timer.timerExpiration} paused={timer.pause} className='playerTimer'/>
+          <Timer
+            timerExpiration={timer.timerExpiration}
+            paused={timer.pause}
+            hasStarted={timer.hasStarted}
+            startingTime={gameState.gameSettings.options.chessTimerDuration * 60 * 1000}
+            className='playerTimer'
+          />
         )
       }
     </div>

@@ -72,8 +72,12 @@ const RoomManager = () => {
       dispatchUserState({ type: 'LEAVE_ROOM' });
     });
 
-    socket.on('currentTimers', (timer) => {
+    socket.on('currentTimers', (timer: Timer) => {
       setTimers(timer);
+    });
+
+    socket.on('startGame', (settings) => {
+      dispatch({ type: 'START_MATCH', payload: settings });
     });
 
     return () => {
@@ -82,6 +86,7 @@ const RoomManager = () => {
       socket.off('endGameFromDisconnect');
       socket.off('startSync');
       socket.off('currentTimers');
+      socket.off('startGame');
     }
   }, [gameState.matchEnded]);
 

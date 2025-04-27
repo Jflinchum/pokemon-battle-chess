@@ -2,13 +2,11 @@ TODO:
 Matchmaking
 Host controls
   - Set player color
-  - Update settings
   - Kick player
   - Promote to host
 Queue up your draft and bans
 Add forfeit button to pokemon battle
 Create formats to quick select game options in room
-Turn timer into second:millisecond timer once down below a minute left
 Write validation functions when writing/reading from localstorage and clear it out if failing validation
 Download/upload replay
   - Store current user info as a spectator
@@ -26,8 +24,8 @@ Move z index to variables at root
 Keyboard navigation and accessibility
 
 Room Options
- - Weather on random chess spaces
  - Preserve damage after battle
+ - Weather on random chess spaces
  - Tera enabled
   - A Pokemon can only tera once in a match, and then they can't tera again
  - Custom Teams
@@ -37,7 +35,6 @@ Room Options
     - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Before starting battle, make sure both room and clients are ready
 - Queueing up Drafts/Chess moves
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
@@ -73,7 +70,6 @@ Issues:
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:
-  - Premoving should still cost .1 seconds, at a minimum
   - Disallow premoving for spectators or when the game has ended
 - Split seed rng for pokemon generation and battle engine
   - Keep battle engine seed secret
