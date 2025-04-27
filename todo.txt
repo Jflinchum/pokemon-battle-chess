@@ -64,14 +64,13 @@ Refactor TODOs:
 - Separate out draft/ban calls
 
 Issues:
-- Use rem for text sizes
+- Make sure you can see timers in pokemon battles
+- Use em/rem for text sizes
 - Serverside room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:
   - Disallow premoving for spectators or when the game has ended
-- Split seed rng for pokemon generation and battle engine
-  - Keep battle engine seed secret
 - Disallow client controls when the match ends
 - Disallow server inputs when match has ended
 - Pokemon sprites occasionally disappearing
@@ -79,7 +78,6 @@ Issues:
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't
   - Can test on mobile by turning off the screen and waiting for timeout to occur
 - Completely redo pokemon battle css
-- Make sure you can see timers in pokemon battles
 - Joining a room should clear viewing results status
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg

@@ -15,6 +15,7 @@ import GameTimer from "./GameTimer";
 export default class GameRoom {
   public roomId: string;
   public roomSeed: PRNGSeed;
+  private gameEngineSeed: PRNGSeed;
   public password: string;
   public hostPlayer: User | null = null;
   public player1: User | null = null;
@@ -49,6 +50,7 @@ export default class GameRoom {
     this.player1 = hostPlayer;
     this.playerList = [hostPlayer];
     this.roomSeed = PRNG.generateSeed();
+    this.gameEngineSeed = PRNG.generateSeed();
     this.isOngoing = false;
     this.password = password;
     this.gameRoomManager = gameRoomManager;
@@ -337,6 +339,7 @@ export default class GameRoom {
   public resetRoomForRematch() {
     this.isOngoing = false;
     this.roomSeed = PRNG.generateSeed();
+    this.gameEngineSeed = PRNG.generateSeed();
     this.chessManager = new Chess();
     this.pokemonGameManager = new PokemonBattleChessManager(this.roomSeed, this.roomGameOptions.format)
     this.currentTurnWhite = true;
@@ -505,7 +508,7 @@ export default class GameRoom {
       });
       const battleStream = BattleStreams.getPlayerStreams(new BattleStreams.BattleStream({}, pokemonBattleChessMod));
       this.currentPokemonBattleStream = battleStream;
-      const spec = { formatid: 'pbc', seed: this.roomSeed };
+      const spec = { formatid: 'pbc', seed: this.gameEngineSeed };
       battleStream.omniscient.write(`>start ${JSON.stringify(spec)}`);
       battleStream.omniscient.write(`>player p1 ${JSON.stringify(p1Spec)}`);
       battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2Spec)}`);
