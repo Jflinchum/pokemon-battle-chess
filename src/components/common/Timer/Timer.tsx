@@ -24,7 +24,7 @@ const formatMillisecondsToTime = (milliseconds: number) => {
     return `${Math.floor(milliseconds / 1000)}.${Math.floor((milliseconds % 1000) / 10) < 10 ? '0' : ''}${Math.floor((milliseconds % 1000) / 10)}`;
   }
   // Report minutes in 1:32 format
-  return `${Math.floor(milliseconds / (60 * 1000))}:${milliseconds % (60 * 1000) < 1000 ? '0' : ''}${Math.floor((milliseconds % (60 * 1000)) / 1000)}`;
+  return `${Math.floor(milliseconds / (60 * 1000))}:${milliseconds % (60 * 1000) < 1000 * 10 ? '0' : ''}${Math.floor((milliseconds % (60 * 1000)) / 1000)}`;
 }
 
 const Timer = ({ timerExpiration, paused, hasStarted, startingTime, className = '' }: TimerProps) => {
@@ -33,7 +33,7 @@ const Timer = ({ timerExpiration, paused, hasStarted, startingTime, className = 
       getTimeLeftInMilliSeconds(timerExpiration) :
       startingTime
   );
-  const [timeInterval, setTimeInterval] = useState<number>(getTimeLeftInMilliSeconds(timerExpiration) < (60 * 100) ? 10 : 1000);
+  const [timeInterval, setTimeInterval] = useState<number>(getTimeLeftInMilliSeconds(timerExpiration) < (60 * 1000) ? 10 : 1000);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -43,6 +43,9 @@ const Timer = ({ timerExpiration, paused, hasStarted, startingTime, className = 
     if (!paused) {
       timerRef.current = setInterval(() => {
         setTime(() => getTimeLeftInMilliSeconds(timerExpiration));
+        if (getTimeLeftInMilliSeconds(timerExpiration) < ((60 * 1000) + 1000) && timeInterval === 1000) {
+          setTimeInterval(10);
+        }
       }, timeInterval);
     }
 
@@ -62,7 +65,7 @@ const Timer = ({ timerExpiration, paused, hasStarted, startingTime, className = 
   }, [timerExpiration]);
 
   return (
-    <span className={`timer ${className}`}>
+    <span className={`timer ${paused ? 'paused' : ''} ${className}`}>
       <FontAwesomeIcon icon={faHourglass} /> <span>{formatMillisecondsToTime(time)}</span>
     </span>
   );

@@ -25,5 +25,8 @@
 
 .playerTimer {
   margin: auto 0 auto auto;
-  width: 10%;
+  width: 15%;
+  @media (min-width: 600px) {
+    width: 10%;
+  }
 }
