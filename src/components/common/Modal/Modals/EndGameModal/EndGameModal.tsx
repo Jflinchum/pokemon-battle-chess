@@ -9,7 +9,7 @@ import './EndGameModal.css';
 import { useMemo } from "react";
 
 const getEndGameTitle = (isSpectator: boolean, playerVictory: boolean, reason: EndGameReason) => {
-  if (isSpectator || reason === 'HOST_DISCONNECTED' || reason === 'PLAYER_DISCONNECTED') {
+  if (isSpectator || reason === 'HOST_DISCONNECTED' || reason === 'PLAYER_DISCONNECTED' || reason === 'HOST_ENDED_GAME') {
     return 'End Game';
   } else if (playerVictory) {
     return 'You Win!';
@@ -28,6 +28,8 @@ const getEndgameSubtitle = (reason: EndGameReason, loseName: string, disconnectN
       return `Game ended because the host has left the game.`;
     case 'PLAYER_DISCONNECTED':
       return `${disconnectName} left the game.`;
+    case 'HOST_ENDED_GAME':
+      return 'The host has ended the game.';
   }
 }
 

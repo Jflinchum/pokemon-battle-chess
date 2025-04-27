@@ -56,7 +56,7 @@ export type GenericData = {
   type: 'generic',
   data: {
     event: 'gameEnd',
-    color: Color,
+    color: Color | '',
     reason: EndGameReason,
   }
 };
@@ -66,4 +66,4 @@ export type Timer = {
   black: { pause: boolean; timerExpiration: number };
 }
 
-export type EndGameReason = 'KING_CAPTURED' | 'TIMEOUT' | 'PLAYER_DISCONNECTED' | 'HOST_DISCONNECTED';
+export type EndGameReason = 'KING_CAPTURED' | 'TIMEOUT' | 'PLAYER_DISCONNECTED' | 'HOST_DISCONNECTED' | 'HOST_ENDED_GAME';

@@ -33,7 +33,11 @@ const GameManagerActions = ({ matchHistory }: { matchHistory?: MatchHistory }) =
     if (matchHistory) {
       downloadReplay(gameState, matchHistory);
     }
-  }
+  };
+
+  const handleReturnEveryoneToRoom = () => {
+    socket.emit('requestEndGameAsHost', userState.currentRoomId, userState.id);
+  };
 
   return (
     <NavOptions minimal={true} className='gameManagerActionContainer'>
@@ -51,7 +55,7 @@ const GameManagerActions = ({ matchHistory }: { matchHistory?: MatchHistory }) =
           )
         }
         {
-          gameState.matchEnded && !gameState.isWatchingReplay && (
+          gameState.matchEnded && gameState.inGame && !gameState.isWatchingReplay && (
             <NavOptionButton className='gameManagerAction' onClick={handleReturn}>
               <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faDoorOpen} /></span>
               <span className='gameManagerActionLabel'>Return to Room</span>
@@ -62,6 +66,14 @@ const GameManagerActions = ({ matchHistory }: { matchHistory?: MatchHistory }) =
           <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faFlag} /></span>
           <span className='gameManagerActionLabel'>Return to Main Menu</span>
         </NavOptionButton>
+        {
+          !gameState.matchEnded && gameState.inGame && !gameState.isWatchingReplay && gameState.isHost && (
+            <NavOptionButton className='gameManagerAction' onClick={() => handleReturnEveryoneToRoom()}>
+              <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faDoorOpen} /></span>
+              <span className='gameManagerActionLabel'>Return Everyone to Room</span>
+            </NavOptionButton>
+          )
+        }
         <NavOptionButton className='gameManagerAction' onClick={() => handleOptionsClick()}>
           <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faCog} /></span>
           <span className='gameManagerActionLabel'>Options</span>

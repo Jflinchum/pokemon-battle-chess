@@ -316,7 +316,7 @@ export default class GameRoom {
     });
   }
 
-  public endGame(color: Color, reason: EndGameReason) {
+  public endGame(color: Color | '', reason: EndGameReason) {
     const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color, reason } };
     this.pushHistory(gameData);
     this.broadcastAll('gameOutput', gameData);

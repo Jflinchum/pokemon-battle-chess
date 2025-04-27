@@ -96,6 +96,18 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       io.to(roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
+    socket.on('requestEndGameAsHost', (roomId, playerId) => {
+      const room = gameRoomManager.getRoom(roomId);
+      console.log(`${playerId} requested to end game for ${roomId}`);
+
+      if (!room || room.hostPlayer?.playerId !== playerId) {
+        console.log(`${playerId} mismatch for ${roomId}.`);
+        return;
+      }
+
+      room.endGame('', 'HOST_ENDED_GAME');
+    });
+
     socket.on('requestSync', (roomId, playerId) => {
       console.log('request sync received ' + roomId + ' ' + playerId);
       const room = gameRoomManager.getRoom(roomId);
