@@ -1,6 +1,7 @@
 import { PieceSymbol, Color, Square } from "chess.js";
 import { PokemonSet } from "@pkmn/data";
 import { PRNG, PRNGSeed } from '@pkmn/sim'
+import { Dex } from "@pkmn/dex";
 import { PokeSimRandomGen } from './PokeSimRandomGen';
 
 export type FormatID = 'random' | 'draft';
@@ -26,7 +27,7 @@ export class PokemonBattleChessManager {
   public draftPieces: PokemonSet[] = [];
   public banPieces: PokemonSet[] = [];
 
-  private pokeSimRandomGen: PokeSimRandomGen | null = null;
+  private pokeSimRandomGen: PokeSimRandomGen;
 
   constructor(seed: PRNGSeed | null, format: FormatID | null, chessPieces?: PokemonPiece[]) {
     this.pokeSimRandomGen = new PokeSimRandomGen(new PRNG(seed));
@@ -43,29 +44,66 @@ export class PokemonBattleChessManager {
     }
   }
 
-  private *teamRandomGenerator(): Generator<PokemonSet> {
-    while (true) {
-      yield this.pokeSimRandomGen!.buildRandomPokemon();
-    }
-  }
-
   public populateBoardWithRandomTeams() {
-    const teamGen = this.teamRandomGenerator();
     const bChessPieceArray = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r', ...Array(8).fill('p')];
     const wChessPieceArray = [...Array(8).fill('p'), 'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
     for (let i = 0; i < 16; i++) {
-      this.chessPieces.push({ type: bChessPieceArray[i], square: `${String.fromCharCode(97 + Math.floor(i % 8))}${8 - Math.floor(i / 8)}` as Square, pkmn: teamGen.next().value, color: 'b' })
+      this.chessPieces.push({
+        type: bChessPieceArray[i],
+        square: `${String.fromCharCode(97 + Math.floor(i % 8))}${8 - Math.floor(i / 8)}` as Square,
+        pkmn: this.pokeSimRandomGen.buildRandomPokemon(this.getFilter(bChessPieceArray[i])),
+        color: 'b'
+      });
     }
     for (let i = 0; i < 16; i++) {
-      this.chessPieces.push({ type: wChessPieceArray[i], square: `${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}` as Square, pkmn: teamGen.next().value, color: 'w' })
+      this.chessPieces.push({
+        type: wChessPieceArray[i],
+        square: `${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}` as Square,
+        pkmn: this.pokeSimRandomGen.buildRandomPokemon(this.getFilter(wChessPieceArray[i])),
+        color: 'w'
+      });
     }
   }
 
   public populateDraftWithRandomTeams() {
-    const teamGen = this.teamRandomGenerator();
     for (let i = 0; i < 38; i++) {
-      this.draftPieces.push(teamGen.next().value);
+      this.draftPieces.push(this.pokeSimRandomGen.buildRandomPokemon());
     }
+  }
+
+  private getFilter(type: PieceSymbol) {
+    switch (type) {
+      case 'p':
+        return this.pawnFilter;
+      case 'b':
+      case 'n':
+        return this.bishopAndKnightFilter;
+      case 'r':
+        return this.rookFilter;
+      case 'q':
+      case 'k':
+        return this.kingAndQueenFilter;
+    }
+  }
+
+  private pawnFilter(pokemon: string) {
+    const pokemonDex = Dex.species.get(pokemon);
+    return pokemonDex.bst < 530;
+  }
+
+  private bishopAndKnightFilter(pokemon: string) {
+    const pokemonDex = Dex.species.get(pokemon);
+    return pokemonDex.bst > 500 && pokemonDex.bst < 580;
+  }
+
+  private rookFilter(pokemon: string) {
+    const pokemonDex = Dex.species.get(pokemon);
+    return pokemonDex.bst > 530 && pokemonDex.bst < 600;
+  }
+
+  private kingAndQueenFilter(pokemon: string) {
+    const pokemonDex = Dex.species.get(pokemon);
+    return pokemonDex.bst > 600;
   }
 
   public assignPokemonToSquare(index: number | null, square: Square, type: PieceSymbol, color: Color) {

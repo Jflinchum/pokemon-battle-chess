@@ -110,6 +110,12 @@ export class PokeSimRandomGen {
       let filteredSets = speciesSets.sets.map((set) => {
         return {
           ...set,
+					abilities: set.abilities.filter((ability) => {
+						if (ability === 'Battle Bond') {
+							return false;
+						}
+						return true;
+					}),
           movepool: set.movepool.filter((moveName) => {
             const move = this.dex.moves.get(moveName);
             if (HAZARDS.includes(move.id)) {
@@ -128,6 +134,9 @@ export class PokeSimRandomGen {
         if (set.movepool.length < 4 && species !== 'ditto') {
           return false;
         }
+				if (set.abilities.length === 0) {
+					return false;
+				}
         return true;
       });
 
@@ -141,9 +150,15 @@ export class PokeSimRandomGen {
     return finalSet;
   }
 
-  public buildRandomPokemon = () => {
-    const randomIndex = this.random(0, this.pokemonPool.length);
-    const pokemon = fastPop(this.pokemonPool, randomIndex);
+  public buildRandomPokemon = (filter?: (pkmn: string) => boolean) => {
+		let pool = [];
+		if (filter) {
+			pool = this.pokemonPool.filter(filter);
+		} else {
+			pool = this.pokemonPool;
+		}
+    const randomIndex = this.random(0, pool.length);
+    const pokemon = fastPop(pool, randomIndex);
     return this.buildRandomSet(pokemon);
   }
 
