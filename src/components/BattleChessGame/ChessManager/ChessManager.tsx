@@ -92,10 +92,15 @@ const ChessManager = ({
     if (chessManager.turn() !== color) {
       const move = getVerboseChessMove(fromSquare, toSquare, simulatedChessManager, promotion);
       if (move) {
+        if (move?.isPromotion() && !promotion) {
+          setRequestedPawnPromotion(move);
+          return;
+        }
         simulateMove(move);
         setPreMoveQueue((curr) => [...curr, { from: move.from, to: move.to, promotion: move.promotion, san: move.san }]);
         setSelectedSquare(null);
         setHighlightedSquare([]);
+        return;
       } else {
         return;
       }
@@ -136,7 +141,6 @@ const ChessManager = ({
   }, 100)
 
   const handlePieceDrop = (square: Square) => {
-    setRequestedPawnPromotion(null);
     if (selectedSquare && getVerboseChessMove(selectedSquare, square, simulatedChessManager)?.color === color) {
       movePiece({ fromSquare: selectedSquare, toSquare: square });
     }

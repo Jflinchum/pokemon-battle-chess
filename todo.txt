@@ -76,7 +76,6 @@ Issues:
   - This issue seems to come and go. Needs more investigation
 - Premoves:
   - Premoving should still cost .1 seconds, at a minimum
-  - Premove decide pawn promotion
   - Disallow premoving for spectators or when the game has ended
 - Split seed rng for pokemon generation and battle engine
   - Keep battle engine seed secret
