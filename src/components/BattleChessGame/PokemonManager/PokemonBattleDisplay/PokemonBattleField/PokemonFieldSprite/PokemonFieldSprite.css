@@ -83,6 +83,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 2px;
+  width: 150px;
 
   .boost {
     font-size: 10px;

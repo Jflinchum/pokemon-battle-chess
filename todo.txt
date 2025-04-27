@@ -87,12 +87,12 @@ Issues:
   - Can test on mobile by turning off the screen and waiting for timeout to occur
 - Bigger turn indicator maybe by player details
   - Better indicator that time is ticking down in timer mode
+- Completely redo pokemon battle css
 - Make sure you can see timers in pokemon battles
 - Pokemon details looks weird on mobile when pokemon only has one move (ditto)
 - Joining a room should clear viewing results status
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
-- Wrap pokemon statuses
 
 Dropping features:
 - Global Chat
