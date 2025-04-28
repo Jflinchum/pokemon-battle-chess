@@ -8,6 +8,37 @@
   }
 }
 
+.squareModifier {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+
+  &.raindance {
+    background-color: blue;
+  }
+  &.sunnyday {
+    background-color: red;
+  }
+  &.sandstorm {
+    background-color: brown;
+  }
+  &.snowscape {
+    background-color: lightblue;
+  }
+  &.psychicterrain {
+    background-color: pink;
+  }
+  &.grassyterrain {
+    background-color: green;
+  }
+  &.electricterrain {
+    background-color: yellow;
+  }
+  &.mistyterrain {
+    background-color: purple;
+  }
+}
+
 .squareColorFilter {
   height: 100%;
   width: 100%;

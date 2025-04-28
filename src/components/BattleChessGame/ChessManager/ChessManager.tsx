@@ -4,7 +4,7 @@ import { PokemonSet } from '@pkmn/data';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
 import PokemonChessDetailsCard from '../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard';
-import { ChessBoardSquare, MoveAttempt } from './types';
+import { ChessBoardSquare, MoveAttempt, PokemonChessBoardSquare } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
 import { getVerboseChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
@@ -129,7 +129,7 @@ const ChessManager = ({
     setHighlightedSquare([]);
   }
 
-  const handleSquareClick = (square: Square) => {
+  const handleSquareClick = ({ square }: PokemonChessBoardSquare) => {
     setRequestedPawnPromotion(null);
     // If there's no current selected square, or the clicked square isn't a valid move, then set the clicked square to the current selected square
     if (selectedSquare === square) {
@@ -148,13 +148,13 @@ const ChessManager = ({
     setHoveredPokemon(pkmn);
   }, 100)
 
-  const handlePieceDrop = (square: Square) => {
+  const handlePieceDrop = ({ square }: PokemonChessBoardSquare) => {
     if (selectedSquare && getVerboseChessMove(selectedSquare, square, simulatedChessManager)?.color === color) {
       movePiece({ fromSquare: selectedSquare, toSquare: square });
     }
   }
 
-  const handlePieceDrag = (square: Square) => {
+  const handlePieceDrag = ({ square }: PokemonChessBoardSquare) => {
     setRequestedPawnPromotion(null);
     updateSelection(square);
   }

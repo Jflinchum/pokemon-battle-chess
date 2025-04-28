@@ -35,6 +35,7 @@ export const getGameOptions = () => {
       accuracy: 0,
       evasion: 0,
     },
+    weatherWars: false,
     timersEnabled: true,
     banTimerDuration: 15,
     chessTimerDuration: 15,

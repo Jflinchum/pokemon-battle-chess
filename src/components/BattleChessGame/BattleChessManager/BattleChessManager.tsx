@@ -42,7 +42,11 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     return new Chess();
   }, []);
   const pokemonManager = useMemo(() => {
-    return new PokemonBattleChessManager(gameState.gameSettings.seed!, gameState.gameSettings.options.format);
+    return new PokemonBattleChessManager({
+      seed: gameState.gameSettings.seed!,
+      format: gameState.gameSettings.options.format,
+      weatherWars: gameState.gameSettings.options.weatherWars,
+    });
   }, []);
 
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(null);
@@ -86,7 +90,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     onDraft: (square, draftPokemonIndex, color) => {
       const chessSquare = chessManager.get(square)!;
       pokemonManager.assignPokemonToSquare(draftPokemonIndex, square, chessSquare.type, color)
-      setCurrentBoard(mergeBoardAndPokemonState(currentBoard, pokemonManager));
+      setCurrentBoard(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
       setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
       setIsDrafting(!!pokemonManager.draftPieces.length);
     },

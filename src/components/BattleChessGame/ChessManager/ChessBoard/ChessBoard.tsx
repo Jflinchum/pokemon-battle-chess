@@ -1,6 +1,6 @@
 import { PieceSymbol, Square } from 'chess.js';
 import { PokemonChessBoardSquare } from '../types';
-import { getSquareColor, getSquareFromIndices } from '../util';
+import { getSquareColor } from '../util';
 import ChessSquare from './ChessSquare/ChessSquare';
 import './ChessBoard.css';
 import { useGameState } from '../../../../context/GameStateContext';
@@ -8,10 +8,10 @@ import { PokemonSet } from '@pkmn/data';
 
 interface ChessBoardProps {
   boardState: PokemonChessBoardSquare[][];
-  onSquareClick: (arg0: Square) => void;
+  onSquareClick: (arg0: PokemonChessBoardSquare) => void;
   onPokemonHover?: (arg0?: PokemonSet | null) => void;
-  onPieceDrag: (arg0: Square) => void;
-  onPieceDrop: (arg0: Square) => void;
+  onPieceDrag: (arg0: PokemonChessBoardSquare) => void;
+  onPieceDrop: (arg0: PokemonChessBoardSquare) => void;
   highlightedSquares: Square[];
   selectedSquare: Square | null;
   mostRecentMove?: { from: Square, to: Square } | null;
@@ -56,38 +56,36 @@ const ChessBoard = ({
         <div className="chessRow" key={rowIndex}>
           {
             boardRow.map((boardSquare, columnIndex) => {
-              const sqInd = getSquareFromIndices(normalizedRowIndex(rowIndex), columnIndex);
               return (
                 <ChessSquare
                   key={columnIndex}
-                  square={{...boardSquare, square: sqInd} as PokemonChessBoardSquare}
+                  square={boardSquare}
                   backgroundColor={getSquareColor(normalizedRowIndex(rowIndex), columnIndex)}
                   onClick={(square) => {
-                    onSquareClick(square?.square || sqInd);
+                    onSquareClick(square);
                   }}
                   onPokemonHover={(pokemon) => {
                     onPokemonHover?.(pokemon);
                   }}
                   onPieceDrag={(square) => {
-                    onPieceDrag(square?.square || sqInd);
+                    onPieceDrag(square);
                   }}
                   onPieceDrop={(square) => {
-                    onPieceDrop(square?.square || sqInd);
+                    onPieceDrop(square);
                   }}
-                  possibleMove={highlightedSquares.includes(sqInd)}
-                  selected={selectedSquare === sqInd}
-                  pokemon={boardSquare?.pokemon}
+                  possibleMove={highlightedSquares.includes(boardSquare.square)}
+                  selected={selectedSquare === boardSquare.square}
                   mostRecentMove={
-                    mostRecentMove?.from === sqInd ||
-                    mostRecentMove?.to === sqInd
+                    mostRecentMove?.from === boardSquare.square ||
+                    mostRecentMove?.to === boardSquare.square
                   }
                   isPreMove={
                     !!preMoveQueue.find((premove) => 
-                      sqInd === premove.from ||
-                      sqInd === premove.to
+                      boardSquare.square === premove.from ||
+                      boardSquare.square === premove.to
                   )}
                   isBattleSquare={
-                    (boardSquare && boardSquare.square === battleSquare) || false
+                    (boardSquare.square === battleSquare) || false
                   }
                 />
               );

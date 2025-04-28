@@ -30,6 +30,7 @@ interface RoomOptionsProp {
 const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
   const [format, setFormat] = useState<FormatID>(gameOptions.format);
   const [offenseAdvantage, setOffenseAdvantage] = useState<BoostsTable>(gameOptions.offenseAdvantage);
+  const [weatherWars, setWeatherWars] = useState<boolean>(gameOptions.weatherWars);
   const [banTimer, setBanTimer] = useState<number>(gameOptions.banTimerDuration);
   const currentTimerId = useMemo(() => getTimerIdFromTimerData({
     chess: gameOptions.chessTimerDuration,
@@ -42,13 +43,14 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
     onChange({
       format,
       offenseAdvantage,
+      weatherWars,
       timersEnabled: timerId !== 'No Timer',
       banTimerDuration: banTimer,
       chessTimerDuration: timerIdToTimerMapping[timerId].chess,
       chessTimerIncrement: timerIdToTimerMapping[timerId].chessInc,
       pokemonTimerIncrement: timerIdToTimerMapping[timerId].pkmnInc,
     });
-  }, [format, offenseAdvantage, banTimer, timerId]);
+  }, [format, offenseAdvantage, weatherWars, banTimer, timerId]);
 
   return (
     <div className='roomOptionsContainer'>
@@ -72,6 +74,16 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               ))
             }
           </select>
+        </li>
+        <li className='roomOption'>
+          <div className='roomOptionLabel'>
+            <label htmlFor='format'>Weather Wars:</label>
+            <p>
+              Enabling this mode will create different weather and terrain effects on random chess squares.
+              These weather and terrain effects will come and go throughout the match.
+            </p>
+          </div>
+          <input checked={gameOptions.weatherWars} type='checkbox' onChange={(e) => setWeatherWars(e.target.checked)} />
         </li>
         <hr></hr>
         <li className='roomOption'>

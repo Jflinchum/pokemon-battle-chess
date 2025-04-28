@@ -20,19 +20,27 @@ Add more music and make music playlist w/ skip track button
 Pokemon Cries
 Use grid for chess board
 Move z index to variables at root
+Are you sure you want to leave? modal when returning to menu in game
 
 Keyboard navigation and accessibility
 
 Room Options
- - Preserve damage after battle
- - Weather on random chess spaces
- - Tera enabled
-  - A Pokemon can only tera once in a match, and then they can't tera again
- - Custom Teams
- - (maybe) Preserve item usage after battle
- - (maybe) Change pokemon on piece promotion
- - (maybe) Level Up Progression
-    - piece starts out weak, but gains levels/evolutions as you beat other pieces
+- Weather on random chess spaces
+  - Logic for initially creating weather squares
+    - Done
+  - Sprites created for chess squares
+  - Sprites created for battle
+  - Weather has duration and will fade out
+  - Weather has a chance to randomly appear on a chess square over the course of the match
+  - Weather info on details card when square selected
+- Preserve damage after battle
+- Tera enabled
+- A Pokemon can only tera once in a match, and then they can't tera again
+- Custom Teams
+- (maybe) Preserve item usage after battle
+- (maybe) Change pokemon on piece promotion
+- (maybe) Level Up Progression
+  - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
 - Queueing up Drafts/Chess moves

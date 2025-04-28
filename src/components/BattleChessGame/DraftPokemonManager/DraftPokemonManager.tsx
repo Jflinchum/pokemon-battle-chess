@@ -30,7 +30,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
     setSelectedSquare(null);
   }
 
-  const handleSquareClick = (square: Square) => {
+  const handleSquareClick = ({ square }: PokemonChessBoardSquare) => {
     if (selectedSquare === square) {
       cancelSelection();
     } else {

@@ -17,7 +17,7 @@ interface BattleHistoryProps {
   onPokemonBattleStart: (p1Pokemon: PokemonBeginBattleData['p1Pokemon'], p2Pokemon: PokemonBeginBattleData['p2Pokemon'], attemptedMove: PokemonBeginBattleData['attemptedMove']) => void,
   onPokemonBattleOutput: ({ args, kwArgs }: { args: ArgType; kwArgs: KWArgType }) => void,
   onPokemonBattleEnd?: (victor: Color) => void,
-  onGameEnd: (victor: Color, reason: EndGameReason) => void,
+  onGameEnd: (victor: Color | '', reason: EndGameReason) => void,
   skipToEndOfSync: boolean,
 };
 

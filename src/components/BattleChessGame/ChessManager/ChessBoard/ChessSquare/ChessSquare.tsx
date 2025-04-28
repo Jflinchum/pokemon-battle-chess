@@ -1,21 +1,21 @@
 import { PokemonSet } from '@pkmn/data';
-import { ChessBoardSquare } from '../../types';
+import { PokemonChessBoardSquare } from '../../types';
 import PokemonChessPieceSprite from '../PokemonChessPieceSprite/PokemonChessPieceSprite';
 import './ChessSquare.css';
+import { Dex } from '@pkmn/dex';
 
 interface ChessSquareProps {
-  square: ChessBoardSquare;
+  square: PokemonChessBoardSquare;
   backgroundColor: 'white' | 'black';
-  onClick: (arg0: ChessBoardSquare) => void;
+  onClick: (arg0: PokemonChessBoardSquare) => void;
   onPokemonHover?: (arg0?: PokemonSet | null) => void;
-  onPieceDrop: (arg0: ChessBoardSquare) => void;
-  onPieceDrag: (arg0: ChessBoardSquare) => void;
+  onPieceDrop: (arg0: PokemonChessBoardSquare) => void;
+  onPieceDrag: (arg0: PokemonChessBoardSquare) => void;
   possibleMove: boolean;
   selected: boolean;
   mostRecentMove: boolean;
   isPreMove: boolean;
   isBattleSquare: boolean;
-  pokemon?: PokemonSet
 }
 
 const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostRecentMove: boolean, isBattleSquare: boolean, isPremove: boolean) => { 
@@ -43,22 +43,23 @@ const ChessSquare = ({
   onPokemonHover,
   possibleMove,
   selected,
-  pokemon,
   mostRecentMove,
   isPreMove,
   isBattleSquare
 }: ChessSquareProps) => {
   return (
     <div 
-      id={`chessSquare-${square?.square}`}
+      id={`chessSquare-${square.square}`}
       className={`chessSquare ${backgroundColor}ChessSquare`}
       onMouseEnter={() => {
-        onPokemonHover?.(pokemon);
+        onPokemonHover?.(square.pokemon);
       }}
       onMouseLeave={() => {
         onPokemonHover?.(null);
       }}
-      onClick={() => { onClick(square); }}
+      onClick={() => {
+        onClick(square);
+      }}
       onDrop={() => {
         onPieceDrop(square);
       }}
@@ -66,23 +67,24 @@ const ChessSquare = ({
         e.preventDefault();
       }}
     >
-      <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${(pokemon || square?.type) ? 'pieceSquare' : ''}`} />
+      <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${(square?.pokemon || square?.type) ? 'pieceSquare' : ''}`} />
+      <div className={`squareModifier ${square.modifier ? Dex.conditions.get(square.modifier).id : ''}`} />
       <PokemonChessPieceSprite
         type={square?.type}
         color={square?.color}
-        pokemon={pokemon}
+        pokemon={square.pokemon}
         onDragStart={() => {
           onPieceDrag(square);
         }}
       />
       {
-        square?.square[0] === 'a' &&
+        square.square[0] === 'a' &&
         (
           <span className='squareText squareNum'>{square.square[1]}</span>
         )
       }
       {
-        square?.square[1] === '1' &&
+        square.square[1] === '1' &&
         (
           <span className='squareText squareChar'>{square.square[0]}</span>
         )

@@ -14,7 +14,10 @@ const createChessManagerCopy = (chessManager: Chess, color: Color) => {
 };
 
 const createPokemonManagerCopy = (pokemonManager: PokemonBattleChessManager) => {
-  return new PokemonBattleChessManager(null, null, JSON.parse(JSON.stringify(pokemonManager.getChessPieces())));
+  return new PokemonBattleChessManager({
+    squareModifiers: pokemonManager.squareModifiers,
+    chessPieces: JSON.parse(JSON.stringify(pokemonManager.getChessPieces()))
+  });
 }
 
 export const usePremoves = (board: ChessBoardSquare[][], chessManager: Chess, pokemonManager: PokemonBattleChessManager) => {

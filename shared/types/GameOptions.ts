@@ -4,6 +4,7 @@ type FormatID = 'random' | 'draft';
 export interface GameOptions {
   format: FormatID;
   offenseAdvantage: BoostsTable;
+  weatherWars: boolean;
   timersEnabled: boolean,
   // In seconds
   banTimerDuration: number;

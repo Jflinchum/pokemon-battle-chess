@@ -11,7 +11,7 @@ export interface RoomCodeModalProps {
 
 export interface EndGameModalProps {
   reason: EndGameReason;
-  victor?: Color;
+  victor?: Color | '';
   name?: string;
 }
 

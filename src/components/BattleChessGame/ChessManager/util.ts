@@ -33,13 +33,16 @@ export const getVerboseSanChessMove = (sanMove: string, chessManager: Chess) => 
 }
 
 export const mergeBoardAndPokemonState = (chessBoard: ChessBoardSquare[][], pokemonManager: PokemonBattleChessManager): PokemonChessBoardSquare[][] => {
-  return chessBoard.map((boardColumn) => 
-    boardColumn.map((boardRowSquare) => {
-      let pokemonPiece = pokemonManager.getPokemonFromSquare(boardRowSquare?.square)!;
-      if (boardRowSquare) {
-        return { ...boardRowSquare, pokemon: pokemonPiece?.pkmn };
-      }
-      return boardRowSquare;
+  return chessBoard.map((boardRow, rowIndex) => 
+    boardRow.map((boardColSquare, colIndex) => {
+      let pokemonPiece = pokemonManager.getPokemonFromSquare(boardColSquare?.square)!;
+      const square = getSquareFromIndices(rowIndex, colIndex);
+      return {
+        ...(boardColSquare || {}),
+        square,
+        pokemon: pokemonPiece?.pkmn,
+        modifier: pokemonManager.squareModifiers.find((sqMod) => sqMod.square === square)?.modifier
+      };
     })
   );
 }

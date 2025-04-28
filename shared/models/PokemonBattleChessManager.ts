@@ -1,8 +1,23 @@
-import { PieceSymbol, Color, Square } from "chess.js";
+import { PieceSymbol, Color, Square, SQUARES } from "chess.js";
 import { PokemonSet } from "@pkmn/data";
 import { PRNG, PRNGSeed } from '@pkmn/sim'
 import { Dex } from "@pkmn/dex";
 import { PokeSimRandomGen } from './PokeSimRandomGen';
+import { WeatherId, TerrainId } from '../types/PokemonTypes';
+
+const WeatherNames: WeatherId[] = [
+ 'sandstorm',
+ 'sunnyday',
+ 'raindance',
+ 'snowscape',
+];
+
+const TerrainNames: TerrainId[] = [
+  'electricterrain',
+  'grassyterrain',
+  'psychicterrain',
+  'mistyterrain'
+];
 
 export type FormatID = 'random' | 'draft';
 
@@ -20,27 +35,48 @@ export interface PokemonBattle {
   player2Pokemon?: PokemonSet,
   onGoing: boolean;
 }
+export interface SquareModifier {
+  square: Square,
+  modifier: WeatherId | TerrainId
+}
 
 export class PokemonBattleChessManager {
   public chessPieces: PokemonPiece[] = [];
-  public seed?: PRNGSeed | null;
+  public seed?: PRNGSeed;
+  public prng: PRNG;
   public draftPieces: PokemonSet[] = [];
   public banPieces: PokemonSet[] = [];
+  public squareModifiers: SquareModifier[] = [];
 
   private pokeSimRandomGen: PokeSimRandomGen;
 
-  constructor(seed: PRNGSeed | null, format: FormatID | null, chessPieces?: PokemonPiece[]) {
-    this.pokeSimRandomGen = new PokeSimRandomGen(new PRNG(seed));
+  constructor({
+    seed,
+    format,
+    weatherWars,
+    chessPieces,
+    squareModifiers
+    }: { seed?: PRNGSeed, format?: FormatID, weatherWars?: boolean; chessPieces?: PokemonPiece[], squareModifiers?: SquareModifier[] }) {
+    this.prng = new PRNG(seed);
+    this.pokeSimRandomGen = new PokeSimRandomGen(this.prng);
+    this.seed = seed;
+
     if (chessPieces) {
       this.chessPieces = chessPieces;
-      return;
+    } else {
+      if (format === 'random') {
+        this.populateBoardWithRandomTeams();
+      } else if (format ==='draft') {
+        this.populateDraftWithRandomTeams();
+      }
     }
-    this.seed = seed;
     
-    if (format === 'random') {
-      this.populateBoardWithRandomTeams();
-    } else if (format ==='draft') {
-      this.populateDraftWithRandomTeams();
+    if (squareModifiers) {
+      this.squareModifiers = squareModifiers;
+    } else {
+      if (weatherWars) {
+        this.populateSquareModifiers();
+      }
     }
   }
 
@@ -68,6 +104,15 @@ export class PokemonBattleChessManager {
   public populateDraftWithRandomTeams() {
     for (let i = 0; i < 38; i++) {
       this.draftPieces.push(this.pokeSimRandomGen.buildRandomPokemon());
+    }
+  }
+
+  public populateSquareModifiers() {
+    const modifiers = [...WeatherNames, ...TerrainNames];
+    for (let i = 0; i < 64; i++) {
+      if (this.prng.randomChance(1, 8)) {
+        this.squareModifiers.push({ square: SQUARES[i], modifier: this.prng.sample(modifiers) })
+      }
     }
   }
 

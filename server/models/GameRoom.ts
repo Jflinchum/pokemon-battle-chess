@@ -181,6 +181,7 @@ export default class GameRoom {
         accuracy: 0,
         evasion: 0,
       },
+      weatherWars: typeof options.weatherWars === 'boolean' ? options.weatherWars : false,
       timersEnabled: typeof options.timersEnabled === 'boolean' ? options.timersEnabled : true,
       banTimerDuration: typeof options.banTimerDuration === 'number' ? options.banTimerDuration : 15,
       chessTimerDuration: typeof options.chessTimerDuration === 'number' ? options.chessTimerDuration : 15,
@@ -233,14 +234,20 @@ export default class GameRoom {
       const p1Pokemon = this.currentTurnWhite ? this.pokemonGameManager.getPokemonFromSquare(chessMove.from) : this.pokemonGameManager.getPokemonFromSquare(chessMove.to);
       const p2Pokemon = this.currentTurnWhite ? this.pokemonGameManager.getPokemonFromSquare(chessMove.to) : this.pokemonGameManager.getPokemonFromSquare(chessMove.from);;
 
-      const moveSucceeds = await this.createPokemonBattleStream({ p1Set: p1Pokemon?.pkmn, p2Set: p2Pokemon?.pkmn, attemptedMove: { san: sanMove, color: chessMove.color } });
-
       let capturedPieceSquare;
       if (chessMove.isEnPassant()) {
         capturedPieceSquare = `${chessMove.to[0] + (parseInt(chessMove.to[1]) + (chessMove.color === 'w' ? -1 : 1))}`;
       } else {
         capturedPieceSquare = chessMove.to;  
       }
+
+      const moveSucceeds = await this.createPokemonBattleStream({
+        p1Set: p1Pokemon?.pkmn,
+        p2Set: p2Pokemon?.pkmn,
+        attemptedMove: { san: sanMove, color: chessMove.color },
+        squareModifier: this.pokemonGameManager.squareModifiers.find(sqMod => sqMod.square === capturedPieceSquare),
+      });
+
       // Clear out the old battle stream
       this.currentPokemonBattleStream = null;
 
@@ -284,8 +291,8 @@ export default class GameRoom {
       );
       this.chessManager.move(sanMove, { continueOnCheck: true });
       const chessData: MatchLog = { type: 'chess', data: { color: this.currentTurnWhite ? 'w' : 'b', san: sanMove } };
-      this.pushHistory(chessData)
-      this.broadcastAll('gameOutput', chessData)
+      this.pushHistory(chessData);
+      this.broadcastAll('gameOutput', chessData);
     }
 
     this.gameTimer.processChessMove(this.currentTurnWhite, () => this.endGameDueToTimeout(this.currentTurnWhite ? 'b' : 'w'));
@@ -342,7 +349,11 @@ export default class GameRoom {
     this.roomSeed = PRNG.generateSeed();
     this.gameEngineSeed = PRNG.generateSeed();
     this.chessManager = new Chess();
-    this.pokemonGameManager = new PokemonBattleChessManager(this.roomSeed, this.roomGameOptions.format)
+    this.pokemonGameManager = new PokemonBattleChessManager({
+      seed: this.roomSeed,
+      format: this.roomGameOptions.format,
+      weatherWars: this.roomGameOptions.weatherWars
+    })
     this.currentTurnWhite = true;
     this.whitePlayerPokemonMove = null;
     this.blackPlayerPokemonMove = null;
@@ -477,7 +488,7 @@ export default class GameRoom {
     }
   }
 
-  private async createPokemonBattleStream({ p1Set, p2Set, attemptedMove }) {
+  private async createPokemonBattleStream({ p1Set, p2Set, attemptedMove, squareModifier }) {
     const p1Spec = { name: this.whitePlayer.playerId, team: Teams.pack([p1Set]) };
     const p2Spec = { name: this.blackPlayer.playerId, team: Teams.pack([p2Set]) };
     const battleStartData: MatchLog = { type: 'pokemon', data: { event: 'battleStart', p1Pokemon: p1Set, p2Pokemon: p2Set, attemptedMove } };
@@ -491,9 +502,16 @@ export default class GameRoom {
     return new Promise((resolve) => {
       const offenseAdvantage = this.roomGameOptions.offenseAdvantage;
       const advantageSide = this.currentTurnWhite ? 'p1' : 'p2';
+      const modifierId = squareModifier.modifier;
+
       const pokemonBattleChessMod = SimDex.mod('pokemonbattlechess', { Formats: [{
           name: 'pbc',
           mod: 'gen9',
+          onBattleStart() {
+            if (modifierId) {
+              this.add('-fieldstart', modifierId);
+            }
+          },
           onSwitchIn(pokemon) {
             if (pokemon.side.id === advantageSide) {
               pokemon.boostBy(offenseAdvantage);
