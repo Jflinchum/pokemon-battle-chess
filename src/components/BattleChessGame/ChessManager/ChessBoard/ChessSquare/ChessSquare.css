@@ -8,34 +8,15 @@
   }
 }
 
-.squareModifier {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-
-  &.raindance {
-    background-color: blue;
-  }
-  &.sunnyday {
-    background-color: red;
-  }
-  &.sandstorm {
-    background-color: brown;
-  }
-  &.snowscape {
-    background-color: lightblue;
-  }
-  &.psychicterrain {
-    background-color: pink;
-  }
-  &.grassyterrain {
-    background-color: green;
-  }
-  &.electricterrain {
-    background-color: yellow;
-  }
-  &.mistyterrain {
-    background-color: purple;
+.pokemonWeatherBackground {
+  &.squareWeather {
+    width: 50%;
+    height: 50%;
+    opacity: 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    border:white solid 1px;
   }
 }
 

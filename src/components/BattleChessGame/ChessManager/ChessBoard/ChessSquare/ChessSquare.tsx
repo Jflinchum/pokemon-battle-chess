@@ -1,8 +1,8 @@
 import { PokemonSet } from '@pkmn/data';
 import { PokemonChessBoardSquare } from '../../types';
 import PokemonChessPieceSprite from '../PokemonChessPieceSprite/PokemonChessPieceSprite';
+import { PokemonWeatherBackground } from '../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground';
 import './ChessSquare.css';
-import { Dex } from '@pkmn/dex';
 
 interface ChessSquareProps {
   square: PokemonChessBoardSquare;
@@ -68,7 +68,7 @@ const ChessSquare = ({
       }}
     >
       <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${(square?.pokemon || square?.type) ? 'pieceSquare' : ''}`} />
-      <div className={`squareModifier ${square.modifier ? Dex.conditions.get(square.modifier).id : ''}`} />
+      <PokemonWeatherBackground className='squareWeather' weatherType={square.modifier} />
       <PokemonChessPieceSprite
         type={square?.type}
         color={square?.color}

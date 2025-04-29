@@ -502,7 +502,7 @@ export default class GameRoom {
     return new Promise((resolve) => {
       const offenseAdvantage = this.roomGameOptions.offenseAdvantage;
       const advantageSide = this.currentTurnWhite ? 'p1' : 'p2';
-      const modifierId = squareModifier.modifier;
+      const modifierId = squareModifier?.modifier;
 
       const pokemonBattleChessMod = SimDex.mod('pokemonbattlechess', { Formats: [{
           name: 'pbc',
