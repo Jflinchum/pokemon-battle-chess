@@ -13,7 +13,7 @@ interface PokemonMoveButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 const PokemonMoveButton = ({ id, onClick, colorPrimary = 'white', colorSecondary = 'white', children, toolTip, className = '', disabled, type }: PokemonMoveButtonProps) => {
 
   return (
-    <span className='pokemonMoveContainer'>
+    <>
       <button
         id={id}
         style={{ border: `${colorPrimary} solid 3px`, background: `linear-gradient(0deg, ${colorPrimary} 0%, ${colorSecondary} 100%)` }}
@@ -27,7 +27,7 @@ const PokemonMoveButton = ({ id, onClick, colorPrimary = 'white', colorSecondary
       <Tooltip anchorSelect={`#${id}`} className='pokemonMoveTooltip'>
         {toolTip}
       </Tooltip>
-    </span>
+    </>
   );
 }
 

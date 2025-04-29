@@ -30,13 +30,13 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [] }: PokemonChes
                 <GenderIcon gender={pokemon.gender} />
                 <span>Lv{pokemon.level}</span>
               </p>
-              <p>
+              <div className='pokemonDetailsTypingContainer'>
                 {
                   Dex.species.get(pokemon.species).types.map((type) => (
                     <PokemonType className='pokemonDetailsTyping' type={type} key={type} />
                   ))
                 }
-              </p>
+              </div>
               <div className='pokemonDetailsCard'>
                 <div className='pokemonDetailsSpriteContainer'>
                   <img className='pokemonDetailsSprite' src={Sprites.getPokemon(speciesOverride(pokemon.species), { gender: pokemon.gender as GenderName }).url}/>

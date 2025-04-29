@@ -38,7 +38,9 @@ Room Options
     - Make weather squares have a higher probability near center of board
   - Weather UI
     - Sprites created for chess squares
+      - Done
     - Sprites created for battle
+      - Done
     - Weather text on pokemon battle UI
     - Weather info on details card when square selected
 - Preserve damage after battle

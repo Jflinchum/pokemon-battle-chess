@@ -1,9 +1,10 @@
 .pokemonDetailsContainer {
   background-color: rgba(125, 125, 125, 0.5);
   backdrop-filter: blur(5px);
-  font-size: 10px;
   border-bottom-right-radius: 10px;
   height: 200px;
+  container-type: size;
+  container-name: pokemonDetails;
 
   @media (orientation: portrait) {
     width: 90vw;
@@ -20,46 +21,35 @@
     border-bottom-left-radius: 10px;
   }
 
-  @media (max-width: 599px) or (max-height: 749px) {
-    button {
-      height: 40px;
-      width: 80px;
-      font-size: 10px;
-      .pokemonMoveSubInfo {
-        display: none;
-      }
-    }
-
-    .movesContainer {
-      gap: 0;
-    }
-  }
-
   @media (min-width: 600px) {
-    width: 200px;
+    width: 30%;
     height: inherit;
     align-self: stretch;
-  }
-  
-  @media (min-width: 600px) and (min-height: 750px) {
-    font-size: 16px;
   }
 }
 
 .pokemonDetailsPadding {
-  margin: 8px;
+  padding: 8px;
+  box-sizing: border-box;
+  height: 100%;
+  font-size: 0.8em;
+  display: flex;
+  flex-direction: column;
+
+  @container pokemonDetails (min-width: 250px) and (min-height: 340px) {
+    font-size: 1em;
+  }
 }
 
 .pokemonDetailsCard {
   display: flex;
   flex-direction: row;
-
+  flex-grow: 1;
 
   ul {
     list-style: none;
-    padding: 0 0 0 20px;
+    padding: 0;
     margin: 0;
-    width: 150px;
 
     b {
       display: block;
@@ -72,25 +62,32 @@
 }
 
 .pokemonDetailsIdentifier {
+  margin: 0;
   & > * {
     margin-right: 6px;
   }
 }
 
+.pokemonDetailsTypingContainer {
+  margin: 4px 0;
+}
+
 .pokemonDetailsSpriteContainer {
-  height: 100px;
+  height: auto;
+  width: 20%;
+
+  @media (min-width: 600px) {
+    height: 20%;
+    width: auto;
+  }
 }
 
 .pokemonDetailsSprite {
   display: block;
   margin: auto;
-  max-width: 50px;
-  max-height: 50px;
 
-  @media (min-width: 600px) {
-    max-width: 100px;
-    max-height: 100px;
-  }
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .pokemonDetailsTyping {

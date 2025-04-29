@@ -44,7 +44,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpec
       {battleState && (
         <>
           <div className='battlefieldAndLog'>
-            <span>
+            <span className='battleContainer'>
               <PokemonBattleField battleHistory={fullBattleLog} battleState={battleState} p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon}/>
               <PokemonBattleLog battleHistory={fullBattleLog} simple={true}/>
               <div className='battleMoveContainer'>

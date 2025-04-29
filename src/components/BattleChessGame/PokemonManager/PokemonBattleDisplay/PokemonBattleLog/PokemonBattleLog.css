@@ -1,7 +1,6 @@
 .pokemonBattleLogContainer {
   min-width: 100px;
-  height: 60vh;
-  width: 400px;
+  width: 30%;
   overflow-y: scroll;  
   background-color: #eef2f5;
   color: black;
