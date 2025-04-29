@@ -15,13 +15,13 @@
       margin: auto;
     }
   }
-  @media (min-width: 999px) {
+  @media (min-width: 1000px) {
     &.simpleLogContainer {
       display: none;
     }
   }
 
-  @media (max-width: 1000px) {
+  @media (max-width: 999px) {
     &.simpleLogContainer {
       display: block;
     }

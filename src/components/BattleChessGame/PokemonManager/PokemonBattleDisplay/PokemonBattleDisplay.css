@@ -7,11 +7,23 @@
 .battleContainer {
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
+  flex-grow: 0.8;
+  align-items: center;
+
+  @media (min-width: 1000px) {
+    flex-direction: row-reverse;
+  }
 }
 
 .battleMoveContainer {
   padding: 10px;
   flex-grow: 1;
+  align-self: stretch;
+
+  @media (min-height: 800px) and (min-width: 1000px) {
+    width: 100%;
+  }
 }
 
 .cancelButton {

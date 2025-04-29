@@ -5,6 +5,7 @@
   background-size: 100% 100%;
   position: relative;
   border: solid black 4px;
+  flex-grow: 1;
 
   @media (max-width: 650px) {
     width: 300px;
