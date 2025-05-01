@@ -4,6 +4,7 @@ import { PRNG, PRNGSeed } from '@pkmn/sim'
 import { Dex } from "@pkmn/dex";
 import { PokeSimRandomGen } from './PokeSimRandomGen';
 import { WeatherId, TerrainId } from '../types/PokemonTypes';
+import { getWeightedRandom } from '../util';
 
 const WeatherNames: WeatherId[] = [
  'sandstorm',
@@ -37,7 +38,8 @@ export interface PokemonBattle {
 }
 export interface SquareModifier {
   square: Square,
-  modifier: WeatherId | TerrainId
+  modifier: WeatherId | TerrainId,
+  duration: number,
 }
 
 export class PokemonBattleChessManager {
@@ -107,13 +109,37 @@ export class PokemonBattleChessManager {
     }
   }
 
+  /**
+   * Initially populated via public room seed and then appended to with a secret internal seed as the game progresses
+   */
   public populateSquareModifiers() {
     const modifiers = [...WeatherNames, ...TerrainNames];
-    for (let i = 0; i < 64; i++) {
-      if (this.prng.randomChance(1, 8)) {
-        this.squareModifiers.push({ square: SQUARES[i], modifier: this.prng.sample(modifiers) })
+    const maxSquare = this.prng.random(10, 20);
+    const distanceProbabilities = [{ value: 0.5, weight: 0.4 }, { value: 1.5, weight: 0.3 }, { value: 2.5, weight: 0.2 }, { value: 3.5, weight: 0.1 }];
+    const squarePool: Square[] = [];
+    let i = 0;
+    while (i < maxSquare) {
+      const x = 4.5 + ((this.prng.random() < 0.5 ? 1 : -1) * getWeightedRandom(distanceProbabilities, this.prng));
+      const y = 4.5 + ((this.prng.random() < 0.5 ? 1 : -1) * getWeightedRandom(distanceProbabilities, this.prng));
+      const square = SQUARES[(x*7) + y];
+      if (squarePool.includes(square)) {
+        continue;
       }
+      this.squareModifiers.push({ square, modifier: this.prng.sample(modifiers), duration: this.prng.random(5, 8) });
+      squarePool.push(square)
+      i++;
     }
+  }
+
+  public tickSquareModifiers() {
+    this.squareModifiers = this.squareModifiers.map((modifier) => {
+      modifier.duration--;
+      return modifier;
+    }).filter((modifier) => modifier.duration > 0);
+  }
+
+  public getWeatherFromSquare(square?: Square | null) {
+    return this.squareModifiers.find((modifier) => modifier.square === square);
   }
 
   private getFilter(type: PieceSymbol) {
@@ -133,22 +159,22 @@ export class PokemonBattleChessManager {
 
   private pawnFilter(pokemon: string) {
     const pokemonDex = Dex.species.get(pokemon);
-    return pokemonDex.bst < 530;
+    return pokemonDex.bst <= 530;
   }
 
   private bishopAndKnightFilter(pokemon: string) {
     const pokemonDex = Dex.species.get(pokemon);
-    return pokemonDex.bst > 500 && pokemonDex.bst < 580;
+    return pokemonDex.bst > 520 && pokemonDex.bst < 550;
   }
 
   private rookFilter(pokemon: string) {
     const pokemonDex = Dex.species.get(pokemon);
-    return pokemonDex.bst > 530 && pokemonDex.bst < 600;
+    return pokemonDex.bst > 540 && pokemonDex.bst < 570;
   }
 
   private kingAndQueenFilter(pokemon: string) {
     const pokemonDex = Dex.species.get(pokemon);
-    return pokemonDex.bst > 600;
+    return pokemonDex.bst >= 570;
   }
 
   public assignPokemonToSquare(index: number | null, square: Square, type: PieceSymbol, color: Color) {

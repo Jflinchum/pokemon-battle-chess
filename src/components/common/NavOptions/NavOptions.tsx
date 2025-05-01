@@ -7,7 +7,7 @@ interface NavOptionsProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
   minimal?: boolean;
 }
 
-const NavOptions = ({ children, className, minimal, ...props }: NavOptionsProps) => {
+const NavOptions = ({ children, className = '', minimal, ...props }: NavOptionsProps) => {
   const [open, setOpen] = useState(false);
 
   return (

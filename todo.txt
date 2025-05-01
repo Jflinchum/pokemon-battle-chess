@@ -31,11 +31,14 @@ Room Options
     - Logic for initially creating weather squares
       - Done
     - Weather has duration and will fade out
+      - Done
     - Weather has a chance to randomly appear on a chess square over the course of the match
     - Weather setting pokemon makes weather persist on the square after battle
     - On init, decide max number of weather squares with flux
+      - Done
     - Make weather chance decrease in probability based on approach to max
     - Make weather squares have a higher probability near center of board
+      - Done
   - Weather UI
     - Sprites created for chess squares
       - Done
@@ -43,6 +46,7 @@ Room Options
       - Done
     - Weather text on pokemon battle UI
     - Weather info on details card when square selected
+      - Done
 - Preserve damage after battle
 - Tera enabled
 - A Pokemon can only tera once in a match, and then they can't tera again

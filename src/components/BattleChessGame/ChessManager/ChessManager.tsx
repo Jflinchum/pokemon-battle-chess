@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Chess, Square, Move } from 'chess.js';
-import { PokemonSet } from '@pkmn/data';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
 import PokemonChessDetailsCard from '../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard';
@@ -42,7 +41,7 @@ const ChessManager = ({
   const color = useMemo(() => gameState.gameSettings!.color, [gameState])
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
-  const [hoveredPokemon, setHoveredPokemon] = useState<PokemonSet | null | undefined>(null);
+  const [hoveredSquare, setHoveredSquare] = useState<Square | null | undefined>(null);
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
   const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
 
@@ -144,8 +143,8 @@ const ChessManager = ({
     }
   };
 
-  const handlePokemonHover = useDebounce((pkmn?: PokemonSet | null) => {
-    setHoveredPokemon(pkmn);
+  const handleSquareHover = useDebounce((pkmnChessSquare?: PokemonChessBoardSquare | null) => {
+    setHoveredSquare(pkmnChessSquare?.square);
   }, 100)
 
   const handlePieceDrop = ({ square }: PokemonChessBoardSquare) => {
@@ -193,7 +192,7 @@ const ChessManager = ({
         <ChessBoard
           boardState={mergeBoardAndPokemonState(simulatedBoard, simulatedPokemonManager)}
           onSquareClick={handleSquareClick}
-          onPokemonHover={handlePokemonHover}
+          onSquareHover={handleSquareHover}
           onPieceDrag={handlePieceDrag}
           onPieceDrop={handlePieceDrop}
           highlightedSquares={highlightedSquares}
@@ -204,8 +203,12 @@ const ChessManager = ({
         />
         <PokemonChessDetailsCard
           chessMoveHistory={chessMoveHistory}
+          squareModifier={
+            simulatedPokemonManager.getWeatherFromSquare(hoveredSquare) ||
+            simulatedPokemonManager.getWeatherFromSquare(selectedSquare)
+          }
           pokemon={
-            hoveredPokemon ||
+            simulatedPokemonManager.getPokemonFromSquare(hoveredSquare)?.pkmn ||
             simulatedPokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn
           }
         />

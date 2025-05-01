@@ -15,7 +15,8 @@ import GameTimer from "./GameTimer";
 export default class GameRoom {
   public roomId: string;
   public roomSeed: PRNGSeed;
-  private gameEngineSeed: PRNGSeed;
+  private secretSeed: PRNGSeed;
+  private secretPRNG: PRNG;
   public password: string;
   public hostPlayer: User | null = null;
   public player1: User | null = null;
@@ -44,13 +45,13 @@ export default class GameRoom {
   public blackMatchHistory: MatchHistory = [];
   public gameTimer: GameTimer;
 
+  private squareModifierTarget: number;
+
   constructor(roomId: string, hostPlayer: User, password: string, gameRoomManager: GameRoomManager) {
     this.roomId = roomId;
     this.hostPlayer = hostPlayer;
     this.player1 = hostPlayer;
     this.playerList = [hostPlayer];
-    this.roomSeed = PRNG.generateSeed();
-    this.gameEngineSeed = PRNG.generateSeed();
     this.isOngoing = false;
     this.password = password;
     this.gameRoomManager = gameRoomManager;
@@ -299,6 +300,10 @@ export default class GameRoom {
     this.broadcastTimers();
 
     this.currentTurnWhite = !this.currentTurnWhite;
+
+    if (this.currentTurnWhite) {
+      this.pokemonGameManager.tickSquareModifiers();
+    }
   }
 
   private endGameDueToTimeout(color) {
@@ -347,19 +352,25 @@ export default class GameRoom {
   public resetRoomForRematch() {
     this.isOngoing = false;
     this.roomSeed = PRNG.generateSeed();
-    this.gameEngineSeed = PRNG.generateSeed();
+    this.secretSeed = PRNG.generateSeed();
+    this.secretPRNG = new PRNG(this.secretSeed);
+
     this.chessManager = new Chess();
+    this.currentTurnWhite = true;
+    this.whiteMatchHistory = [];
+    this.blackMatchHistory = [];
+
     this.pokemonGameManager = new PokemonBattleChessManager({
       seed: this.roomSeed,
       format: this.roomGameOptions.format,
       weatherWars: this.roomGameOptions.weatherWars
-    })
-    this.currentTurnWhite = true;
+    });
     this.whitePlayerPokemonMove = null;
     this.blackPlayerPokemonMove = null;
-    this.whiteMatchHistory = [];
-    this.blackMatchHistory = [];
 
+    /**
+     * Timers
+     */
     if (this.gameTimer) {
       this.gameTimer.clearTimeouts();
     }
@@ -373,6 +384,13 @@ export default class GameRoom {
     );
     this.gameTimer.initializeGameTimer(timerDuration);
     this.gameTimer.startTimer(callback, 'w');
+
+    /**
+     * Weather Wars init 
+     */
+    if (this.roomGameOptions.weatherWars) {
+      this.squareModifierTarget = this.secretPRNG.random(10, 20);
+    }
   }
 
   public validateAndEmitPokemonMove({ pokemonMove, playerId }) {
@@ -527,7 +545,7 @@ export default class GameRoom {
       });
       const battleStream = BattleStreams.getPlayerStreams(new BattleStreams.BattleStream({}, pokemonBattleChessMod));
       this.currentPokemonBattleStream = battleStream;
-      const spec = { formatid: 'pbc', seed: this.gameEngineSeed };
+      const spec = { formatid: 'pbc' };
       battleStream.omniscient.write(`>start ${JSON.stringify(spec)}`);
       battleStream.omniscient.write(`>player p1 ${JSON.stringify(p1Spec)}`);
       battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2Spec)}`);

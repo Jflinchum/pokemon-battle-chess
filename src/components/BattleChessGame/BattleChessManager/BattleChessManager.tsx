@@ -180,6 +180,9 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       pokemonManager.movePokemonToSquare(fromCastledRookSquare, toCastledRookSquare);
     }
 
+    if (chessManager.turn() === 'w') {
+      pokemonManager.tickSquareModifiers();
+    }
     setMostRecentMove({ from: fromSquare, to: toSquare });
     setBoard(chessManager.board());
     if (capturedPieceSquare) {

@@ -1,4 +1,3 @@
-import { PokemonSet } from '@pkmn/data';
 import { PokemonChessBoardSquare } from '../../types';
 import PokemonChessPieceSprite from '../PokemonChessPieceSprite/PokemonChessPieceSprite';
 import { PokemonWeatherBackground } from '../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground';
@@ -8,7 +7,7 @@ interface ChessSquareProps {
   square: PokemonChessBoardSquare;
   backgroundColor: 'white' | 'black';
   onClick: (arg0: PokemonChessBoardSquare) => void;
-  onPokemonHover?: (arg0?: PokemonSet | null) => void;
+  onSquareHover?: (arg0?: PokemonChessBoardSquare | null) => void;
   onPieceDrop: (arg0: PokemonChessBoardSquare) => void;
   onPieceDrag: (arg0: PokemonChessBoardSquare) => void;
   possibleMove: boolean;
@@ -40,7 +39,7 @@ const ChessSquare = ({
   onPieceDrop,
   onPieceDrag,
   onClick,
-  onPokemonHover,
+  onSquareHover,
   possibleMove,
   selected,
   mostRecentMove,
@@ -52,10 +51,10 @@ const ChessSquare = ({
       id={`chessSquare-${square.square}`}
       className={`chessSquare ${backgroundColor}ChessSquare`}
       onMouseEnter={() => {
-        onPokemonHover?.(square.pokemon);
+        onSquareHover?.(square);
       }}
       onMouseLeave={() => {
-        onPokemonHover?.(null);
+        onSquareHover?.(null);
       }}
       onClick={() => {
         onClick(square);

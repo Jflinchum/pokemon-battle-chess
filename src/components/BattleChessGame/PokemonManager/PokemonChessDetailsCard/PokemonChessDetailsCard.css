@@ -100,3 +100,24 @@
   align-items: center;
   gap: 12px;
 }
+
+.pokemonDetailsSquareModifier {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.pokemonWeatherBackground {
+  &.detailsCardWeather {
+    width: 20px;
+    height: 20px;
+    position: inherit;
+    display: inline-block;
+    opacity: 100%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    border:white solid 1px;
+  }
+}
