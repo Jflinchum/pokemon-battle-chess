@@ -1,0 +1,16 @@
+.pokemonBattleConditions {
+  position: absolute;
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+  font-size: 1.2em;
+  font-weight: 800;
+  opacity: 70%;
+  background-color: rgb(70, 70, 70);
+  border-radius: 8px;
+  padding: 8px;
+  margin: 8px;
+  
+  p {
+    margin: 0;
+    padding: 0;
+  }
+}

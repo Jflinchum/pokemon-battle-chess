@@ -11,6 +11,8 @@ import { ChessData } from '../../../../../shared/types/game';
 import { GenderIcon } from '../../../common/GenderIcon/GenderIcon';
 import { SquareModifier } from '../../../../../shared/models/PokemonBattleChessManager';
 import { PokemonWeatherBackground } from '../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground';
+import { WeatherId, TerrainId } from '../../../../../shared/types/PokemonTypes';
+import { TerrainName, WeatherName } from '@pkmn/client';
 import './PokemonChessDetailsCard.css';
 
 interface PokemonChessDetailsCardProps {
@@ -19,15 +21,33 @@ interface PokemonChessDetailsCardProps {
   squareModifier?: SquareModifier;
 }
 
-const squareModifierMapping: Record<SquareModifier['modifier'], { label: string, desc: string }> = {
-  'sandstorm': { label: 'Sandstorm', desc: 'All Pokémon on the field are damaged by 1/16 of their max HP at the end of each turn, except Ground, Rock, and Steel. Rock type pokemon get a 50% Special Defense buff.' },
-  'sunnyday': { label: 'Sunny', desc: 'Boosts the power of Fire type moves by 50% and decreases the power of Water type moves by 50%.' },
-  'raindance': { label: 'Rain', desc: 'Boosts the power of Water type moves by 50% and decreases the power of Fire type moves by 50%.' },
-  'snowscape': { label: 'Snowy Weather', desc: 'Boosts the Defence of Ice type Pokémon by 50%.' },
-  'electricterrain': { label: 'Electric Terrain', desc: 'Boosts the power of Electric type moves by 50% and prevents grounded Pokémon from sleeping.' },
-  'grassyterrain': { label: 'Grassy Terrain', desc: 'Boosts the power of Grass type moves by 50% and all grounded Pokémon have 1/16 of their max HP restored every turn.' },
-  'psychicterrain': { label: 'Psychic Terrain', desc: 'Boosts the power of Psychic type moves by 50% and all grounded Pokémon cannot use priority moves.' },
-  'mistyterrain': { label: 'Misty Terrain', desc: 'Decreases the power of Dragon type moves by 50% and all grounded Pokémon cannot be affected by status conditions.' },
+export const getSquareModifierMapping = (condition: WeatherId | TerrainId | WeatherName | TerrainName) => {
+  switch (condition.toLowerCase()) {
+    case 'electricterrain':
+    case 'electric':
+      return { label: 'Electric Terrain', desc: 'Boosts the power of Electric type moves by 50% and prevents grounded Pokémon from sleeping.' }
+    case 'psychicterrain':
+    case 'psychic':
+      return { label: 'Psychic Terrain', desc: 'Boosts the power of Psychic type moves by 50% and all grounded Pokémon cannot use priority moves.' }
+    case 'grassyterrain':
+    case 'grassy':
+      return { label: 'Grassy Terrain', desc: 'Boosts the power of Grass type moves by 50% and all grounded Pokémon have 1/16 of their max HP restored every turn.' }
+    case 'mistyterrain':
+    case 'misty':
+      return { label: 'Misty Terrain', desc: 'Decreases the power of Dragon type moves by 50% and all grounded Pokémon cannot be affected by status conditions.' }
+    case 'snowscape':
+    case 'snow':
+      return { label: 'Snow', desc: 'Boosts the Defence of Ice type Pokémon by 50%.' }
+    case 'raindance':
+    case 'rain':
+      return { label: 'Rain', desc: 'Boosts the power of Water type moves by 50% and decreases the power of Fire type moves by 50%.' }
+    case 'sandstorm':
+    case 'sand':
+      return { label: 'Sandstorm', desc: 'All Pokémon on the field are damaged by 1/16 of their max HP at the end of each turn, except Ground, Rock, and Steel. Rock type pokemon get a 50% Special Defense buff.' }
+    case 'sunnyday':
+    case 'sun':
+      return { label: 'Sun', desc: 'Boosts the power of Fire type moves by 50% and decreases the power of Water type moves by 50%.' }
+  }
 }
 
 const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifier }: PokemonChessDetailsCardProps) => {
@@ -36,16 +56,16 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
     <div className='pokemonDetailsContainer'>
       <div className='pokemonDetailsPadding'>
         {
-          squareModifier && (
-            <div id='pokemonDetailsModifier' className='pokemonDetailsSquareModifier'>
-              <PokemonWeatherBackground weatherType={squareModifier.modifier} className='detailsCardWeather'/>
-              <span>{squareModifierMapping[squareModifier.modifier].label} - </span>
-              <span>{squareModifier.duration} turns remaining</span>
-              <Tooltip anchorSelect={'#pokemonDetailsModifier'}>
-                { squareModifierMapping[squareModifier.modifier].desc }
+          squareModifier && squareModifier.modifiers.map((squareMod) => (
+            <div key={squareMod.modifier} id={`squareMod-${squareMod.modifier}`} className='pokemonDetailsSquareModifier'>
+              <PokemonWeatherBackground weatherType={squareMod.modifier} className='detailsCardWeather'/>
+              <span>{getSquareModifierMapping(squareMod.modifier)?.label} - </span>
+              <span>{squareMod.duration} turns</span>
+              <Tooltip anchorSelect={`#squareMod-${squareMod.modifier}`}>
+                {getSquareModifierMapping(squareMod.modifier)?.desc}
               </Tooltip>
             </div>
-          )
+          ))
         }
         {
           pokemon ?

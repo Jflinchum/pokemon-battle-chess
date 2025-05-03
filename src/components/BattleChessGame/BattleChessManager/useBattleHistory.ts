@@ -7,6 +7,7 @@ import { CurrentBattle } from "./BattleChessManager";
 import { useGameState } from "../../../context/GameStateContext";
 import { ArgType, KWArgType, Protocol } from "@pkmn/protocol";
 import { useUserState } from "../../../context/UserStateContext";
+import { SquareModifier } from "../../../../shared/models/PokemonBattleChessManager";
 
 interface BattleHistoryProps {
   matchHistory?: MatchLog[],
@@ -17,6 +18,7 @@ interface BattleHistoryProps {
   onPokemonBattleStart: (p1Pokemon: PokemonBeginBattleData['p1Pokemon'], p2Pokemon: PokemonBeginBattleData['p2Pokemon'], attemptedMove: PokemonBeginBattleData['attemptedMove']) => void,
   onPokemonBattleOutput: ({ args, kwArgs }: { args: ArgType; kwArgs: KWArgType }) => void,
   onPokemonBattleEnd?: (victor: Color) => void,
+  onWeatherChange?: (squareModifiers: SquareModifier[]) => void;
   onGameEnd: (victor: Color | '', reason: EndGameReason) => void,
   skipToEndOfSync: boolean,
 };
@@ -43,6 +45,7 @@ const useBattleHistory = ({
   onPokemonBattleStart,
   onPokemonBattleOutput,
   onPokemonBattleEnd = () => {},
+  onWeatherChange = () => {},
   onGameEnd,
   skipToEndOfSync
 }: BattleHistoryProps) => {
@@ -146,6 +149,13 @@ const useBattleHistory = ({
                 catchUpTimer = timer(timeBetweenSteps);
                 await catchUpTimer.start();
                 break;
+            }
+            break;
+          case 'weather':
+            switch (currentLog.data.event) {
+              case 'weatherChange':
+                onWeatherChange(currentLog.data.squareModifiers);
+                matchLogIndex.current++;
             }
         }
       }

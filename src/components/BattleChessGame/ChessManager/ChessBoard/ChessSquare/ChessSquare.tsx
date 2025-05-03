@@ -67,7 +67,15 @@ const ChessSquare = ({
       }}
     >
       <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${(square?.pokemon || square?.type) ? 'pieceSquare' : ''}`} />
-      <PokemonWeatherBackground className='squareWeather' weatherType={square.modifier} />
+      <div className='squareWeatherContainer'>
+        {
+          square?.modifiers?.map((squareMod) => {
+            return (
+              <PokemonWeatherBackground key={squareMod.modifier} className='squareWeather' weatherType={squareMod.modifier} />
+            )
+          })
+        }
+      </div>
       <PokemonChessPieceSprite
         type={square?.type}
         color={square?.color}

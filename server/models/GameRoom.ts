@@ -7,7 +7,7 @@ import { Protocol } from '@pkmn/protocol';
 import { ObjectReadWriteStream } from "@pkmn/streams";
 import User from "./User";
 import GameRoomManager from "./GameRoomManager";
-import { PokemonBattleChessManager } from "../../shared/models/PokemonBattleChessManager";
+import { PokemonBattleChessManager, TerrainNames, WeatherNames } from "../../shared/models/PokemonBattleChessManager";
 import { EndGameReason, MatchHistory, MatchLog } from "../../shared/types/game";
 import { GameOptions } from "../../shared/types/GameOptions";
 import GameTimer from "./GameTimer";
@@ -304,6 +304,14 @@ export default class GameRoom {
     if (this.currentTurnWhite) {
       this.pokemonGameManager.tickSquareModifiers();
     }
+    if (this.roomGameOptions.weatherWars && this.currentTurnWhite) {
+      const numSquares = this.pokemonGameManager.createNewSquareModifiers(this.squareModifierTarget, this.secretPRNG);
+      if (numSquares && numSquares > 0) {
+        const squareModifierData: MatchLog = { type: 'weather', data: { event: 'weatherChange', squareModifiers: this.pokemonGameManager.squareModifiers } };
+        this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
+        this.broadcastAll('gameOutput', squareModifierData);
+      }
+    }
   }
 
   private endGameDueToTimeout(color) {
@@ -520,16 +528,12 @@ export default class GameRoom {
     return new Promise((resolve) => {
       const offenseAdvantage = this.roomGameOptions.offenseAdvantage;
       const advantageSide = this.currentTurnWhite ? 'p1' : 'p2';
-      const modifierId = squareModifier?.modifier;
+      const modifiers = squareModifier?.modifiers;
+      let addedModifiers = false;
 
       const pokemonBattleChessMod = SimDex.mod('pokemonbattlechess', { Formats: [{
           name: 'pbc',
           mod: 'gen9',
-          onBattleStart() {
-            if (modifierId) {
-              this.add('-fieldstart', modifierId);
-            }
-          },
           onSwitchIn(pokemon) {
             if (pokemon.side.id === advantageSide) {
               pokemon.boostBy(offenseAdvantage);
@@ -539,6 +543,16 @@ export default class GameRoom {
                   this.add('-boost', pokemon.fullname.replace(/(p[1-2])/g, '$1a'), stat, `${offenseAdvantage[stat as BoostID]}`);
                 }
               }
+            }
+            if (!addedModifiers) {
+              modifiers?.forEach(({ modifier }) => {
+                if (WeatherNames.includes(modifier)) {
+                  this.field.setWeather(modifier, 'debug');
+                } else {
+                  this.field.setTerrain(modifier, 'debug');
+                }
+              });
+              addedModifiers = true;
             }
           },
         }]

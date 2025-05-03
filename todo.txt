@@ -33,10 +33,12 @@ Room Options
     - Weather has duration and will fade out
       - Done
     - Weather has a chance to randomly appear on a chess square over the course of the match
+      - Done
     - Weather setting pokemon makes weather persist on the square after battle
     - On init, decide max number of weather squares with flux
       - Done
     - Make weather chance decrease in probability based on approach to max
+      - Done
     - Make weather squares have a higher probability near center of board
       - Done
   - Weather UI
@@ -45,7 +47,10 @@ Room Options
     - Sprites created for battle
       - Done
     - Weather text on pokemon battle UI
+      - Done
     - Weather info on details card when square selected
+      - Done
+    - Support for both weather and terrain at the same time
       - Done
 - Preserve damage after battle
 - Tera enabled
@@ -101,6 +106,7 @@ Issues:
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't
   - Can test on mobile by turning off the screen and waiting for timeout to occur
+- "The opposing pokemon" no matter what side in pokemon battle
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
 

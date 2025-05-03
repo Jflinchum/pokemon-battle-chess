@@ -1,6 +1,7 @@
 import { PokemonSet } from "@pkmn/data";
 import { Square, PieceSymbol, Color, Chess } from "chess.js";
 import { WeatherId, TerrainId } from '../../../../shared/types/PokemonTypes';
+import { SquareModifier } from "../../../../shared/models/PokemonBattleChessManager";
 
 export type ChessBoardSquare = { square: Square; type: PieceSymbol; color: Color } | null;
 
@@ -9,7 +10,7 @@ export type PokemonChessBoardSquare = {
   type?: PieceSymbol;
   color?: Color;
   pokemon?: PokemonSet;
-  modifier?: WeatherId | TerrainId;
+  modifiers?: SquareModifier['modifiers'];
 };
 
 export type MoveAttempt = {

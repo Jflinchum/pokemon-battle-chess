@@ -1,8 +1,9 @@
 import { PokemonSet } from "@pkmn/data";
 import { Color, Square } from "chess.js"
+import { SquareModifier } from "../models/PokemonBattleChessManager";
 
 export type MatchHistory = MatchLog[];
-export type MatchLog = BanData | DraftData | ChessData | PokemonData | GenericData;
+export type MatchLog = BanData | DraftData | ChessData | PokemonData | WeatherData | GenericData;
 
 export type BanData = {
   type: 'ban',
@@ -29,6 +30,14 @@ export type ChessData = {
     failed?: boolean,
   },
 };
+
+export type WeatherData = {
+  type: 'weather',
+  data: {
+    event: 'weatherChange',
+    squareModifiers: SquareModifier[],
+  }
+}
 
 export type PokemonData = {
   type: 'pokemon',

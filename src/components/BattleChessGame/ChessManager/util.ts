@@ -41,7 +41,7 @@ export const mergeBoardAndPokemonState = (chessBoard: ChessBoardSquare[][], poke
         ...(boardColSquare || {}),
         square,
         pokemon: pokemonPiece?.pkmn,
-        modifier: pokemonManager.squareModifiers.find((sqMod) => sqMod.square === square)?.modifier
+        modifiers: pokemonManager.squareModifiers.find((sqMod) => sqMod.square === square)?.modifiers
       };
     })
   );

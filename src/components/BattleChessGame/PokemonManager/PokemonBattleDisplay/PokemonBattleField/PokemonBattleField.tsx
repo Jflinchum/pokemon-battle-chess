@@ -6,8 +6,9 @@ import pokemonBattleBackgroundImage from '../../../../../assets/pokemonBattleBac
 import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";
 import { useGameState } from '../../../../../context/GameStateContext';
 import { PokemonWeatherBackground } from '../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground';
-import './PokemonBattleField.css';
 import { WeatherId } from '../../../../../../shared/types/PokemonTypes';
+import { PokemonBattleConditions } from './PokemonBattleCondition/PokemonBattleConditions';
+import './PokemonBattleField.css';
 
 interface PokemonBattleFieldProps {
   battleState: Battle,
@@ -25,7 +26,9 @@ const PokemonBattleField = ({ battleState, battleHistory, p1PokemonSet, p2Pokemo
     <div className='pokemonBattleBackground' style={{
       backgroundImage: `url(${pokemonBattleBackgroundImage})`
     }}>
-      <PokemonWeatherBackground weatherType={battleState.field.terrain || battleState.field.weather || (Object.keys(battleState.field.pseudoWeather)[0] as WeatherId)} />
+      <PokemonWeatherBackground weatherType={battleState.field.weather || (Object.keys(battleState.field.pseudoWeather)[0] as WeatherId)} />
+      <PokemonWeatherBackground weatherType={battleState.field.terrain} />
+      <PokemonBattleConditions battleField={battleState.field} />
       { p1Pokemon && <PokemonFieldSprite pokemon={p1Pokemon} set={p1PokemonSet} side='p1' /> }
       { p2Pokemon && <PokemonFieldSprite pokemon={p2Pokemon} set={p2PokemonSet} side='p2' /> }
     </div>

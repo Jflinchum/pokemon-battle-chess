@@ -128,6 +128,9 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       }
       setCurrentPokemonMoveHistory((curr) => [...curr, parsedChunk]);
     },
+    onWeatherChange: (squareModifiers) => {
+      pokemonManager.setSquareModifiers(squareModifiers);
+    },
     onGameEnd: (color, reason) => {
       modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: color, reason } } })
       dispatch({ type: 'END_MATCH' });
