@@ -1,5 +1,5 @@
 import electricTerrain from '../../../../assets/pokemonAssets/weather/weather-electricterrain.png';
-import psychicTerrain from '../../../../assets/pokemonAssets/weather/weather-psychicTerrain.png';
+import psychicTerrain from '../../../../assets/pokemonAssets/weather/weather-psychicterrain.png';
 import grassyTerrain from '../../../../assets/pokemonAssets/weather/weather-grassyterrain.png';
 import mistyTerrain from '../../../../assets/pokemonAssets/weather/weather-mistyterrain.png';
 import hailWeather from '../../../../assets/pokemonAssets/weather/weather-hail.png';
