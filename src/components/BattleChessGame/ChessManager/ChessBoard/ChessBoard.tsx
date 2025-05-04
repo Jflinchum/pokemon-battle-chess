@@ -4,7 +4,6 @@ import { getSquareColor } from '../util';
 import ChessSquare from './ChessSquare/ChessSquare';
 import './ChessBoard.css';
 import { useGameState } from '../../../../context/GameStateContext';
-import { PokemonSet } from '@pkmn/data';
 
 interface ChessBoardProps {
   boardState: PokemonChessBoardSquare[][];
