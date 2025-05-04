@@ -1,16 +1,17 @@
 import { Socket } from "socket.io";
 import { Chess, Color, Square } from "chess.js";
 import { Dex as SimDex, BattleStreams, Teams, PRNGSeed } from '@pkmn/sim';
-import { BoostID } from "@pkmn/data";
-import { PRNG } from '@pkmn/sim'
+import { BoostID, PokemonSet } from "@pkmn/data";
+import { PRNG, Condition } from '@pkmn/sim'
 import { Protocol } from '@pkmn/protocol';
 import { ObjectReadWriteStream } from "@pkmn/streams";
 import User from "./User";
 import GameRoomManager from "./GameRoomManager";
-import { PokemonBattleChessManager, TerrainNames, WeatherNames } from "../../shared/models/PokemonBattleChessManager";
+import { PokemonBattleChessManager, SquareModifier, TerrainNames, WeatherNames } from "../../shared/models/PokemonBattleChessManager";
 import { EndGameReason, MatchHistory, MatchLog } from "../../shared/types/game";
 import { GameOptions } from "../../shared/types/GameOptions";
 import GameTimer from "./GameTimer";
+import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes";
 
 export default class GameRoom {
   public roomId: string;
@@ -243,10 +244,11 @@ export default class GameRoom {
       }
 
       const moveSucceeds = await this.createPokemonBattleStream({
-        p1Set: p1Pokemon?.pkmn,
-        p2Set: p2Pokemon?.pkmn,
+        p1Set: p1Pokemon!.pkmn,
+        p2Set: p2Pokemon!.pkmn,
         attemptedMove: { san: sanMove, color: chessMove.color },
         squareModifier: this.pokemonGameManager.squareModifiers.find(sqMod => sqMod.square === capturedPieceSquare),
+        battleSquare: capturedPieceSquare,
       });
 
       // Clear out the old battle stream
@@ -305,6 +307,9 @@ export default class GameRoom {
       this.pokemonGameManager.tickSquareModifiers();
     }
     if (this.roomGameOptions.weatherWars && this.currentTurnWhite) {
+      if (this.chessManager.moveNumber() % 10 === 0) {
+        this.squareModifierTarget = this.secretPRNG.random(10, 20);
+      }
       const numSquares = this.pokemonGameManager.createNewSquareModifiers(this.squareModifierTarget, this.secretPRNG);
       if (numSquares && numSquares > 0) {
         const squareModifierData: MatchLog = { type: 'weather', data: { event: 'weatherChange', squareModifiers: this.pokemonGameManager.squareModifiers } };
@@ -514,7 +519,7 @@ export default class GameRoom {
     }
   }
 
-  private async createPokemonBattleStream({ p1Set, p2Set, attemptedMove, squareModifier }) {
+  private async createPokemonBattleStream({ p1Set, p2Set, attemptedMove, squareModifier, battleSquare }: { p1Set: PokemonSet, p2Set: PokemonSet, attemptedMove: { san: string, color: Color }, squareModifier?: SquareModifier, battleSquare: Square }) {
     const p1Spec = { name: this.whitePlayer.playerId, team: Teams.pack([p1Set]) };
     const p2Spec = { name: this.blackPlayer.playerId, team: Teams.pack([p2Set]) };
     const battleStartData: MatchLog = { type: 'pokemon', data: { event: 'battleStart', p1Pokemon: p1Set, p2Pokemon: p2Set, attemptedMove } };
@@ -530,10 +535,27 @@ export default class GameRoom {
       const advantageSide = this.currentTurnWhite ? 'p1' : 'p2';
       const modifiers = squareModifier?.modifiers;
       let addedModifiers = false;
+      let weatherChanges;
+      let terrainChanges;
 
       const pokemonBattleChessMod = SimDex.mod('pokemonbattlechess', { Formats: [{
           name: 'pbc',
           mod: 'gen9',
+          onWeather(target, source, effect) {
+            console.log(target);
+            console.log(source);
+            console.log(effect);
+          },
+          onWeatherChange(target, _, sourceEffect) {
+            if (sourceEffect && WeatherNames.includes(target.battle.field.weather as WeatherId)) {
+              weatherChanges = target.battle.field.weather;
+            }
+          },
+          onTerrainChange(target, _, sourceEffect) {
+            if (sourceEffect && TerrainNames.includes(target.battle.field.terrain as TerrainId)) {
+              terrainChanges = target.battle.field.terrain;
+            }
+          },
           onSwitchIn(pokemon) {
             if (pokemon.side.id === advantageSide) {
               pokemon.boostBy(offenseAdvantage);
@@ -545,13 +567,13 @@ export default class GameRoom {
               }
             }
             if (!addedModifiers) {
-              modifiers?.forEach(({ modifier }) => {
-                if (WeatherNames.includes(modifier)) {
-                  this.field.setWeather(modifier, 'debug');
-                } else {
-                  this.field.setTerrain(modifier, 'debug');
-                }
-              });
+
+              if (modifiers?.weather) {
+                this.field.setWeather(modifiers.weather.id, 'debug');
+              }
+              if (modifiers?.terrain) {
+                this.field.setTerrain(modifiers.terrain.id, 'debug');
+              }
               addedModifiers = true;
             }
           },
@@ -583,6 +605,15 @@ export default class GameRoom {
           for (const { args } of Protocol.parse(chunk)) {
             if (args[0] === 'win') {
               this.gameTimer.stopTimers();
+
+              if (weatherChanges || terrainChanges && this.roomGameOptions.weatherWars) {
+                this.pokemonGameManager.updateSquareWeather(battleSquare, weatherChanges);
+                this.pokemonGameManager.updateSquareTerrain(battleSquare, terrainChanges);
+                const squareModifierData: MatchLog = { type: 'weather', data: { event: 'weatherChange', squareModifiers: this.pokemonGameManager.squareModifiers } };
+                this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
+                this.broadcastAll('gameOutput', squareModifierData);
+              }
+
               if ((this.currentTurnWhite && args[1] === this.whitePlayer.playerId) || (!this.currentTurnWhite && args[1] === this.blackPlayer.playerId)) {
                 const data: MatchLog = { type: 'pokemon', data: { event: 'victory', color: this.currentTurnWhite ? 'w' : 'b' } };
                 this.pushHistory(data);

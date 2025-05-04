@@ -14,6 +14,7 @@ import { PokemonWeatherBackground } from '../../../common/Pokemon/PokemonWeather
 import { WeatherId, TerrainId } from '../../../../../shared/types/PokemonTypes';
 import { TerrainName, WeatherName } from '@pkmn/client';
 import './PokemonChessDetailsCard.css';
+import { useMemo } from 'react';
 
 interface PokemonChessDetailsCardProps {
   pokemon?: PokemonSet | null;
@@ -51,21 +52,33 @@ export const getSquareModifierMapping = (condition: WeatherId | TerrainId | Weat
 }
 
 const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifier }: PokemonChessDetailsCardProps) => {
+  const squareModArray = useMemo(() => {
+    return Object.keys(squareModifier?.modifiers || {}).map((squareMod) => {
+      const weatherOrTerrain = squareModifier?.modifiers?.[squareMod as 'weather' | 'terrain'];
+      if (weatherOrTerrain) {
+        return {
+          id: weatherOrTerrain.id,
+          duration: weatherOrTerrain.duration
+        }
+      }
+    }).filter((squareMod) => squareMod);
+  }, [squareModifier]);
 
   return (
     <div className='pokemonDetailsContainer'>
       <div className='pokemonDetailsPadding'>
         {
-          squareModifier && squareModifier.modifiers.map((squareMod) => (
-            <div key={squareMod.modifier} id={`squareMod-${squareMod.modifier}`} className='pokemonDetailsSquareModifier'>
-              <PokemonWeatherBackground weatherType={squareMod.modifier} className='detailsCardWeather'/>
-              <span>{getSquareModifierMapping(squareMod.modifier)?.label} - </span>
+          squareModArray.map((squareMod) => (
+            squareMod && (
+            <div key={squareMod.id} id={`squareMod-${squareMod.id}`} className='pokemonDetailsSquareModifier'>
+              <PokemonWeatherBackground weatherType={squareMod.id} className='detailsCardWeather'/>
+              <span>{getSquareModifierMapping(squareMod.id)?.label} - </span>
               <span>{squareMod.duration} turns</span>
-              <Tooltip anchorSelect={`#squareMod-${squareMod.modifier}`}>
-                {getSquareModifierMapping(squareMod.modifier)?.desc}
+              <Tooltip anchorSelect={`#squareMod-${squareMod.id}`}>
+                {getSquareModifierMapping(squareMod.id)?.desc}
               </Tooltip>
             </div>
-          ))
+          )))
         }
         {
           pokemon ?

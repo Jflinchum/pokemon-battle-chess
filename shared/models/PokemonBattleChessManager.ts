@@ -38,7 +38,16 @@ export interface PokemonBattle {
 }
 export interface SquareModifier {
   square: Square,
-  modifiers: { modifier: WeatherId | TerrainId, duration: number }[];
+  modifiers: {
+    weather?: {
+      id: WeatherId,
+      duration: number
+    },
+    terrain?: {
+      id: TerrainId,
+      duration: number
+    }
+  };
 }
 
 export class PokemonBattleChessManager {
@@ -121,7 +130,6 @@ export class PokemonBattleChessManager {
    * @param numSquares Number of squares to generate
    */
   private generateSquareModifiers(numSquares: number) {
-    const modifiers = [...WeatherNames, ...TerrainNames];
     const distanceProbabilities = [{ value: 0.5, weight: 0.4 }, { value: 1.5, weight: 0.3 }, { value: 2.5, weight: 0.2 }, { value: 3.5, weight: 0.1 }];
     let i = 0;
     while (i < numSquares) {
@@ -139,24 +147,48 @@ export class PokemonBattleChessManager {
          * We could get around this extra generation by keeping track of a map of possible squares
          * and removing them from the pool if they have too many modifiers
          */
-        if (currentSquareWeather.modifiers.length > 1) {
+        if (currentSquareWeather.modifiers.terrain && currentSquareWeather.modifiers.weather) {
           continue;
         }
 
         /**
          * Generate terrain if we have weather, otherwise generate weather
          */
-        const isTerrain = TerrainNames.includes(currentSquareWeather.modifiers[0].modifier as TerrainId);
-        const newSquareModifier = {
-          modifier: isTerrain ? this.prng.sample(WeatherNames) : this.prng.sample(TerrainNames),
-          duration: this.prng.random(5, 15),
-        };
-        currentSquareWeather.modifiers.push(newSquareModifier);
+        if (currentSquareWeather.modifiers.terrain) {
+          currentSquareWeather.modifiers.weather = {
+            id: this.prng.sample(WeatherNames),
+            duration: this.prng.random(5, 15)
+          }
+        } else {
+          currentSquareWeather.modifiers.terrain = {
+            id: this.prng.sample(TerrainNames),
+            duration: this.prng.random(5, 15)
+          }
+        }
       } else {
-        const newSquareModifier = {
-          square,
-          modifiers: [{ modifier: this.prng.sample(modifiers), duration: this.prng.random(5, 15) }],
-        };
+        const isTerrainModifier = this.prng.random() > 0.5;
+        let newSquareModifier;
+        if (isTerrainModifier) {
+          newSquareModifier = {
+            square,
+            modifiers: {
+              terrain: {
+                id: this.prng.sample(TerrainNames),
+                duration: this.prng.random(5, 15),
+              }
+            },
+          };
+        } else {
+          newSquareModifier = {
+            square,
+            modifiers: {
+              weather: {
+                id: this.prng.sample(WeatherNames),
+                duration: this.prng.random(5, 15),
+              }
+            },
+          };
+        }
         this.squareModifiers.push(newSquareModifier)
       }
       i++;
@@ -165,12 +197,58 @@ export class PokemonBattleChessManager {
 
   public tickSquareModifiers() {
     this.squareModifiers = this.squareModifiers.map((squareMod) => {
-      squareMod.modifiers = squareMod.modifiers.map((modifier) => {
-        modifier.duration--;
-        return modifier;
-      }).filter((modifier) => modifier.duration > 0);
+      if (squareMod.modifiers.weather) {
+        squareMod.modifiers.weather.duration--;
+        if (squareMod.modifiers.weather.duration === 0) {
+          delete squareMod.modifiers.weather;
+        }
+      }
+      if (squareMod.modifiers.terrain) {
+        squareMod.modifiers.terrain.duration--;
+        if (squareMod.modifiers.terrain.duration === 0) {
+          delete squareMod.modifiers.terrain;
+        }
+      }
       return squareMod;
-    }).filter((squareMod) => squareMod.modifiers.length > 0);
+    }).filter((squareMod) => squareMod.modifiers.terrain || squareMod.modifiers.weather);
+  }
+
+  public updateSquareWeather(square: Square, weather?: WeatherId) {
+    if (!weather) return;
+    const squareMod = this.getWeatherFromSquare(square);
+    const newWeather = {
+      id: weather,
+      duration: this.prng.random(5, 15),
+    };
+    if (squareMod) {
+      squareMod.modifiers.weather = newWeather;
+    } else {
+      this.squareModifiers.push({
+        square,
+        modifiers: {
+          weather: newWeather
+        }
+      })
+    }
+  }
+
+  public updateSquareTerrain(square: Square, terrain?: TerrainId) {
+    if (!terrain) return;
+    const squareMod = this.getWeatherFromSquare(square);
+    const newTerrain = {
+      id: terrain,
+      duration: this.prng.random(5, 15),
+    };
+    if (squareMod) {
+      squareMod.modifiers.terrain = newTerrain;
+    } else {
+      this.squareModifiers.push({
+        square,
+        modifiers: {
+          terrain: newTerrain
+        }
+      })
+    }
   }
 
   public createNewSquareModifiers(target: number, secretPrng: PRNG) {

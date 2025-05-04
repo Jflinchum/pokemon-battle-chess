@@ -50,7 +50,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpec
               <div className='battleMoveContainer'>
                 <BattleMoveContainer
                   hideMoves={
-                    fullBattleLog[fullBattleLog.length - 1]?.args?.[0] !== 'turn' || fullBattleLog.some((log) => log.args[0] === 'win')
+                    !['turn', 'request'].includes(fullBattleLog[fullBattleLog.length - 1]?.args?.[0]) || fullBattleLog.some((log) => log.args[0] === 'win')
                   }
                   moveChosen={moveChosen}
                   onMoveSelect={onMoveSelect}

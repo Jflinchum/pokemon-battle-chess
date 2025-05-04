@@ -37,6 +37,8 @@ Room Options
     - Weather setting pokemon makes weather persist on the square after battle
     - On init, decide max number of weather squares with flux
       - Done
+    - Change weather target after n turns
+      - Done
     - Make weather chance decrease in probability based on approach to max
       - Done
     - Make weather squares have a higher probability near center of board
@@ -94,6 +96,9 @@ Refactor TODOs:
 Issues:
 - Make sure you can see timers in pokemon battles
   - Completely redo pokemon battle css
+- Resyncing while in pokemon battle prevents any actions from sending to the server
+  - Specifically regaining socket connection, not rejoining the room
+- Duplicate pokemon occurring still
 - Use em/rem for text sizes
 - Serverside room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding

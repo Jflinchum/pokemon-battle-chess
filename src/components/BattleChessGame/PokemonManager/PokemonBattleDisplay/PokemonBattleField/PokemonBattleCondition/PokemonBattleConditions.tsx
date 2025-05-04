@@ -18,7 +18,6 @@ const PokemonBattleConditionLabel = ({ condition }: { condition?: Field['terrain
 }
 
 export const PokemonBattleConditions = ({ battleField }: { battleField: Field }) => {
-  console.log('battleField', battleField);
   return (
     <div className='pokemonBattleConditions'>
       <PokemonBattleConditionLabel condition={battleField.weatherState} />
