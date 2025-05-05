@@ -4,10 +4,14 @@ import { LogFormatter } from "@pkmn/view";
 import StylizedText from "../../../../common/StylizedText/StylizedText";
 import './PokemonBattleLog.css';
 import { useGameState } from "../../../../../context/GameStateContext";
+import { Battle } from "@pkmn/client";
+import { SideID } from "@pkmn/data";
 
 interface PokemonBattleLogProps {
   battleHistory: { args: ArgType, kwArgs: BattleArgsKWArgType }[];
   simple?: boolean;
+  perspective: SideID;
+  battleState: Battle;
 }
 
 const getClassnameFromBattleArg = (args: ArgType) => {
@@ -24,9 +28,9 @@ const formatTextFromBattleArg = (text: string, args: ArgType) => {
   return text;
 }
 
-const PokemonBattleLog = ({ battleHistory, simple }: PokemonBattleLogProps) => {
+const PokemonBattleLog = ({ battleHistory, simple, perspective, battleState }: PokemonBattleLogProps) => {
   const { gameState } = useGameState();
-  const formatter = useMemo(() => (new LogFormatter()), []);
+  const formatter = useMemo(() => (new LogFormatter(perspective, battleState)), []);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,10 +48,10 @@ const PokemonBattleLog = ({ battleHistory, simple }: PokemonBattleLogProps) => {
           let formattedText = formatter.formatText(args, kwArgs);
 
           if (gameState.gameSettings.whitePlayer?.playerId) {
-            formattedText = formattedText.replace(gameState.gameSettings.whitePlayer.playerId, gameState.gameSettings.whitePlayer?.playerName);
+            formattedText = formattedText.replace(new RegExp(gameState.gameSettings.whitePlayer.playerId, 'g'), gameState.gameSettings.whitePlayer?.playerName);
           }
           if (gameState.gameSettings.blackPlayer?.playerId) {
-            formattedText = formattedText.replace(gameState.gameSettings.blackPlayer.playerId, gameState.gameSettings.blackPlayer?.playerName);
+            formattedText = formattedText.replace(new RegExp(gameState.gameSettings.blackPlayer.playerId, 'g'), gameState.gameSettings.blackPlayer?.playerName);
           }
           
           if (formattedText) {

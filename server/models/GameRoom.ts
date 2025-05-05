@@ -380,6 +380,7 @@ export default class GameRoom {
     });
     this.whitePlayerPokemonMove = null;
     this.blackPlayerPokemonMove = null;
+    this.currentPokemonBattleStream = null;
 
     /**
      * Timers
@@ -541,11 +542,6 @@ export default class GameRoom {
       const pokemonBattleChessMod = SimDex.mod('pokemonbattlechess', { Formats: [{
           name: 'pbc',
           mod: 'gen9',
-          onWeather(target, source, effect) {
-            console.log(target);
-            console.log(source);
-            console.log(effect);
-          },
           onWeatherChange(target, _, sourceEffect) {
             if (sourceEffect && WeatherNames.includes(target.battle.field.weather as WeatherId)) {
               weatherChanges = target.battle.field.weather;

@@ -1,7 +1,7 @@
 .pokemonBattleConditions {
   position: absolute;
   text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-  font-size: 1.2em;
+  font-size: 0.7em;
   font-weight: 800;
   opacity: 70%;
   background-color: rgb(70, 70, 70);
@@ -12,5 +12,9 @@
   p {
     margin: 0;
     padding: 0;
+  }
+
+  @media (min-width: 650px) {
+    font-size: 1.2em;
   }
 }

@@ -77,6 +77,7 @@ const RoomManager = () => {
     });
 
     socket.on('startGame', (settings) => {
+      setMatchHistory(undefined);
       dispatch({ type: 'START_MATCH', payload: settings });
     });
 

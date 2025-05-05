@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Dex } from '@pkmn/dex';
-import { PokemonSet, Generations } from "@pkmn/data";
+import { PokemonSet, Generations, SideID } from "@pkmn/data";
 import { ArgType, KWArgType } from '@pkmn/protocol';
 import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
@@ -12,10 +12,11 @@ interface PokemonBattleManagerProps {
   p1Pokemon: PokemonSet;
   p2Pokemon: PokemonSet;
   currentPokemonMoveHistory: { args: ArgType; kwArgs: KWArgType }[];
+  perspective: SideID;
 }
 
 
-const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory }: PokemonBattleManagerProps) => {
+const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory, perspective }: PokemonBattleManagerProps) => {
   const { userState } = useUserState();
   const { gameState } = useGameState();
 
@@ -31,18 +32,17 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory 
   , [currentPokemonMoveHistory]);
 
   return (
-    <>
-      <PokemonBattleDisplay
-        battleState={battle}
-        fullBattleLog={currentPokemonMoveHistory}
-        onMoveSelect={(move) => {
-          socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
-        }}
-        isSpectator={gameState.players.find((player) => player.playerId === userState.id)?.isSpectator}
-        p1Pokemon={p1Pokemon}
-        p2Pokemon={p2Pokemon}
-      />
-    </>
+    <PokemonBattleDisplay
+      battleState={battle}
+      fullBattleLog={currentPokemonMoveHistory}
+      onMoveSelect={(move) => {
+        socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
+      }}
+      isSpectator={gameState.players.find((player) => player.playerId === userState.id)?.isSpectator}
+      p1Pokemon={p1Pokemon}
+      p2Pokemon={p2Pokemon}
+      perspective={perspective}
+    />
   )
 }
 

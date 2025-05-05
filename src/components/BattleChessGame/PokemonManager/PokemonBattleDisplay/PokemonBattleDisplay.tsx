@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Battle } from "@pkmn/client";
 import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
-import { PokemonSet } from "@pkmn/data";
+import { PokemonSet, SideID } from "@pkmn/data";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
 import PokemonMoveChoices, { PokemonMoveChoice } from "./PokemonMoveChoices/PokemonMoveChoices";
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
@@ -14,9 +14,10 @@ interface PokemonBattleDisplayProps {
   isSpectator?: boolean;
   p1Pokemon: PokemonSet;
   p2Pokemon: PokemonSet;
+  perspective: SideID;
 }
 
-const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpectator, p1Pokemon, p2Pokemon }: PokemonBattleDisplayProps) => {
+const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpectator, p1Pokemon, p2Pokemon, perspective }: PokemonBattleDisplayProps) => {
   const [moveChosen, setMoveChosen] = useState<string>();
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpec
           <div className='battlefieldAndLog'>
             <span className='battleContainer'>
               <PokemonBattleField battleHistory={fullBattleLog} battleState={battleState} p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon}/>
-              <PokemonBattleLog battleHistory={fullBattleLog} simple={true}/>
+              <PokemonBattleLog battleHistory={fullBattleLog} simple={true} battleState={battleState} perspective={perspective}/>
               <div className='battleMoveContainer'>
                 <BattleMoveContainer
                   hideMoves={
@@ -60,7 +61,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpec
                 />
               </div>
             </span>
-            <PokemonBattleLog battleHistory={fullBattleLog}/>
+            <PokemonBattleLog battleHistory={fullBattleLog} battleState={battleState} perspective={perspective}/>
           </div>
         </>
       )}

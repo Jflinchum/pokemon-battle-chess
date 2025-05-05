@@ -26,34 +26,6 @@ Use sprites option in game settings
 Keyboard navigation and accessibility
 
 Room Options
-- Weather on random chess spaces
-  - Weather Logic
-    - Logic for initially creating weather squares
-      - Done
-    - Weather has duration and will fade out
-      - Done
-    - Weather has a chance to randomly appear on a chess square over the course of the match
-      - Done
-    - Weather setting pokemon makes weather persist on the square after battle
-    - On init, decide max number of weather squares with flux
-      - Done
-    - Change weather target after n turns
-      - Done
-    - Make weather chance decrease in probability based on approach to max
-      - Done
-    - Make weather squares have a higher probability near center of board
-      - Done
-  - Weather UI
-    - Sprites created for chess squares
-      - Done
-    - Sprites created for battle
-      - Done
-    - Weather text on pokemon battle UI
-      - Done
-    - Weather info on details card when square selected
-      - Done
-    - Support for both weather and terrain at the same time
-      - Done
 - Preserve damage after battle
 - Tera enabled
 - A Pokemon can only tera once in a match, and then they can't tera again
@@ -64,6 +36,7 @@ Room Options
   - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
+- Terrain/weather clearing should clear square modifier
 - Queueing up Drafts/Chess moves
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
@@ -88,19 +61,16 @@ Priority:
 
 Refactor TODOs:
 - Potentially lift game logic into new model
+- Lift weather out of pokemon manager
 - Put API request and response types in shared folder
 - Organize frontend types in a single dir and re-use more efficiently
 - Separate out draft/ban calls
 - Move logic in controller/index into GameRoom
 
 Issues:
-- Make sure you can see timers in pokemon battles
-  - Completely redo pokemon battle css
 - Resyncing while in pokemon battle prevents any actions from sending to the server
   - Specifically regaining socket connection, not rejoining the room
-- Duplicate pokemon occurring still
 - Use em/rem for text sizes
-- Serverside room not resetting fully when rematching sometimes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:

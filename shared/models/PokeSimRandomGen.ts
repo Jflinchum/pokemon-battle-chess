@@ -159,6 +159,7 @@ export class PokeSimRandomGen {
 		}
     const randomIndex = this.random(0, pool.length);
     const pokemon = fastPop(pool, randomIndex);
+		this.pokemonPool = this.pokemonPool.filter((species) => pokemon !== species);
     return this.buildRandomSet(pokemon);
   }
 

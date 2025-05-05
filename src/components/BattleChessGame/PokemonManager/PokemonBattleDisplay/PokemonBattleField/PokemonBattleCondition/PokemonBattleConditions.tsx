@@ -18,6 +18,8 @@ const PokemonBattleConditionLabel = ({ condition }: { condition?: Field['terrain
 }
 
 export const PokemonBattleConditions = ({ battleField }: { battleField: Field }) => {
+  if (!battleField.weatherState.id && !battleField.terrainState.id) return null;
+
   return (
     <div className='pokemonBattleConditions'>
       <PokemonBattleConditionLabel condition={battleField.weatherState} />

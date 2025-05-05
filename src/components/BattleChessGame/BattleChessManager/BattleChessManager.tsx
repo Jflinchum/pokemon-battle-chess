@@ -100,8 +100,8 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     onPokemonBattleStart: (p1Pokemon, p2Pokemon, attemptedMove) => {
       setCurrentPokemonMoveHistory([]);
       setCurrentBattle({
-        p1Pokemon: color === 'b' ? p2Pokemon : p1Pokemon,
-        p2Pokemon: color === 'b' ? p1Pokemon : p2Pokemon,
+        p1Pokemon,
+        p2Pokemon,
         attemptedMove,
         offensivePlayer: chessManager.turn() === 'w' ? 'p1' : 'p2'
       });
@@ -239,6 +239,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
                 p1Pokemon={currentBattle.p1Pokemon}
                 p2Pokemon={currentBattle.p2Pokemon}
                 currentPokemonMoveHistory={currentPokemonMoveHistory}
+                perspective={color === 'w' ? 'p1' : 'p2'}
               />
             )
           }
