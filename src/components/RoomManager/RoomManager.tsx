@@ -19,8 +19,10 @@ const RoomManager = () => {
 
   const { stopSongs } = useMusicPlayer();
   useEffect(() => {
-    stopSongs();
-  }, []);
+    if (!gameState.inGame) {
+      stopSongs();
+    }
+  }, [gameState.inGame]);
 
   useEffect(() => {
     socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);

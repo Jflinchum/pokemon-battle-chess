@@ -19,8 +19,8 @@ import { Timer } from '../../../../shared/types/game';
 import movePieceMP3 from '../../../assets/chessAssets/audio/movePiece.mp3';
 import capturePieceMP3 from '../../../assets/chessAssets/audio/capturePiece.mp3';
 import GameManagerActions from './GameManagerActions/GameManagerActions';
-import './BattleChessManager.css';
 import { useMusicPlayer } from '../../../util/useMusicPlayer';
+import './BattleChessManager.css';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;

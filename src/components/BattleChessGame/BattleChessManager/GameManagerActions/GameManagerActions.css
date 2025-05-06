@@ -59,7 +59,7 @@
 
 .gameManagerActionLabel {
   width: 150px;
-  font-size: 0.8em;
+  font-size: 0.7em;
 
   @media (min-width: 600px) {
     width: 200px;
