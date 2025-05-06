@@ -5,6 +5,9 @@
   align-items: center;
 
   img {
-    max-width: 80px;
+    max-height: 40px;
+    @media (min-height: 700px) {
+      max-height: 80px;
+    }
   }
 }

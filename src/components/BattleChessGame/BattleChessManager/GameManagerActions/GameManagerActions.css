@@ -3,11 +3,13 @@
   flex-direction: column;
   background-color: rgb(70, 70, 70);
   z-index: 10;
+  font-size: 0.7em;
 
   @media (min-width: 600px) {
     position: fixed;
     width: 70px;
     height: 100%;
+    font-size: 1em;
   }
 }
 
@@ -17,12 +19,10 @@
   container-type: inline-size;
   width: 100%;
   margin: 60px 0 0 0;
-  font-size: 16px;
   letter-spacing: 2px;
 
   @media (min-width: 600px) {
     margin: 7px 0;
-    font-size: 24px;
   }
 
   @media (min-width: 800px) {
@@ -49,13 +49,6 @@
   align-items: center;
   margin: 10px 12px 10px auto;
   width: 100%;
-
-  font-size: 12px;
-
-
-  @media (min-width: 600px) {
-    font-size: 16px;
-  }
 }
 
 .gameManagerAction {
@@ -65,8 +58,8 @@
 }
 
 .gameManagerActionLabel {
-  vertical-align: super;
   width: 150px;
+  font-size: 0.8em;
 
   @media (min-width: 600px) {
     width: 200px;

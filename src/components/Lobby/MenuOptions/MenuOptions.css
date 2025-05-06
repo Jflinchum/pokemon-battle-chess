@@ -6,7 +6,6 @@
   padding: 0 10px;
   text-align: center;
   margin-top: 40px;
-  font-size: 12px;
 
   @media (min-width: 600px) { 
     margin-top: 0;
@@ -14,12 +13,6 @@
 }
 
 .avatarContainer {
-  display: none;
-
-  @media (min-width: 600px) {
-    display: block;
-  }
-
   img {
     display: block;
     margin: 0 auto;
@@ -30,12 +23,10 @@
 .pokemonOfTheDayContainer {
   margin-top: auto;
   margin-bottom: 20px;
-  font-size: 14px;
 }
 
 .menuOptionButtonContainer {
   padding: 16px 8px;
-  font-size: 10px;
 
   svg {
     max-height: 16px;

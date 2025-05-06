@@ -12,11 +12,17 @@
   top: 0;
   z-index: 1;
   box-shadow: none;
-  font-size: 12px;
+  font-size: 1em;
 
   transition: left 0.5s;
 
   &.navMinimal {
+    font-size: 1.6em;
+
+    svg {
+      min-width: unset;
+    }
+
     @media (min-width: 600px) {
       transition: width 0.3s;
       width: 70px;
@@ -33,7 +39,6 @@
   }
 
   @media (min-width: 600px) {
-    font-size: 16px;
     position: inherit;
     box-shadow: 0 0 10px 0 black;
     top: auto;

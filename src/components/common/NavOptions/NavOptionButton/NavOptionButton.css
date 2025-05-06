@@ -6,20 +6,15 @@
   width: 100%;
   padding: 20px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.8em;
   border-top: 2px solid rgb(50, 50, 50);
-
-  svg {
-    font-size: 16px;
-    width: 40px;
+  
+  & > * {
+    vertical-align: middle;
   }
 
-  @media (min-width: 600px) {
-    svg {
-      font-size: 30px;
-    }
-
-    font-size: 14px;
+  svg {
+    min-width: 40px;
   }
 
   span {

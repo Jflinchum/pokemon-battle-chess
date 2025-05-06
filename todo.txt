@@ -81,7 +81,6 @@ Issues:
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't
   - Can test on mobile by turning off the screen and waiting for timeout to occur
-- "The opposing pokemon" no matter what side in pokemon battle
 - Chat rooms work between multiple rooms
 - OG/Twitter meta tags do not support svg
 
