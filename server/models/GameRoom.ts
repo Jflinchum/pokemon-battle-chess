@@ -233,16 +233,16 @@ export default class GameRoom {
       return;
     }
 
-    if (chessMove.isCapture()) {
-      const p1Pokemon = this.currentTurnWhite ? this.pokemonGameManager.getPokemonFromSquare(chessMove.from) : this.pokemonGameManager.getPokemonFromSquare(chessMove.to);
-      const p2Pokemon = this.currentTurnWhite ? this.pokemonGameManager.getPokemonFromSquare(chessMove.to) : this.pokemonGameManager.getPokemonFromSquare(chessMove.from);;
-
+    if (chessMove.isCapture() || chessMove.isEnPassant()) {
       let capturedPieceSquare;
       if (chessMove.isEnPassant()) {
         capturedPieceSquare = `${chessMove.to[0] + (parseInt(chessMove.to[1]) + (chessMove.color === 'w' ? -1 : 1))}`;
       } else {
         capturedPieceSquare = chessMove.to;  
       }
+
+      const p1Pokemon = this.currentTurnWhite ? this.pokemonGameManager.getPokemonFromSquare(chessMove.from) : this.pokemonGameManager.getPokemonFromSquare(capturedPieceSquare);
+      const p2Pokemon = this.currentTurnWhite ? this.pokemonGameManager.getPokemonFromSquare(capturedPieceSquare) : this.pokemonGameManager.getPokemonFromSquare(chessMove.from);
 
       const moveSucceeds = await this.createPokemonBattleStream({
         p1Set: p1Pokemon!.pkmn,

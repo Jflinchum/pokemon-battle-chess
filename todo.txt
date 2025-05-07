@@ -65,9 +65,8 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
-- Resync not working, likely due to clearing out match history state in room manager
-- En Passant battles not working properly
 - Wrong music playing after skipping to current turn when catching up
+- Music isn't playing on replays
 - Resyncing while in pokemon battle prevents any actions from sending to the server
   - Specifically regaining socket connection, not rejoining the room
 - Use em/rem for text sizes
