@@ -1,27 +1,28 @@
 import { useRef, useEffect, useMemo } from "react";
-import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
+import { BattleArgsKWArgType, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from "@pkmn/view";
 import StylizedText from "../../../../common/StylizedText/StylizedText";
 import './PokemonBattleLog.css';
 import { useGameState } from "../../../../../context/GameStateContext";
 import { Battle } from "@pkmn/client";
 import { SideID } from "@pkmn/data";
+import { CustomArgTypes } from "../../../../../../shared/types/PokemonTypes";
 
 interface PokemonBattleLogProps {
-  battleHistory: { args: ArgType, kwArgs: BattleArgsKWArgType }[];
+  battleHistory: { args: CustomArgTypes, kwArgs: BattleArgsKWArgType }[];
   simple?: boolean;
   perspective: SideID;
   battleState: Battle;
 }
 
-const getClassnameFromBattleArg = (args: ArgType) => {
+const getClassnameFromBattleArg = (args: CustomArgTypes) => {
   if (args[0] === 'turn') {
     return 'turnLog';
   }
   return '';
 }
 
-const formatTextFromBattleArg = (text: string, args: ArgType) => {
+const formatTextFromBattleArg = (text: string, args: CustomArgTypes) => {
   if (args[0] === 'turn') {
     return text.replace(/\=/g, '');
   }
@@ -45,7 +46,7 @@ const PokemonBattleLog = ({ battleHistory, simple, perspective, battleState }: P
       {
         battleHistory.map(({ args, kwArgs }, index) => {
           let totalLog: { text: string, args: string[]  }[] = [];
-          let formattedText = formatter.formatText(args, kwArgs);
+          let formattedText = formatter.formatText(args as Protocol.ArgType, kwArgs);
 
           if (gameState.gameSettings.whitePlayer?.playerId) {
             formattedText = formattedText.replace(new RegExp(gameState.gameSettings.whitePlayer.playerId, 'g'), gameState.gameSettings.whitePlayer?.playerName);

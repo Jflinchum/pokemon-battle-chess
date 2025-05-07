@@ -5,7 +5,6 @@ Host controls
   - Kick player
   - Promote to host
 Queue up your draft and bans
-Add forfeit button to pokemon battle
 Create formats to quick select game options in room
 Write validation functions when writing/reading from localstorage and clear it out if failing validation
 Download/upload replay
@@ -68,6 +67,7 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- Resync not working, likely due to clearing out match history state in room manager
 - Resyncing while in pokemon battle prevents any actions from sending to the server
   - Specifically regaining socket connection, not rejoining the room
 - Use em/rem for text sizes
@@ -75,6 +75,7 @@ Issues:
   - This issue seems to come and go. Needs more investigation
 - Premoves:
   - Disallow premoving for spectators or when the game has ended
+  - Occasionally clearing when it shouldn't
 - Disallow client controls when the match ends
 - Disallow server inputs when match has ended
 - Pokemon sprites occasionally disappearing

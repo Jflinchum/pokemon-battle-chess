@@ -1,18 +1,18 @@
 import { useMemo } from 'react';
 import { Battle } from "@pkmn/client";
-import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
+import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet } from '@pkmn/data';
 import pokemonBattleBackgroundImage from '../../../../../assets/pokemonBattleBackground.png';
 import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";
 import { useGameState } from '../../../../../context/GameStateContext';
 import { PokemonWeatherBackground } from '../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground';
-import { WeatherId } from '../../../../../../shared/types/PokemonTypes';
+import { CustomArgTypes, WeatherId } from '../../../../../../shared/types/PokemonTypes';
 import { PokemonBattleConditions } from './PokemonBattleCondition/PokemonBattleConditions';
 import './PokemonBattleField.css';
 
 interface PokemonBattleFieldProps {
   battleState: Battle,
-  battleHistory: { args: ArgType, kwArgs: BattleArgsKWArgType }[],
+  battleHistory: { args: CustomArgTypes, kwArgs: BattleArgsKWArgType }[],
   p1PokemonSet: PokemonSet,
   p2PokemonSet: PokemonSet,
 }

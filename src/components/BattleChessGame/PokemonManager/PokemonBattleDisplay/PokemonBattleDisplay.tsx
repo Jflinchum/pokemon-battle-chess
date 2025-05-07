@@ -1,15 +1,16 @@
 import { useState, useEffect, useMemo } from "react";
 import { Battle } from "@pkmn/client";
-import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
+import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet, SideID } from "@pkmn/data";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
 import PokemonMoveChoices, { PokemonMoveChoice } from "./PokemonMoveChoices/PokemonMoveChoices";
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
 import './PokemonBattleDisplay.css';
+import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 
 interface PokemonBattleDisplayProps {
   battleState: Battle | null,
-  fullBattleLog: { args: ArgType, kwArgs: BattleArgsKWArgType }[],
+  fullBattleLog: { args: CustomArgTypes, kwArgs: BattleArgsKWArgType }[],
   onMoveSelect: (move: string) => void,
   isSpectator?: boolean;
   p1Pokemon: PokemonSet;
@@ -99,6 +100,13 @@ const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, h
   } else {
     return (
       <>
+        <button onClick={
+          () => {
+            onMoveSelect('forfeit');
+          }
+        }>
+          Forfeit this battle
+        </button>
         <p>Moves</p>
         <PokemonMoveChoices moves={moves} onMoveSelect={(move) => {
           setMoveChosen(move);

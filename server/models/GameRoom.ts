@@ -1,8 +1,8 @@
 import { Socket } from "socket.io";
 import { Chess, Color, Square } from "chess.js";
-import { Dex as SimDex, BattleStreams, Teams, PRNGSeed } from '@pkmn/sim';
+import { Dex as SimDex, BattleStreams, Teams, PRNGSeed, Battle } from '@pkmn/sim';
 import { BoostID, PokemonSet } from "@pkmn/data";
-import { PRNG, Condition } from '@pkmn/sim'
+import { PRNG } from '@pkmn/sim'
 import { Protocol } from '@pkmn/protocol';
 import { ObjectReadWriteStream } from "@pkmn/streams";
 import User from "./User";
@@ -40,6 +40,7 @@ export default class GameRoom {
     p1: ObjectReadWriteStream<string>,
     p2: ObjectReadWriteStream<string>,
   } | null;
+  public currentPokemonBattle: Battle | null;
   public pokemonGameManager: PokemonBattleChessManager;
   public chessManager: Chess;
   public whiteMatchHistory: MatchHistory = [];
@@ -253,6 +254,7 @@ export default class GameRoom {
 
       // Clear out the old battle stream
       this.currentPokemonBattleStream = null;
+      this.currentPokemonBattle = null;
 
       if (moveSucceeds) {
         const lostPiece = this.chessManager.get(capturedPieceSquare);
@@ -381,6 +383,7 @@ export default class GameRoom {
     this.whitePlayerPokemonMove = null;
     this.blackPlayerPokemonMove = null;
     this.currentPokemonBattleStream = null;
+    this.currentPokemonBattle = null;
 
     /**
      * Timers
@@ -408,13 +411,20 @@ export default class GameRoom {
   }
 
   public validateAndEmitPokemonMove({ pokemonMove, playerId }) {
-    const isUndo = pokemonMove === 'undo'
+    const isUndo = pokemonMove === 'undo';
+    const isForfeit = pokemonMove === 'forfeit';
     if (playerId === this.whitePlayer.playerId) {
       if (isUndo) {
         this.whitePlayerPokemonMove = null;
         if (this.roomGameOptions.timersEnabled) {
           this.gameTimer.startTimer(() => this.endGameDueToTimeout('w'), 'w');
         }
+      } else if (isForfeit && this.currentPokemonBattleStream) {
+        this.currentPokemonBattle?.add('message', `${playerId} has forefeitted`);
+        // Custom forfeit command to reduce hp to 0 on client
+        this.currentPokemonBattle?.add('-forfeit', 'p1')
+        this.currentPokemonBattle?.sendUpdates();
+        this.currentPokemonBattleStream.omniscient.write('>forcelose p1');
       } else {
         this.whitePlayerPokemonMove = pokemonMove;
         this.gameTimer.pauseTimer('w');
@@ -425,6 +435,12 @@ export default class GameRoom {
         if (this.roomGameOptions.timersEnabled) {
           this.gameTimer.startTimer(() => this.endGameDueToTimeout('b'), 'b');
         }
+      } else if (isForfeit && this.currentPokemonBattleStream) {
+        this.currentPokemonBattle?.add('message', `${playerId} has forefeitted`);
+        // Custom forfeit command to reduce hp to 0 on client
+        this.currentPokemonBattle?.add('-forfeit', 'p2');
+        this.currentPokemonBattle?.sendUpdates();
+        this.currentPokemonBattleStream.omniscient.write('>forcelose p2');
       } else {
         this.blackPlayerPokemonMove = pokemonMove;
         this.gameTimer.pauseTimer('b');
@@ -524,6 +540,7 @@ export default class GameRoom {
     const p1Spec = { name: this.whitePlayer.playerId, team: Teams.pack([p1Set]) };
     const p2Spec = { name: this.blackPlayer.playerId, team: Teams.pack([p2Set]) };
     const battleStartData: MatchLog = { type: 'pokemon', data: { event: 'battleStart', p1Pokemon: p1Set, p2Pokemon: p2Set, attemptedMove } };
+    const gameRoomScope = this;
     this.broadcastAll('gameOutput', battleStartData);
     this.pushHistory(battleStartData);
 
@@ -536,20 +553,23 @@ export default class GameRoom {
       const advantageSide = this.currentTurnWhite ? 'p1' : 'p2';
       const modifiers = squareModifier?.modifiers;
       let addedModifiers = false;
-      let weatherChanges;
-      let terrainChanges;
+      let weatherChanges: WeatherId;
+      let terrainChanges: TerrainId;
 
       const pokemonBattleChessMod = SimDex.mod('pokemonbattlechess', { Formats: [{
           name: 'pbc',
           mod: 'gen9',
+          onBegin() {
+            gameRoomScope.currentPokemonBattle = this;
+          },
           onWeatherChange(target, _, sourceEffect) {
             if (sourceEffect && WeatherNames.includes(target.battle.field.weather as WeatherId)) {
-              weatherChanges = target.battle.field.weather;
+              weatherChanges = target.battle.field.weather as WeatherId;
             }
           },
           onTerrainChange(target, _, sourceEffect) {
             if (sourceEffect && TerrainNames.includes(target.battle.field.terrain as TerrainId)) {
-              terrainChanges = target.battle.field.terrain;
+              terrainChanges = target.battle.field.terrain as TerrainId;
             }
           },
           onSwitchIn(pokemon) {
