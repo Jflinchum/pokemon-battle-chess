@@ -49,7 +49,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
         if (room.roomGameOptions.timersEnabled) {
           socket.emit('currentTimers', room.gameTimer.getTimersWithLastMoveShift());
         }
-        socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'));
+        socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'), true);
       }
     });
 

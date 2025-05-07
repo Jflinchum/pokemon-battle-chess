@@ -174,7 +174,7 @@ const useBattleHistory = ({
 };
 
 const shouldDelayBeforeContinuing = (logType: string) => {
-  const delayLogs = ['move', '-damage', '-heal'];
+  const delayLogs = ['move', '-damage', '-heal', '-forfeit'];
   if (delayLogs.includes(logType)) {
     return true;
   }

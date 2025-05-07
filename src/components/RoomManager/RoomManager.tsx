@@ -78,8 +78,10 @@ const RoomManager = () => {
       setTimers(timer);
     });
 
-    socket.on('startGame', (settings) => {
-      setMatchHistory(undefined);
+    socket.on('startGame', (settings, isSyncing) => {
+      if (!isSyncing) {
+        setMatchHistory(undefined);
+      }
       dispatch({ type: 'START_MATCH', payload: settings });
     });
 

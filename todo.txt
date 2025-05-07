@@ -17,10 +17,10 @@ Make modal with tabs on side for different screens
   - Options for Game, Sound, etc.
 Add more music and make music playlist w/ skip track button
 Pokemon Cries
-Use grid for chess board
 Move z index to variables at root
 Are you sure you want to leave? modal when returning to menu in game
 Use sprites option in game settings
+Profanity filter on names and chat
 
 Keyboard navigation and accessibility
 
@@ -46,8 +46,6 @@ Priority:
       when it is the player's turn to draft
       - Be careful of index shifting. Pokemon are unique, so we could store the species.
         However it may be nicer to shift the index of the queue when a pokemon is drafted
-  - Chess moves
-    - Clear queue if most recent move of your color failed
 - Host controls
   - Redesign player list first, both in room and in game
 - Better logging
@@ -68,6 +66,8 @@ Refactor TODOs:
 
 Issues:
 - Resync not working, likely due to clearing out match history state in room manager
+- En Passant battles not working properly
+- Wrong music playing after skipping to current turn when catching up
 - Resyncing while in pokemon battle prevents any actions from sending to the server
   - Specifically regaining socket connection, not rejoining the room
 - Use em/rem for text sizes
