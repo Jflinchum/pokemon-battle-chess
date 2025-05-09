@@ -69,6 +69,13 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     };
   }, [userState.volumePreference.pieceVolume]);
 
+  useEffect(() => {
+    if (gameState.matchEnded) {
+      setBattleStarted(false);
+      setCurrentBattle(null);
+    }
+  }, [gameState.matchEnded]);
+
   const { playRandomGlobalSong, playRandomBattleSong } = useMusicPlayer();
 
   useEffect(() => {

@@ -6,7 +6,6 @@ import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/P
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
 import { PokemonChessBoardSquare } from "../ChessManager/types";
-import { useUserState } from "../../../context/UserStateContext";
 import Button from "../../common/Button/Button";
 import './DraftPokemonManager.css';
 
@@ -20,7 +19,6 @@ interface DraftPokemonManager {
 }
 
 const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draftTurnPick, onBanPokemon }: DraftPokemonManager) => {
-  const { userState } = useUserState();
   const { gameState } = useGameState();
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);

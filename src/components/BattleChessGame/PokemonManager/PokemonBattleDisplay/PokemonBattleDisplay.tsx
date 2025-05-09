@@ -5,20 +5,21 @@ import { PokemonSet, SideID } from "@pkmn/data";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
 import PokemonMoveChoices, { PokemonMoveChoice } from "./PokemonMoveChoices/PokemonMoveChoices";
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
-import './PokemonBattleDisplay.css';
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
+import { useGameState } from "../../../../context/GameStateContext";
+import './PokemonBattleDisplay.css';
 
 interface PokemonBattleDisplayProps {
   battleState: Battle | null,
   fullBattleLog: { args: CustomArgTypes, kwArgs: BattleArgsKWArgType }[],
   onMoveSelect: (move: string) => void,
-  isSpectator?: boolean;
   p1Pokemon: PokemonSet;
   p2Pokemon: PokemonSet;
   perspective: SideID;
 }
 
-const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpectator, p1Pokemon, p2Pokemon, perspective }: PokemonBattleDisplayProps) => {
+const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, p1Pokemon, p2Pokemon, perspective }: PokemonBattleDisplayProps) => {
+  const { gameState } = useGameState();
   const [moveChosen, setMoveChosen] = useState<string>();
 
   useEffect(() => {
@@ -52,13 +53,14 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpec
               <div className='battleMoveContainer'>
                 <BattleMoveContainer
                   hideMoves={
-                    !['turn', 'request'].includes(fullBattleLog[fullBattleLog.length - 1]?.args?.[0]) || fullBattleLog.some((log) => log.args[0] === 'win')
+                    !['turn', 'request'].includes(fullBattleLog[fullBattleLog.length - 1]?.args?.[0]) || fullBattleLog.some((log) => log.args[0] === 'win') ||
+                    gameState.isSpectator ||
+                    gameState.isCatchingUp
                   }
                   moveChosen={moveChosen}
                   onMoveSelect={onMoveSelect}
                   setMoveChosen={setMoveChosen}
                   moves={moves}
-                  isSpectator={isSpectator}
                 />
               </div>
             </span>
@@ -73,15 +75,14 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, isSpec
 interface BattleMoveContainerProps {
   moveChosen?: string;
   hideMoves: boolean;
-  isSpectator?: boolean;
   setMoveChosen: (move?: string) => void;
   onMoveSelect: (move: string) => void;
   moves: PokemonMoveChoice[];
 }
 
-const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, hideMoves, isSpectator }: BattleMoveContainerProps) => {
+const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, hideMoves }: BattleMoveContainerProps) => {
 
-  if (hideMoves || isSpectator) {
+  if (hideMoves) {
     return (
       <div></div>
     );

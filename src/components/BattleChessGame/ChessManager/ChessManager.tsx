@@ -96,7 +96,7 @@ const ChessManager = ({
   }
 
   const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
-    if (gameState.isSpectator) {
+    if (gameState.isSpectator || gameState.matchEnded || gameState.isCatchingUp) {
       return;
     }
     if (chessManager.turn() !== color) {

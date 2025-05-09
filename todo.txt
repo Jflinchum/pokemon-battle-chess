@@ -74,9 +74,7 @@ Issues:
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:
-  - Disallow premoving when the game has ended
   - Occasionally clearing when it shouldn't
-- Disallow client controls when the match ends
 - Disallow server inputs when match has ended
 - Pokemon sprites occasionally disappearing
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
