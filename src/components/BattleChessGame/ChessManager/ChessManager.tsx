@@ -96,6 +96,9 @@ const ChessManager = ({
   }
 
   const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
+    if (gameState.isSpectator) {
+      return;
+    }
     if (chessManager.turn() !== color) {
       const move = getVerboseChessMove(fromSquare, toSquare, simulatedChessManager, promotion);
       if (move) {

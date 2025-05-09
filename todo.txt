@@ -27,7 +27,7 @@ Keyboard navigation and accessibility
 Room Options
 - Preserve damage after battle
 - Tera enabled
-- A Pokemon can only tera once in a match, and then they can't tera again
+  - A Pokemon can only tera once in a match, and then they can't tera again
 - Custom Teams
 - (maybe) Preserve item usage after battle
 - (maybe) Change pokemon on piece promotion
@@ -35,7 +35,8 @@ Room Options
   - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Terrain/weather clearing should clear square modifier
+- Host controls
+  - Redesign player list first, both in room and in game
 - Queueing up Drafts/Chess moves
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
@@ -46,8 +47,6 @@ Priority:
       when it is the player's turn to draft
       - Be careful of index shifting. Pokemon are unique, so we could store the species.
         However it may be nicer to shift the index of the queue when a pokemon is drafted
-- Host controls
-  - Redesign player list first, both in room and in game
 - Better logging
   - Use winston + prometheus + grafana?
 - Toast notifications for errors and such
@@ -65,6 +64,8 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- Terrain/weather clearing should clear square modifier
+- Volume slider toggle between muted and previous value on click of icon
 - Wrong music playing after skipping to current turn when catching up
 - Music isn't playing on replays
 - Resyncing while in pokemon battle prevents any actions from sending to the server
@@ -73,7 +74,7 @@ Issues:
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:
-  - Disallow premoving for spectators or when the game has ended
+  - Disallow premoving when the game has ended
   - Occasionally clearing when it shouldn't
 - Disallow client controls when the match ends
 - Disallow server inputs when match has ended

@@ -64,7 +64,7 @@ const EndGameModal = () => {
       <h2 className='endGameTitle'>
         {
           getEndGameTitle(
-            !!gameState.players.find((player) => player.playerId === userState.id)?.isSpectator,
+            !!gameState.isSpectator,
             currentColor === victor,
             reason,
           )

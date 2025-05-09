@@ -57,17 +57,18 @@ const RoomManager = () => {
     });
 
     socket.on('connectedPlayers', (players: Player[]) => {
-      players.forEach((player) => {
+      let isHost = false;
+      let isSpectator = false;
+      for (let i = 0; i < players.length; i++) {
+        const player = players[i];
         if (player.playerId === userState.id) {
-          if (player.isHost && !gameState.isHost) {
-            dispatch({ type: 'SET_HOST', payload: true });
-          } else if (!player.isHost && gameState.isHost) {
-            dispatch({ type: 'SET_HOST', payload: false });
-          }
+          isHost = player.isHost;
+          isSpectator = player.isSpectator;
+          break;
         }
-      })
+      }
 
-      dispatch({ type: 'SET_PLAYERS', payload: players });
+      dispatch({ type: 'SET_PLAYERS', payload: { players: players as Player[], isHost, isSpectator } });
     });
 
     socket.on('roomClosed', () => {

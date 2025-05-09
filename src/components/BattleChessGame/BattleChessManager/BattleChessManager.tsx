@@ -36,7 +36,6 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
 
   const whitePlayer = gameState.gameSettings.whitePlayer;
   const blackPlayer = gameState.gameSettings.blackPlayer;
-  const thisPlayer = useMemo(() => gameState.players.find((player) => player.playerId === userState.id), [gameState.players])
   const color = useMemo(() => gameState.gameSettings!.color, []);
   const chessManager = useMemo(() => {
     return new Chess();
@@ -196,7 +195,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
   }
 
   const validateDraftPick = ((square: Square, draftColor: Color) => {
-    if (draftTurnPick !== color || thisPlayer?.isSpectator) {
+    if (draftTurnPick !== color || gameState.isSpectator) {
       return false;
     }
     const chessSquare = chessManager.get(square);
@@ -253,7 +252,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
               board={board}
               battleSquare={battleSquare}
               onMove={(san) => {
-                if (thisPlayer?.isSpectator) {
+                if (gameState.isSpectator) {
                   return;
                 }
                 socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
@@ -274,7 +273,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
                   }
                 }}
                 onBanPokemon={(pkmnIndex) => {
-                  if (thisPlayer?.isSpectator) {
+                  if (gameState.isSpectator) {
                     return;
                   }
                   socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });

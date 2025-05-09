@@ -23,6 +23,7 @@ export interface GameState {
   isSkippingAhead: boolean;
   isCatchingUp: boolean;
   isHost: boolean;
+  isSpectator: boolean;
   isWatchingReplay: boolean;
   replayHistory: MatchHistory;
   players: Player[];
@@ -37,10 +38,9 @@ interface GameStateType {
 type GameStateAction = 
   { type: 'RESET_ROOM'; }
   | { type: 'CREATE_ROOM'; }
-  | { type: 'SET_HOST'; payload: boolean }
   | { type: 'SET_SKIPPING_AHEAD'; payload: boolean }
   | { type: 'SET_CATCHING_UP'; payload: boolean }
-  | { type: 'SET_PLAYERS'; payload: Player[]; }
+  | { type: 'SET_PLAYERS'; payload: { players: Player[], isSpectator: boolean, isHost: boolean }; }
   | { type: 'RETURN_TO_ROOM'; }
   | { type: 'END_MATCH'; }
   | { type: 'START_REPLAY'; payload: ReplayData; }
@@ -53,6 +53,7 @@ const getInitialGameState = (): GameState => (
     inGame: false,
     matchEnded: false,
     isHost: false,
+    isSpectator: false,
     isSkippingAhead: false,
     isCatchingUp: false,
     isWatchingReplay: false,
@@ -71,9 +72,7 @@ export const gameStateReducer = (gameState: GameState, action: GameStateAction):
     case 'CREATE_ROOM':
       return { ...gameState, isHost: true, matchEnded: false };
     case 'SET_PLAYERS':
-      return { ...gameState, players: action.payload };
-    case 'SET_HOST': 
-      return { ...gameState, isHost: action.payload };
+      return { ...gameState, players: action.payload.players, isSpectator: action.payload.isSpectator, isHost: action.payload.isHost };
     case 'SET_SKIPPING_AHEAD':
       return { ...gameState, isSkippingAhead: action.payload };
     case 'SET_CATCHING_UP':

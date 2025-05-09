@@ -47,7 +47,7 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory,
       onMoveSelect={(move) => {
         socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
       }}
-      isSpectator={gameState.players.find((player) => player.playerId === userState.id)?.isSpectator}
+      isSpectator={gameState.isSpectator}
       p1Pokemon={p1Pokemon}
       p2Pokemon={p2Pokemon}
       perspective={perspective}

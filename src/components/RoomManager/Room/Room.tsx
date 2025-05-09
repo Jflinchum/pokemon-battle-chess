@@ -78,10 +78,6 @@ const Room = () => {
     return connectedPlayers.find((player) => player.isPlayer2);
   }, [connectedPlayers]);
 
-  const thisPlayer = useMemo(() => {
-    return connectedPlayers.find((player) => player.playerId === userState.id);
-  }, [connectedPlayers])
-
   return (
     <>
       <GameManagerActions />
@@ -93,13 +89,13 @@ const Room = () => {
               <Button
                 color='primary'
                 onClick={handleStartGame}
-                disabled={!thisPlayer?.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
+                disabled={!gameState.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
               >
                   Start Game
               </Button>
-              <Button disabled={thisPlayer?.isSpectator ? (!!player1 && !!player2) : (false)} onClick={handleToggleSpectating}>
+              <Button disabled={gameState.isSpectator ? (!!player1 && !!player2) : (false)} onClick={handleToggleSpectating}>
                 {
-                  thisPlayer?.isSpectator ?
+                  gameState.isSpectator ?
                   'Stop Spectating' :
                   'Move to Spectators'
                 }
@@ -133,7 +129,7 @@ const Room = () => {
             <SpectatorList players={connectedPlayers} />
           </div>
           <hr/>
-          <RoomOptions isHost={thisPlayer?.isHost} gameOptions={gameOptions} onChange={handleRoomOptionsChange} />
+          <RoomOptions isHost={gameState.isHost} gameOptions={gameOptions} onChange={handleRoomOptionsChange} />
         </div>
       </div>
     </>

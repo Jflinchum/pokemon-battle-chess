@@ -76,7 +76,7 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
         </div>
         <div className='banButton'>
           {
-            draftPokemonSelected !== null && pokemonManager.draftPieces.length > 32 && draftTurnPick === gameState.gameSettings.color && !gameState.players.find((player) => player.playerId === userState.id)?.isSpectator?
+            draftPokemonSelected !== null && pokemonManager.draftPieces.length > 32 && draftTurnPick === gameState.gameSettings.color && !gameState.isSpectator ?
             (<Button color='danger' onClick={() => onBanPokemon(draftPokemonSelected)}>Ban Pokemon</Button>) :
             null
           }
