@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChessKing, faCog, faDoorOpen, faFaceGrin, faNoteSticky, faPencil, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faChessKing, faCog, faDoorOpen, faFaceGrin, faNoteSticky, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useModalState } from "../../../context/ModalStateContext";
 import { useUserState } from "../../../context/UserStateContext";
 import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
