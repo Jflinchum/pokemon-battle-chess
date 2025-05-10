@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
-import { useModalState } from "../../../context/ModalStateContext";
+import { ModalName, useModalState } from "../../../context/ModalStateContext";
 import RoomCodeModal from "./Modals/RoomCodeModal/RoomCodeModal";
 import NameChangeModal from "./Modals/NameChangeModal/NameChangeModal";
-import AvatarChangeModal from "./Modals/AvatarChangeModal/AvatarChangeModal";
 import CreateRoomModal from "./Modals/CreateRoomModal/CreateRoomModal";
 import EndGameModal from "./Modals/EndGameModal/EndGameModal";
 import HowToPlayModal from "./Modals/HowToPlayModal/HowToPlayModal";
 import OptionsModal from "./Modals/OptionsModal/OptionsModal";
+import CustomizeModal from "./Modals/CustomizeModal/CustomizeModal";
 import './Modal.css';
 
-const renderModal = (currentModal: string) => {
+const renderModal = (currentModal: ModalName) => {
   switch (currentModal) {
     case 'ROOM_CODE':
       return (<RoomCodeModal />);
@@ -19,14 +19,14 @@ const renderModal = (currentModal: string) => {
       return (<OptionsModal />);
     case 'NAME_CHANGE':
       return (<NameChangeModal />);
-    case 'AVATAR_CHANGE':
-      return (<AvatarChangeModal />);
     case 'CREATE_ROOM':
-        return (<CreateRoomModal />)
+        return (<CreateRoomModal />);
     case 'HOW_TO_PLAY':
-        return (<HowToPlayModal />)
+        return (<HowToPlayModal />);
     case 'END_GAME':
-        return (<EndGameModal />)
+        return (<EndGameModal />);
+    case 'CUSTOMIZE':
+        return (<CustomizeModal />);
     default:
       <div>Not implemented</div>
   }

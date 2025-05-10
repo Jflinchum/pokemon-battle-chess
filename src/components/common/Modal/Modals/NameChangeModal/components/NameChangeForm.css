@@ -1,0 +1,15 @@
+.nameChangeForm {
+  display: flex;
+  gap: 20px;
+  height: 60px;
+}
+
+.nameChangeInput {
+  flex-grow: 1;
+}
+
+.nameChangeActions {
+  height: 100%;
+  font-weight: 800;
+  font-size: 0.8em;
+}

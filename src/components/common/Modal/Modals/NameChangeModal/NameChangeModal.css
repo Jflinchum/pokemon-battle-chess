@@ -1,18 +1,8 @@
 .nameChangeModalContainer {
-  label {
+  .nameChangeNotification {
+    margin-bottom: 4px;
     display: block
   }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-}
-
-.nameChangeBottomActions {
-  display: flex;
-  justify-content: space-between;
 }
 
 .nameChangeTitle {

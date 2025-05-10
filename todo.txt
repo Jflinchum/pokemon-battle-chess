@@ -12,9 +12,6 @@ Download/upload replay
   - Offer "Download Replay" button on Error Boundary if player was in game?
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
 Player secret generation and handshake on move requests
-Make modal with tabs on side for different screens
-  - Collapse Change Name and Change Avatar into Customize menu option
-  - Options for Game, Sound, etc.
 Add more music and make music playlist w/ skip track button
 Pokemon Cries
 Move z index to variables at root

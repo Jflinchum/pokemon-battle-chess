@@ -1,14 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { useModalState } from "../../../../../context/ModalStateContext";
-import Button from "../../../Button/Button";
-import Input from "../../../Input/Input";
-import { useUserState } from "../../../../../context/UserStateContext";
 import './NameChangeModal.css';
+import { NameChangeForm } from "./components/NameChangeForm";
 
 const NameChangeModal = () => {
-  const { modalState, dispatch } = useModalState();
-  const { userState, dispatch: userStateDispatch } = useUserState();
-  const [name, setName] = useState(userState.name);
+  const { modalState } = useModalState();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -16,36 +12,15 @@ const NameChangeModal = () => {
     inputRef.current?.focus();
   }, []);
 
-  const handleChangeName = () => {
-    userStateDispatch({ type: 'SET_NAME', payload: name });
-    dispatch({ type: 'CLOSE_MODAL' });
-  }
-
-  const handleCancel = () => {
-    dispatch({ type: 'CLOSE_MODAL' });
-  }
-
   return (
     <div className='nameChangeModalContainer'>
       <h2 className='nameChangeTitle'>Enter Name</h2>
-      <form onSubmit={handleChangeName}>
-        {
-          modalState.required && (
-            <span>Before you can play any games, you need to enter a name!</span>
-          )
-        }
-        <div>
-          <Input label='Name' ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} maxLength={30}/>
-        </div>
-        <div className='nameChangeBottomActions'>
-          {
-            (modalState.required ? null : (
-              <Button type='button' onClick={handleCancel}>Cancel</Button>
-            ))
-          }
-          <Button type='submit' disabled={name.length === 0} color='primary'>Submit</Button>
-        </div>
-      </form>
+      {
+        modalState.required && (
+          <span className='nameChangeNotification'>Before you can play any games, you need to enter a name!</span>
+        )
+      }
+      <NameChangeForm closeModalOnSubmit/>
     </div>
   )
 };

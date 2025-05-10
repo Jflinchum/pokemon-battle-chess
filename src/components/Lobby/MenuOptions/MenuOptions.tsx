@@ -19,16 +19,12 @@ const MenuOptions = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChangeName = () => {
-    dispatch({ type: 'OPEN_NAME_MODAL', payload: {} });
-  };
-
   const handleCreateRoom = () => {
     dispatch({ type: 'OPEN_CREATE_ROOM_MODAL', payload: {} });
   };
 
-  const handleChangeAvatar = () => {
-    dispatch({ type: 'OPEN_AVATAR_MODAL', payload: {} });
+  const handleCustomize = () => {
+    dispatch({ type: 'OPEN_CUSTOMIZE_MODAL', payload: {} });
   }
 
   const handleHowToPlay = () => {
@@ -86,13 +82,9 @@ const MenuOptions = () => {
           <FontAwesomeIcon icon={faDoorOpen} />
           <span>Create New Room</span>
         </NavOptionButton>
-        <NavOptionButton className='menuOptionButtonContainer' onClick={handleChangeName}>
-          <FontAwesomeIcon icon={faPencil} />
-          <span>Change Name</span>
-        </NavOptionButton>
-        <NavOptionButton className='menuOptionButtonContainer' onClick={handleChangeAvatar}>
+        <NavOptionButton className='menuOptionButtonContainer' onClick={handleCustomize}>
           <FontAwesomeIcon icon={faFaceGrin} />
-          <span>Change Avatar</span>
+          <span>Customize</span>
         </NavOptionButton>
         <NavOptionButton className='menuOptionButtonContainer' onClick={handleHowToPlay}>
           <FontAwesomeIcon icon={faNoteSticky} />
