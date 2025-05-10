@@ -1,0 +1,20 @@
+.menuContainer {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+
+  @container menuContainer (min-width: 400px) {
+    flex-direction: row;
+  }
+}
+
+.menuSideNavContainer {
+  display: flex;
+  flex-direction: row;
+
+  @container menuContainer (min-width: 400px) {
+    flex-direction: column;
+    width: 30%;
+    max-width: 200px;
+  }
+}

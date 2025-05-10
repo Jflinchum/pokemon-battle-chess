@@ -1,5 +1,13 @@
 .optionsModalContainer {
   min-width: 250px;
+  width: 80vw;
+
+  container-type: inline-size;
+  container-name: menuContainer;
+
+  @media (min-width: 800px) {
+    width: 50vw
+  }
 }
 
 .optionsTitle {

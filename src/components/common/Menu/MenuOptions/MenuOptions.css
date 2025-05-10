@@ -1,0 +1,35 @@
+.menuOptionsButton {
+  background: none;
+  color: white;
+  font-weight: 800;
+  border: 0;
+  width: 100%;
+  padding: 20px;
+  cursor: pointer;
+  font-size: 0.8em;
+  border-top: 2px solid rgb(50, 50, 50);
+  
+  & > * {
+    vertical-align: middle;
+  }
+
+  svg {
+    min-width: 40px;
+  }
+
+  span {
+    display: inline-block;
+  }
+
+  &:hover {
+    background-color: rgb(50, 50, 50);
+  }
+
+  &:last-child {
+    border-bottom: 2px solid rgb(50, 50, 50);
+  }
+
+  &.menuOptionsButtonActive {
+    background-color: rgb(75, 75, 75);
+  }
+}
