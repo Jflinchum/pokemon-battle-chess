@@ -133,9 +133,9 @@ export class PokemonBattleChessManager {
     const distanceProbabilities = [{ value: 0.5, weight: 0.4 }, { value: 1.5, weight: 0.3 }, { value: 2.5, weight: 0.2 }, { value: 3.5, weight: 0.1 }];
     let i = 0;
     while (i < numSquares) {
-      const x = 4.5 + ((this.prng.random() < 0.5 ? 1 : -1) * getWeightedRandom(distanceProbabilities, this.prng));
-      const y = 4.5 + ((this.prng.random() < 0.5 ? 1 : -1) * getWeightedRandom(distanceProbabilities, this.prng));
-      const square = SQUARES[(x*7) + y];
+      const x = 3.5 + ((this.prng.random() < 0.5 ? 1 : -1) * getWeightedRandom(distanceProbabilities, this.prng));
+      const y = 3.5 + ((this.prng.random() < 0.5 ? 1 : -1) * getWeightedRandom(distanceProbabilities, this.prng));
+      const square = SQUARES[(x*8) + y];
       const currentSquareWeather = this.getWeatherFromSquare(square);
 
       /**
