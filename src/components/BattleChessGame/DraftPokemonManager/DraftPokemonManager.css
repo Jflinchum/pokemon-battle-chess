@@ -22,6 +22,10 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+
+  @media (min-width: 1450px) {
+    width: 35%;
+  }
 }
 
 .draftGameContainer {
@@ -29,6 +33,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-grow: 1;
 
   @media (min-width: 600px) {
     flex-direction: row; 

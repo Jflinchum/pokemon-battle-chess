@@ -242,8 +242,8 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
             battleStarted && currentBattle &&
             (
               <PokemonBattleManager
-                p1Pokemon={currentBattle.p1Pokemon}
-                p2Pokemon={currentBattle.p2Pokemon}
+                p1Pokemon={color === 'w' ? currentBattle.p1Pokemon : currentBattle.p2Pokemon}
+                p2Pokemon={color === 'w' ? currentBattle.p2Pokemon : currentBattle.p1Pokemon}
                 currentPokemonMoveHistory={currentPokemonMoveHistory}
                 perspective={color === 'w' ? 'p1' : 'p2'}
               />

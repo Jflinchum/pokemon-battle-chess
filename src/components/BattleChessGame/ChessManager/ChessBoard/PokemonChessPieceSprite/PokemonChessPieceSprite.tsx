@@ -35,6 +35,7 @@ const PokemonChessPieceSprite = ({ type, color, pokemon, onDragStart }: PokemonC
             pokemonIdentifier={pokemon.species}
             gender={pokemon.gender as GenderName}
             shiny={pokemon.shiny}
+            useDiv
           />
         )
       }

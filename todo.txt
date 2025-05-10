@@ -60,6 +60,7 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- Pokemon sprites do not initially show after drafting
 - Chess board squished on draft mode full screen
 - Terrain/weather clearing should clear square modifier
 - Wrong music playing after skipping to current turn when catching up
