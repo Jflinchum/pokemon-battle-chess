@@ -58,10 +58,9 @@ Refactor TODOs:
 - Organize frontend types in a single dir and re-use more efficiently
 - Separate out draft/ban calls
 - Move logic in controller/index into GameRoom
+- Remove key from chessmanager since it's a hack to re-render pokemon after drafting
 
 Issues:
-- Pokemon sprites do not initially show after drafting
-- Chess board squished on draft mode full screen
 - Terrain/weather clearing should clear square modifier
 - Wrong music playing after skipping to current turn when catching up
 - Music isn't playing on replays

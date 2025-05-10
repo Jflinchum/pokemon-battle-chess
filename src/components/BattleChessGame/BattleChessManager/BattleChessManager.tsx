@@ -227,6 +227,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
    * - Draft/ban phase
    * - Chess phase
    * - Pokemon battle phase
+   * - TODO - Remove key from chess manager. Hack to re-render chessmanager and display drafted pokemon
    */
   return (
     <div className='battleChessAndActionContainer'>
@@ -251,6 +252,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
           }
           <div style={{ display: !battleStarted && !isDrafting ? 'block' : 'none' }}>
             <ChessManager
+              key={`${!isDrafting}`}
               chessManager={chessManager}
               pokemonManager={pokemonManager}
               mostRecentMove={mostRecentMove}
