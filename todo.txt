@@ -65,7 +65,6 @@ Refactor TODOs:
 
 Issues:
 - Terrain/weather clearing should clear square modifier
-- Volume slider toggle between muted and previous value on click of icon
 - Wrong music playing after skipping to current turn when catching up
 - Music isn't playing on replays
 - Resyncing while in pokemon battle prevents any actions from sending to the server

@@ -11,15 +11,25 @@ interface VolumeSliderProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 export const VolumeSlider = ({ initialVolume = 100, onVolumeUpdate = () => {}, ...props }: VolumeSliderProps) => {
   const [volume, setVolume] = useState(initialVolume);
+  const [previousVolume, setPreviousVolume] = useState(initialVolume);
 
-  const handleChange = (volume: number) => {
-    setVolume(volume);
-    debounceVolumeChange(volume);
+  const handleChange = (newVolume: number) => {
+    setPreviousVolume(volume);
+    setVolume(newVolume);
+    debounceVolumeChange(newVolume);
   };
 
-  const debounceVolumeChange = useDebounce((volume: number) => {
-    onVolumeUpdate(volume);
+  const debounceVolumeChange = useDebounce((newVolume: number) => {
+    onVolumeUpdate(newVolume);
   }, 200);
+
+  const handleVolumeIconClick = () => {
+    if (volume === 0) {
+      handleChange(previousVolume);
+    } else {
+      handleChange(0);
+    }
+  };
 
   const volumeIcon = useMemo(() => {
     if (volume > 50) {
@@ -32,7 +42,7 @@ export const VolumeSlider = ({ initialVolume = 100, onVolumeUpdate = () => {}, .
 
   return (
     <span className='volumeSliderContainer'>
-      <FontAwesomeIcon icon={volumeIcon} size="xs" onClick={() => handleChange(0)}/>
+      <FontAwesomeIcon icon={volumeIcon} size="xs" onClick={handleVolumeIconClick}/>
       <input type='range' value={volume} onChange={(e) => handleChange(parseInt(e.target.value))} {...props}/>
     </span>
   );

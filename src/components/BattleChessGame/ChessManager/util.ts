@@ -48,7 +48,7 @@ export const mergeBoardAndPokemonState = (chessBoard: ChessBoardSquare[][], poke
 }
 
 export const speciesOverride = (species: string) => {
-  // Greninja bond sprite is broken. Just get greninja for now
+  // TODO fix - Greninja bond sprite is broken. Just get greninja for now
   if (species === 'Greninja-Bond') {
     return 'Greninja';
   }
