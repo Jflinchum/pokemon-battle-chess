@@ -4,6 +4,7 @@ import { Color, PieceSymbol } from 'chess.js';
 import ChessPieceSprite from '../BattleChessGame/ChessManager/ChessBoard/ChessPieceSprite/ChessPieceSprite';
 import { getRandomPokemon } from '../Lobby/PokemonOfTheDay/PokemonOfTheDayUtil';
 import './AnimatedBackground.css';
+import { useUserState } from '../../context/UserStateContext';
 
 const getRandomChessPiece = () => {
   const chessPieces: PieceSymbol[] = ['p', 'b', 'n', 'r', 'k', 'q'];
@@ -37,6 +38,7 @@ const getRandomBackgroundPokemon = (availablePokemon: string[]) => {
 
 const RandomPokemonBackground = ({ delay, availablePokemon }: { delay: number, availablePokemon: string[] }) => {
   const [pkmn, setPkmn] = useState(getRandomBackgroundPokemon(availablePokemon));
+  const { userState } = useUserState();
 
   return (
     <img
@@ -49,7 +51,7 @@ const RandomPokemonBackground = ({ delay, availablePokemon }: { delay: number, a
         animationDelay: `${delay}s`,
         zIndex: -1 * Math.floor(pkmn.scale) - 1,
       } as React.CSSProperties}
-      src={Sprites.getDexPokemon(pkmn.pkmn, { shiny: pkmn.shiny }).url}
+      src={Sprites.getDexPokemon(pkmn.pkmn, { gen: userState.use2DSprites ? 'gen5' : 'dex' , shiny: pkmn.shiny }).url}
       className='float backgroundPokemon'
     />
   );

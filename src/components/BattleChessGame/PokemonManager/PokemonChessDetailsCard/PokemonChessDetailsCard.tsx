@@ -1,9 +1,10 @@
+import { useMemo } from 'react';
+import { TerrainName, WeatherName } from '@pkmn/client';
 import { PokemonSet } from '@pkmn/data';
 import { Dex } from '@pkmn/dex';
-import { Sprites, Icons } from "@pkmn/img";
+import { Icons } from "@pkmn/img";
 import { GenderName } from "@pkmn/data";
 import PokemonMoveChoices from '../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices';
-import { speciesOverride } from '../../ChessManager/util';
 import PokemonType from '../../../common/Pokemon/PokemonType/PokemonType';
 import ChessMoveHistory from '../../ChessManager/ChessMoveHistory/ChessMoveHistory';
 import Tooltip from '../../../common/Tooltip/Tooltip';
@@ -12,9 +13,8 @@ import { GenderIcon } from '../../../common/GenderIcon/GenderIcon';
 import { SquareModifier } from '../../../../../shared/models/PokemonBattleChessManager';
 import { PokemonWeatherBackground } from '../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground';
 import { WeatherId, TerrainId } from '../../../../../shared/types/PokemonTypes';
-import { TerrainName, WeatherName } from '@pkmn/client';
+import { PokemonSprite } from '../../../common/Pokemon/PokemonSprite/PokemonSprite';
 import './PokemonChessDetailsCard.css';
-import { useMemo } from 'react';
 
 interface PokemonChessDetailsCardProps {
   pokemon?: PokemonSet | null;
@@ -98,7 +98,7 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
               </div>
               <div className='pokemonDetailsCard'>
                 <div className='pokemonDetailsSpriteContainer'>
-                  <img className='pokemonDetailsSprite' src={Sprites.getPokemon(speciesOverride(pokemon.species), { gender: pokemon.gender as GenderName }).url}/>
+                  <PokemonSprite className='pokemonDetailsSprite' pokemonIdentifier={pokemon.species} gender={pokemon.gender as GenderName} shiny={pokemon.shiny} />
                 </div>
                 <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
                 <ul>

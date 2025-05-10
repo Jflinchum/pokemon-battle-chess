@@ -16,8 +16,6 @@
   position: absolute;
   height: 50%;
   width: 100%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: bottom;
+  object-fit: contain;
   bottom: 0;
 }

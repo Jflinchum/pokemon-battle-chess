@@ -59,6 +59,12 @@ export const getVolumePreference = () => {
   return (volumePreference ? JSON.parse(volumePreference) : defaultVolumePreferences) as VolumePreference;
 }
 
+export const get2DSpritePreference = () => {
+  const default2DSpritePreference = false;
+  const spritePreference = localStorage.getItem('spritePreference');
+  return (spritePreference ? spritePreference === 'true' : default2DSpritePreference);
+}
+
 export const useDebounce = (cb: Function, delay: number) => {
   let timer: RefObject<NodeJS.Timeout | null> = useRef(null);
   return (...args: any) => {

@@ -1,5 +1,5 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { getAnimationSpeedPreference, getAvatar, getName, getOrInitializeUUID, getVolumePreference } from "../utils.ts";
+import { get2DSpritePreference, getAnimationSpeedPreference, getAvatar, getName, getOrInitializeUUID, getVolumePreference } from "../utils.ts";
 import { leaveRoom } from "../service/lobby";
 
 export interface VolumePreference {
@@ -13,6 +13,7 @@ interface UserState {
   id: string;
   animationSpeedPreference: number;
   volumePreference: VolumePreference,
+  use2DSprites: boolean;
   currentRoomId: string;
   currentRoomCode: string;
 }
@@ -27,6 +28,7 @@ type UserStateAction =
   | { type: 'SET_AVATAR'; payload: string }
   | { type: 'SET_ANIMATION_SPEED_PREFERENCE'; payload: number }
   | { type: 'SET_VOLUME_PREFERENCE'; payload: Partial<VolumePreference> }
+  | { type: 'SET_2D_SPRITE_PREFERENCE'; payload: boolean }
   | { type: 'SET_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'JOIN_ROOM'; payload: { roomId: string, roomCode: string } }
   | { type: 'LEAVE_ROOM' };
@@ -48,6 +50,9 @@ export const userStateReducer = (userState: UserState, action: UserStateAction):
       const newVolumePreference = { ...userState.volumePreference, ...action.payload };
       localStorage.setItem('volumePreference', JSON.stringify(newVolumePreference));
       return { ...userState, volumePreference: newVolumePreference };
+    case 'SET_2D_SPRITE_PREFERENCE':
+      localStorage.setItem('spritePreference', `${action.payload}`);
+      return { ...userState, use2DSprites: action.payload };
     case 'SET_ROOM':
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode };
     case 'LEAVE_ROOM':
@@ -67,6 +72,7 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     id: getOrInitializeUUID(),
     animationSpeedPreference: getAnimationSpeedPreference(),
     volumePreference: getVolumePreference(),
+    use2DSprites: get2DSpritePreference(),
     currentRoomId: '',
     currentRoomCode: '',
   });

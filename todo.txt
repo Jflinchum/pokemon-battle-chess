@@ -16,7 +16,6 @@ Add more music and make music playlist w/ skip track button
 Pokemon Cries
 Move z index to variables at root
 Are you sure you want to leave? modal when returning to menu in game
-Use sprites option in game settings
 Profanity filter on names and chat
 
 Keyboard navigation and accessibility
@@ -61,6 +60,7 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- Chess board squished on draft mode full screen
 - Terrain/weather clearing should clear square modifier
 - Wrong music playing after skipping to current turn when catching up
 - Music isn't playing on replays

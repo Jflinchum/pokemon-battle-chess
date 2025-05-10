@@ -1,13 +1,13 @@
 import { Pokemon } from "@pkmn/client";
-import { Sprites } from "@pkmn/img";
 import { Dex } from "@pkmn/dex";
 import { BoostID, GenderName, PokemonSet } from "@pkmn/data";
 import ProgressBar from "../../../../../common/ProgressBar/ProgressBar";
-import './PokemonFieldSprite.css';
 import PokemonStatus from "../../../../../common/Pokemon/PokemonStatus/PokemonStatus";
 import PokemonType from "../../../../../common/Pokemon/PokemonType/PokemonType";
 import Tooltip from "../../../../../common/Tooltip/Tooltip";
 import { GenderIcon } from "../../../../../common/GenderIcon/GenderIcon";
+import { PokemonSprite } from "../../../../../common/Pokemon/PokemonSprite/PokemonSprite";
+import './PokemonFieldSprite.css';
 
 interface PokemonFieldSpriteProps {
   pokemon: Pokemon,
@@ -95,13 +95,14 @@ const PokemonFieldSprite = ({ pokemon, side, set }: PokemonFieldSpriteProps) => 
           }
         </div>
       </div>
-      <img
+      
+      <PokemonSprite
         className={`pokemonSprite ${side}PokemonSprite`}
-        src={
-          pokemon.volatiles['substitute'] ?
-          Sprites.getSubstitute({ side }).url :
-          Sprites.getPokemon(pokemon.baseSpeciesForme, { gender: pokemon.gender as GenderName, side }).url
-        }
+        isSubstitute={!!pokemon.volatiles['substitute']}
+        side={side}
+        pokemonIdentifier={pokemon.baseSpeciesForme}
+        gender={pokemon.gender as GenderName}
+        shiny={pokemon.shiny}
       />
       <PokemonTooltip side={side} pokemon={pokemon} set={set} />
     </div>

@@ -22,7 +22,7 @@ const PlayerInGameDisplay = ({ player, takenChessPieces, timer }: PlayerInGameDi
   }
   return (
     <div className='playerGameDisplayContainer'>
-      <img src={Sprites.getAvatar(player.avatarId || 1)} />
+      <img className='playerGameDisplaySprite' src={Sprites.getAvatar(player.avatarId || 1)} />
       <div className='nameContainer'>
         {
           player.transient ? (

@@ -1,4 +1,5 @@
 import { useUserState } from "../../../../../../context/UserStateContext";
+import './GameSettings.css';
 
 const animationSpeedMap: Record<string, string> = {
   1500: 'Slow',
@@ -13,6 +14,10 @@ export const GameSettings = () => {
   const handleAnimationSpeedPreferenceChange = (animationSpeed: number) => {
     dispatch({ type: 'SET_ANIMATION_SPEED_PREFERENCE', payload: animationSpeed });
   };
+
+  const handle2DSpriteChange = (use2DSprites: boolean) => {
+    dispatch({ type: 'SET_2D_SPRITE_PREFERENCE', payload: use2DSprites });
+  }
 
   return (
     <div className='optionsActions'>
@@ -31,6 +36,10 @@ export const GameSettings = () => {
               ))
             }
           </select>
+        </li>
+        <li>
+          <label>Use Pokemon 2D Sprites</label>
+          <input className='gameSettingsInput' type='checkbox' checked={userState.use2DSprites} onChange={(e) => handle2DSpriteChange(e.target.checked)} />
         </li>
       </ul>
     </div>

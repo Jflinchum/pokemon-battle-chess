@@ -1,10 +1,9 @@
-import ChessPieceSprite from "../ChessPieceSprite/ChessPieceSprite";
-import { Sprites } from "@pkmn/img";
 import { GenderName } from "@pkmn/data";
 import { Color, PieceSymbol } from "chess.js";
 import { PokemonSet } from "@pkmn/data";
+import { PokemonSprite } from "../../../../common/Pokemon/PokemonSprite/PokemonSprite";
+import ChessPieceSprite from "../ChessPieceSprite/ChessPieceSprite";
 import './PokemonChessPieceSprite.css';
-import { speciesOverride } from "../../util";
 
 interface PokemonChessPieceSpriteProps {
   type?: PieceSymbol
@@ -31,9 +30,11 @@ const PokemonChessPieceSprite = ({ type, color, pokemon, onDragStart }: PokemonC
       }
       {
         pokemon && (
-          <div
-            style={{ 'backgroundImage': `url(${Sprites.getPokemon(speciesOverride(pokemon.species), { gender: pokemon.gender as GenderName }).url})`}}
+          <PokemonSprite
             className='pokemonPieceSprite'
+            pokemonIdentifier={pokemon.species}
+            gender={pokemon.gender as GenderName}
+            shiny={pokemon.shiny}
           />
         )
       }

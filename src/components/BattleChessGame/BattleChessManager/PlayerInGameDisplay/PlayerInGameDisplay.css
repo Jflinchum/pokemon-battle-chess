@@ -4,7 +4,7 @@
   background-color: rgb(70, 70, 70);
   font-size: 10px;
 
-  img {
+  .playerGameDisplaySprite {
     width: 40px;
     height: 40px;
   }
@@ -16,7 +16,7 @@
   @media (min-width: 800px) {
     font-size: 16px;
 
-    img {
+    .playerGameDisplaySprite {
       width: 60px;
       height: 60px;
     }
@@ -26,6 +26,7 @@
 .playerTimer {
   margin: auto 0 auto auto;
   width: 15%;
+
   @media (min-width: 600px) {
     width: 10%;
   }
