@@ -9,10 +9,12 @@
 
   &.simpleLogContainer {
     height: 80px;
-    width: 600px;
+    min-width: 600px;
+    width: 100%;
 
     @media (max-width: 650px) {
-      width: 300px;
+      min-width: 300px;
+      width: 100%;
       margin: auto;
     }
   }
