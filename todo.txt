@@ -17,13 +17,19 @@ Pokemon Cries
 Move z index to variables at root
 Are you sure you want to leave? modal when returning to menu in game
 Profanity filter on names and chat
-
+Add Pokemon Details above battle window instead of tooltips
+  - Show moves, abilities, items, weaknesses
 Keyboard navigation and accessibility
+Add arrow going from attacking piece to attacked piece on client
+  - Can build it up by parts. Start with line going from middle of the square to 
+  any 8 directions. Then line going through square. Then one curve for knight moves.
+Battle conclusion animation? Needs to be a little short and skippable for bullet chess
 
 Room Options
 - Preserve damage after battle
 - Tera enabled
   - A Pokemon can only tera once in a match, and then they can't tera again
+- Closed Team Sheets
 - Custom Teams
 - (maybe) Preserve item usage after battle
 - (maybe) Change pokemon on piece promotion

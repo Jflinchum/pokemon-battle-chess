@@ -622,7 +622,7 @@ export default class GameRoom {
             if (args[0] === 'win') {
               this.gameTimer.stopTimers();
 
-              if (weatherChanges || terrainChanges && this.roomGameOptions.weatherWars) {
+              if ((weatherChanges || terrainChanges) && this.roomGameOptions.weatherWars) {
                 this.pokemonGameManager.updateSquareWeather(battleSquare, weatherChanges);
                 this.pokemonGameManager.updateSquareTerrain(battleSquare, terrainChanges);
                 const squareModifierData: MatchLog = { type: 'weather', data: { event: 'weatherChange', squareModifiers: this.pokemonGameManager.squareModifiers } };
