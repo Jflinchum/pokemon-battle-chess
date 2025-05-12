@@ -3,7 +3,7 @@ import { Color } from "chess.js";
 import Modal from "../components/common/Modal/Modal";
 import { EndGameReason } from "../../shared/types/game";
 
-export type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | 'HOW_TO_PLAY' | 'OPTIONS' | 'CUSTOMIZE' | '';
+export type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | 'HOW_TO_PLAY' | 'OPTIONS' | 'CUSTOMIZE' | 'GENERIC' | '';
 
 export interface RoomCodeModalProps {
   roomId: string;
@@ -15,12 +15,16 @@ export interface EndGameModalProps {
   name?: string;
 }
 
-type ModalProps = RoomCodeModalProps | EndGameModalProps | undefined;
+export interface GenericModalProps {
+  title: string;
+  body: string;
+}
 
 type ModalStateAction = 
-  { type: 'OPEN_ROOM_MODAL'; payload: { required?: boolean, modalProps: ModalProps }; }
+  { type: 'OPEN_ROOM_MODAL'; payload: { required?: boolean, modalProps: RoomCodeModalProps }; }
   | { type: 'OPEN_NAME_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_OPTIONS_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
+  | { type: 'OPEN_GENERIC_MODAL'; payload: { required?: boolean, modalProps?: GenericModalProps }; }
   | { type: 'OPEN_CREATE_ROOM_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_HOW_TO_PLAY_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_CUSTOMIZE_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
@@ -30,7 +34,7 @@ type ModalStateAction =
 interface ModalState {
   currentModal: ModalName;
   required?: boolean;
-  modalProps?: RoomCodeModalProps | EndGameModalProps;
+  modalProps?: RoomCodeModalProps | EndGameModalProps | GenericModalProps;
 }
 
 interface ModalStateType {
@@ -52,6 +56,8 @@ export const modalStateReducer = (modalState: ModalState, action: ModalStateActi
       return { ...modalState, currentModal: 'CREATE_ROOM', required: action.payload.required };
     case 'OPEN_END_GAME_MODAL':
       return { ...modalState, currentModal: 'END_GAME', required: action.payload.required, modalProps: action.payload.modalProps as EndGameModalProps };
+    case 'OPEN_GENERIC_MODAL':
+      return { ...modalState, currentModal: 'GENERIC', required: action.payload.required, modalProps: action.payload.modalProps as GenericModalProps };
     case 'OPEN_HOW_TO_PLAY_MODAL':
       return { ...modalState, currentModal: 'HOW_TO_PLAY', required: action.payload.required };
     case 'OPEN_CUSTOMIZE_MODAL':

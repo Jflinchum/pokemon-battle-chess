@@ -10,6 +10,7 @@ import HowToPlayModal from "./Modals/HowToPlayModal/HowToPlayModal";
 import OptionsModal from "./Modals/OptionsModal/OptionsModal";
 import CustomizeModal from "./Modals/CustomizeModal/CustomizeModal";
 import './Modal.css';
+import GenericModal from "./Modals/GenericModal/GenericModal";
 
 const renderModal = (currentModal: ModalName) => {
   switch (currentModal) {
@@ -27,6 +28,8 @@ const renderModal = (currentModal: ModalName) => {
         return (<EndGameModal />);
     case 'CUSTOMIZE':
         return (<CustomizeModal />);
+    case 'GENERIC':
+        return (<GenericModal />);
     default:
       <div>Not implemented</div>
   }

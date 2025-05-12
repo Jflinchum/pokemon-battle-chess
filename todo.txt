@@ -1,9 +1,5 @@
 TODO:
 Matchmaking
-Host controls
-  - Set player color
-  - Kick player
-  - Promote to host
 Queue up your draft and bans
 Create formats to quick select game options in room
 Write validation functions when writing/reading from localstorage and clear it out if failing validation
@@ -28,6 +24,7 @@ Room Options
 - Preserve damage after battle
 - Tera enabled
   - A Pokemon can only tera once in a match, and then they can't tera again
+- Set player colors before starting
 - Closed Team Sheets
 - Custom Teams
 - (maybe) Preserve item usage after battle

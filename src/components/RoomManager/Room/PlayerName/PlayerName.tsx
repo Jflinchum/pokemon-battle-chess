@@ -3,13 +3,13 @@ import { faCrown, faBookOpen, faEye, faPlugCircleXmark } from "@fortawesome/free
 import { Player } from "../Room";
 import './PlayerName.css';
 
-interface PlayerNameProps {
+interface PlayerNameProps extends React.HTMLAttributes<HTMLSpanElement> {
   player: Player;
 }
 
-const PlayerName = ({ player }: PlayerNameProps) => {
+const PlayerName = ({ player, ...props }: PlayerNameProps) => {
   return (
-    <span>
+    <span {...props}>
       {
         player.isHost ? (
           <FontAwesomeIcon icon={faCrown} className='nameIcon' title='Host'/>

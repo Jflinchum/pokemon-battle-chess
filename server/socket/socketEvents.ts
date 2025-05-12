@@ -108,6 +108,44 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       room.endGame('', 'HOST_ENDED_GAME');
     });
 
+    socket.on('requestKickPlayer', (roomId, hostId, playerId) => {
+      const room = gameRoomManager.getRoom(roomId);
+      console.log(`${hostId} requested to kick ${playerId} for ${roomId}`);
+
+      if (!room || !hostId || !playerId) {
+        console.log(`${playerId} mismatch for ${roomId}.`);
+        return;
+      }
+      const player = room.getPlayer(playerId);
+      const host = room.getPlayer(hostId);
+      if (!player || !host || room.hostPlayer?.playerId !== hostId) {
+        return;
+      }
+
+      player.socket?.timeout(5000).emit('kickedFromRoom', () => {
+        player.socket?.disconnect();
+      });
+      gameRoomManager.playerLeaveRoom(roomId, playerId);
+    });
+
+    socket.on('requestMovePlayerToSpectator', (roomId, hostId, playerId) => {
+      const room = gameRoomManager.getRoom(roomId);
+      console.log(`${hostId} requested to change ${playerId} to spectator for ${roomId}`);
+
+      if (!room || !hostId || !playerId) {
+        console.log(`${playerId} mismatch for ${roomId}.`);
+        return;
+      }
+      const player = room.getPlayer(playerId);
+      const host = room.getPlayer(hostId);
+      if (!player || !host || room.hostPlayer?.playerId !== hostId) {
+        return;
+      }
+
+      room.toggleSpectating(player);
+      io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
+    });
+
     socket.on('requestSync', (roomId, playerId) => {
       console.log('request sync received ' + roomId + ' ' + playerId);
       const room = gameRoomManager.getRoom(roomId);

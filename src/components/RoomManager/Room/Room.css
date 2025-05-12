@@ -17,26 +17,17 @@
 
 .roomPlayerContainer {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   padding-bottom: 12px;
-
-  @media (max-width: 1000px) {
-    flex-direction: column-reverse; 
-  }
 }
 
 .roomButtons {
   display: flex;
-  flex-direction: column;
-  padding: 0 20px;
+  justify-content: space-evenly;
+  padding: 20px 20px;
 
   button {
     margin-top: 12px;
-  }
-
-  @media (max-width: 1000px) {
-    flex-direction: row-reverse;
-    justify-content: space-evenly;
   }
 
   @media (max-width: 500px) {

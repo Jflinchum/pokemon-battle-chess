@@ -60,33 +60,34 @@ export default class GameRoomManager {
   
   public playerLeaveRoom(roomId: string, playerId?: string) {
     const room = this.getRoom(roomId);
+    const player = room?.getPlayer(playerId);
+    if (!room || !player) {
+      return;
+    }
 
-    if (room) {
-      const player = room.getPlayer(playerId);
-      const isActivePlayer = room.getActivePlayer(player?.playerId);
+    const isActivePlayer = room.getActivePlayer(player?.playerId);
 
-      if (playerId && room.transientPlayerList[playerId]) {
-        clearTimeout(room.transientPlayerList[playerId]);
-        delete room.transientPlayerList[playerId];
-      }
+    if (playerId && room.transientPlayerList[playerId]) {
+      clearTimeout(room.transientPlayerList[playerId]);
+      delete room.transientPlayerList[playerId];
+    }
 
-      if (room.hostPlayer?.playerId === playerId) {
-        this.io.to(room.roomId).emit('endGameFromDisconnect', { name: player?.playerName, isHost: true });
-        this.removeRoom(room.roomId);
-        return;
-      }
-      if (room.isOngoing && isActivePlayer) {
-        this.io.to(room.roomId).emit('endGameFromDisconnect', { name: player?.playerName, isHost: false });
-        room.resetRoomForRematch();
-      } 
+    if (room.hostPlayer?.playerId === playerId) {
+      this.io.to(room.roomId).emit('endGameFromDisconnect', { name: player?.playerName, isHost: true });
+      this.removeRoom(room.roomId);
+      return;
+    }
+    if (room.isOngoing && isActivePlayer) {
+      this.io.to(room.roomId).emit('endGameFromDisconnect', { name: player?.playerName, isHost: false });
+      room.resetRoomForRematch();
+    } 
 
-      room.leaveRoom(player?.playerId);
+    room.leaveRoom(player?.playerId);
 
-      if (!room.hasPlayers()) {
-        this.removeRoom(room.roomId);
-      } else {
-        this.io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
-      }
+    if (!room.hasPlayers()) {
+      this.removeRoom(room.roomId);
+    } else {
+      this.io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
     }
   }
 }

@@ -85,23 +85,6 @@ const Room = () => {
       <div className='roomContainer'>
         <div className='roomForm'>
           <div className="roomPlayerContainer">
-            <div className='roomButtons'>
-              <Button
-                color='primary'
-                onClick={handleStartGame}
-                disabled={!gameState.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
-              >
-                  Start Game
-              </Button>
-              <Button disabled={gameState.isSpectator ? (!!player1 && !!player2) : (false)} onClick={handleToggleSpectating}>
-                {
-                  gameState.isSpectator ?
-                  'Stop Spectating' :
-                  'Move to Spectators'
-                }
-              </Button>
-            </div>
-
             <div className='playerContainer'>
               <div className='player'>
                 {
@@ -124,6 +107,22 @@ const Room = () => {
                   ) : null
                 }
               </div>
+            </div>
+            <div className='roomButtons'>
+              <Button disabled={gameState.isSpectator ? (!!player1 && !!player2) : (false)} onClick={handleToggleSpectating}>
+                {
+                  gameState.isSpectator ?
+                  'Stop Spectating' :
+                  'Move to Spectators'
+                }
+              </Button>
+              <Button
+                color='primary'
+                onClick={handleStartGame}
+                disabled={!gameState.isHost || !player1 || !player2 || player1?.viewingResults || player2?.viewingResults}
+              >
+                  Start Game
+              </Button>
             </div>
 
             <PlayerList players={connectedPlayers} />

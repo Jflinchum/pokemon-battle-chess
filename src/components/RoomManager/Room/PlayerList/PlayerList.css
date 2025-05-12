@@ -1,14 +1,11 @@
 
 .playerListContainer {
-  width: 500px;
-  background-color: #374151;
+  background-color: rgb(50, 50, 50);
   margin-left: auto;
   overflow-y: scroll;
   border-radius: 4px;
-  
-  @media (max-width: 1000px) {
-    width: 100%;
-  }
+  width: 100%;
+  max-height: 300px;
   
   .playerList {
     padding: 10px;
@@ -20,17 +17,44 @@
   }
 
   li {
+    display: flex;
+    align-items: center;
     word-break: break-all;
     font-size: 12px;
     align-content: center;
     padding: 8px;
-    border-radius: 4px;
+
+    &:first-child {
+      border-radius: 4px 4px 0 0;
+    }
+    
+    &:last-child {
+      border-radius: 0 0 4px 4px;
+    }
 
     &:nth-child(odd) {
-      background-color: grey;
+      background-color: rgb(100, 100, 100);
     }
     &:nth-child(even) {
-      background-color: darkcyan;
+      background-color: rgb(75, 75, 75);
     }
   }
+}
+
+.playerListSprite {
+  max-height: 30px;
+}
+
+.playerListName {
+  display: inline-block;
+}
+
+.playerActions {
+  margin-left: auto;
+}
+
+.playerAction {
+  margin-left: 4px;
+  width: 30px;
+  height: 30px;
 }

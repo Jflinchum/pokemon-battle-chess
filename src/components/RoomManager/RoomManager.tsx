@@ -86,6 +86,17 @@ const RoomManager = () => {
       dispatch({ type: 'START_MATCH', payload: settings });
     });
 
+    socket.on('kickedFromRoom', (cb) => {
+      dispatchUserState({ type: 'LEAVE_ROOM' });
+      dispatchModalState({ type: 'OPEN_GENERIC_MODAL', payload: {
+        modalProps: {
+          title: 'Disconnected',
+          body: 'You were kicked from the game by the host.'
+        }
+      }})
+      cb?.();
+    });
+
     return () => {
       socket.off('connectedPlayers');
       socket.off('roomClosed');
@@ -93,6 +104,7 @@ const RoomManager = () => {
       socket.off('startSync');
       socket.off('currentTimers');
       socket.off('startGame');
+      socket.off('kickedFromRoom');
     }
   }, [gameState.matchEnded]);
 
