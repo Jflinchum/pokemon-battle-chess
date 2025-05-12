@@ -33,8 +33,13 @@ Room Options
   - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
-- Host controls
-  - Redesign player list first, both in room and in game
+- Better logging
+  - Use winston + prometheus + grafana?
+- Toast notifications for errors and such
+- More detailed modals in game
+  - Add server disconnect
+- Robots.txt disable search engine crawling (for now)
+- (better) Error boundary
 - Queueing up Drafts/Chess moves
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
@@ -45,13 +50,6 @@ Priority:
       when it is the player's turn to draft
       - Be careful of index shifting. Pokemon are unique, so we could store the species.
         However it may be nicer to shift the index of the queue when a pokemon is drafted
-- Better logging
-  - Use winston + prometheus + grafana?
-- Toast notifications for errors and such
-- More detailed modals in game
-  - Add server disconnect
-- Robots.txt disable search engine crawling (for now)
-- (better) Error boundary
 
 Refactor TODOs:
 - Potentially lift game logic into new model

@@ -1,6 +1,7 @@
 import { GenderName, PokemonSet } from "@pkmn/data";
 import { PokemonSprite } from "../../../common/Pokemon/PokemonSprite/PokemonSprite";
-import './PokemonDraftSelect.css'
+import Button from "../../../common/Button/Button";
+import './PokemonDraftSelect.css';
 
 interface PokemonDraftSelectProps {
   draftablePokemon: PokemonSet[];
@@ -16,7 +17,7 @@ const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftab
       {
         draftablePokemon.map((pokemon, index) => (
           <li key={index}>
-            <button className={`pokemonDraftOption ${selectedDraftablePokemon === index ? 'selectedDraft' : ''}`} onClick={() => { onPokemonSelect(index); }}>
+            <Button highlighted={selectedDraftablePokemon === index} className='pokemonDraftOption' onClick={() => { onPokemonSelect(index); }}>
               <div
                 draggable
                 onDragStart={() => onPokemonSelect(index)}
@@ -28,7 +29,7 @@ const PokemonDraftSelect = ({ draftablePokemon, onPokemonSelect, selectedDraftab
                   shiny={pokemon.shiny}
                 />
               </div>
-            </button>
+            </Button>
           </li>
         ))
       }
