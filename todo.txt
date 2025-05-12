@@ -17,8 +17,6 @@ Pokemon Cries
 Move z index to variables at root
 Are you sure you want to leave? modal when returning to menu in game
 Profanity filter on names and chat
-Add Pokemon Details above battle window instead of tooltips
-  - Show moves, abilities, items, weaknesses
 Keyboard navigation and accessibility
 Add arrow going from attacking piece to attacked piece on client
   - Can build it up by parts. Start with line going from middle of the square to 

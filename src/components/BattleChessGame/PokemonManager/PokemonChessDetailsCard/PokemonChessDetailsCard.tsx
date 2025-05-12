@@ -68,23 +68,27 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
     }).filter((squareMod) => squareMod);
   }, [squareModifier]);
 
-  const { weaknesses, resistances } = useMemo(() => {
+  const { weaknesses, resistances, immunities } = useMemo(() => {
     const weaknesses: TypeName[] = [];
     const resistances: TypeName[] = [];
+    const immunities: TypeName[] = [];
     if (!dexPokemon) {
-      return { weaknesses, resistances };
+      return { weaknesses, resistances, immunities };
     }
     Dex.types.names().map((type) => {
       const notImmune = Dex.getImmunity(type, dexPokemon.types);
       const typeModifier = Dex.getEffectiveness(type, dexPokemon.types);
+      if (!notImmune) {
+        immunities.push(type as TypeName);
+      }
       if (notImmune && typeModifier > 0) {
         weaknesses.push(type as TypeName);
       }
-      if (!notImmune || typeModifier < 0) {
+      if (notImmune && typeModifier < 0) {
         resistances.push(type as TypeName);
       }
     });
-    return { weaknesses, resistances };
+    return { weaknesses, resistances, immunities };
   }, [dexPokemon]);
 
   return (
@@ -151,26 +155,48 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
                         </div>
                       </span>
                     </li>
-                    <li>
-                      <b>Weaknesses: </b>
-                      <div>
-                        {
-                          weaknesses.map((type) => (
-                            <PokemonType key={type} type={type as TypeName} className='pokemonDetailsTyping' />
-                          ))
-                        }
-                      </div>
-                    </li>
-                    <li>
-                      <b>Resistances: </b>
-                      <div>
-                        {
-                          resistances.map((type) => (
-                            <PokemonType key={type} type={type as TypeName} className='pokemonDetailsTyping' />
-                          ))
-                        }
-                      </div>
-                    </li>
+                    {
+                      weaknesses.length > 0 && (
+                        <li>
+                          <b>Weaknesses: </b>
+                          <div>
+                            {
+                              weaknesses.map((type) => (
+                                <PokemonType key={type} type={type as TypeName} className='pokemonDetailsTyping' />
+                              ))
+                            }
+                          </div>
+                        </li>
+                      )
+                    }
+                    {
+                      resistances.length > 0 && (
+                        <li>
+                          <b>Resistances: </b>
+                          <div>
+                            {
+                              resistances.map((type) => (
+                                <PokemonType key={type} type={type as TypeName} className='pokemonDetailsTyping' />
+                              ))
+                            }
+                          </div>
+                        </li>
+                      )
+                    }
+                    {
+                      immunities.length > 0 && (
+                        <li>
+                          <b>Immunities: </b>
+                          <div>
+                            {
+                              immunities.map((type) => (
+                                <PokemonType key={type} type={type as TypeName} className='pokemonDetailsTyping' />
+                              ))
+                            }
+                          </div>
+                        </li>
+                      )
+                    }
                   </ul>
                 </div>
               </>
