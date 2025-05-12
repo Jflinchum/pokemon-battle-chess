@@ -1,6 +1,6 @@
 import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDoorOpen, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faX } from "@fortawesome/free-solid-svg-icons";
 import PlayerName from "../PlayerName/PlayerName";
 import { Player } from "../Room";
 import Button from "../../../common/Button/Button";
@@ -9,11 +9,11 @@ import { useUserState } from "../../../../context/UserStateContext";
 import { socket } from "../../../../socket";
 import './PlayerList.css';
 
-interface PlayerListProps {
+interface PlayerListProps extends React.HTMLAttributes<HTMLDivElement> {
   players: Player[]
 }
 
-const PlayerList = ({ players }: PlayerListProps) => {
+const PlayerList = ({ players, className = '', ...props }: PlayerListProps) => {
   const { gameState } = useGameState();
   const { userState } = useUserState();
 
@@ -26,7 +26,7 @@ const PlayerList = ({ players }: PlayerListProps) => {
   }
 
   return (
-    <div className='playerListContainer'>
+    <div {...props} className={`playerListContainer ${className}`}>
       <div className='playerList'>
         <span>Players</span>
         <hr/>
@@ -40,13 +40,13 @@ const PlayerList = ({ players }: PlayerListProps) => {
                 gameState.isHost && player.playerId !== userState.id && (
                   <span className='playerActions'>
                     {
-                      (player.isPlayer1 || player.isPlayer2) &&
+                      (player.isPlayer1 || player.isPlayer2) && !gameState.inGame &&
                       <Button className='playerAction' title='Move Player To Spectator' onClick={() => handleMovePlayerToSpectator(player.playerId)}>
                         <FontAwesomeIcon icon={faEye}/>
                       </Button>
                     }
                     <Button className='playerAction' title='Kick Player' onClick={() => handleKickClick(player.playerId)}>
-                      <FontAwesomeIcon icon={faDoorOpen}/>
+                      <FontAwesomeIcon icon={faX}/>
                     </Button>
                   </span>
                 )

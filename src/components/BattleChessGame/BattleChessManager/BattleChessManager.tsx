@@ -21,6 +21,7 @@ import capturePieceMP3 from '../../../assets/chessAssets/audio/capturePiece.mp3'
 import GameManagerActions from './GameManagerActions/GameManagerActions';
 import { useMusicPlayer } from '../../../util/useMusicPlayer';
 import './BattleChessManager.css';
+import PlayerList from '../../RoomManager/Room/PlayerList/PlayerList';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;
@@ -230,82 +231,86 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
    * - TODO - Remove key from chess manager. Hack to re-render chessmanager and display drafted pokemon
    */
   return (
-    <div className='battleChessAndActionContainer'>
-      <GameManagerActions matchHistory={currentMatchLog} />
-      <div className='battleChessContainer'>
-        <PlayerInGameDisplay
-          player={color === 'w' ? blackPlayer : whitePlayer}
-          takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}
-          timer={color === 'w' ? timers?.black : timers?.white}
-        />
-        <div style={{ display: catchingUp && gameState.isSkippingAhead ? 'none' : 'block' }}>
-          {
-            battleStarted && currentBattle &&
-            (
-              <PokemonBattleManager
-                p1Pokemon={color === 'w' ? currentBattle.p1Pokemon : currentBattle.p2Pokemon}
-                p2Pokemon={color === 'w' ? currentBattle.p2Pokemon : currentBattle.p1Pokemon}
-                currentPokemonMoveHistory={currentPokemonMoveHistory}
-                perspective={color === 'w' ? 'p1' : 'p2'}
-              />
-            )
-          }
-          <div style={{ display: !battleStarted && !isDrafting ? 'block' : 'none' }}>
-            <ChessManager
-              key={`${!isDrafting}`}
-              chessManager={chessManager}
-              pokemonManager={pokemonManager}
-              mostRecentMove={mostRecentMove}
-              currentBattle={currentBattle}
-              chessMoveHistory={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
-              board={board}
-              battleSquare={battleSquare}
-              onMove={(san) => {
-                if (gameState.isSpectator) {
-                  return;
-                }
-                socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
-              }}
-            />
-          </div>
-          {
-            isDrafting && (
-              <DraftPokemonManager
-                draftTurnPick={draftTurnPick}
+    <>
+      <div className='battleChessAndActionContainer'>
+        <GameManagerActions matchHistory={currentMatchLog} />
+        <div className='battleChessContainer'>
+          <PlayerInGameDisplay
+            player={color === 'w' ? blackPlayer : whitePlayer}
+            takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}
+            timer={color === 'w' ? timers?.black : timers?.white}
+          />
+          <div style={{ display: catchingUp && gameState.isSkippingAhead ? 'none' : 'block' }}>
+            {
+              battleStarted && currentBattle &&
+              (
+                <PokemonBattleManager
+                  p1Pokemon={color === 'w' ? currentBattle.p1Pokemon : currentBattle.p2Pokemon}
+                  p2Pokemon={color === 'w' ? currentBattle.p2Pokemon : currentBattle.p1Pokemon}
+                  currentPokemonMoveHistory={currentPokemonMoveHistory}
+                  perspective={color === 'w' ? 'p1' : 'p2'}
+                />
+              )
+            }
+            <div style={{ display: !battleStarted && !isDrafting ? 'block' : 'none' }}>
+              <ChessManager
+                key={`${!isDrafting}`}
                 chessManager={chessManager}
                 pokemonManager={pokemonManager}
-                boardState={currentBoard}
-                onDraftPokemon={(sq, pkmnIndex) => {
-                  if (validateDraftPick(sq, color!)) {
-                    socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, square: sq, draftPokemonIndex: pkmnIndex });
-                    setIsDrafting(!!pokemonManager.draftPieces.length);
-                  }
-                }}
-                onBanPokemon={(pkmnIndex) => {
+                mostRecentMove={mostRecentMove}
+                currentBattle={currentBattle}
+                chessMoveHistory={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
+                board={board}
+                battleSquare={battleSquare}
+                onMove={(san) => {
                   if (gameState.isSpectator) {
                     return;
                   }
-                  socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
+                  socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
                 }}
               />
+            </div>
+            {
+              isDrafting && (
+                <DraftPokemonManager
+                  draftTurnPick={draftTurnPick}
+                  chessManager={chessManager}
+                  pokemonManager={pokemonManager}
+                  boardState={currentBoard}
+                  onDraftPokemon={(sq, pkmnIndex) => {
+                    if (validateDraftPick(sq, color!)) {
+                      socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, square: sq, draftPokemonIndex: pkmnIndex });
+                      setIsDrafting(!!pokemonManager.draftPieces.length);
+                    }
+                  }}
+                  onBanPokemon={(pkmnIndex) => {
+                    if (gameState.isSpectator) {
+                      return;
+                    }
+                    socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
+                  }}
+                />
+              )
+            }
+          </div>
+          {
+            gameState.isCatchingUp && gameState.isSkippingAhead && (
+              <div className='skipSpinnerContainer'>
+                <Spinner />
+                Skipping ahead...
+              </div>
             )
           }
+          <PlayerInGameDisplay
+            player={color === 'w' ? whitePlayer : blackPlayer}
+            takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
+            timer={color === 'w' ? timers?.white : timers?.black}
+          />
+
+          <PlayerList players={gameState.players} className='battleChessPlayerList' />
         </div>
-        {
-          gameState.isCatchingUp && gameState.isSkippingAhead && (
-            <div className='skipSpinnerContainer'>
-              <Spinner />
-              Skipping ahead...
-            </div>
-          )
-        }
-        <PlayerInGameDisplay
-          player={color === 'w' ? whitePlayer : blackPlayer}
-          takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
-          timer={color === 'w' ? timers?.white : timers?.black}
-        />
       </div>
-    </div>
+    </>
   )
 }
 

@@ -24,3 +24,7 @@
   align-items: center;
   height: 60vh;
 }
+
+.battleChessPlayerList {
+  margin-top: 50px;
+}
