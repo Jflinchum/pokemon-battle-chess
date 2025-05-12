@@ -74,11 +74,9 @@
 }
 
 .pokemonDetailsSpriteContainer {
-  height: auto;
   width: 20%;
 
   @media (min-width: 600px) {
-    height: 40%;
     width: auto;
   }
 }
