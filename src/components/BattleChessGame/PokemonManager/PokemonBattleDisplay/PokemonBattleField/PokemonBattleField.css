@@ -5,6 +5,7 @@
   background-repeat: no-repeat;
   background-size: 100% 100%;
   position: relative;
+  box-sizing: border-box;
   border: solid black 4px;
   flex-grow: 1;
 

@@ -3,7 +3,8 @@
 }
 
 .pokemonMovePP {
-  float: right;
+  text-align: right;
+  margin-top: auto;
 }
 
 .pokemonMoveButton {
@@ -15,8 +16,15 @@
 .pokemonMoveSubInfo {
   font-size: 0.8em;
   text-align: left;
+  display: grid;
+  grid-template: 1fr / 1fr 2fr 1fr;
 }
 
-.pokemonMoveType {
-  max-height: 16px;
+.pokemonMoveTypeEffectiveness {
+  text-align: center;
+  font-weight: 700;
+}
+
+.pokemonMoveTyping {
+  margin-top: auto;
 }

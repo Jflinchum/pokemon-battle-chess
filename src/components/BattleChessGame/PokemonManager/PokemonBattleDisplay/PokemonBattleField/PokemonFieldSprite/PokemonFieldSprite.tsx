@@ -68,13 +68,12 @@ const PokemonTooltip = ({ pokemon, set, side }: { pokemon: Pokemon, set: Pokemon
 }
 
 const PokemonFieldSprite = ({ pokemon, side, set }: PokemonFieldSpriteProps) => {
-
   return (
     <div id={`${side}-${pokemon.name.split(' ').join('-')}`} className={`pokemonFieldSprite ${side}Pokemon`}>
       <div className='pokemonSpriteInfo'>
         <div className='pokemonDetails'>
           <span>{pokemon.name}</span>
-          <span className="pokemonGender"><GenderIcon gender={pokemon.gender} /></span>
+          <span className='pokemonGender'><GenderIcon gender={pokemon.gender} /></span>
           <span className='pokemonLevel'>Lv{pokemon.level}</span>
         </div>
         <div className='pokemonHealth'>

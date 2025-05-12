@@ -1,0 +1,54 @@
+.pokemonBattleDetailsContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  font-size: 0.7em;
+
+  @media (min-width: 600px) {
+    font-size: 1em;
+  }
+}
+
+.pokemonBattleDetailsCard {
+  width: 50%;
+  background-color: rgb(50, 50, 50);
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+}
+
+.pokemonBattleDetailsCardSprite {
+  max-width: 50%;
+  max-height: 50%;
+}
+
+.pokemonBattleDetailsCardSet {
+  display: flex;
+  flex-direction: column;
+}
+
+.pokemonBattleDetailsCardSetTooltip {
+  max-width: 200px;
+}
+
+.pokemonBattleDetailsCardSetType {
+  width: 60px;
+  height: 12px;
+  margin-right: 8px;
+
+  @media (min-width: 600px) {
+    width: 75px;
+    height: 15px;
+  }
+}
+
+.pokemonBattleDetailsCardName {
+  display: flex;
+  gap: 4px;
+
+  img {
+    width: 7px;
+    height: 10px;
+    margin: auto 0;
+  }
+}

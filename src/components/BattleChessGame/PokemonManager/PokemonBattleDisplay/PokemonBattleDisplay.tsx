@@ -8,6 +8,7 @@ import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 import { useGameState } from "../../../../context/GameStateContext";
 import './PokemonBattleDisplay.css';
+import { PokemonBattleDetails } from "./PokemonBattleDetails/PokemonBattleDetails";
 
 interface PokemonBattleDisplayProps {
   battleState: Battle | null,
@@ -48,6 +49,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, p1Poke
         <>
           <div className='battlefieldAndLog'>
             <span className='battleContainer'>
+              <PokemonBattleDetails p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon} />
               <PokemonBattleField battleHistory={fullBattleLog} battleState={battleState} p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon}/>
               <PokemonBattleLog battleHistory={fullBattleLog} simple={true} battleState={battleState} perspective={perspective}/>
               <div className='battleMoveContainer'>
@@ -61,6 +63,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, p1Poke
                   onMoveSelect={onMoveSelect}
                   setMoveChosen={setMoveChosen}
                   moves={moves}
+                  opponentPokemon={p2Pokemon.species}
                 />
               </div>
             </span>
@@ -78,9 +81,10 @@ interface BattleMoveContainerProps {
   setMoveChosen: (move?: string) => void;
   onMoveSelect: (move: string) => void;
   moves: PokemonMoveChoice[];
+  opponentPokemon?: string;
 }
 
-const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, hideMoves }: BattleMoveContainerProps) => {
+const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, hideMoves, opponentPokemon }: BattleMoveContainerProps) => {
 
   if (hideMoves) {
     return (
@@ -109,7 +113,7 @@ const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, h
           Forfeit this battle
         </button>
         <p>Moves</p>
-        <PokemonMoveChoices moves={moves} onMoveSelect={(move) => {
+        <PokemonMoveChoices opponentPokemon={opponentPokemon} moves={moves} onMoveSelect={(move) => {
           setMoveChosen(move);
           onMoveSelect(move);
         }}/>

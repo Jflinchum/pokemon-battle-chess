@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { TerrainName, WeatherName } from '@pkmn/client';
-import { PokemonSet } from '@pkmn/data';
+import { PokemonSet, TypeName } from '@pkmn/data';
 import { Dex } from '@pkmn/dex';
 import { Icons } from "@pkmn/img";
 import { GenderName } from "@pkmn/data";
@@ -52,6 +52,10 @@ export const getSquareModifierMapping = (condition: WeatherId | TerrainId | Weat
 }
 
 const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifier }: PokemonChessDetailsCardProps) => {
+  const dexPokemon = useMemo(() => (
+    pokemon ? Dex.species.get(pokemon.species) : null
+  ), [pokemon]);
+
   const squareModArray = useMemo(() => {
     return Object.keys(squareModifier?.modifiers || {}).map((squareMod) => {
       const weatherOrTerrain = squareModifier?.modifiers?.[squareMod as 'weather' | 'terrain'];
@@ -64,78 +68,143 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
     }).filter((squareMod) => squareMod);
   }, [squareModifier]);
 
+  const { weaknesses, resistances } = useMemo(() => {
+    const weaknesses: TypeName[] = [];
+    const resistances: TypeName[] = [];
+    if (!dexPokemon) {
+      return { weaknesses, resistances };
+    }
+    Dex.types.names().map((type) => {
+      const notImmune = Dex.getImmunity(type, dexPokemon.types);
+      const typeModifier = Dex.getEffectiveness(type, dexPokemon.types);
+      if (notImmune && typeModifier > 0) {
+        weaknesses.push(type as TypeName);
+      }
+      if (!notImmune || typeModifier < 0) {
+        resistances.push(type as TypeName);
+      }
+    });
+    return { weaknesses, resistances };
+  }, [dexPokemon]);
+
   return (
-    <div className='pokemonDetailsContainer'>
-      <div className='pokemonDetailsPadding'>
-        {
-          squareModArray.map((squareMod) => (
-            squareMod && (
-            <div key={squareMod.id} id={`squareMod-${squareMod.id}`} className='pokemonDetailsSquareModifier'>
-              <PokemonWeatherBackground weatherType={squareMod.id} className='detailsCardWeather'/>
-              <span>{getSquareModifierMapping(squareMod.id)?.label} - </span>
-              <span>{squareMod.duration} turns</span>
-              <Tooltip anchorSelect={`#squareMod-${squareMod.id}`}>
-                {getSquareModifierMapping(squareMod.id)?.desc}
-              </Tooltip>
+    <>
+      <div className='pokemonDetailsContainer'>
+        <div className='pokemonDetailsPadding'>
+          <div className='pokemonDetailsTitle'>
+            <div>
+              {
+                squareModArray.map((squareMod) => (
+                  squareMod && (
+                  <div key={squareMod.id} id={`squareMod-${squareMod.id}`} className='pokemonDetailsSquareModifier'>
+                    <PokemonWeatherBackground weatherType={squareMod.id} className='detailsCardWeather'/>
+                    <span>{getSquareModifierMapping(squareMod.id)?.label} - {squareMod.duration} turns</span>
+                  </div>
+                )))
+              }
             </div>
-          )))
-        }
-        {
-          pokemon ?
-          (
-            <>
-              <p className='pokemonDetailsIdentifier'>
-                <span>{pokemon.name}</span>
-                <GenderIcon gender={pokemon.gender} />
-                <span>Lv{pokemon.level}</span>
-              </p>
-              <div className='pokemonDetailsTypingContainer'>
-                {
-                  Dex.species.get(pokemon.species).types.map((type) => (
-                    <PokemonType className='pokemonDetailsTyping' type={type} key={type} />
-                  ))
-                }
-              </div>
-              <div className='pokemonDetailsCard'>
-                <div className='pokemonDetailsSpriteContainer'>
-                  <PokemonSprite className='pokemonDetailsSprite' pokemonIdentifier={pokemon.species} gender={pokemon.gender as GenderName} shiny={pokemon.shiny} />
+            {
+              pokemon && (
+                <div className='pokemonDetailsIdentifierAndType'>
+                  <p className='pokemonDetailsIdentifier'>
+                    <span>{pokemon.name}</span>
+                    <GenderIcon gender={pokemon.gender} />
+                    <span>Lv{pokemon.level}</span>
+                  </p>
+                  <div className='pokemonDetailsTypingContainer'>
+                    {
+                      Dex.species.get(pokemon.species).types.map((type) => (
+                        <PokemonType className='pokemonDetailsTyping' type={type} key={type} />
+                      ))
+                    }
+                  </div>
                 </div>
-                <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
-                <ul>
-                  <li>
-                    <span>
-                      <b>Item: </b>
-                      <div id={`${pokemon.item.split(' ').join('-')}`} className='pokemonDetailsItemContainer'>
-                        { pokemon.item && <div style={Icons.getItem(pokemon.item).css} /> }
-                        <span>{pokemon.item || 'None'}</span>
-                        <Tooltip anchorSelect={`#${pokemon.item.split(' ').join('-')}`}>
-                          { Dex.items.get(pokemon.item).shortDesc }
-                        </Tooltip>
-                      </div>
-                    </span>
-                  </li>
-                  <li>
-                    <span>
-                      <b>Ability: </b>
-                      <div id={`${pokemon.ability.split(' ').join('-')}`}>
-                        <span>{pokemon.ability || 'None'}</span>
-                        <Tooltip anchorSelect={`#${pokemon.ability.split(' ').join('-')}`}>
-                          { Dex.abilities.get(pokemon.ability).shortDesc }
-                        </Tooltip>
-                      </div>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </>
-          ) : (
-          <div className='pokemonDetailsChessMoveHistory'>
-            <ChessMoveHistory chessMoveHistory={chessMoveHistory} />
+              )
+            }
           </div>
-          )
-        }
+          {
+            pokemon && dexPokemon ?
+            (
+              <>
+                <div className='pokemonDetailsCard'>
+                  <div>
+                    <div className='pokemonDetailsSpriteContainer'>
+                      <PokemonSprite className='pokemonDetailsSprite' pokemonIdentifier={pokemon.species} gender={pokemon.gender as GenderName} shiny={pokemon.shiny} />
+                    </div>
+                    <PokemonMoveChoices moves={pokemon.moves.map((move) => ({ id: move }))}/>
+                  </div>
+                  <ul>
+                    <li>
+                      <span>
+                        <b>Item: </b>
+                        <div id={`${pokemon.item.split(' ').join('-')}`} className='pokemonDetailsItemContainer'>
+                          { pokemon.item && <div style={Icons.getItem(pokemon.item).css} /> }
+                          <span>{pokemon.item || 'None'}</span>
+                        </div>
+                      </span>
+                    </li>
+                    <li>
+                      <span>
+                        <b>Ability: </b>
+                        <div id={`${pokemon.ability.split(' ').join('-')}`}>
+                          <span>{pokemon.ability || 'None'}</span>
+                        </div>
+                      </span>
+                    </li>
+                    <li>
+                      <b>Weaknesses: </b>
+                      <div>
+                        {
+                          weaknesses.map((type) => (
+                            <PokemonType key={type} type={type as TypeName} className='pokemonDetailsTyping' />
+                          ))
+                        }
+                      </div>
+                    </li>
+                    <li>
+                      <b>Resistances: </b>
+                      <div>
+                        {
+                          resistances.map((type) => (
+                            <PokemonType key={type} type={type as TypeName} className='pokemonDetailsTyping' />
+                          ))
+                        }
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </>
+            ) : (
+            <div className='pokemonDetailsChessMoveHistory'>
+              <ChessMoveHistory chessMoveHistory={chessMoveHistory} />
+            </div>
+            )
+          }
+        </div>
       </div>
-    </div>
+    {
+      // Necessary to render this outside of above div to prevent tooltips from scrolling the container
+      pokemon ? (
+        <>
+          <Tooltip anchorSelect={`#${pokemon.ability.split(' ').join('-')}`}>
+            { Dex.abilities.get(pokemon.ability).shortDesc }
+          </Tooltip>
+          <Tooltip anchorSelect={`#${pokemon.item.split(' ').join('-')}`}>
+            { Dex.items.get(pokemon.item).shortDesc }
+          </Tooltip>
+          {
+            squareModArray.map((squareMod) => (
+              squareMod ? 
+                <Tooltip anchorSelect={`#squareMod-${squareMod.id}`}>
+                  {getSquareModifierMapping(squareMod.id)?.desc}
+                </Tooltip>
+              : null
+            ))
+          }
+        </>
+      ) : null
+    }
+    </>
   )
 }
 
