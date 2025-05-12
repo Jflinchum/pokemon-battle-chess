@@ -6,7 +6,7 @@ import { useUserState } from "../../../context/UserStateContext";
 import { socket } from "../../../socket";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
 import Button from "../../common/Button/Button";
-import SpectatorList from "./SpectatorList/SpectatorList";
+import PlayerList from "./PlayerList/PlayerList";
 import PlayerName from "./PlayerName/PlayerName";
 import RoomOptions from "./RoomOptions/RoomOptions";
 import { GameOptions } from "../../../../shared/types/GameOptions";
@@ -126,7 +126,7 @@ const Room = () => {
               </div>
             </div>
 
-            <SpectatorList players={connectedPlayers} />
+            <PlayerList players={connectedPlayers} />
           </div>
           <hr/>
           <RoomOptions isHost={gameState.isHost} gameOptions={gameOptions} onChange={handleRoomOptionsChange} />

@@ -22,6 +22,7 @@ Add arrow going from attacking piece to attacked piece on client
   - Can build it up by parts. Start with line going from middle of the square to 
   any 8 directions. Then line going through square. Then one curve for knight moves.
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
+Add Pokedex on left nav to look up full descriptions?
 
 Room Options
 - Preserve damage after battle
@@ -70,7 +71,6 @@ Issues:
 - Music isn't playing on replays
 - Resyncing while in pokemon battle prevents any actions from sending to the server
   - Specifically regaining socket connection, not rejoining the room
-- Use em/rem for text sizes
 - Resyncing right after a battle while fast forwarding
   - This issue seems to come and go. Needs more investigation
 - Premoves:

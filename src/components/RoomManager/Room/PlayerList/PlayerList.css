@@ -1,5 +1,5 @@
 
-.spectatorListContainer {
+.playerListContainer {
   width: 500px;
   background-color: #374151;
   margin-left: auto;
@@ -10,7 +10,7 @@
     width: 100%;
   }
   
-  .spectatorList {
+  .playerList {
     padding: 10px;
   }
 

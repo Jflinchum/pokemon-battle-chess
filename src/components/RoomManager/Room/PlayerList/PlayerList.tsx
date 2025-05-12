@@ -1,16 +1,16 @@
 import PlayerName from "../PlayerName/PlayerName";
 import { Player } from "../Room";
-import './SpectatorList.css';
+import './PlayerList.css';
 
-interface SpectatorListProps {
+interface PlayerListProps {
   players: Player[]
 }
 
-const SpectatorList = ({ players }: SpectatorListProps) => {
+const PlayerList = ({ players }: PlayerListProps) => {
 
   return (
-    <div className='spectatorListContainer'>
-      <div className='spectatorList'>
+    <div className='playerListContainer'>
+      <div className='playerList'>
         <span>Players</span>
         <hr/>
         <ul>
@@ -25,4 +25,4 @@ const SpectatorList = ({ players }: SpectatorListProps) => {
   );
 };
 
-export default SpectatorList;
+export default PlayerList;
