@@ -33,7 +33,7 @@ const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
     if (hasPassword) {
       dispatchModalState({ type: 'OPEN_ROOM_MODAL', payload: { modalProps: { roomId: roomId } } });
     } else {
-      const response = await joinRoom(roomId, '', userState.id, userState.name, userState.avatarId);
+      const response = await joinRoom(roomId, '', userState.id, userState.name, userState.avatarId, userState.secretId);
       if (response.status === 200) {
         dispatch({ type: 'JOIN_ROOM', payload: { roomId: roomId, roomCode: '' } });
       } else {

@@ -7,7 +7,6 @@ Download/upload replay
   - Store current user info as a spectator
   - Offer "Download Replay" button on Error Boundary if player was in game?
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
-Player secret generation and handshake on move requests
 Add more music and make music playlist w/ skip track button
 Pokemon Cries
 Are you sure you want to leave? modal when returning to menu in game
@@ -54,7 +53,6 @@ Priority:
 Refactor TODOs:
 - Potentially lift game logic into new model
 - Lift weather out of pokemon manager
-- Type socket events and parameters
 - Move z index to variables at root
 - Put API request and response types in shared folder
 - Organize frontend types in a single dir and re-use more efficiently

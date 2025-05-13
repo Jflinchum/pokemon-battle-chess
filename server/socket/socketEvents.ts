@@ -18,7 +18,7 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       }
     });
 
-    socket.on('joinRoom', ({ roomId, playerId, roomCode }) => {
+    socket.on('joinRoom', ({ roomId, playerId, roomCode, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to join room ${roomId}`);
       if (!room || !playerId) {
@@ -27,6 +27,9 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       }
       if (room.password !== roomCode) {
         console.log(`${playerId} invalid password for ${roomId}`);
+        return socket.disconnect();
+      }
+      if (!room.verifyPlayer(playerId, secretId)) {
         return socket.disconnect();
       }
 
@@ -54,7 +57,7 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       }
     });
 
-    socket.on('requestToggleSpectating', ({ roomId, playerId }) => {
+    socket.on('requestToggleSpectating', ({ roomId, playerId, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to change to spectator for ${roomId}`);
 
@@ -66,12 +69,15 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       if (!player) {
         return;
       }
+      if (!room.verifyPlayer(playerId, secretId)) {
+        return;
+      }
 
       room.toggleSpectating(player);
       io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
-    socket.on('requestChangeGameOptions', ({ roomId, playerId, options }) => {
+    socket.on('requestChangeGameOptions', ({ roomId, playerId, options, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to change game options for ${roomId}`);
 
@@ -79,12 +85,15 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
         console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
+      if (!room.verifyPlayer(room.hostPlayer.playerId, secretId)) {
+        return;
+      }
 
       room.setOptions(options);
       room.hostPlayer?.socket?.broadcast.emit('changeGameOptions', options);
     });
 
-    socket.on('requestStartGame', ({ roomId, playerId }) => {
+    socket.on('requestStartGame', ({ roomId, playerId, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to start game for ${roomId}`);
 
@@ -92,12 +101,15 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
         console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
+      if (!room.verifyPlayer(room.hostPlayer.playerId, secretId)) {
+        return;
+      }
 
       room.startGame();
       io.to(roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
-    socket.on('requestEndGameAsHost', ({ roomId, playerId }) => {
+    socket.on('requestEndGameAsHost', ({ roomId, playerId, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to end game for ${roomId}`);
 
@@ -105,11 +117,14 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
         console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
+      if (!room.verifyPlayer(room.hostPlayer.playerId, secretId)) {
+        return;
+      }
 
       room.endGame('', 'HOST_ENDED_GAME');
     });
 
-    socket.on('requestKickPlayer', ({ roomId, playerId, kickedPlayerId }) => {
+    socket.on('requestKickPlayer', ({ roomId, playerId, kickedPlayerId, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to kick ${kickedPlayerId} for ${roomId}`);
 
@@ -122,6 +137,9 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       if (!player || !host || room.hostPlayer?.playerId !== playerId) {
         return;
       }
+      if (!room.verifyPlayer(room.hostPlayer.playerId, secretId)) {
+        return;
+      }
 
       player.socket?.timeout(5000).emit('kickedFromRoom', () => {
         player.socket?.disconnect();
@@ -129,7 +147,7 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       gameRoomManager.playerLeaveRoom(roomId, kickedPlayerId);
     });
 
-    socket.on('requestMovePlayerToSpectator', ({ roomId, playerId, spectatorPlayerId }) => {
+    socket.on('requestMovePlayerToSpectator', ({ roomId, playerId, spectatorPlayerId, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to change ${spectatorPlayerId} to spectator for ${roomId}`);
 
@@ -142,15 +160,21 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       if (!player || !host || room.hostPlayer?.playerId !== playerId) {
         return;
       }
+      if (!room.verifyPlayer(room.hostPlayer.playerId, secretId)) {
+        return;
+      }
 
       room.toggleSpectating(player);
       io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
-    socket.on('requestSync', ({ roomId, playerId }) => {
+    socket.on('requestSync', ({ roomId, playerId, secretId }) => {
       console.log('request sync received ' + roomId + ' ' + playerId);
       const room = gameRoomManager.getRoom(roomId);
       if (!room) {
+        return;
+      }
+      if (!room.verifyPlayer(playerId, secretId)) {
         return;
       }
 
@@ -167,18 +191,21 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       }
     });
 
-    socket.on('requestChessMove', ({ sanMove, roomId, playerId }) => {
+    socket.on('requestChessMove', ({ sanMove, roomId, playerId, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to chess move ${sanMove} for ${roomId}`);
       if (!room || !playerId) {
         console.log(`${playerId} mismatch for ${roomId}`);
         return;
       }
+      if (!room.verifyPlayer(playerId, secretId)) {
+        return;
+      }
 
       room.validateAndEmitChessMove({ sanMove, playerId });
     });
 
-    socket.on('requestPokemonMove', ({ pokemonMove, roomId, playerId }) => {
+    socket.on('requestPokemonMove', ({ pokemonMove, roomId, playerId, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to chess move ${pokemonMove} for ${roomId}`);
 
@@ -186,16 +213,22 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
         console.log(`${playerId} mismatch for ${roomId}`);
         return;
       }
+      if (!room.verifyPlayer(playerId, secretId)) {
+        return;
+      }
 
       room.validateAndEmitPokemonMove({ pokemonMove, playerId });
     });
 
-    socket.on('requestDraftPokemon', ({ roomId, playerId, square, draftPokemonIndex, isBan }) => {
+    socket.on('requestDraftPokemon', ({ roomId, playerId, square, draftPokemonIndex, isBan, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to ${isBan ? 'ban' : 'draft'} pokemon ${draftPokemonIndex} at ${square} for ${roomId}`);
 
       if (!room || !playerId) {
         console.log(`${playerId} mismatch for ${roomId}`);
+        return;
+      }
+      if (!room.verifyPlayer(playerId, secretId)) {
         return;
       }
 
@@ -206,24 +239,27 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       }
     });
 
-    socket.on('setViewingResults', ({ roomId, playerId, viewingResults }) => {
+    socket.on('setViewingResults', ({ roomId, playerId, viewingResults, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       if (!room || !playerId || !room.getPlayer(playerId)) {
         return socket.disconnect();
       }
-
-      if (room.isOngoing) {
-        room.resetRoomForRematch();
+      if (!room.verifyPlayer(playerId, secretId)) {
+        return;
       }
+
       room.getPlayer(playerId)?.setViewingResults(!!viewingResults);
       io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
-    socket.on('sendChatMessage', ({ roomId, playerId, message }) => {
+    socket.on('sendChatMessage', ({ roomId, playerId, message, secretId }) => {
       const room = gameRoomManager.getRoom(roomId);
       const player = room?.getPlayer(playerId);
       if (!room || !playerId || !player) {
         return socket.disconnect();
+      }
+      if (!room.verifyPlayer(playerId, secretId)) {
+        return;
       }
 
       socket.broadcast.emit('chatMessage', { playerName: player.playerName, message })

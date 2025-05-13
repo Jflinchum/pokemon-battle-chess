@@ -18,7 +18,7 @@ const CreateRoomModal = () => {
   const handleCreateRoom = async ({ password }: { password: string }) => {
     setErrorText('');
     setCreateRoomLoading(true);
-    const response = await createNewRoom(userState.id, userState.name, password, userState.avatarId);
+    const response = await createNewRoom(userState.id, userState.name, password, userState.avatarId, userState.secretId);
     if (response.status === 200) {
       const { data } = await response.json();
       userStateDispatch({ type: 'SET_ROOM', payload: { roomId: data.roomId, roomCode: password } });

@@ -18,7 +18,7 @@ const RoomCodeModal = () => {
     setErrorText('');
     const roomId = (modalState.modalProps as RoomCodeModalProps)?.roomId;
     const roomCode = inputRef.current?.value || '';
-    const response = await joinRoom(roomId, roomCode, userState.id, userState.name, userState.avatarId);
+    const response = await joinRoom(roomId, roomCode, userState.id, userState.name, userState.avatarId, userState.secretId);
     if (response.status === 401) {
       setErrorText('Invalid Password');
       return;

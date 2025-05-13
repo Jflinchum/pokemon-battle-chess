@@ -263,6 +263,14 @@ export default class GameRoom {
     }
   }
 
+  public verifyPlayer(playerId?: string, playerSecret?: string) {
+    if (!playerId || !playerSecret) return false;
+    const player = this.getPlayer(playerId);
+    if (!player) return false;
+
+    return player.playerSecret === playerSecret;
+  }
+
   public async validateAndEmitChessMove({ sanMove, playerId }: { sanMove: string, playerId: string }) {
     if (!this.whitePlayer || !this.blackPlayer) {
       return;

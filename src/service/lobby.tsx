@@ -1,6 +1,6 @@
 import { socket } from "../socket";
 
-export const createNewRoom = async (playerId: string, playerName: string, password: string, avatarId: string) => {
+export const createNewRoom = async (playerId: string, playerName: string, password: string, avatarId: string, secretId: string) => {
   const response = await fetch('/api/createRoom', {
     method: 'POST',
     headers: {
@@ -11,6 +11,7 @@ export const createNewRoom = async (playerId: string, playerName: string, passwo
       playerName,
       password,
       avatarId,
+      playerSecret: secretId,
     })
   });
   return response;
@@ -30,7 +31,7 @@ export const leaveRoom = async (roomId: string, playerId: string) => {
   socket.disconnect();
 };
 
-export const joinRoom = async (roomId: string, password: string, playerId: string, playerName: string, avatarId: string) => {
+export const joinRoom = async (roomId: string, password: string, playerId: string, playerName: string, avatarId: string, secretId: string) => {
   const response = await fetch('/api/joinRoom', {
     method: 'POST',
     headers: {
@@ -42,6 +43,7 @@ export const joinRoom = async (roomId: string, password: string, playerId: strin
       playerId,
       playerName,
       avatarId,
+      playerSecret: secretId,
     })
   });
 
