@@ -1,7 +1,7 @@
 import { Color } from "chess.js";
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
 import { PRNGSeed } from '@pkmn/sim';
-import { getGameOptions } from "../utils.ts";
+import { getGameOptions } from "../util/localWebData.ts";
 import { Player } from "../components/RoomManager/Room/Room.tsx";
 import { GameOptions } from '../../shared/types/GameOptions';
 import { ReplayData } from "../components/BattleChessGame/BattleChessManager/GameManagerActions/downloadReplay.ts";

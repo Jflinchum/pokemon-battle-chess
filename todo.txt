@@ -10,7 +10,6 @@ Download/upload replay
 Player secret generation and handshake on move requests
 Add more music and make music playlist w/ skip track button
 Pokemon Cries
-Move z index to variables at root
 Are you sure you want to leave? modal when returning to menu in game
 Profanity filter on names and chat
 Keyboard navigation and accessibility
@@ -54,6 +53,8 @@ Priority:
 Refactor TODOs:
 - Potentially lift game logic into new model
 - Lift weather out of pokemon manager
+- Type socket events and parameters
+- Move z index to variables at root
 - Put API request and response types in shared folder
 - Organize frontend types in a single dir and re-use more efficiently
 - Separate out draft/ban calls
@@ -62,6 +63,7 @@ Refactor TODOs:
 
 Issues:
 - Terrain/weather clearing should clear square modifier
+- Weather square info on detail card does not show up during drafting
 - Wrong music playing after skipping to current turn when catching up
 - Music isn't playing on replays
 - Resyncing while in pokemon battle prevents any actions from sending to the server

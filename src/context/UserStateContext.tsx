@@ -1,5 +1,5 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { get2DSpritePreference, getAnimationSpeedPreference, getAvatar, getName, getOrInitializeUUID, getVolumePreference } from "../utils.ts";
+import { get2DSpritePreference, getAnimationSpeedPreference, getAvatar, getName, getOrInitializeUUID, getVolumePreference, set2DSpritePreference, setAnimationSpeedPreference, setAvatar, setName, setVolumePreference } from "../util/localWebData.ts";
 import { leaveRoom } from "../service/lobby";
 
 export interface VolumePreference {
@@ -38,20 +38,20 @@ export const UserStateContext = createContext<UserStateType | null>(null);
 export const userStateReducer = (userState: UserState, action: UserStateAction): UserState => {
   switch (action.type) {
     case 'SET_NAME':
-      localStorage.setItem('name', action.payload);
+      setName(action.payload);
       return { ...userState, name: action.payload };
     case 'SET_AVATAR':
-      localStorage.setItem('avatarId', `${action.payload}`);
+      setAvatar(action.payload);
       return { ...userState, avatarId: action.payload };
     case 'SET_ANIMATION_SPEED_PREFERENCE':
-      localStorage.setItem('animationSpeedPreference', `${action.payload}`);
+      setAnimationSpeedPreference(action.payload);
       return { ...userState, animationSpeedPreference: action.payload };
     case 'SET_VOLUME_PREFERENCE':
       const newVolumePreference = { ...userState.volumePreference, ...action.payload };
-      localStorage.setItem('volumePreference', JSON.stringify(newVolumePreference));
+      setVolumePreference(newVolumePreference);
       return { ...userState, volumePreference: newVolumePreference };
     case 'SET_2D_SPRITE_PREFERENCE':
-      localStorage.setItem('spritePreference', `${action.payload}`);
+      set2DSpritePreference(action.payload);
       return { ...userState, use2DSprites: action.payload };
     case 'SET_ROOM':
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode };
