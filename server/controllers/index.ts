@@ -24,11 +24,12 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
    * Creates a room and adds it in memory.
    * The player that creates the room becomes the host.
    */
-  app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName, playerId, password, avatarId }>('/api/createRoom', (req, res) => {
+  app.post<Empty, APIResponse<Partial<GameRoom>>, { playerName: User['playerName'], playerId: User['playerId'], password: string, avatarId: User['avatarId'], playerSecret: User['playerSecret'] }>('/api/createRoom', (req, res) => {
     const playerName = req.body.playerName;
     const playerId = req.body.playerId;
     const password = req.body.password;
     const avatarId = req.body.avatarId;
+    const secret = req.body.playerSecret;
 
     if (!playerName || !playerId) {
       res.status(400).send();
@@ -41,7 +42,7 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
     }
     const newRoomId = crypto.randomUUID();
 
-    const host = new User(playerName, playerId, avatarId || '1');
+    const host = new User(playerName, playerId, avatarId || '1', secret);
     const gameRoom = new GameRoom(newRoomId, host, password, gameRoomManager);
     gameRoomManager.addRoom(newRoomId, gameRoom);
 
@@ -57,12 +58,13 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
    * - Send room id back to user
    * - User joins on socket
    */
-  app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: User['playerId'], playerName?: User['playerName'], password?: GameRoom['password'], avatarId?: User['avatarId'] }>('/api/joinRoom', (req, res) => {
+  app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: User['playerId'], playerName?: User['playerName'], playerSecret: User['playerSecret'], password?: GameRoom['password'], avatarId?: User['avatarId'] }>('/api/joinRoom', (req, res) => {
     const roomId = req.body.roomId;
     const playerId = req.body.playerId;
     const playerName = req.body.playerName;
     const password = req.body.password;
     const avatarId = req.body.avatarId;
+    const playerSecret = req.body.playerSecret;
     const room = gameRoomManager.getRoom(roomId);
 
     if (!roomId || !playerId || !playerName) {
@@ -83,7 +85,7 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
       }
       existingPlayer.setViewingResults(false);
     } else {
-      room.joinRoom(new User(playerName, playerId, avatarId || '1'));
+      room.joinRoom(new User(playerName, playerId, avatarId || '1', playerSecret));
     }
     res.status(200).send({ data: { roomId: roomId } });
   });

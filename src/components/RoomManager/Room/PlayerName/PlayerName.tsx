@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown, faBookOpen, faEye, faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { Player } from "../Room";
+import { Player } from "../../../../../shared/types/Player";
 import './PlayerName.css';
 
 interface PlayerNameProps extends React.HTMLAttributes<HTMLSpanElement> {

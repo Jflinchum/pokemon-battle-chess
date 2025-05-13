@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { Color } from "chess.js";
 import { Sprites } from "@pkmn/img";
 import { useGameState } from "../../../context/GameStateContext";
 import { socket } from "../../../socket";
@@ -13,18 +12,6 @@ import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameMan
 import { useSocketRequests } from "../../../util/useSocketRequests";
 import './Room.css';
 
-export interface Player {
-  playerName: string;
-  playerId: string;
-  avatarId: string;
-  transient: boolean;
-  viewingResults: boolean;
-  isHost: boolean;
-  isPlayer1: boolean;
-  isPlayer2: boolean;
-  color: Color | null;
-  isSpectator: boolean;
-}
 
 const Room = () => {
   const { gameState } = useGameState();

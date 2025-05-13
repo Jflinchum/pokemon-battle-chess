@@ -24,7 +24,7 @@ export default class GameRoomManager {
     return this.currentRooms[roomId] = room;
   }
 
-  public removeRoom(roomId) {
+  public removeRoom(roomId: string) {
     console.log(`Cleaning up room ${roomId}`);
     this.io.to(roomId).emit('roomClosed');
     delete this.currentRooms[roomId];

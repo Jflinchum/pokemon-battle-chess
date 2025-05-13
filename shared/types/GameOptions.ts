@@ -1,4 +1,7 @@
-import { BoostsTable } from '@pkmn/data'
+import { BoostsTable } from '@pkmn/data';
+import { PRNGSeed } from '@pkmn/sim';
+import { Color } from 'chess.js';
+import { Player } from './Player';
 type FormatID = 'random' | 'draft';
 
 export interface GameOptions {
@@ -14,4 +17,12 @@ export interface GameOptions {
   chessTimerIncrement: number;
   // In seconds
   pokemonTimerIncrement: number;
+}
+
+export interface GameSettings {
+  whitePlayer?: Player;
+  blackPlayer?: Player;
+  seed?: PRNGSeed;
+  color?: Color;
+  options: GameOptions;
 }

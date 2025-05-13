@@ -9,11 +9,13 @@ export default class User {
   // If the socket has disconnected temporarily
   public viewingResults: boolean;
 
-  constructor(name: string, id: string, avatarId: string) {
+  constructor(name: string, id: string, avatarId: string, secret: string) {
     this.playerName = name;
     this.playerId = id;
     this.avatarId = avatarId;
     this.viewingResults = false;
+    this.playerSecret = secret;
+    this.socket = null;
   }
 
   public assignSocket(socket:Socket) {

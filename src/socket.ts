@@ -1,5 +1,6 @@
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
+import { ServerToClientEvents, ClientToServerEvents } from '../shared/types/Socket';
 
 const url = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:3000';
 
-export const socket = io(url, { autoConnect: false });
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(url, { autoConnect: false });

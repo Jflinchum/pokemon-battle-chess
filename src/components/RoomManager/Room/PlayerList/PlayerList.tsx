@@ -2,7 +2,7 @@ import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faX } from "@fortawesome/free-solid-svg-icons";
 import PlayerName from "../PlayerName/PlayerName";
-import { Player } from "../Room";
+import { Player } from "../../../../../shared/types/Player";
 import Button from "../../../common/Button/Button";
 import { useGameState } from "../../../../context/GameStateContext";
 import { useUserState } from "../../../../context/UserStateContext";

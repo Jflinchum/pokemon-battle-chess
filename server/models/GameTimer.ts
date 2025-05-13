@@ -1,3 +1,4 @@
+import { Color } from "chess.js";
 import { Timer } from "../../shared/types/game";
 
 
@@ -15,6 +16,12 @@ export default class GameTimer {
   private blackTimerStarted: boolean;
 
   constructor(chessTimerIncrement: number, pokemonTimerIncrement: number, timersEnabled: boolean) {
+    this.whitePlayerTimerExpiration = new Date().getTime();
+    this.whitePlayerLastMoveTime = new Date().getTime();
+    this.blackPlayerTimerExpiration = new Date().getTime();
+    this.blackPlayerLastMoveTime = new Date().getTime();
+    this.whitePlayerTimer = null;
+    this.blackPlayerTimer = null;
     this.chessTimerIncrement = chessTimerIncrement;
     this.pokemonTimerIncrement = pokemonTimerIncrement;
     this.timersEnabled = timersEnabled;
@@ -43,7 +50,7 @@ export default class GameTimer {
     }
   }
 
-  public startTimer(cb, color) {
+  public startTimer(cb: () => void, color: Color) {
 		if (this.timersEnabled) {
 			if (color === 'w') {
 				this.whitePlayerTimerExpiration += (new Date().getTime() - this.whitePlayerLastMoveTime);
@@ -63,7 +70,7 @@ export default class GameTimer {
 		}
   };
 
-  public stopTimer(color) {
+  public stopTimer(color: Color) {
 		if (this.timersEnabled) {
 			if (color === 'w' && this.whitePlayerTimer) {
 				clearTimeout(this.whitePlayerTimer);
@@ -99,7 +106,7 @@ export default class GameTimer {
     }
 	}
 
-	public pauseTimer(color) {
+	public pauseTimer(color: Color) {
 		if (this.timersEnabled) {
 			if (color === 'w') {
 				this.whitePlayerLastMoveTime = new Date().getTime();
@@ -126,7 +133,7 @@ export default class GameTimer {
     };
   }
 
-  public processChessMove(currentTurnWhite: boolean, cb: Function) {
+  public processChessMove(currentTurnWhite: boolean, cb: () => void) {
 		if (this.timersEnabled) {
       if (currentTurnWhite) {
         const diff = new Date().getTime() - this.whitePlayerLastMoveTime;

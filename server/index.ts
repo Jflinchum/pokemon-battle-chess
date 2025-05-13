@@ -10,6 +10,7 @@ import { config } from './config';
 import { registerSocketEvents } from './socket/socketEvents';
 import { registerRoutes } from './controllers';
 import { registerSocketIoAdmin } from './socket/socketIoAdmin';
+import { ClientToServerEvents, ServerToClientEvents } from '../shared/types/Socket';
 
 const configSettings = process.env.NODE_ENV === 'production' ? config.prodConfig : config.devConfig;
 
@@ -42,7 +43,7 @@ const server = http.createServer(app).listen(httpPort, () => {
   console.log(`HTTP is listening on ${httpPort}`);
 });
 
-const io = new Server(server, {
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: {
     origin: [...allowedOrigins, 'https://admin.socket.io'],
     credentials: true

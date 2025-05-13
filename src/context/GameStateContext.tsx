@@ -1,21 +1,11 @@
-import { Color } from "chess.js";
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { PRNGSeed } from '@pkmn/sim';
 import { getGameOptions } from "../util/localWebData.ts";
-import { Player } from "../components/RoomManager/Room/Room.tsx";
-import { GameOptions } from '../../shared/types/GameOptions';
+import { Player } from "../../shared/types/Player.ts";
 import { ReplayData } from "../components/BattleChessGame/BattleChessManager/GameManagerActions/downloadReplay.ts";
 import { MatchHistory } from "../../shared/types/game.ts";
+import { GameSettings } from "../../shared/types/GameOptions.ts";
 
 export type FormatID = 'random' | 'draft';
-
-interface GameSettings {
-  whitePlayer?: Player;
-  blackPlayer?: Player;
-  seed?: PRNGSeed;
-  color?: Color;
-  options: GameOptions;
-}
 
 export interface GameState {
   inGame: boolean;

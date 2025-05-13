@@ -1,7 +1,7 @@
 import { PRNGSeed } from '@pkmn/sim';
 import { MatchHistory } from "../../../../../shared/types/game";
 import { GameState } from "../../../../context/GameStateContext";
-import { Player } from "../../../RoomManager/Room/Room";
+import { Player } from "../../../../../shared/types/Player";
 import { GameOptions } from '../../../../../shared/types/GameOptions';
 
 export interface ReplayData {

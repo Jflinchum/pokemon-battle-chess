@@ -1,7 +1,8 @@
 import { Server } from "socket.io";
 import GameRoomManager from "../models/GameRoomManager";
+import { ClientToServerEvents, ServerToClientEvents } from "../../shared/types/Socket";
 
-export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManager) => {
+export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToClientEvents>, gameRoomManager: GameRoomManager) => {
   io.on('connection', (socket) => {
     console.log('New User Connection');
 
@@ -17,14 +18,14 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       }
     });
 
-    socket.on('joinRoom', (roomId, playerId, playerName, password) => {
+    socket.on('joinRoom', ({ roomId, playerId, roomCode }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to join room ${roomId}`);
-      if (!room || !playerId || !playerName) {
+      if (!room || !playerId) {
         console.log(`${playerId} mismatch for ${roomId}`);
         return socket.disconnect();
       }
-      if (room.password !== password) {
+      if (room.password !== roomCode) {
         console.log(`${playerId} invalid password for ${roomId}`);
         return socket.disconnect();
       }
@@ -44,16 +45,16 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       socket.emit('changeGameOptions', room.roomGameOptions);
       console.log(`Player ${playerId} joined room ${roomId}`);
 
-      if (room.isOngoing) {
+      if (room.isOngoing && room.whitePlayer && room.blackPlayer) {
         socket.emit('startSync', { history: room.getHistory(playerId) });
-        if (room.roomGameOptions.timersEnabled) {
+        if (room.roomGameOptions.timersEnabled && room.gameTimer) {
           socket.emit('currentTimers', room.gameTimer.getTimersWithLastMoveShift());
         }
-        socket.emit('startGame', room.blackPlayer.playerId === playerId ? room.buildStartGameArgs('b') : room.buildStartGameArgs('w'), true);
+        socket.emit('startGame', room.blackPlayer?.playerId === playerId ? room.buildStartGameArgs('b', room.whitePlayer, room.blackPlayer) : room.buildStartGameArgs('w', room.whitePlayer, room.blackPlayer), true);
       }
     });
 
-    socket.on('requestToggleSpectating', (roomId, playerId) => {
+    socket.on('requestToggleSpectating', ({ roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to change to spectator for ${roomId}`);
 
@@ -70,7 +71,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
-    socket.on('requestChangeGameOptions', (roomId, playerId, gameOptions) => {
+    socket.on('requestChangeGameOptions', ({ roomId, playerId, options }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to change game options for ${roomId}`);
 
@@ -79,11 +80,11 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
         return;
       }
 
-      room.setOptions(gameOptions);
-      room.hostPlayer?.socket?.broadcast.emit('changeGameOptions', gameOptions);
+      room.setOptions(options);
+      room.hostPlayer?.socket?.broadcast.emit('changeGameOptions', options);
     });
 
-    socket.on('requestStartGame', (roomId, playerId) => {
+    socket.on('requestStartGame', ({ roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to start game for ${roomId}`);
 
@@ -96,7 +97,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       io.to(roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
-    socket.on('requestEndGameAsHost', (roomId, playerId) => {
+    socket.on('requestEndGameAsHost', ({ roomId, playerId }) => {
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to end game for ${roomId}`);
 
@@ -108,37 +109,37 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       room.endGame('', 'HOST_ENDED_GAME');
     });
 
-    socket.on('requestKickPlayer', (roomId, hostId, playerId) => {
+    socket.on('requestKickPlayer', ({ roomId, playerId, kickedPlayerId }) => {
       const room = gameRoomManager.getRoom(roomId);
-      console.log(`${hostId} requested to kick ${playerId} for ${roomId}`);
+      console.log(`${playerId} requested to kick ${kickedPlayerId} for ${roomId}`);
 
-      if (!room || !hostId || !playerId) {
+      if (!room || !kickedPlayerId || !playerId) {
         console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
-      const player = room.getPlayer(playerId);
-      const host = room.getPlayer(hostId);
-      if (!player || !host || room.hostPlayer?.playerId !== hostId) {
+      const player = room.getPlayer(kickedPlayerId);
+      const host = room.getPlayer(playerId);
+      if (!player || !host || room.hostPlayer?.playerId !== playerId) {
         return;
       }
 
       player.socket?.timeout(5000).emit('kickedFromRoom', () => {
         player.socket?.disconnect();
       });
-      gameRoomManager.playerLeaveRoom(roomId, playerId);
+      gameRoomManager.playerLeaveRoom(roomId, kickedPlayerId);
     });
 
-    socket.on('requestMovePlayerToSpectator', (roomId, hostId, playerId) => {
+    socket.on('requestMovePlayerToSpectator', ({ roomId, playerId, spectatorPlayerId }) => {
       const room = gameRoomManager.getRoom(roomId);
-      console.log(`${hostId} requested to change ${playerId} to spectator for ${roomId}`);
+      console.log(`${playerId} requested to change ${spectatorPlayerId} to spectator for ${roomId}`);
 
-      if (!room || !hostId || !playerId) {
+      if (!room || !playerId || !spectatorPlayerId) {
         console.log(`${playerId} mismatch for ${roomId}.`);
         return;
       }
-      const player = room.getPlayer(playerId);
-      const host = room.getPlayer(hostId);
-      if (!player || !host || room.hostPlayer?.playerId !== hostId) {
+      const player = room.getPlayer(spectatorPlayerId);
+      const host = room.getPlayer(playerId);
+      if (!player || !host || room.hostPlayer?.playerId !== playerId) {
         return;
       }
 
@@ -146,7 +147,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
       io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
     });
 
-    socket.on('requestSync', (roomId, playerId) => {
+    socket.on('requestSync', ({ roomId, playerId }) => {
       console.log('request sync received ' + roomId + ' ' + playerId);
       const room = gameRoomManager.getRoom(roomId);
       if (!room) {
@@ -159,7 +160,7 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
           delete room.transientPlayerList[playerId];
         }
         socket.emit('startSync', { history: room.getHistory(playerId) });
-        if (room.roomGameOptions.timersEnabled) {
+        if (room.roomGameOptions.timersEnabled && room.gameTimer) {
           socket.emit('currentTimers', room.gameTimer.getTimersWithLastMoveShift());
         }
         io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
@@ -198,10 +199,14 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
         return;
       }
 
-      room.validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId, isBan });
+      if (isBan) {
+        room.validateAndEmitPokemonBan({ draftPokemonIndex, playerId });
+      } else {
+        room.validateAndEmitPokemonDraft({ square, draftPokemonIndex, playerId });
+      }
     });
 
-    socket.on('setViewingResults', (roomId, playerId, viewingResults: boolean) => {
+    socket.on('setViewingResults', ({ roomId, playerId, viewingResults }) => {
       const room = gameRoomManager.getRoom(roomId);
       if (!room || !playerId || !room.getPlayer(playerId)) {
         return socket.disconnect();
@@ -216,11 +221,12 @@ export const registerSocketEvents = (io: Server, gameRoomManager: GameRoomManage
 
     socket.on('sendChatMessage', ({ roomId, playerId, message }) => {
       const room = gameRoomManager.getRoom(roomId);
-      if (!room || !playerId || !room.getPlayer(playerId)) {
+      const player = room?.getPlayer(playerId);
+      if (!room || !playerId || !player) {
         return socket.disconnect();
       }
 
-      socket.broadcast.emit('chatMessage', { playerName: room.getPlayer(playerId)?.playerName, message })
+      socket.broadcast.emit('chatMessage', { playerName: player.playerName, message })
     });
   });
 }
