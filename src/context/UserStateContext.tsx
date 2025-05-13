@@ -1,5 +1,5 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { get2DSpritePreference, getAnimationSpeedPreference, getAvatar, getName, getOrInitializeUUID, getVolumePreference, set2DSpritePreference, setAnimationSpeedPreference, setAvatar, setName, setVolumePreference } from "../util/localWebData.ts";
+import { get2DSpritePreference, getAnimationSpeedPreference, getAvatar, getName, getOrInitializeSecretUUID, getOrInitializeUUID, getVolumePreference, set2DSpritePreference, setAnimationSpeedPreference, setAvatar, setName, setVolumePreference } from "../util/localWebData.ts";
 import { leaveRoom } from "../service/lobby";
 
 export interface VolumePreference {
@@ -11,6 +11,7 @@ interface UserState {
   name: string;
   avatarId: string;
   id: string;
+  secretId: string;
   animationSpeedPreference: number;
   volumePreference: VolumePreference,
   use2DSprites: boolean;
@@ -70,6 +71,7 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     name: getName(),
     avatarId: getAvatar(),
     id: getOrInitializeUUID(),
+    secretId: getOrInitializeSecretUUID(),
     animationSpeedPreference: getAnimationSpeedPreference(),
     volumePreference: getVolumePreference(),
     use2DSprites: get2DSpritePreference(),

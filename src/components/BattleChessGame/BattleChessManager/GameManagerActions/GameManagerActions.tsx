@@ -2,18 +2,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog, faDoorOpen, faDownload, faFlag, faForwardFast } from "@fortawesome/free-solid-svg-icons";
 import { useGameState } from "../../../../context/GameStateContext";
 import { useUserState } from "../../../../context/UserStateContext";
-import { socket } from "../../../../socket";
 import NavOptions from "../../../common/NavOptions/NavOptions";
 import { NavOptionButton } from "../../../common/NavOptions/NavOptionButton/NavOptionButton";
 import { useModalState } from "../../../../context/ModalStateContext";
 import { MatchHistory } from "../../../../../shared/types/game";
-import './GameManagerActions.css';
 import { downloadReplay } from "./downloadReplay";
+import { useSocketRequests } from "../../../../util/useSocketRequests";
+import './GameManagerActions.css';
 
 const GameManagerActions = ({ matchHistory }: { matchHistory?: MatchHistory }) => {
-  const { userState, dispatch } = useUserState();
+  const { dispatch } = useUserState();
   const { gameState, dispatch: dispatchGameState } = useGameState();
   const { dispatch: dispatchModalState } = useModalState();
+  const {
+    requestSetViewingResults,
+    requestReturnEveryoneToRoom,
+  } = useSocketRequests();
 
   const handleLeaveRoom = () => {
     dispatch({ type: 'LEAVE_ROOM' });
@@ -26,7 +30,7 @@ const GameManagerActions = ({ matchHistory }: { matchHistory?: MatchHistory }) =
 
   const handleReturn = () => {
     dispatchGameState({ type: 'RETURN_TO_ROOM' });
-    socket.emit('setViewingResults', userState.currentRoomId, userState.id, false);
+    requestSetViewingResults(false);
   };
 
   const handleDownloadReplay = () => {
@@ -36,7 +40,7 @@ const GameManagerActions = ({ matchHistory }: { matchHistory?: MatchHistory }) =
   };
 
   const handleReturnEveryoneToRoom = () => {
-    socket.emit('requestEndGameAsHost', userState.currentRoomId, userState.id);
+    requestReturnEveryoneToRoom();
   };
 
   return (

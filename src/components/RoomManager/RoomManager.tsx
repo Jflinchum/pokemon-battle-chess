@@ -8,6 +8,7 @@ import Room, { Player } from "./Room/Room";
 import ChatToggle from "./Chat/ChatToggle/ChatToggle";
 import { MatchHistory, Timer } from "../../../shared/types/game";
 import { useMusicPlayer } from "../../util/useMusicPlayer";
+import { useSocketRequests } from "../../util/useSocketRequests";
 import './RoomManager.css';
 
 const RoomManager = () => {
@@ -16,6 +17,7 @@ const RoomManager = () => {
   const { dispatch: dispatchModalState } = useModalState();
   const [matchHistory, setMatchHistory] = useState<MatchHistory>();
   const [timers, setTimers] = useState<Timer>();
+  const { requestJoinGame, requestSync } = useSocketRequests();
 
   const { stopSongs } = useMusicPlayer();
   useEffect(() => {
@@ -25,7 +27,7 @@ const RoomManager = () => {
   }, [gameState.inGame]);
 
   useEffect(() => {
-    socket.emit('joinRoom', userState.currentRoomId, userState.id, userState.name, userState.currentRoomCode);
+    requestJoinGame();
   }, []);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const RoomManager = () => {
 
     socket.io.on('reconnect', () => {
       console.log('reconnecting -- attempting resync');
-      socket.emit('requestSync', userState.currentRoomId, userState.id);
+      requestSync();
     });
 
     socket.on('endGameFromDisconnect', ({ name, isHost }) => {

@@ -1,7 +1,8 @@
 import { RefObject, useEffect, useRef, useState } from 'react';
 import { socket } from '../../../../socket';
-import './ChatDisplay.css';
 import { useUserState } from '../../../../context/UserStateContext';
+import { useSocketRequests } from '../../../../util/useSocketRequests';
+import './ChatDisplay.css';
 
 interface ChatDisplayProps {
   onMessage: (message: ChatMessage) => void;
@@ -18,6 +19,7 @@ const ChatDisplay = ({ className, onMessage, inputRef }: ChatDisplayProps) => {
   const { userState } = useUserState();
   const [currentMessage, setCurrentMessage] = useState<string>('');
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
+  const { sendChatMessage } = useSocketRequests();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ const ChatDisplay = ({ className, onMessage, inputRef }: ChatDisplayProps) => {
     if (e.key === 'Enter') {
       const userMessage = { playerName: userState.name, message: currentMessage };
       setChatLog((curr) => [...curr, userMessage]);
-      socket.emit('sendChatMessage', { message: currentMessage, playerId: userState.id, roomId: userState.currentRoomId });
+      sendChatMessage(currentMessage);
       setCurrentMessage('');
       onMessage(userMessage);
     }

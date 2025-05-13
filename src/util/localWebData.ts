@@ -14,6 +14,19 @@ export const getOrInitializeUUID = () => {
   return newUUID;
 };
 
+export const getOrInitializeSecretUUID = () => {
+  const localStorageUUID = localStorage.getItem('secretUUID');
+
+  if (localStorageUUID) {
+    return localStorageUUID;
+  }
+
+  const newUUID = crypto.randomUUID();
+  localStorage.setItem('secretUUID', newUUID);
+
+  return newUUID;
+};
+
 export const getName = () => {
   return localStorage.getItem('name') || '';
 };

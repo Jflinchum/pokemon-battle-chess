@@ -2,11 +2,11 @@ import { Sprites } from "@pkmn/img";
 import { EndGameModalProps, useModalState } from "../../../../../context/ModalStateContext";
 import { useUserState } from "../../../../../context/UserStateContext";
 import { useGameState } from "../../../../../context/GameStateContext";
-import { socket } from "../../../../../socket";
 import Button from "../../../Button/Button";
 import { EndGameReason } from "../../../../../../shared/types/game";
 import './EndGameModal.css';
 import { useMemo } from "react";
+import { useSocketRequests } from "../../../../../util/useSocketRequests";
 
 const getEndGameTitle = (isSpectator: boolean, playerVictory: boolean, reason: EndGameReason) => {
   if (isSpectator || reason === 'HOST_DISCONNECTED' || reason === 'PLAYER_DISCONNECTED' || reason === 'HOST_ENDED_GAME') {
@@ -35,8 +35,9 @@ const getEndgameSubtitle = (reason: EndGameReason, loseName: string, disconnectN
 
 const EndGameModal = () => {
   const { modalState, dispatch } = useModalState();
-  const { userState, dispatch: userStateDispatch } = useUserState();
+  const { dispatch: userStateDispatch } = useUserState();
   const { gameState, dispatch: gameStateDispatch } = useGameState();
+  const { requestSetViewingResults } = useSocketRequests();
 
   const currentColor = gameState.gameSettings?.color;
   const { victor, reason, name: disconnectName } = (modalState.modalProps as EndGameModalProps);
@@ -49,7 +50,7 @@ const EndGameModal = () => {
 
   const handleReturn = () => {
     gameStateDispatch({ type: 'RETURN_TO_ROOM' });
-    socket.emit('setViewingResults', userState.currentRoomId, userState.id, false);
+    requestSetViewingResults(false);
     dispatch({ type: 'CLOSE_MODAL' });
   };
 

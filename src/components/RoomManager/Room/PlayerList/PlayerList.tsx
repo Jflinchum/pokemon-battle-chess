@@ -6,7 +6,7 @@ import { Player } from "../Room";
 import Button from "../../../common/Button/Button";
 import { useGameState } from "../../../../context/GameStateContext";
 import { useUserState } from "../../../../context/UserStateContext";
-import { socket } from "../../../../socket";
+import { useSocketRequests } from "../../../../util/useSocketRequests";
 import './PlayerList.css';
 
 interface PlayerListProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -16,13 +16,14 @@ interface PlayerListProps extends React.HTMLAttributes<HTMLDivElement> {
 const PlayerList = ({ players, className = '', ...props }: PlayerListProps) => {
   const { gameState } = useGameState();
   const { userState } = useUserState();
+  const { requestKickPlayer, requestMovePlayerToSpectator } = useSocketRequests();
 
   const handleKickClick = (playerId: string) => {
-    socket.emit('requestKickPlayer', userState.currentRoomId, userState.id, playerId);
+    requestKickPlayer(playerId)
   };
 
   const handleMovePlayerToSpectator = (playerId: string) => {
-    socket.emit('requestMovePlayerToSpectator', userState.currentRoomId, userState.id, playerId)
+    requestMovePlayerToSpectator(playerId);
   }
 
   return (

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Color } from "chess.js";
 import { Sprites } from "@pkmn/img";
 import { useGameState } from "../../../context/GameStateContext";
-import { useUserState } from "../../../context/UserStateContext";
 import { socket } from "../../../socket";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
 import Button from "../../common/Button/Button";
@@ -11,6 +10,7 @@ import PlayerName from "./PlayerName/PlayerName";
 import RoomOptions from "./RoomOptions/RoomOptions";
 import { GameOptions } from "../../../../shared/types/GameOptions";
 import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameManagerActions/GameManagerActions";
+import { useSocketRequests } from "../../../util/useSocketRequests";
 import './Room.css';
 
 export interface Player {
@@ -27,10 +27,10 @@ export interface Player {
 }
 
 const Room = () => {
-  const { userState } = useUserState();
   const { gameState } = useGameState();
   const [gameOptions, setGameOptions] = useState<GameOptions>(gameState.gameSettings.options);
   const connectedPlayers = useMemo(() => gameState.players, [gameState.players]);
+  const { requestStartGame, requestToggleSpectating, requestChangeGameOptions } = useSocketRequests();
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -56,16 +56,16 @@ const Room = () => {
   const handleStartGame = (e: React.MouseEvent) => {
     e.preventDefault();
     setGameOptions(gameOptions);
-    socket.emit('requestStartGame', userState.currentRoomId, userState.id);
+    requestStartGame();
   }
   
   const handleToggleSpectating = () => {
-    socket.emit('requestToggleSpectating', userState.currentRoomId, userState.id);
+    requestToggleSpectating();
   }
 
   const handleRoomOptionsChange = (options: GameOptions) => {
     if (options && gameState.isHost) {
-      socket.emit('requestChangeGameOptions', userState.currentRoomId, userState.id, options);
+      requestChangeGameOptions(options);
       setGameOptions(options);
     }
   }

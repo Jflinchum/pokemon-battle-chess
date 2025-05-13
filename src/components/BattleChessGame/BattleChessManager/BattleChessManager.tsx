@@ -10,7 +10,6 @@ import { useUserState } from '../../../context/UserStateContext';
 import { useGameState } from '../../../context/GameStateContext';
 import { useModalState } from '../../../context/ModalStateContext';
 import { getCastledRookSquare, getVerboseSanChessMove, mergeBoardAndPokemonState } from '../ChessManager/util';
-import { socket } from '../../../socket';
 import { ChessData, MatchHistory } from '../../../../shared/types/game';
 import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
 import useBattleHistory from './useBattleHistory';
@@ -22,6 +21,7 @@ import GameManagerActions from './GameManagerActions/GameManagerActions';
 import { useMusicPlayer } from '../../../util/useMusicPlayer';
 import './BattleChessManager.css';
 import PlayerList from '../../RoomManager/Room/PlayerList/PlayerList';
+import { useSocketRequests } from '../../../util/useSocketRequests';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;
@@ -86,6 +86,12 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       playRandomGlobalSong();
     }
   }, [currentBattle]);
+
+  const {
+    requestChessMove,
+    requestDraftPokemon,
+    requestBanPokemon,
+  } = useSocketRequests();
 
   const { catchingUp, currentMatchLog } = useBattleHistory({
     matchHistory,
@@ -266,7 +272,8 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
                   if (gameState.isSpectator) {
                     return;
                   }
-                  socket.emit('requestChessMove', { sanMove: san, roomId: userState.currentRoomId, playerId: userState.id });
+
+                  requestChessMove(san);
                 }}
               />
             </div>
@@ -279,7 +286,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
                   boardState={currentBoard}
                   onDraftPokemon={(sq, pkmnIndex) => {
                     if (validateDraftPick(sq, color!)) {
-                      socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, square: sq, draftPokemonIndex: pkmnIndex });
+                      requestDraftPokemon(sq, pkmnIndex);
                       setIsDrafting(!!pokemonManager.draftPieces.length);
                     }
                   }}
@@ -287,7 +294,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
                     if (gameState.isSpectator) {
                       return;
                     }
-                    socket.emit('requestDraftPokemon', { roomId: userState.currentRoomId, playerId: userState.id, draftPokemonIndex: pkmnIndex, isBan: true });
+                    requestBanPokemon(pkmnIndex);
                   }}
                 />
               )

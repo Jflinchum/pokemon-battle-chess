@@ -4,9 +4,8 @@ import { PokemonSet, Generations, SideID } from "@pkmn/data";
 import { KWArgType } from '@pkmn/protocol';
 import { Battle } from '@pkmn/client';
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
-import { socket } from '../../../../socket';
-import { useUserState } from '../../../../context/UserStateContext';
 import { CustomArgTypes } from '../../../../../shared/types/PokemonTypes';
+import { useSocketRequests } from '../../../../util/useSocketRequests';
 
 interface PokemonBattleManagerProps {
   p1Pokemon: PokemonSet;
@@ -17,7 +16,7 @@ interface PokemonBattleManagerProps {
 
 
 const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory, perspective }: PokemonBattleManagerProps) => {
-  const { userState } = useUserState();
+  const { requestPokemonMove } = useSocketRequests();
 
   // TODO - optimize this so we pass primitives down instead of recreating the class every time
   const battle = useMemo(
@@ -43,7 +42,7 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory,
       battleState={battle}
       fullBattleLog={currentPokemonMoveHistory}
       onMoveSelect={(move) => {
-        socket.emit('requestPokemonMove', { pokemonMove: move, roomId: userState.currentRoomId, playerId: userState.id });
+        requestPokemonMove(move);
       }}
       p1Pokemon={p1Pokemon}
       p2Pokemon={p2Pokemon}
