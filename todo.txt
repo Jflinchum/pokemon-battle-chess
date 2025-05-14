@@ -61,7 +61,6 @@ Refactor TODOs:
 - Remove key from chessmanager since it's a hack to re-render pokemon after drafting
 
 Issues:
-- Local storage setting for game options does not seem to be saving
 - Terrain/weather clearing should clear square modifier
 - Weather square info on detail card does not show up during drafting
 - Wrong music playing after skipping to current turn when catching up

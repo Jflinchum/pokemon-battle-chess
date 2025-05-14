@@ -10,6 +10,7 @@ import RoomOptions from "./RoomOptions/RoomOptions";
 import { GameOptions } from "../../../../shared/types/GameOptions";
 import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameManagerActions/GameManagerActions";
 import { useSocketRequests } from "../../../util/useSocketRequests";
+import { setGameOptions as setLocalGameOptions } from "../../../util/localWebData";
 import './Room.css';
 
 
@@ -42,7 +43,7 @@ const Room = () => {
 
   const handleStartGame = (e: React.MouseEvent) => {
     e.preventDefault();
-    setGameOptions(gameOptions);
+    setLocalGameOptions(gameOptions);
     requestStartGame();
   }
   
