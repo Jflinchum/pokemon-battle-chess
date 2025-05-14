@@ -1,7 +1,9 @@
 import { Dex } from "@pkmn/dex";
 import { Move } from "@pkmn/data";
+import { Pokemon } from "@pkmn/client";
 import PokemonMoveButton from "../../../../common/PokemonMoveButton/PokemonMoveButton";
 import { PokemonMoveTooltip } from "../PokemonMoveTooltip/PokemonMoveTooltip";
+import { getTypeEffectiveness } from "./getTypeEffectiveness";
 import './PokemonMoveInfoButton.css';
 
 interface PokemonMoveInfoButtonProps {
@@ -10,7 +12,8 @@ interface PokemonMoveInfoButtonProps {
   pp?: number;
   maxpp?: number;
   onMoveSelect?: (move: string) => void;
-  opponentPokemon?: string;
+  currentPokemon?: Pokemon | null;
+  opponentPokemon?: Pokemon | null;
 }
 
 const getMoveButtonColor = (moveType: Move['type']) => {
@@ -35,13 +38,11 @@ const getMoveButtonColor = (moveType: Move['type']) => {
     case 'Fairy': return '#e58fe1';
     default: return '#d8d5de';
   }
-}
+};
 
-const PokemonMoveInfoButton = ({ move, pp, maxpp, disabled, onMoveSelect = () => {}, opponentPokemon }: PokemonMoveInfoButtonProps) => {
+const PokemonMoveInfoButton = ({ move, pp, maxpp, disabled, onMoveSelect = () => {}, currentPokemon, opponentPokemon }: PokemonMoveInfoButtonProps) => {
   const dexMoveInfo = Dex.moves.get(move);
-  const dexOpponentPokemon = opponentPokemon ? Dex.species.get(opponentPokemon) : null;
-  const effectiveness = dexOpponentPokemon ? Dex.getEffectiveness(dexMoveInfo.type, dexOpponentPokemon) : undefined
-  const notImmune = dexOpponentPokemon ? Dex.getImmunity(dexMoveInfo, dexOpponentPokemon) : undefined;
+  const { effectiveness, notImmune } = getTypeEffectiveness(dexMoveInfo, currentPokemon, opponentPokemon);
 
   return (
     <PokemonMoveButton id={move} disabled={disabled} colorPrimary={getMoveButtonColor(dexMoveInfo.type)} onClick={() => { onMoveSelect(move) }} toolTip={PokemonMoveTooltip({ move })}>
@@ -57,7 +58,7 @@ const PokemonMoveInfoButton = ({ move, pp, maxpp, disabled, onMoveSelect = () =>
         }
 
         {
-          dexOpponentPokemon && (dexMoveInfo.basePower) ? (
+          effectiveness !== undefined && notImmune !== undefined && dexMoveInfo.basePower ? (
             <TypeEffectiveness effectiveness={effectiveness} notImmune={notImmune}/>
           ) : (<span />)
         }

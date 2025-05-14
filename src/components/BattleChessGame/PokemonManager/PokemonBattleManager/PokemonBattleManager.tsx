@@ -21,7 +21,8 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory,
   // TODO - optimize this so we pass primitives down instead of recreating the class every time
   const battle = useMemo(
     () => {
-      const newBattle = new Battle(new Generations(Dex));
+      const newGeneration = new Generations(Dex);
+      const newBattle = new Battle(newGeneration, null, [p1Pokemon], undefined);
       for (const { args, kwArgs } of currentPokemonMoveHistory) {
         // Custom handling for forfeit
         if (args[0] === '-forfeit') {

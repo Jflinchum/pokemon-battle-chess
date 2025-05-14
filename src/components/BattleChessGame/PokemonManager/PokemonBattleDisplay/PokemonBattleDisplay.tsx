@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Battle } from "@pkmn/client";
+import { Battle, Pokemon } from "@pkmn/client";
 import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet, SideID } from "@pkmn/data";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
@@ -63,7 +63,8 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, p1Poke
                   onMoveSelect={onMoveSelect}
                   setMoveChosen={setMoveChosen}
                   moves={moves}
-                  opponentPokemon={p2Pokemon.species}
+                  currentPokemon={battleState.p1.active[0]}
+                  opponentPokemon={battleState.p2.active[0]}
                 />
               </div>
             </span>
@@ -81,10 +82,11 @@ interface BattleMoveContainerProps {
   setMoveChosen: (move?: string) => void;
   onMoveSelect: (move: string) => void;
   moves: PokemonMoveChoice[];
-  opponentPokemon?: string;
+  currentPokemon?: Pokemon | null;
+  opponentPokemon?: Pokemon | null;
 }
 
-const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, hideMoves, opponentPokemon }: BattleMoveContainerProps) => {
+const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, hideMoves, currentPokemon, opponentPokemon }: BattleMoveContainerProps) => {
 
   if (hideMoves) {
     return (
@@ -113,7 +115,7 @@ const BattleMoveContainer = ({ moveChosen, setMoveChosen, onMoveSelect, moves, h
           Forfeit this battle
         </button>
         <p>Moves</p>
-        <PokemonMoveChoices opponentPokemon={opponentPokemon} moves={moves} onMoveSelect={(move) => {
+        <PokemonMoveChoices currentPokemon={currentPokemon} opponentPokemon={opponentPokemon} moves={moves} onMoveSelect={(move) => {
           setMoveChosen(move);
           onMoveSelect(move);
         }}/>

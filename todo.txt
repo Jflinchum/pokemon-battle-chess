@@ -61,6 +61,7 @@ Refactor TODOs:
 - Remove key from chessmanager since it's a hack to re-render pokemon after drafting
 
 Issues:
+- Local storage setting for game options does not seem to be saving
 - Terrain/weather clearing should clear square modifier
 - Weather square info on detail card does not show up during drafting
 - Wrong music playing after skipping to current turn when catching up
@@ -71,6 +72,7 @@ Issues:
   - This issue seems to come and go. Needs more investigation
 - Premoves:
   - Occasionally clearing when it shouldn't
+  - Does not clear if opponent piece moves to premove spot (triggers battle)
 - Disallow server inputs when match has ended
 - Pokemon sprites occasionally disappearing
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients

@@ -3,8 +3,8 @@ import { Dex } from "@pkmn/dex";
 import PokemonType from "../../../../common/Pokemon/PokemonType/PokemonType";
 import Tooltip from "../../../../common/Tooltip/Tooltip";
 import { GenderIcon } from "../../../../common/GenderIcon/GenderIcon";
-import './PokemonBattleDetails.css';
 import { PokemonMoveTooltip } from "../PokemonMoveTooltip/PokemonMoveTooltip";
+import './PokemonBattleDetails.css';
 
 interface PokemonBattleDetailsProps {
   p1PokemonSet: PokemonSet;
@@ -50,14 +50,14 @@ const PokemonBattleDetailsCard = ({ pokemonSet }: { pokemonSet: PokemonSet }) =>
           <strong>Moves: </strong>
           {
             pokemonSet.moves.map((move, index) => (
-              <>
-                <span key={index} id={`${move.split(' ').join('-')}-${pokemonSet.species.split(' ').join('-')}`}>
+              <span key={index}>
+                <span id={`${move.split(' ').join('-')}-${pokemonSet.species.split(' ').join('-')}`}>
                   {Dex.moves.get(move).name}{index === pokemonSet.moves.length - 1 ? ' ' : ', '}
                 </span>
-                <Tooltip key={`tooltip-${index}`} className='pokemonBattleDetailsCardSetTooltip' anchorSelect={`#${move.split(' ').join('-')}-${pokemonSet.species.split(' ').join('-')}`}>
+                <Tooltip className='pokemonBattleDetailsCardSetTooltip' anchorSelect={`#${move.split(' ').join('-')}-${pokemonSet.species.split(' ').join('-')}`}>
                   <PokemonMoveTooltip move={move} />
                 </Tooltip>
-              </>
+              </span>
             ))
           }
         </span>
