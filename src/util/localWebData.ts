@@ -81,7 +81,7 @@ export const setAnimationSpeedPreference = (animationSpeedPreference: number) =>
 export const getVolumePreference = () => {
   const defaultVolumePreferences: VolumePreference = {
     pieceVolume: 0.50,
-    musicVolume: 0.50,
+    musicVolume: 0.30,
   };
   const volumePreference = localStorage.getItem('volumePreference');
   return (volumePreference ? JSON.parse(volumePreference) : defaultVolumePreferences) as VolumePreference;
