@@ -57,7 +57,7 @@ export const getGameOptions = () => {
     },
     weatherWars: false,
     timersEnabled: true,
-    banTimerDuration: 15,
+    banTimerDuration: 30,
     chessTimerDuration: 15,
     pokemonTimerIncrement: 1,
     chessTimerIncrement: 5,

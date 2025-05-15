@@ -128,16 +128,16 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
           gameOptions.format === 'draft' && currentTimerId !== 'No Timer' && (
             <li className='roomOption'>
               <div className='roomOptionLabel'>
-                <label htmlFor='banTimer'>Ban Timer:</label>
+                <label htmlFor='banTimer'>Draft/Ban Timer:</label>
                 <p>
-                  Amount of time (in seconds) that the player has to ban a pokemon.
+                  Amount of time (in seconds) that the player has to ban and draft a pokemon.
                 </p>
               </div>
               <select className='roomOptionBanTimer' name='banTimerDuration' value={gameOptions.banTimerDuration} onChange={(e) => setBanTimer(parseInt(e.target.value))} disabled={!isHost}>
-                <option value={5}>5 seconds</option>
-                <option value={10}>10 seconds</option>
                 <option value={15}>15 seconds</option>
                 <option value={30}>30 seconds</option>
+                <option value={45}>45 seconds</option>
+                <option value={60}>60 seconds</option>
               </select>
             </li>
           )
