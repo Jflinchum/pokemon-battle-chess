@@ -208,28 +208,28 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
           }
         </div>
       </div>
-    {
-      // Necessary to render this outside of above div to prevent tooltips from scrolling the container
-      pokemon ? (
-        <>
-          <Tooltip anchorSelect={`#${pokemon.ability.split(' ').join('-')}`}>
-            { Dex.abilities.get(pokemon.ability).shortDesc }
-          </Tooltip>
-          <Tooltip anchorSelect={`#${pokemon.item.split(' ').join('-')}`}>
-            { Dex.items.get(pokemon.item).shortDesc }
-          </Tooltip>
-          {
-            squareModArray.map((squareMod) => (
-              squareMod ? 
-                <Tooltip anchorSelect={`#squareMod-${squareMod.id}`}>
-                  {getSquareModifierMapping(squareMod.id)?.desc}
-                </Tooltip>
-              : null
-            ))
-          }
-        </>
-      ) : null
-    }
+      {
+        // Necessary to render this outside of above div to prevent tooltips from scrolling the container
+        pokemon ? (
+          <>
+            <Tooltip anchorSelect={`#${pokemon.ability.split(' ').join('-')}`}>
+              { Dex.abilities.get(pokemon.ability).shortDesc }
+            </Tooltip>
+            <Tooltip anchorSelect={`#${pokemon.item.split(' ').join('-')}`}>
+              { Dex.items.get(pokemon.item).shortDesc }
+            </Tooltip>
+          </>
+        ) : null
+      }
+      {
+        squareModArray.map((squareMod) => (
+          squareMod ? 
+            <Tooltip anchorSelect={`#squareMod-${squareMod.id}`}>
+              {getSquareModifierMapping(squareMod.id)?.desc}
+            </Tooltip>
+          : null
+        ))
+      }
     </>
   )
 }

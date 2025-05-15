@@ -61,6 +61,11 @@ Refactor TODOs:
 - Remove key from chessmanager since it's a hack to re-render pokemon after drafting
 
 Issues:
+- "Invalid move from h1 to g1"
+  - On error, if in game, try reconnecting
+- Player missing a packet does not sync up automatically
+- Update items if they swap (with trick, for example)
+- Background width stretching image does not look good
 - Terrain/weather clearing should clear square modifier
 - Weather square info on detail card does not show up during drafting
 - Wrong music playing after skipping to current turn when catching up
