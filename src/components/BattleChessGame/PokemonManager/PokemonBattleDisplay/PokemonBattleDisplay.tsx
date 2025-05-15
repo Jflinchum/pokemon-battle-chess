@@ -63,8 +63,8 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, p1Poke
                   onMoveSelect={onMoveSelect}
                   setMoveChosen={setMoveChosen}
                   moves={moves}
-                  currentPokemon={battleState.p1.active[0]}
-                  opponentPokemon={battleState.p2.active[0]}
+                  currentPokemon={battleState[perspective === 'p1' ? 'p1' : 'p2'].active[0]}
+                  opponentPokemon={battleState[perspective === 'p1' ? 'p2' : 'p1'].active[0]}
                 />
               </div>
             </span>
