@@ -58,8 +58,9 @@ const useBattleHistory = ({
   const pokemonLogIndex = useRef(0);
 
   useEffect(() => {
-    socket.on('gameOutput', (log: MatchLog) => {
+    socket.on('gameOutput', (log, ack) => {
       setCurrentMatchLog((curr) => [...curr, log]);
+      ack();
     });
 
     return () => {

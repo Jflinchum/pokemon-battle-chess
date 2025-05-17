@@ -7,27 +7,37 @@ import PokemonMoveChoices, { PokemonMoveChoice } from "./PokemonMoveChoices/Poke
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 import { useGameState } from "../../../../context/GameStateContext";
-import './PokemonBattleDisplay.css';
 import { PokemonBattleDetails } from "./PokemonBattleDetails/PokemonBattleDetails";
+import { useSocketRequests } from '../../../../util/useSocketRequests';
+import './PokemonBattleDisplay.css';
 
 interface PokemonBattleDisplayProps {
   battleState: Battle | null,
   fullBattleLog: { args: CustomArgTypes, kwArgs: BattleArgsKWArgType }[],
-  onMoveSelect: (move: string) => void,
   p1Pokemon: PokemonSet;
   p2Pokemon: PokemonSet;
   perspective: SideID;
 }
 
-const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, p1Pokemon, p2Pokemon, perspective }: PokemonBattleDisplayProps) => {
+const PokemonBattleDisplay = ({ battleState, fullBattleLog, p1Pokemon, p2Pokemon, perspective }: PokemonBattleDisplayProps) => {
   const { gameState } = useGameState();
   const [moveChosen, setMoveChosen] = useState<string>();
+  const { requestPokemonMove } = useSocketRequests();
 
   useEffect(() => {
     // TODO: Better handling for clearing move selection
     setMoveChosen(undefined);
   }, [fullBattleLog]);
 
+
+  const handleMoveSelect = (move: string) => {
+    requestPokemonMove(move, (err) => {
+      if (err) {
+        setMoveChosen(undefined);
+        // display error toast notification
+      }
+    });
+  }
 
   const moves = useMemo(() => {
     if (battleState?.request?.requestType === 'move' && battleState.request.active[0]?.moves) {
@@ -60,7 +70,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, onMoveSelect, p1Poke
                     gameState.isCatchingUp
                   }
                   moveChosen={moveChosen}
-                  onMoveSelect={onMoveSelect}
+                  onMoveSelect={handleMoveSelect}
                   setMoveChosen={setMoveChosen}
                   moves={moves}
                   currentPokemon={battleState[perspective === 'p1' ? 'p1' : 'p2'].active[0]}

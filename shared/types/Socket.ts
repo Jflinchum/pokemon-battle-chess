@@ -10,16 +10,17 @@ export interface ServerToClientEvents {
   currentTimers: (timer: Timer) => void;
   startGame: (args: GameSettings, isSync?: boolean) => void;
   chatMessage: (args: { playerName: string; message: string; }) => void;
-  gameOutput: (log: MatchLog) => void;
+  gameOutput: (log: MatchLog, ack: () => void) => void;
   endGameFromDisconnect: (args: { name: string, isHost?: boolean }) => void;
   roomClosed: () => void;
   kickedFromRoom: (cb?: () => void) => void;
+  health: (cb: () => void) => void;
 }
 
 export interface ClientToServerEvents {
   requestChessMove: (args: RequestChessMoveArgs) => void;
   requestDraftPokemon: (args: RequestDraftPokemonArgs) => void;
-  requestPokemonMove: (args: RequestPokemonMoveArgs) => void;
+  requestPokemonMove: (args: RequestPokemonMoveArgs, cb: () => void) => void;
   setViewingResults: (args: SetViewingResultsArgs) => void;
   requestEndGameAsHost: (args: CommonClientArgs) => void;
   requestStartGame: (args: CommonClientArgs) => void;

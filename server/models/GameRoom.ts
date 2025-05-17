@@ -271,6 +271,52 @@ export default class GameRoom {
     return player.playerSecret === playerSecret;
   }
 
+  private emitGameOutput = (data: MatchLog, user?: User | null) => {
+    if (user) {
+      user.socket?.timeout(10000).emit('gameOutput', data, (err: Error) => {
+        if (err) {
+          this.startHealthCheck(user)
+        }
+      });
+    } else {
+      this.playerList.forEach(
+        (user) => user.socket?.timeout(10000).emit('gameOutput', data, (err: Error) => {
+          if (err) {
+            this.startHealthCheck(user)
+          }
+        })
+      )
+    }
+  }
+
+  private startHealthCheck(user: User) {
+    console.log(`Starting healthcheck for player ${user.playerId}`);
+    let timeout: NodeJS.Timeout;
+
+    const healthCheck = () => {
+      // If the player has left or disconnected, stop the health check
+      if (this.transientPlayerList[user.playerId]) {
+        clearTimeout(timeout);
+        return;
+      }
+      if (!this.getPlayer(user.playerId)) {
+        clearTimeout(timeout);
+        return;
+      }
+
+      user.socket?.timeout(10000).emit('health', (err: Error) => {
+        if (!err) {
+          user.socket?.emit('startSync', { history: this.getHistory(user.playerId) });
+          clearTimeout(timeout);
+          return;
+        }
+      });
+    };
+
+    healthCheck();
+    timeout = setInterval(healthCheck, 15000);
+  }
+
   public async validateAndEmitChessMove({ sanMove, playerId }: { sanMove: string, playerId: string }) {
     if (!this.whitePlayer || !this.blackPlayer) {
       return;
@@ -322,7 +368,7 @@ export default class GameRoom {
 
         const chessData: MatchLog = { type: 'chess', data: { color: this.currentTurnWhite ? 'w' : 'b', san: sanMove, failed: false } };
         this.pushHistory(chessData);
-        this.broadcastAll('gameOutput', chessData);
+        this.emitGameOutput(chessData);
         if (lostPiece?.type === 'k') {
           // Game ender
           this.endGame(this.currentTurnWhite ? 'w' : 'b', 'KING_CAPTURED');
@@ -336,7 +382,7 @@ export default class GameRoom {
 
         const chessData: MatchLog = { type: 'chess', data: { color: this.currentTurnWhite ? 'w' : 'b', san: sanMove, failed: true } };
         this.pushHistory(chessData);
-        this.broadcastAll('gameOutput', chessData);
+        this.emitGameOutput(chessData);
         if (lostPiece?.type === 'k') {
           // Game ender
           this.endGame(this.currentTurnWhite ? 'w' : 'b', 'KING_CAPTURED');
@@ -352,7 +398,7 @@ export default class GameRoom {
       this.chessManager.move(sanMove, { continueOnCheck: true });
       const chessData: MatchLog = { type: 'chess', data: { color: this.currentTurnWhite ? 'w' : 'b', san: sanMove } };
       this.pushHistory(chessData);
-      this.broadcastAll('gameOutput', chessData);
+      this.emitGameOutput(chessData);
     }
 
     this.gameTimer?.processChessMove(this.currentTurnWhite, () => this.endGameDueToTimeout(this.currentTurnWhite ? 'b' : 'w'));
@@ -371,7 +417,7 @@ export default class GameRoom {
       if (numSquares && numSquares > 0) {
         const squareModifierData: MatchLog = { type: 'weather', data: { event: 'weatherChange', squareModifiers: this.pokemonGameManager.squareModifiers } };
         this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
-        this.broadcastAll('gameOutput', squareModifierData);
+        this.emitGameOutput(squareModifierData);
       }
     }
   }
@@ -419,7 +465,7 @@ export default class GameRoom {
   public endGame(color: Color | '', reason: EndGameReason) {
     const gameData: MatchLog = { type: 'generic', data: { event: 'gameEnd', color, reason } };
     this.pushHistory(gameData);
-    this.broadcastAll('gameOutput', gameData);
+    this.emitGameOutput(gameData);
     this.playerList.forEach((player) => {
       player.setViewingResults(true);
     });
@@ -542,12 +588,12 @@ export default class GameRoom {
       this.pokemonGameManager.banDraftPiece(draftPokemonIndex);
       const matchLog: MatchLog = { type: 'ban', data: { index: draftPokemonIndex, color: 'w' } };
       this.pushHistory(matchLog);
-      this.broadcastAll('gameOutput', matchLog);
+      this.emitGameOutput(matchLog);
     } else if (playerId === this.blackPlayer.playerId) {
       this.pokemonGameManager.banDraftPiece(draftPokemonIndex);
       const matchLog: MatchLog = { type: 'ban', data: { index: draftPokemonIndex, color: 'b' } };
       this.pushHistory(matchLog)
-      this.broadcastAll('gameOutput', matchLog);
+      this.emitGameOutput(matchLog);
     }
 
     if (this.roomGameOptions.timersEnabled) {
@@ -587,14 +633,14 @@ export default class GameRoom {
       );
       const matchLog: MatchLog = { type: 'draft', data: { square, index: draftPokemonIndex, color: 'w' } };
       this.pushHistory(matchLog);
-      this.broadcastAll('gameOutput', matchLog);
+      this.emitGameOutput(matchLog);
     } else if (playerId === this.blackPlayer.playerId) {
       this.pokemonGameManager.assignPokemonToSquare(
         draftPokemonIndex, square, chessSquare!.type, 'b',
       );
       const matchLog: MatchLog = { type: 'draft', data: { square, index: draftPokemonIndex, color: 'b' } }
       this.pushHistory(matchLog)
-      this.broadcastAll('gameOutput', matchLog);
+      this.emitGameOutput(matchLog);
     }
 
     if (this.roomGameOptions.timersEnabled) {
@@ -652,7 +698,7 @@ export default class GameRoom {
     const p2Spec = { name: this.blackPlayer.playerId, team: Teams.pack([p2Set]) };
     const battleStartData: MatchLog = { type: 'pokemon', data: { event: 'battleStart', p1Pokemon: p1Set, p2Pokemon: p2Set, attemptedMove } };
     const gameRoomScope = this;
-    this.broadcastAll('gameOutput', battleStartData);
+    this.emitGameOutput(battleStartData);
     this.pushHistory(battleStartData);
 
     this.gameTimer?.startTimer(() => this.endGameDueToTimeout('w'), 'w');
@@ -716,15 +762,15 @@ export default class GameRoom {
         for await (const chunk of battleStream.p1) {
           const pokemonData: MatchLog = { type: 'pokemon', data: { event: 'streamOutput', chunk } };
           this.whiteMatchHistory.push(pokemonData);
-          this.whitePlayer?.socket?.emit('gameOutput', pokemonData);
-          this.getSpectators().forEach((spectator) => spectator.socket?.emit('gameOutput', pokemonData));
+          this.emitGameOutput(pokemonData, this.whitePlayer);
+          this.getSpectators().forEach((spectator) => this.emitGameOutput(pokemonData, spectator));
         }
       }
       const blackBattleStreamHandler = async () => {
         for await (const chunk of battleStream.p2) {
           const pokemonData: MatchLog = { type: 'pokemon', data: { event: 'streamOutput', chunk } };
           this.blackMatchHistory.push(pokemonData);
-          this.blackPlayer?.socket?.emit('gameOutput', pokemonData);
+          this.emitGameOutput(pokemonData, this.blackPlayer)
         }
       }
       const omniscientBattleStreamHandler = async () => {
@@ -738,18 +784,18 @@ export default class GameRoom {
                 this.pokemonGameManager.updateSquareTerrain(battleSquare, terrainChanges);
                 const squareModifierData: MatchLog = { type: 'weather', data: { event: 'weatherChange', squareModifiers: this.pokemonGameManager.squareModifiers } };
                 this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
-                this.broadcastAll('gameOutput', squareModifierData);
+                this.emitGameOutput(squareModifierData);
               }
 
               if ((this.currentTurnWhite && args[1] === this.whitePlayer?.playerId) || (!this.currentTurnWhite && args[1] === this.blackPlayer?.playerId)) {
                 const data: MatchLog = { type: 'pokemon', data: { event: 'victory', color: this.currentTurnWhite ? 'w' : 'b' } };
                 this.pushHistory(data);
-                this.broadcastAll('gameOutput', data);
+                this.emitGameOutput(data);
                 return resolve(true);
               }
               const data: MatchLog = { type: 'pokemon', data: { event: 'victory', color: this.currentTurnWhite ? 'b' : 'w' } };
               this.pushHistory(data);
-              this.broadcastAll('gameOutput', data);
+              this.emitGameOutput(data);
               return resolve(false);
             }
           }

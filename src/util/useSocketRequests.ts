@@ -22,8 +22,8 @@ export const useSocketRequests = () => {
     requestBanPokemon: (draftPokemonIndex: number) => {
       socket.emit('requestDraftPokemon', { draftPokemonIndex, isBan: true, ...commonClientArgs });
     },
-    requestPokemonMove: (pokemonMove: string) => {
-      socket.emit('requestPokemonMove', { pokemonMove, ...commonClientArgs });
+    requestPokemonMove: (pokemonMove: string, cb: (err?: Error) => void) => {
+      socket.timeout(10000).emit('requestPokemonMove', { pokemonMove, ...commonClientArgs }, cb);
     },
     requestSetViewingResults: (viewingResults: boolean) => {
       socket.emit('setViewingResults', { viewingResults, ...commonClientArgs });

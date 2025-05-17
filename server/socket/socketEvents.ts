@@ -177,6 +177,7 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       if (!room.verifyPlayer(playerId, secretId)) {
         return;
       }
+      room.getPlayer(playerId)?.assignSocket(socket);
 
       if (room.isOngoing) {
         if (room.transientPlayerList[playerId]) {
@@ -205,7 +206,8 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
       room.validateAndEmitChessMove({ sanMove, playerId });
     });
 
-    socket.on('requestPokemonMove', ({ pokemonMove, roomId, playerId, secretId }) => {
+    socket.on('requestPokemonMove', ({ pokemonMove, roomId, playerId, secretId }, cb) => {
+      cb();
       const room = gameRoomManager.getRoom(roomId);
       console.log(`${playerId} requested to chess move ${pokemonMove} for ${roomId}`);
 

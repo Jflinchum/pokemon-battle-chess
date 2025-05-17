@@ -100,6 +100,10 @@ const RoomManager = () => {
       cb?.();
     });
 
+    socket.on('health', (cb) => {
+      cb();
+    });
+
     return () => {
       socket.off('connectedPlayers');
       socket.off('roomClosed');
@@ -108,6 +112,7 @@ const RoomManager = () => {
       socket.off('currentTimers');
       socket.off('startGame');
       socket.off('kickedFromRoom');
+      socket.io.off('reconnect');
     }
   }, [gameState.matchEnded]);
 
