@@ -222,9 +222,9 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
         ) : null
       }
       {
-        squareModArray.map((squareMod) => (
+        squareModArray.map((squareMod, index) => (
           squareMod ? 
-            <Tooltip anchorSelect={`#squareMod-${squareMod.id}`}>
+            <Tooltip key={index} anchorSelect={`#squareMod-${squareMod.id}`}>
               {getSquareModifierMapping(squareMod.id)?.desc}
             </Tooltip>
           : null
