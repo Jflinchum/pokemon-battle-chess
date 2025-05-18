@@ -1,7 +1,6 @@
 TODO:
 Add arrow going from attacking piece to attacked piece on client
-  - Can build it up by parts. Start with line going from middle of the square to 
-  any 8 directions. Then line going through square. Then one curve for knight moves.
+  - Use polygon html tag to build points
 Matchmaking
 Queue up your draft and bans
 Create formats to quick select game options in room
@@ -69,12 +68,10 @@ Issues:
 - Terrain/weather clearing should clear square modifier
 - Weather square info on detail card does not show up during drafting
 - Count Arceus as one unique pokemon when drafting sets. Don't dupe Arceus-Flying and Arceus-Ground, for example
+- Squawkabillyblue vs regular Squawkabilly is duplicating when drafting
 - Wrong music playing after skipping to current turn when catching up
 - Music isn't playing on replays
-- Resyncing while in pokemon battle prevents any actions from sending to the server
-  - Specifically regaining socket connection, not rejoining the room
-- Resyncing right after a battle while fast forwarding
-  - This issue seems to come and go. Needs more investigation
+- Skipping to current turn while battle is about to start leads to a blank screen
 - Premoves:
   - Occasionally clearing when it shouldn't
   - Does not clear if opponent piece moves to premove spot (triggers battle)

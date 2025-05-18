@@ -141,7 +141,7 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
                     <li>
                       <span>
                         <b>Item: </b>
-                        <div id={`${pokemon.item.split(' ').join('-')}`} className='pokemonDetailsItemContainer'>
+                        <div id={`${pokemon.item.split(' ').join('-').replace('\'', '')}`} className='pokemonDetailsItemContainer'>
                           { pokemon.item && <div style={Icons.getItem(pokemon.item).css} /> }
                           <span>{pokemon.item || 'None'}</span>
                         </div>
@@ -150,7 +150,7 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
                     <li>
                       <span>
                         <b>Ability: </b>
-                        <div id={`${pokemon.ability.split(' ').join('-')}`}>
+                        <div id={`${pokemon.ability.split(' ').join('-').replace('\'', '')}`}>
                           <span>{pokemon.ability || 'None'}</span>
                         </div>
                       </span>
@@ -212,10 +212,10 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
         // Necessary to render this outside of above div to prevent tooltips from scrolling the container
         pokemon ? (
           <>
-            <Tooltip anchorSelect={`#${pokemon.ability.split(' ').join('-')}`}>
+            <Tooltip anchorSelect={`#${pokemon.ability.split(' ').join('-').replace('\'', '')}`}>
               { Dex.abilities.get(pokemon.ability).shortDesc }
             </Tooltip>
-            <Tooltip anchorSelect={`#${pokemon.item.split(' ').join('-')}`}>
+            <Tooltip anchorSelect={`#${pokemon.item.split(' ').join('-').replace('\'', '')}`}>
               { Dex.items.get(pokemon.item).shortDesc }
             </Tooltip>
           </>

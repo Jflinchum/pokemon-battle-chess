@@ -22,6 +22,7 @@ interface ChessManagerProps {
   onMove: (san: string) => void;
   chessMoveHistory: ChessData[];
   battleSquare?: Square;
+  onError?: (err: Error) => void;
 }
 
 const ChessManager = ({
@@ -31,7 +32,8 @@ const ChessManager = ({
   battleSquare,
   board,
   onMove,
-  chessMoveHistory
+  chessMoveHistory,
+  onError = () => {},
 }: ChessManagerProps) => {
   /**
    * TODO: 
@@ -106,12 +108,17 @@ const ChessManager = ({
           setRequestedPawnPromotion(move);
           return;
         }
-        simulateMove(move);
-        setPreMoveQueue((curr) => [...curr, { from: move.from, to: move.to, promotion: move.promotion, san: move.san }]);
-        setSelectedSquare(null);
-        setHighlightedSquare([]);
+        try {
+          simulateMove(move);
+          setPreMoveQueue((curr) => [...curr, { from: move.from, to: move.to, promotion: move.promotion, san: move.san }]);
+          setSelectedSquare(null);
+          setHighlightedSquare([]);
+        } catch (err) {
+          onError(err as Error);
+        }
         return;
       } else {
+        onError(new Error('Premove simulation is undefined'));
         return;
       }
     }

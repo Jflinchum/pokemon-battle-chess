@@ -8,13 +8,14 @@ import { useGameState } from "../../../context/GameStateContext";
 import { ArgType, KWArgType, Protocol } from "@pkmn/protocol";
 import { useUserState } from "../../../context/UserStateContext";
 import { SquareModifier } from "../../../../shared/models/PokemonBattleChessManager";
+import { useSocketRequests } from "../../../util/useSocketRequests";
 
 interface BattleHistoryProps {
   matchHistory?: MatchLog[],
   currentBattle?: CurrentBattle | null,
   onBan: (index: number) => void,
   onDraft: (square: Square, index: number, color: Color) => void,
-  onMove: (sanMove: string, moveFailed?: boolean) => void,
+  onMove: (sanMove: string, moveFailed?: boolean) => Error | void,
   onPokemonBattleStart: (p1Pokemon: PokemonBeginBattleData['p1Pokemon'], p2Pokemon: PokemonBeginBattleData['p2Pokemon'], attemptedMove: PokemonBeginBattleData['attemptedMove']) => void,
   onPokemonBattleOutput: ({ args, kwArgs }: { args: ArgType; kwArgs: KWArgType }) => void,
   onPokemonBattleEnd?: (victor: Color) => void,
@@ -50,7 +51,10 @@ const useBattleHistory = ({
   skipToEndOfSync
 }: BattleHistoryProps) => {
   const { userState } = useUserState();
-  const { gameState } = useGameState();
+  const { gameState, dispatch } = useGameState();
+  const {
+    requestSync,
+  } = useSocketRequests();
 
   const [matchLog, setCurrentMatchLog] = useState(matchHistory || []);
 
@@ -109,10 +113,12 @@ const useBattleHistory = ({
             await catchUpTimer.start();
             break;
           case 'chess':
-            onMove(currentLog.data.san, currentLog.data.failed);
-            matchLogIndex.current++;
-            catchUpTimer = timer(timeBetweenSteps);
-            await catchUpTimer.start();
+            const err = onMove(currentLog.data.san, currentLog.data.failed);
+            if (!err) {
+              matchLogIndex.current++;
+              catchUpTimer = timer(timeBetweenSteps);
+              await catchUpTimer.start();
+            }
             break;
           case 'pokemon':
             switch (currentLog.data.event) {
@@ -157,6 +163,7 @@ const useBattleHistory = ({
               case 'weatherChange':
                 onWeatherChange(currentLog.data.squareModifiers);
                 matchLogIndex.current++;
+                break;
             }
         }
       }
@@ -171,7 +178,14 @@ const useBattleHistory = ({
     }
   }, [currentBattle, skipToEndOfSync, matchLog, userState.animationSpeedPreference]);
 
-  return { catchingUp, currentMatchLog: matchLog.slice(0, matchLogIndex.current) };
+  const resetMatchHistory = () => {
+    matchLogIndex.current = 0;
+    pokemonLogIndex.current = 0;
+    dispatch({ type: 'SET_SKIPPING_AHEAD', payload: true });
+    requestSync();
+  }
+
+  return { catchingUp, currentMatchLog: matchLog.slice(0, matchLogIndex.current), resetMatchHistory };
 };
 
 const shouldDelayBeforeContinuing = (logType: string) => {

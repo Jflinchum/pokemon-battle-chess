@@ -59,6 +59,8 @@ export class PokemonBattleChessManager {
   public squareModifiers: SquareModifier[] = [];
 
   private pokeSimRandomGen: PokeSimRandomGen;
+  private format?: string;
+  private weatherWars?: boolean;
 
   constructor({
     seed,
@@ -70,6 +72,8 @@ export class PokemonBattleChessManager {
     this.prng = new PRNG(seed);
     this.pokeSimRandomGen = new PokeSimRandomGen(this.prng);
     this.seed = seed;
+    this.format = format;
+    this.weatherWars = weatherWars;
 
     if (chessPieces) {
       this.chessPieces = chessPieces;
@@ -87,6 +91,23 @@ export class PokemonBattleChessManager {
       if (weatherWars) {
         this.populateSquareModifiers();
       }
+    }
+  }
+
+  public reset() {
+    this.chessPieces = [];
+    this.draftPieces = [];
+    this.banPieces = [];
+    this.squareModifiers = [];
+    this.prng = new PRNG(this.seed);
+    this.pokeSimRandomGen = new PokeSimRandomGen(this.prng);
+    if (this.format === 'random') {
+      this.populateBoardWithRandomTeams();
+    } else if (this.format ==='draft') {
+      this.populateDraftWithRandomTeams();
+    }
+    if (this.weatherWars) {
+      this.populateSquareModifiers();
     }
   }
 

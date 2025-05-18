@@ -19,9 +19,9 @@ import movePieceMP3 from '../../../assets/chessAssets/audio/movePiece.mp3';
 import capturePieceMP3 from '../../../assets/chessAssets/audio/capturePiece.mp3';
 import GameManagerActions from './GameManagerActions/GameManagerActions';
 import { useMusicPlayer } from '../../../util/useMusicPlayer';
-import './BattleChessManager.css';
 import PlayerList from '../../RoomManager/Room/PlayerList/PlayerList';
 import { useSocketRequests } from '../../../util/useSocketRequests';
+import './BattleChessManager.css';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;
@@ -58,6 +58,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
   const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<{ args: ArgType, kwArgs: KWArgType }[]>([]);
+  const [errorRecoveryAttempts, setErrorRecoveryAttempts] = useState(0);
 
   const { movePieceAudio, capturePieceAudio } = useMemo(() => {
     const movePieceAudio = new Audio(movePieceMP3);
@@ -79,21 +80,13 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
 
   const { playRandomGlobalSong, playRandomBattleSong } = useMusicPlayer();
 
-  useEffect(() => {
-    if (currentBattle && (!catchingUp || userState.animationSpeedPreference >= 1000) && !gameState.isSkippingAhead) {
-      playRandomBattleSong();
-    } else {
-      playRandomGlobalSong();
-    }
-  }, [currentBattle]);
-
   const {
     requestChessMove,
     requestDraftPokemon,
     requestBanPokemon,
   } = useSocketRequests();
 
-  const { catchingUp, currentMatchLog } = useBattleHistory({
+  const { catchingUp, currentMatchLog, resetMatchHistory } = useBattleHistory({
     matchHistory,
     currentBattle,
     onBan: (draftPokemonIndex) => {
@@ -108,7 +101,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       setIsDrafting(!!pokemonManager.draftPieces.length);
     },
     onMove: (sanMove, moveFailed) => {
-      handleMove({ sanMove, moveFailed });
+      return handleMove({ sanMove, moveFailed });
     },
     onPokemonBattleStart: (p1Pokemon, p2Pokemon, attemptedMove) => {
       setCurrentPokemonMoveHistory([]);
@@ -151,20 +144,39 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     skipToEndOfSync: gameState.isSkippingAhead,
   });
 
+  const handleError = (err: Error) => {
+    if (errorRecoveryAttempts < 3) {
+      console.log(`Encountered error: ${err.message}. Attempting resync.`);
+      console.log(err.stack);
+      chessManager.reset();
+      pokemonManager.reset();
+      resetMatchHistory();
+      setErrorRecoveryAttempts((attempts) => ++attempts);
+    } else {
+      // Error toast message
+      console.log('Max error recovery attempts reached.');
+    }
+  }
+
   useEffect(() => {
+    dispatch({ type: 'SET_CATCHING_UP', payload: catchingUp });
+
     if (!catchingUp && gameState.isSkippingAhead) {
       dispatch({ type: 'SET_SKIPPING_AHEAD', payload: false });
     }
   }, [catchingUp]);
 
-  useEffect(() => {
-    dispatch({ type: 'SET_CATCHING_UP', payload: catchingUp });
-  }, [catchingUp]);
-
   const handleMove = ({ sanMove, moveFailed }: { sanMove: string; moveFailed?: boolean }) => {
     let castledRookSquare;
 
-    const verboseChessMove = getVerboseSanChessMove(sanMove, chessManager)!;
+    const verboseChessMove = getVerboseSanChessMove(sanMove, chessManager);
+
+    if (!verboseChessMove) {
+      const err = new Error('Verbose chess move undefined.');
+      handleError(err);
+      return err;
+    }
+
     const fromSquare = verboseChessMove.from;
     const toSquare = verboseChessMove.to;
     const promotion = verboseChessMove.promotion;
@@ -187,7 +199,12 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       chessManager.remove(verboseChessMove.from);
       chessManager.forceAdvanceTurn();
     } else {
-      chessManager.move({ from: fromSquare, to: toSquare, promotion }, { continueOnCheck: true });
+      try {
+        chessManager.move({ from: fromSquare, to: toSquare, promotion }, { continueOnCheck: true });
+      } catch (err) {
+        handleError(err as Error);
+        return err as Error;
+      }
       pokemonManager.movePokemonToSquare(fromSquare, toSquare);
     }
 
@@ -217,6 +234,12 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
   });
 
   const battleSquare = useMemo(() => {
+    if (currentBattle && (!catchingUp || userState.animationSpeedPreference >= 1000) && !gameState.isSkippingAhead) {
+      playRandomBattleSong();
+    } else {
+      playRandomGlobalSong();
+    }
+
     if (currentBattle?.attemptedMove.san) {
       const chessMove = getVerboseSanChessMove(currentBattle?.attemptedMove.san, chessManager);
       if (chessMove) {
@@ -268,6 +291,9 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
                 chessMoveHistory={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
                 board={board}
                 battleSquare={battleSquare}
+                onError={(err) => {
+                  handleError(err);
+                }}
                 onMove={(san) => {
                   if (gameState.isSpectator) {
                     return;
