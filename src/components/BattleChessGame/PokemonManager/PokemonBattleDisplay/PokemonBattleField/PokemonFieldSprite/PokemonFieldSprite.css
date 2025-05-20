@@ -5,7 +5,7 @@
   bottom: 100px;
   left: 100px;
 
-  @media (max-width: 650px) {
+  @media (max-width: 900px) {
     width: 50%;
     height: 50%;
     bottom: 10px;
@@ -20,7 +20,7 @@
   top: 120px;
   right: 100px;
 
-  @media (max-width: 650px) {
+  @media (max-width: 900px) {
     width: 50%;
     height: 50%;
     top: 50px;
@@ -109,7 +109,7 @@
 .pokemonSprite {
   margin: auto;
 
-  @media (max-width: 650px) {
+  @media (max-width: 900px) {
     transform: scale(50%) translateY(-50%);
   }
 }
