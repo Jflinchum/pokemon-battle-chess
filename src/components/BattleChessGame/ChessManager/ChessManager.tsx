@@ -5,12 +5,13 @@ import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBatt
 import PokemonChessDetailsCard from '../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard';
 import { ChessBoardSquare, MoveAttempt, PokemonChessBoardSquare } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
-import { getVerboseChessMove, mergeBoardAndPokemonState } from './util';
+import { getVerboseChessMove, getVerboseSanChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
 import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
 import { useDebounce } from '../../../utils';
 import { ChessData } from '../../../../shared/types/game';
 import { usePremoves } from './usePremoves';
+import { ArrowController } from './ArrowController/ArrowController';
 import './ChessManager.css';
 
 interface ChessManagerProps {
@@ -29,6 +30,7 @@ const ChessManager = ({
   chessManager,
   pokemonManager,
   mostRecentMove,
+  currentBattle,
   battleSquare,
   board,
   onMove,
@@ -96,6 +98,22 @@ const ChessManager = ({
     }).filter((move) => move.color === color);
     setHighlightedSquare(selectedSquareMoves.map((squareMove) => squareMove.to) as Square[]);
   }
+
+  const currentArrows = useMemo(() => {
+    let arrows = [];
+
+    if (mostRecentMove) {
+      arrows.push({ from: mostRecentMove.from, to: mostRecentMove.to, type: 'default' as const });
+    }
+
+    if (currentBattle) {
+      const battleChessMove = getVerboseSanChessMove(currentBattle.attemptedMove.san, chessManager);
+      if (battleChessMove) {
+        arrows.push({ from: battleChessMove.from, to: battleChessMove.to, type: 'battle' as const });
+      }
+    }
+    return arrows;
+  }, [mostRecentMove, currentBattle]);
 
   const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
     if (gameState.isSpectator || gameState.matchEnded || gameState.isCatchingUp) {
@@ -199,18 +217,20 @@ const ChessManager = ({
         }
       </div>
       <div className='chessGameContainer'>
-        <ChessBoard
-          boardState={mergeBoardAndPokemonState(simulatedBoard, simulatedPokemonManager)}
-          onSquareClick={handleSquareClick}
-          onSquareHover={handleSquareHover}
-          onPieceDrag={handlePieceDrag}
-          onPieceDrop={handlePieceDrop}
-          highlightedSquares={highlightedSquares}
-          selectedSquare={selectedSquare}
-          mostRecentMove={mostRecentMove}
-          battleSquare={battleSquare}
-          preMoveQueue={preMoveQueue}
-        />
+        <ArrowController arrows={currentArrows} perspective={color || 'w'}>
+          <ChessBoard
+            boardState={mergeBoardAndPokemonState(simulatedBoard, simulatedPokemonManager)}
+            onSquareClick={handleSquareClick}
+            onSquareHover={handleSquareHover}
+            onPieceDrag={handlePieceDrag}
+            onPieceDrop={handlePieceDrop}
+            highlightedSquares={highlightedSquares}
+            selectedSquare={selectedSquare}
+            mostRecentMove={mostRecentMove}
+            battleSquare={battleSquare}
+            preMoveQueue={preMoveQueue}
+          />
+        </ArrowController>
         <PokemonChessDetailsCard
           chessMoveHistory={chessMoveHistory}
           squareModifier={

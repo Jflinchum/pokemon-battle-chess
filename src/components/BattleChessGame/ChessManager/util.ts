@@ -10,6 +10,10 @@ export const getSquareFromIndices = (rowIndex: number, columnIndex: number): Squ
   return String.fromCharCode(97 + columnIndex) + (8 - rowIndex) as Square;
 }
 
+export const getNumberFromSquareLetter = (letter: string): number => {
+  return letter.charCodeAt(0) - 97;
+}
+
 export const getCastledRookSquare = (color: Color, isKingsideCastle: boolean): { from: Square, to: Square } => {
   return {
     from: `${isKingsideCastle ? 'h' : 'a'}${color === 'w' ? '1' : '8'}`,

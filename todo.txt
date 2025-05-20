@@ -1,6 +1,4 @@
 TODO:
-Add arrow going from attacking piece to attacked piece on client
-  - Use polygon html tag to build points
 Matchmaking
 Queue up your draft and bans
 Create formats to quick select game options in room
@@ -60,9 +58,8 @@ Refactor TODOs:
 - Remove key from chessmanager since it's a hack to re-render pokemon after drafting
 
 Issues:
-- "Invalid move from h1 to g1"
-  - On error, if in game, try reconnecting
 - Update items if they swap (with trick, for example)
+- Weather from weather squares says "5 or 8 turns" when it's always 5
 - Draft picking timer does not reset exactly to max time. It goes as little above or below it
 - Background width stretching image does not look good
 - Terrain/weather clearing should clear square modifier
