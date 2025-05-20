@@ -36,7 +36,7 @@ export const usePremoves = (board: ChessBoardSquare[][], chessManager: Chess, po
   };
 
   const simulateMove = (move: Move) => {
-    simulatedChessManager.move(move);
+    simulatedChessManager.move(move, { continueOnCheck: true });
     simulatedPokemonManager.movePokemonToSquare(move.from, move.to, move.promotion);
     simulatedChessManager.forceAdvanceTurn();
     setSimulatedBoard(simulatedChessManager.board());
@@ -55,7 +55,7 @@ export const usePremoves = (board: ChessBoardSquare[][], chessManager: Chess, po
       const preMove = preMoveQueue[i];
       const verboseMove = getVerboseChessMove(preMove.from, preMove.to, chessManagerCopy, preMove.promotion);
       if (verboseMove && preMove.san === verboseMove?.san) {
-        chessManagerCopy.move(preMove);
+        chessManagerCopy.move(preMove, { continueOnCheck: true });
         pokemonManagerCopy.movePokemonToSquare(verboseMove.from, verboseMove.to, verboseMove.promotion);
         chessManagerCopy.forceAdvanceTurn();
       } else {
