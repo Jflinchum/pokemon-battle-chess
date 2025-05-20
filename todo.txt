@@ -1,6 +1,15 @@
 TODO:
 Matchmaking
 Queue up your draft and bans
+  - Queue up drafts but not bans? Bans seem tough to convey queues with
+  - Drafts
+    - Instead of merging the board state within BattleChessManager, 
+      store state of current drafted pieces and merge the board state
+      within draft manager
+    - Store a queue of drafts within draft manager that you can the dequeue
+      when it is the player's turn to draft
+      - Be careful of index shifting. Pokemon are unique, so we could store the species.
+        However it may be nicer to shift the index of the queue when a pokemon is drafted
 Create formats to quick select game options in room
 Write validation functions when writing/reading from localstorage and clear it out if failing validation
 Download/upload replay
@@ -9,7 +18,6 @@ Download/upload replay
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
 Add more music and make music playlist w/ skip track button
 Pokemon Cries
-Are you sure you want to leave? modal when returning to menu in game
 Profanity filter on names and chat
 Keyboard navigation and accessibility
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
@@ -33,19 +41,9 @@ Priority:
   - Use winston + prometheus + grafana?
 - Toast notifications for errors and such
 - More detailed modals in game
+  - Are you sure you want to leave? modal when returning to menu in game
   - Add server disconnect
-- Robots.txt disable search engine crawling (for now)
 - (better) Error boundary
-- Queueing up Drafts/Chess moves
-  - Queue up drafts but not bans? Bans seem tough to convey queues with
-  - Drafts
-    - Instead of merging the board state within BattleChessManager, 
-      store state of current drafted pieces and merge the board state
-      within draft manager
-    - Store a queue of drafts within draft manager that you can the dequeue
-      when it is the player's turn to draft
-      - Be careful of index shifting. Pokemon are unique, so we could store the species.
-        However it may be nicer to shift the index of the queue when a pokemon is drafted
 
 Refactor TODOs:
 - Potentially lift game logic into new model
@@ -58,16 +56,16 @@ Refactor TODOs:
 - Remove key from chessmanager since it's a hack to re-render pokemon after drafting
 
 Issues:
-- Update items if they swap (with trick, for example)
+- Dupe pokemon generating
+  - Count Arceus as one unique pokemon when drafting sets. Don't dupe Arceus-Flying and Arceus-Ground, for example
+  - Squawkabillyblue vs regular Squawkabilly is duplicating when drafting
+- Update items if they swap (with trick, for example) or if they get used/knocked off
 - Weather from weather squares says "5 or 8 turns" when it's always 5
 - Draft picking timer does not reset exactly to max time. It goes as little above or below it
 - Background width stretching image does not look good
 - Terrain/weather clearing should clear square modifier
 - Weather square info on detail card does not show up during drafting
-- Count Arceus as one unique pokemon when drafting sets. Don't dupe Arceus-Flying and Arceus-Ground, for example
-- Squawkabillyblue vs regular Squawkabilly is duplicating when drafting
 - Wrong music playing after skipping to current turn when catching up
-- Music isn't playing on replays
 - Skipping to current turn while battle is about to start leads to a blank screen
 - Premoves:
   - Occasionally clearing when it shouldn't

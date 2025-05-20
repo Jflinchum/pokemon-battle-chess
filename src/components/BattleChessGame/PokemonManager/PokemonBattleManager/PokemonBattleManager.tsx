@@ -19,7 +19,7 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory,
   const battle = useMemo(
     () => {
       const newGeneration = new Generations(Dex);
-      const newBattle = new Battle(newGeneration, null, [p1Pokemon], undefined);
+      const newBattle = new Battle(newGeneration, null, [[perspective === 'p1' ? p1Pokemon : p2Pokemon], [perspective === 'p1' ? p2Pokemon : p1Pokemon]], undefined);
       for (const { args, kwArgs } of currentPokemonMoveHistory) {
         // Custom handling for forfeit
         if (args[0] === '-forfeit') {

@@ -6,15 +6,14 @@ export const getTypeEffectiveness = (move: Move, currentPokemon?: Pokemon | null
   if (!currentPokemon || !opponentPokemon) {
     return {};
   }
-  const dexOpponentPokemon = Dex.species.get(opponentPokemon.name);
   const type = modifyTypeAbilities[currentPokemon.set?.ability.toLowerCase() || ''] ? modifyTypeAbilities[currentPokemon.set!.ability.toLowerCase()](move, currentPokemon) : move.type;
-  const effectiveness = Dex.getEffectiveness(type, dexOpponentPokemon);
-  const notImmune = Dex.getImmunity(move, dexOpponentPokemon);
+  const effectiveness = Dex.getEffectiveness(type, opponentPokemon);
+  const notImmune = immunityAbilities[opponentPokemon.set?.ability.toLowerCase() || ''] ? immunityAbilities[opponentPokemon.set!.ability.toLowerCase()](move, currentPokemon) : Dex.getImmunity(move, opponentPokemon);
 
   return {
     effectiveness,
     notImmune,
-  }
+  };
 };
 
 // Taken from onModifyType
@@ -71,4 +70,53 @@ const modifyTypeAbilities: Record<string, (move: Move, pokemon: Pokemon) => Type
     }
     return move.type;
   }
+}
+
+/**
+ * To stay consistent with pokemon showdown's implementation, getting a pokemon's immunity
+ * actually returns if they're not immune
+ */
+const immunityAbilities: Record<string, (move: Move, target: Pokemon) => boolean> = {
+  'sap sipper': (move: Move) => {
+    return move.type !== 'Grass';
+  },
+  'levitate': (move: Move) => {
+    return move.type !== 'Ground';
+  },
+  'motor drive': (move: Move) => {
+    return move.type !== 'Electric';
+  },
+  'soundproof': (move: Move) => {
+    return !move.flags['sound'];
+  },
+  'storm drain': (move: Move) => {
+    return move.type !== 'Water';
+  },
+  'volt absorb': (move: Move) => {
+    return move.type !== 'Electric';
+  },
+  'water absorb': (move: Move) => {
+    return move.type !== 'Water';
+  },
+  'well baked body': (move: Move) => {
+    return move.type !== 'Fire';
+  },
+  'wonder guard': (move: Move, target: Pokemon) => {
+    return Dex.getEffectiveness(move, target) > 0;
+  },
+  'bulletproof': (move: Move) => {
+    return !move.flags['bullet'];
+  },
+  'dry skin': (move: Move) => {
+    return move.type !== 'Water';
+  },
+  'earth eater': (move: Move) => {
+    return move.type !== 'Ground';
+  },
+  'flash fire': (move: Move) => {
+    return move.type !== 'Fire';
+  },
+  'lightning rod': (move: Move) => {
+    return move.type !== 'Electric';
+  },
 }
