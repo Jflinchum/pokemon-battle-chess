@@ -38,7 +38,6 @@ Room Options
 Priority:
 - Better logging
   - Use winston + prometheus + grafana?
-- Toast notifications for errors and such
 - More detailed modals in game
   - Are you sure you want to leave? modal when returning to menu in game
   - Add server disconnect
@@ -53,6 +52,7 @@ Refactor TODOs:
 - Separate out draft/ban calls
 - Move logic in controller/index into GameRoom
 - Remove key from chessmanager since it's a hack to re-render pokemon after drafting
+- Prettier/eslint
 
 Issues:
 - Weather from weather squares says "5 or 8 turns" when it's always 5

@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { toast } from "react-toastify";
 import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChessKing, faCog, faDoorOpen, faFaceGrin, faNoteSticky, faUpload } from "@fortawesome/free-solid-svg-icons";
@@ -53,6 +54,7 @@ const MenuOptions = () => {
           gameStateDispatch({ type: 'START_REPLAY', payload: matchReplay });
         }
       } catch (err) {
+        toast('Error: Unable to read replay file');
         console.log(err);
       }
     };

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretLeft, faCaretRight, faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-toastify";
 import RoomList from "../RoomList/RoomList";
 import MenuOptions from "../MenuOptions/MenuOptions";
 import { getAvailableRooms } from "../../../service/lobby";
 import { useGameState } from "../../../context/GameStateContext";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
+import usePageVisibility from "../../../util/usePageVisibility";
 import './LobbyManager.css';
 
 const LobbyManager = () => {
@@ -15,7 +17,7 @@ const LobbyManager = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [refreshDisabled, setRefreshDisabled] = useState(false);
   const { dispatch: dispatchGameState } = useGameState();
-  const [errorText, setErrorText] = useState('');
+  const { isVisible } = usePageVisibility();
 
   const { stopSongs } = useMusicPlayer();
   useEffect(() => {
@@ -24,7 +26,6 @@ const LobbyManager = () => {
 
   const handleRefreshRoom = (searchTerm = '') => {
     setRefreshDisabled(true);
-    setErrorText('');
 
     const fetchRooms = async () => {
       const response = await getAvailableRooms(currentPage, 10, searchTerm);
@@ -33,7 +34,7 @@ const LobbyManager = () => {
         setAvailableRooms(rooms || []);
         setTotalPages(pageCount);
       } else {
-        setErrorText('Error while getting rooms.');
+        toast('Error: Could not get rooms.')
       }
     }
     fetchRooms();
@@ -48,13 +49,19 @@ const LobbyManager = () => {
     // Whenever we're back at the lobby, reset the room to a clean slate
     dispatchGameState({ type: 'RESET_ROOM' });
 
-    const refreshInterval = setInterval(() => {
-      handleRefreshRoom();
-    }, 1000 * 10);
-    return () => {
-      clearInterval(refreshInterval);
+    let refreshInterval: NodeJS.Timeout;
+    if (isVisible) {
+      refreshInterval = setInterval(() => {
+        handleRefreshRoom();
+      }, 1000 * 10);
     }
-  }, []);
+
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    }
+  }, [isVisible]);
 
   const handleOnSearch = (searchTerm: string) => {
     handleRefreshRoom(searchTerm);
@@ -68,7 +75,7 @@ const LobbyManager = () => {
         <div className='roomListLobbyContainer'>
           <h1 className='mainMenuHeader'>Pokemon Gambit</h1>
           <div className='roomListContainer'>
-            <RoomList availableRooms={availableRooms} errorText={errorText} onSearch={handleOnSearch}/>
+            <RoomList availableRooms={availableRooms} onSearch={handleOnSearch}/>
             <div className='roomListBottomActions'>
               <div className='paginationActions'>
                 <button aria-label='Page Left' className='paginationButton' onClick={() => setCurrentPage((curr => curr - 1 <= 0 ? curr : --curr))}>

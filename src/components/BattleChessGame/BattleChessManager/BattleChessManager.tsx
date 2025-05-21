@@ -22,6 +22,7 @@ import { useMusicPlayer } from '../../../util/useMusicPlayer';
 import PlayerList from '../../RoomManager/Room/PlayerList/PlayerList';
 import { useSocketRequests } from '../../../util/useSocketRequests';
 import './BattleChessManager.css';
+import { toast } from 'react-toastify';
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;
@@ -148,6 +149,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
 
   const handleError = (err: Error) => {
     if (errorRecoveryAttempts < 3) {
+      toast('Oops! We encountered an error. Attempting to recover...');
       console.log(`Encountered error: ${err.message}. Attempting resync.`);
       console.log(err.stack);
       chessManager.reset();
@@ -156,6 +158,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       setErrorRecoveryAttempts((attempts) => ++attempts);
     } else {
       // Error toast message
+      toast('Error: Could not recover from game bug. Please refresh and try to reconnect.');
       console.log('Max error recovery attempts reached.');
     }
   }

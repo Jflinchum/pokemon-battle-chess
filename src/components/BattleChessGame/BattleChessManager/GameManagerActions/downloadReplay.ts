@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import { PRNGSeed } from '@pkmn/sim';
 import { MatchHistory } from "../../../../../shared/types/game";
 import { GameState } from "../../../../context/GameStateContext";
@@ -17,7 +18,7 @@ export const downloadReplay = (gameState: GameState, matchHistory: MatchHistory)
   const seed = gameState.gameSettings.seed;
 
   if (!whitePlayer || !blackPlayer || !seed) {
-    // TODO - better error state
+    toast('Error: Unable to download replay');
     return;
   }
   const replayData: ReplayData = {

@@ -1,12 +1,13 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 import RoomListItem from "./RoomListItem";
 import { useUserState } from "../../../context/UserStateContext";
 import { useModalState } from "../../../context/ModalStateContext";
 import { joinRoom } from "../../../service/lobby";
-import './RoomList.css';
 import ErrorMessage from "../../common/ErrorMessage/ErrorMessage";
 import { useDebounce } from "../../../utils";
 import Input from "../../common/Input/Input";
+import './RoomList.css';
 
 export interface Room {
   roomId: string,
@@ -26,10 +27,8 @@ const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
   const { dispatch, userState } = useUserState();
   const { dispatch: dispatchModalState } = useModalState();
   const [roomSearch, setRoomSearch] = useState('');
-  const [joinErrorText, setJoinErrorText] = useState('');
 
   const handleJoinRoom = async ({ roomId, hasPassword }: { roomId: string, hasPassword: boolean }) => {
-    setJoinErrorText('');
     if (hasPassword) {
       dispatchModalState({ type: 'OPEN_ROOM_MODAL', payload: { modalProps: { roomId: roomId } } });
     } else {
@@ -37,7 +36,7 @@ const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
       if (response.status === 200) {
         dispatch({ type: 'JOIN_ROOM', payload: { roomId: roomId, roomCode: '' } });
       } else {
-        setJoinErrorText('Failed to join room.')
+        toast('Error: Failed to join room.');
       }
     }
   }
@@ -47,7 +46,6 @@ const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
   return (
     <div>
       <ErrorMessage display='block'>{errorText}</ErrorMessage>
-      <ErrorMessage display='block'>{joinErrorText}</ErrorMessage>
       <div className='roomListTopActions'>
         <span>Rooms:</span>
         <span className='roomSearchContainer'>

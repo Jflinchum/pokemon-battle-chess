@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
 import LobbyManager from '../Lobby/LobbyManager/LobbyManager'
 import RoomManager from '../RoomManager/RoomManager';
 import { useUserState } from '../../context/UserStateContext';
@@ -22,6 +23,15 @@ const MainMenu = () => {
 
   return (
     <ErrorBoundary>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        rtl={false}
+        pauseOnFocusLoss
+        pauseOnHover
+        theme="dark"
+      />
       {
         userState.currentRoomId ?
         (<RoomManager />) :
