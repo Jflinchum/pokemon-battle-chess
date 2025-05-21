@@ -64,7 +64,6 @@ Issues:
 - Premoves:
   - Occasionally clearing when it shouldn't
   - Does not clear if opponent piece moves to premove spot (triggers battle)
-- Disallow server inputs when match has ended
 - Pokemon sprites occasionally disappearing
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't

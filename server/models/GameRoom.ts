@@ -318,7 +318,7 @@ export default class GameRoom {
   }
 
   public async validateAndEmitChessMove({ sanMove, playerId }: { sanMove: string, playerId: string }) {
-    if (!this.whitePlayer || !this.blackPlayer) {
+    if (!this.whitePlayer || !this.blackPlayer || !this.isOngoing) {
       return;
     }
     if (this.currentTurnWhite && this.whitePlayer.playerId !== playerId) {
@@ -521,7 +521,7 @@ export default class GameRoom {
   }
 
   public validateAndEmitPokemonMove({ pokemonMove, playerId }: { pokemonMove: string; playerId: string }) {
-    if (!this.whitePlayer || !this.blackPlayer) {
+    if (!this.whitePlayer || !this.blackPlayer || !this.isOngoing) {
       return;
     }
     const isUndo = pokemonMove === 'undo';
@@ -624,7 +624,7 @@ export default class GameRoom {
     playerId: string;
   }) {
     const chessSquare = square ? this.chessManager.get(square) : null;
-    if (!square || !chessSquare || !this.whitePlayer || !this.blackPlayer) {
+    if (!square || !chessSquare || !this.whitePlayer || !this.blackPlayer || !this.isOngoing) {
       return;
     }
     if (playerId === this.whitePlayer.playerId) {
