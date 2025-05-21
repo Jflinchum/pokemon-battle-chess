@@ -264,7 +264,7 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
         return;
       }
 
-      socket.broadcast.emit('chatMessage', { playerName: player.playerName, message })
+      socket.to(room.roomId).emit('chatMessage', { playerName: player.playerName, message })
     });
   });
 }
