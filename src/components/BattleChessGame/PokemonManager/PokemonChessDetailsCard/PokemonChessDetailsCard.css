@@ -63,6 +63,8 @@
 }
 
 .pokemonDetailsIdentifier {
+  display: flex;
+  align-items: center;
   margin: 0;
   & > * {
     margin-right: 6px;
@@ -136,4 +138,9 @@
 
 .pokemonDetailsIdentifierAndType {
   margin-right: auto;
+}
+
+.pokemonDetailsShiny {
+  width: 20px;
+  height: 20px;
 }

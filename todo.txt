@@ -22,7 +22,6 @@ Profanity filter on names and chat
 Keyboard navigation and accessibility
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
 Add Pokedex on left nav to look up full descriptions?
-Shiny icon on shiny pokemon details card
 
 Room Options
 - Preserve damage after battle

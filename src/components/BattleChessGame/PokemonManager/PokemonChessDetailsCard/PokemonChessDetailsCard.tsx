@@ -14,6 +14,7 @@ import { SquareModifier } from '../../../../../shared/models/PokemonBattleChessM
 import { PokemonWeatherBackground } from '../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground';
 import { WeatherId, TerrainId } from '../../../../../shared/types/PokemonTypes';
 import { PokemonSprite } from '../../../common/Pokemon/PokemonSprite/PokemonSprite';
+import shinyIcon from '../../../../assets/pokemonAssets/shiny.png'; 
 import './PokemonChessDetailsCard.css';
 
 interface PokemonChessDetailsCardProps {
@@ -114,6 +115,7 @@ const PokemonChessDetailsCard = ({ pokemon, chessMoveHistory = [], squareModifie
                     <span>{pokemon.name}</span>
                     <GenderIcon gender={pokemon.gender} />
                     <span>Lv{pokemon.level}</span>
+                    {pokemon.shiny && <img src={shinyIcon} className='pokemonDetailsShiny' />}
                   </p>
                   <div className='pokemonDetailsTypingContainer'>
                     {
