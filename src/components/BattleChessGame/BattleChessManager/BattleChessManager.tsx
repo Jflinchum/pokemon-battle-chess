@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { Chess, Color, Square } from 'chess.js';
 import { PokemonSet, SideID } from '@pkmn/data';
 import { ArgType, KWArgType } from '@pkmn/protocol';
@@ -52,13 +52,14 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(null);
   const [battleStarted, setBattleStarted] = useState(false);
   const [board, setBoard] = useState(chessManager.board());
-  // pokemon chess board TODO rename
-  const [currentBoard, setCurrentBoard] = useState(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
+  const [currentPokemonBoard, setCurrentPokemonBoard] = useState(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
   const [isDrafting, setIsDrafting] = useState<boolean>(gameState.gameSettings.options.format === 'draft');
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
   const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
   const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<{ args: ArgType, kwArgs: KWArgType }[]>([]);
   const [errorRecoveryAttempts, setErrorRecoveryAttempts] = useState(0);
+  // The timeout to start/end the pokemon battle when initiating one.
+  const battleTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const { movePieceAudio, capturePieceAudio } = useMemo(() => {
     const movePieceAudio = new Audio(movePieceMP3);
@@ -96,7 +97,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     onDraft: (square, draftPokemonIndex, color) => {
       const chessSquare = chessManager.get(square)!;
       pokemonManager.assignPokemonToSquare(draftPokemonIndex, square, chessSquare.type, color)
-      setCurrentBoard(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
+      setCurrentPokemonBoard(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
       setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
       setIsDrafting(!!pokemonManager.draftPieces.length);
     },
@@ -114,7 +115,8 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       if (gameState.isSkippingAhead) {
         setBattleStarted(true);
       } else {
-        setTimeout(() => {
+        // Need to cancel this timeout when skip to current turn is clicked
+        battleTimeout.current = setTimeout(() => {
           setBattleStarted(true);
         }, userState.animationSpeedPreference);
       }
@@ -127,7 +129,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
         if (gameState.isSkippingAhead) {
           setCurrentBattle(null);
         } else {
-          setTimeout(() => {
+          battleTimeout.current = setTimeout(() => {
             setCurrentBattle(null);
           }, userState.animationSpeedPreference);
         }
@@ -165,6 +167,16 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       dispatch({ type: 'SET_SKIPPING_AHEAD', payload: false });
     }
   }, [catchingUp]);
+
+  /**
+   * Clear out the timeout for starting and ending a battle if we start skipping ahead.
+   * This is to prevent unintended side effects while we're not rendering anything.
+   */
+  useEffect(() => {
+    if (gameState.isSkippingAhead && battleTimeout.current) {
+      clearTimeout(battleTimeout.current);
+    }
+  }, [gameState.isSkippingAhead]);
 
   const handleMove = ({ sanMove, moveFailed }: { sanMove: string; moveFailed?: boolean }) => {
     let castledRookSquare;
@@ -309,7 +321,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
                   draftTurnPick={draftTurnPick}
                   chessManager={chessManager}
                   pokemonManager={pokemonManager}
-                  boardState={currentBoard}
+                  boardState={currentPokemonBoard}
                   onDraftPokemon={(sq, pkmnIndex) => {
                     if (validateDraftPick(sq, color!)) {
                       requestDraftPokemon(sq, pkmnIndex);
