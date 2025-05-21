@@ -61,7 +61,7 @@ Issues:
     Would need to add a species tag to each pokemon set and filter that species tag out of the pool whenever we generate a pokemon.
   - Count Arceus as one unique pokemon when drafting sets. Don't dupe Arceus-Flying and Arceus-Ground, for example
   - Squawkabillyblue vs regular Squawkabilly is duplicating when drafting
-- Update items if they swap (with trick, for example) or if they get used/knocked off
+- Remove any Self-destruct moves
 - Weather from weather squares says "5 or 8 turns" when it's always 5
 - Draft picking timer does not reset exactly to max time. It goes as little above or below it
 - Terrain/weather clearing should clear square modifier

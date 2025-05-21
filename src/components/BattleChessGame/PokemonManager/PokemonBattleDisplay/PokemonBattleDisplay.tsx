@@ -59,7 +59,7 @@ const PokemonBattleDisplay = ({ battleState, fullBattleLog, p1Pokemon, p2Pokemon
         <>
           <div className='battlefieldAndLog'>
             <span className='battleContainer'>
-              <PokemonBattleDetails p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon}>
+              <PokemonBattleDetails p1Pokemon={battleState.p1.active[0]} p2Pokemon={battleState.p2.active[0]}>
                 <PokemonBattleField battleHistory={fullBattleLog} battleState={battleState} p1PokemonSet={p1Pokemon} p2PokemonSet={p2Pokemon}/>
               </PokemonBattleDetails>
               <PokemonBattleLog battleHistory={fullBattleLog} simple={true} battleState={battleState} perspective={perspective}/>

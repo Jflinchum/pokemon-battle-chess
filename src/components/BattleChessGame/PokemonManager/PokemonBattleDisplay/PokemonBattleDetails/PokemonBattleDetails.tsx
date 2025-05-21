@@ -1,32 +1,36 @@
-import { PokemonSet, TypeName } from "@pkmn/data";
+import { useMemo } from "react";
+import { Pokemon } from "@pkmn/client";
+import { TypeName } from "@pkmn/data";
 import { Dex } from "@pkmn/dex";
 import PokemonType from "../../../../common/Pokemon/PokemonType/PokemonType";
 import Tooltip from "../../../../common/Tooltip/Tooltip";
 import { GenderIcon } from "../../../../common/GenderIcon/GenderIcon";
 import { PokemonMoveTooltip } from "../PokemonMoveTooltip/PokemonMoveTooltip";
 import './PokemonBattleDetails.css';
-import { useMemo } from "react";
 
 interface PokemonBattleDetailsProps {
-  p1PokemonSet: PokemonSet;
-  p2PokemonSet: PokemonSet;
+  p1Pokemon: Pokemon | null;
+  p2Pokemon: Pokemon | null;
   children: React.ReactNode;
 }
 
-export const PokemonBattleDetails = ({ p1PokemonSet, p2PokemonSet, children }: PokemonBattleDetailsProps) => {
+export const PokemonBattleDetails = ({ p1Pokemon, p2Pokemon, children }: PokemonBattleDetailsProps) => {
   return (
     <div className='pokemonBattleDetailsContainer'>
-      <PokemonBattleDetailsCard pokemonSet={p1PokemonSet} />
+      <PokemonBattleDetailsCard pokemon={p1Pokemon} />
       <span className='pokemonBattleDetailsChild'>
         {children}
       </span>
-      <PokemonBattleDetailsCard pokemonSet={p2PokemonSet} />
+      <PokemonBattleDetailsCard pokemon={p2Pokemon} />
     </div>
   );
 };
 
-const PokemonBattleDetailsCard = ({ pokemonSet }: { pokemonSet: PokemonSet }) => {
-  const dexPokemon = Dex.species.get(pokemonSet.species);
+const PokemonBattleDetailsCard = ({ pokemon }: { pokemon: Pokemon | null }) => {
+  if (!pokemon) {
+    return null;
+  }
+  const dexPokemon = Dex.species.get(pokemon.speciesForme);
 
   const { weaknesses, resistances, immunities } = useMemo(() => {
     const weaknesses: TypeName[] = [];
@@ -63,19 +67,19 @@ const PokemonBattleDetailsCard = ({ pokemonSet }: { pokemonSet: PokemonSet }) =>
             }
           </span>
           <span className='pokemonBattleDetailsCardName'>
-            <span>{pokemonSet.species}</span>
-            <GenderIcon gender={pokemonSet.gender} />
-            <span>Lv{pokemonSet.level}</span>
+            <span>{pokemon.baseSpeciesForme}</span>
+            <GenderIcon gender={pokemon.gender} />
+            <span>Lv{pokemon.level}</span>
           </span>
-          <span id={`ability-${pokemonSet.species.split(' ').join('-')}`}><strong>Ability: </strong>{pokemonSet.ability}</span>
-          <span id={`item-${pokemonSet.species.split(' ').join('-')}`}><strong>Item: </strong>{pokemonSet.item}</span>
+          <span id={`ability-${pokemon.baseSpeciesForme.split(' ').join('-')}`}><strong>Ability: </strong>{pokemon.set?.ability}</span>
+          <span id={`item-${pokemon.baseSpeciesForme.split(' ').join('-')}`}><strong>Item: </strong>{Dex.items.get(pokemon.item || '').name}</span>
           <span>
             <strong>Moves: </strong>
             {
-              pokemonSet.moves.map((move, index) => (
+              pokemon.set?.moves.map((move, index) => (
                 <span key={index}>
-                  <span id={`${move.split(' ').join('-')}-${pokemonSet.species.split(' ').join('-')}`}>
-                    {Dex.moves.get(move).name}{index === pokemonSet.moves.length - 1 ? ' ' : ', '}
+                  <span id={`${move.split(' ').join('-')}-${pokemon.baseSpeciesForme.split(' ').join('-')}`}>
+                    {Dex.moves.get(move).name}{index === ((pokemon.set?.moves.length || 0) - 1) ? ' ' : ', '}
                   </span>
                 </span>
               ))
@@ -126,17 +130,17 @@ const PokemonBattleDetailsCard = ({ pokemonSet }: { pokemonSet: PokemonSet }) =>
         </div>
       </div>
       {
-        pokemonSet.moves.map((move, index) => (
-          <Tooltip key={index} className='pokemonBattleDetailsCardSetTooltip' anchorSelect={`#${move.split(' ').join('-')}-${pokemonSet.species.split(' ').join('-')}`}>
+        pokemon.set?.moves.map((move, index) => (
+          <Tooltip key={index} className='pokemonBattleDetailsCardSetTooltip' anchorSelect={`#${move.split(' ').join('-')}-${pokemon.baseSpeciesForme.split(' ').join('-')}`}>
             <PokemonMoveTooltip move={move} />
           </Tooltip>
         ))
       }
-      <Tooltip className='pokemonBattleDetailsCardSetTooltip' anchorSelect={`#ability-${pokemonSet.species.split(' ').join('-')}`}>
-        { Dex.abilities.get(pokemonSet.ability).shortDesc }
+      <Tooltip className='pokemonBattleDetailsCardSetTooltip' anchorSelect={`#ability-${pokemon.baseSpeciesForme.split(' ').join('-')}`}>
+        { Dex.abilities.get(pokemon.set?.ability || '').shortDesc }
       </Tooltip>
-      <Tooltip className='pokemonBattleDetailsCardSetTooltip' anchorSelect={`#item-${pokemonSet.species.split(' ').join('-')}`}>
-        { Dex.items.get(pokemonSet.item).shortDesc }
+      <Tooltip className='pokemonBattleDetailsCardSetTooltip' anchorSelect={`#item-${pokemon.baseSpeciesForme.split(' ').join('-')}`}>
+        { Dex.items.get(pokemon.item).shortDesc }
       </Tooltip>
     </>
   );

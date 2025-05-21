@@ -99,7 +99,7 @@ const PokemonFieldSprite = ({ pokemon, side, set }: PokemonFieldSpriteProps) => 
         className={`pokemonSprite ${side}PokemonSprite`}
         isSubstitute={!!pokemon.volatiles['substitute']}
         side={side}
-        pokemonIdentifier={pokemon.baseSpeciesForme}
+        pokemonIdentifier={pokemon.speciesForme}
         gender={pokemon.gender as GenderName}
         shiny={pokemon.shiny}
       />
