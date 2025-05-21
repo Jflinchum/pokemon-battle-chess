@@ -59,6 +59,9 @@ const DraftPokemonManager = ({ pokemonManager, onDraftPokemon, boardState, draft
           selectedSquare={selectedSquare}
         />
         <PokemonChessDetailsCard
+          squareModifier={
+            pokemonManager.getWeatherFromSquare(selectedSquare)
+          }
           pokemon={
             pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn || (draftPokemonSelected !== null ? pokemonManager.draftPieces[draftPokemonSelected] : null)
           }

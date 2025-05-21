@@ -57,7 +57,6 @@ Refactor TODOs:
 Issues:
 - Weather from weather squares says "5 or 8 turns" when it's always 5
 - Draft picking timer does not reset exactly to max time. It goes as little above or below it
-- Weather square info on detail card does not show up during drafting
 - Wrong music playing after skipping to current turn when catching up
 - Skipping to current turn while battle is about to start leads to a blank screen
 - Premoves:
