@@ -710,8 +710,8 @@ export default class GameRoom {
       const advantageSide = this.currentTurnWhite ? 'p1' : 'p2';
       const modifiers = squareModifier?.modifiers;
       let addedModifiers = false;
-      let weatherChanges: WeatherId;
-      let terrainChanges: TerrainId;
+      let weatherChanges: WeatherId | 'unset';
+      let terrainChanges: TerrainId | 'unset';
 
       const pokemonBattleChessMod = SimDex.mod('pokemonbattlechess', { Formats: [{
           name: 'pbc',
@@ -720,13 +720,13 @@ export default class GameRoom {
             gameRoomScope.currentPokemonBattle = this;
           },
           onWeatherChange(target, _, sourceEffect) {
-            if (sourceEffect && WeatherNames.includes(target.battle.field.weather as WeatherId)) {
-              weatherChanges = target.battle.field.weather as WeatherId;
+            if (sourceEffect && (target.battle.field.weather === '' || WeatherNames.includes(target.battle.field.weather as WeatherId))) {
+              weatherChanges = target.battle.field.weather as WeatherId || 'unset';
             }
           },
           onTerrainChange(target, _, sourceEffect) {
-            if (sourceEffect && TerrainNames.includes(target.battle.field.terrain as TerrainId)) {
-              terrainChanges = target.battle.field.terrain as TerrainId;
+            if (sourceEffect && (target.battle.field.terrain === '' || TerrainNames.includes(target.battle.field.terrain as TerrainId))) {
+              terrainChanges = target.battle.field.terrain as TerrainId || 'unset';
             }
           },
           onSwitchIn(pokemon) {
@@ -779,7 +779,7 @@ export default class GameRoom {
             if (args[0] === 'win') {
               this.gameTimer?.stopTimers();
 
-              if ((weatherChanges || terrainChanges) && this.roomGameOptions.weatherWars) {
+              if ((weatherChanges !== undefined || terrainChanges !== undefined) && this.roomGameOptions.weatherWars) {
                 this.pokemonGameManager.updateSquareWeather(battleSquare, weatherChanges);
                 this.pokemonGameManager.updateSquareTerrain(battleSquare, terrainChanges);
                 const squareModifierData: MatchLog = { type: 'weather', data: { event: 'weatherChange', squareModifiers: this.pokemonGameManager.squareModifiers } };

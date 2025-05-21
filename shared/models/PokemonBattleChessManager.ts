@@ -234,41 +234,58 @@ export class PokemonBattleChessManager {
     }).filter((squareMod) => squareMod.modifiers.terrain || squareMod.modifiers.weather);
   }
 
-  public updateSquareWeather(square: Square, weather?: WeatherId) {
-    if (!weather) return;
+  public updateSquareWeather(square: Square, weather?: WeatherId | 'unset') {
+    if (weather === undefined) return;
     const squareMod = this.getWeatherFromSquare(square);
-    const newWeather = {
-      id: weather,
-      duration: this.prng.random(5, 15),
-    };
-    if (squareMod) {
-      squareMod.modifiers.weather = newWeather;
+
+    if (weather === 'unset') {
+      if (squareMod?.modifiers.terrain) {
+        delete squareMod.modifiers.weather;
+      } else {
+        this.squareModifiers = this.squareModifiers.filter((sqMod) => sqMod.square !== square);
+      }
     } else {
-      this.squareModifiers.push({
-        square,
-        modifiers: {
-          weather: newWeather
-        }
-      })
+      const newWeather = {
+        id: weather,
+        duration: this.prng.random(5, 15),
+      };
+      if (squareMod) {
+        squareMod.modifiers.weather = newWeather;
+      } else {
+        this.squareModifiers.push({
+          square,
+          modifiers: {
+            weather: newWeather
+          }
+        })
+      }
     }
   }
 
-  public updateSquareTerrain(square: Square, terrain?: TerrainId) {
-    if (!terrain) return;
+  public updateSquareTerrain(square: Square, terrain?: TerrainId | 'unset') {
+    if (terrain === undefined) return;
     const squareMod = this.getWeatherFromSquare(square);
-    const newTerrain = {
-      id: terrain,
-      duration: this.prng.random(5, 15),
-    };
-    if (squareMod) {
-      squareMod.modifiers.terrain = newTerrain;
+    if (terrain === 'unset') {
+      if (squareMod?.modifiers.weather) {
+        delete squareMod.modifiers.terrain;
+      } else {
+        this.squareModifiers = this.squareModifiers.filter((sqMod) => sqMod.square !== square);
+      }
     } else {
-      this.squareModifiers.push({
-        square,
-        modifiers: {
-          terrain: newTerrain
-        }
-      })
+      const newTerrain = {
+        id: terrain,
+        duration: this.prng.random(5, 15),
+      };
+      if (squareMod) {
+        squareMod.modifiers.terrain = newTerrain;
+      } else {
+        this.squareModifiers.push({
+          square,
+          modifiers: {
+            terrain: newTerrain
+          }
+        })
+      }
     }
   }
 
