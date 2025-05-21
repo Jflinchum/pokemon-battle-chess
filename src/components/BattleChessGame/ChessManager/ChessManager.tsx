@@ -62,9 +62,9 @@ const ChessManager = ({
 
   useEffect(() => {
     if (color === chessManager.turn() && preMoveQueue.length > 0) {
-      const { from, to, promotion } = preMoveQueue[0];
+      const { from, to, promotion, san } = preMoveQueue[0];
       const verboseChessMove = getVerboseChessMove(from, to, chessManager, promotion);
-      if (verboseChessMove) {
+      if (verboseChessMove?.san === san) {
         setPreMoveQueue((curr) => curr.slice(1));
         onMove(verboseChessMove.san)
       } else {
