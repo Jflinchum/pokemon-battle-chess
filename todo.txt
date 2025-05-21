@@ -55,7 +55,6 @@ Refactor TODOs:
 - Remove key from chessmanager since it's a hack to re-render pokemon after drafting
 
 Issues:
-- Remove any Self-destruct moves
 - Weather from weather squares says "5 or 8 turns" when it's always 5
 - Draft picking timer does not reset exactly to max time. It goes as little above or below it
 - Terrain/weather clearing should clear square modifier

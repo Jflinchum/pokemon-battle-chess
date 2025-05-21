@@ -128,6 +128,9 @@ export class PokeSimRandomGen {
 						if (move.id === 'destinybond') {
 							return false;
 						}
+						if (move.selfdestruct) {
+							return false;
+						}
             return true;
           })
         };
