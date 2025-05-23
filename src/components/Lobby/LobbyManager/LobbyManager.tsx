@@ -53,7 +53,7 @@ const LobbyManager = () => {
     if (isVisible) {
       refreshInterval = setInterval(() => {
         handleRefreshRoom();
-      }, 1000 * 10);
+      }, 1000 * 20);
     }
 
     return () => {

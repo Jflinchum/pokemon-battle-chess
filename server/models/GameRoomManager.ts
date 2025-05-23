@@ -1,6 +1,8 @@
 import { Server, Socket } from "socket.io";
 import GameRoom from "./GameRoom";
 import User from "./User";
+import { GameOptions } from "../../shared/types/GameOptions";
+import { ClientToServerEvents, ServerToClientEvents } from "../../shared/types/Socket";
 
 interface GameRoomList {
   [roomId: string]: GameRoom
@@ -8,15 +10,28 @@ interface GameRoomList {
 
 export default class GameRoomManager {
   public currentRooms: GameRoomList;
+
+  public randomBattleMatchQueue: User[];
+  public draftBattleMatchQueue: User[];
+
   private io: Server;
 
-  constructor(rooms = {}, io: Server) {
+  constructor(rooms = {}, io: Server<ClientToServerEvents, ServerToClientEvents>) {
     this.currentRooms = rooms;
     this.io = io;
+
+    this.randomBattleMatchQueue = [];
+    this.draftBattleMatchQueue = [];
+    setInterval(() => {
+      this.processAllQueues();
+    }, 10 * 1000);
   }
 
   public getRoom(roomId?: string): GameRoom | undefined {
-    return this.currentRooms[roomId || ''];
+    if (!roomId) {
+      return;
+    }
+    return this.currentRooms[roomId];
   }
 
   public addRoom(roomId: string, room: GameRoom) {
@@ -89,5 +104,74 @@ export default class GameRoomManager {
     } else {
       this.io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
     }
+  };
+
+  public addPlayerToQueue(user: User, queue: 'random' | 'draft') {
+    if (queue === 'random') {
+      this.randomBattleMatchQueue.push(user)
+    } else if (queue === 'draft') {
+      this.draftBattleMatchQueue.push(user);
+    }
+  }
+
+  public removePlayerFromQueue(socket: Socket, queue?: 'random' | 'draft') {
+    if (queue || queue === 'random') {
+      this.randomBattleMatchQueue = this.randomBattleMatchQueue.filter((user) => user.socket?.id !== socket.id);
+    }
+    if (queue || queue === 'draft') {
+      this.draftBattleMatchQueue = this.draftBattleMatchQueue.filter((user) => user.socket?.id !== socket.id);
+    }
+  }
+
+  private processAllQueues() {
+    this.randomBattleMatchQueue = this.randomBattleMatchQueue.filter((user) => user.socket?.connected === true);
+    this.draftBattleMatchQueue = this.draftBattleMatchQueue.filter((user) => user.socket?.connected === true);
+    const gameOptions = {
+      offenseAdvantage: {
+        atk: 0,
+        def: 0,
+        spa: 0,
+        spd: 1,
+        spe: 0,
+        accuracy: 0,
+        evasion: 0,
+      },
+      weatherWars: true,
+      timersEnabled: true,
+      banTimerDuration: 30,
+      chessTimerDuration: 15,
+      chessTimerIncrement: 5,
+      pokemonTimerIncrement: 1,
+    };
+
+    this.randomBattleMatchQueue = this.createGamesForQueue(this.randomBattleMatchQueue, {
+      format: 'random',
+      ...gameOptions,
+    });
+
+    this.draftBattleMatchQueue = this.createGamesForQueue(this.draftBattleMatchQueue, {
+      format: 'draft',
+      ...gameOptions,
+    });
+  }
+
+  private createGamesForQueue(queue: User[], gameOptions: GameOptions) {
+    let remainingQueue: User[] = [];
+    for (let i = 0; i < queue.length - 1; i += 2) {
+      const newRoomId = crypto.randomUUID();
+
+      this.currentRooms[newRoomId] = new GameRoom(newRoomId, null, '', this, true);
+      this.currentRooms[newRoomId].joinRoom(queue[i]);
+      this.currentRooms[newRoomId].joinRoom(queue[i + 1]);
+      this.currentRooms[newRoomId].setOptions(gameOptions);
+      queue[i].socket?.emit('foundMatch', { roomId: newRoomId });
+      queue[i + 1].socket?.emit('foundMatch', { roomId: newRoomId });
+      this.currentRooms[newRoomId].startGame();
+    }
+
+    if (queue.length % 2 !== 0) {
+      remainingQueue.push(queue[queue.length - 1]);
+    }
+    return remainingQueue;
   }
 }

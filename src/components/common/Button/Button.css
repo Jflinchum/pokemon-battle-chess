@@ -21,7 +21,7 @@
     outline: rgb(100, 100, 200);
   }
   &:hover {
-    filter: brightness(110%);
+    filter: brightness(130%);
   }
   &:disabled {
     filter: grayscale(50%) brightness(70%);

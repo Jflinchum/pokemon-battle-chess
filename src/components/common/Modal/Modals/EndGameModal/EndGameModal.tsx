@@ -100,7 +100,7 @@ const EndGameModal = () => {
           <div className='endGameBottomActions'>
             <Button color='danger' onClick={handleBackToMenu}>Back To Main Menu</Button>
             {
-              !gameState.isWatchingReplay && (
+              !gameState.isWatchingReplay && !gameState.gameSettings.isQuickPlay && (
                 <Button className='endGameRematch' onClick={handleReturn} color='primary'>Return to Room</Button>
               )
             }

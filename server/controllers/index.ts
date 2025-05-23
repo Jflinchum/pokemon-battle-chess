@@ -43,7 +43,7 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
     const newRoomId = crypto.randomUUID();
 
     const host = new User(playerName, playerId, avatarId || '1', secret);
-    const gameRoom = new GameRoom(newRoomId, host, password, gameRoomManager);
+    const gameRoom = new GameRoom(newRoomId, host, password, gameRoomManager, false);
     gameRoomManager.addRoom(newRoomId, gameRoom);
 
     res.status(200).send({
@@ -107,6 +107,9 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
     .filter((id) => {
       const hostPlayerName = gameRoomManager.getRoom(id)?.hostPlayer?.playerName;
       if (!hostPlayerName) {
+        return false;
+      }
+      if (gameRoomManager.getRoom(id)?.isQuickPlay) {
         return false;
       }
       return hostPlayerName.toLowerCase().includes(searchTerm.toLowerCase());

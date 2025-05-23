@@ -22,6 +22,7 @@ Profanity filter on names and chat
 Keyboard navigation and accessibility
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
 Add Pokedex on left nav to look up full descriptions?
+Make toast progress bar green
 
 Room Options
 - Preserve damage after battle
@@ -29,6 +30,8 @@ Room Options
   - A Pokemon can only tera once in a match, and then they can't tera again
 - Set player colors before starting
 - Closed Team Sheets
+  - Hide opposing Pokemon information 
+  - In draft mode, don't show pokemon information until after drafting it to your side
 - Custom Teams
 - (maybe) Preserve item usage after battle
 - (maybe) Change pokemon on piece promotion
@@ -42,6 +45,7 @@ Priority:
   - Are you sure you want to leave? modal when returning to menu in game
   - Add server disconnect
 - (better) Error boundary
+- (better) How to Play
 
 Refactor TODOs:
 - Potentially lift game logic into new model

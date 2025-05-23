@@ -19,6 +19,7 @@ export default class GameRoom {
   public roomSeed: PRNGSeed;
   private secretSeed: PRNGSeed;
   private secretPRNG: PRNG;
+  public isQuickPlay: boolean;
   public password: string;
   public hostPlayer: User | null = null;
   public player1: User | null = null;
@@ -50,11 +51,16 @@ export default class GameRoom {
 
   private squareModifierTarget: number;
 
-  constructor(roomId: string, hostPlayer: User, password: string, gameRoomManager: GameRoomManager) {
+  constructor(roomId: string, hostPlayer: User | null, password: string, gameRoomManager: GameRoomManager, isQuickPlay: boolean) {
     this.roomId = roomId;
     this.hostPlayer = hostPlayer;
     this.player1 = hostPlayer;
-    this.playerList = [hostPlayer];
+    this.playerList = [];
+    if (hostPlayer) {
+      this.playerList.push(hostPlayer);
+    }
+
+    this.isQuickPlay = isQuickPlay;
     this.isOngoing = false;
     this.password = password;
     this.gameRoomManager = gameRoomManager;
@@ -102,7 +108,9 @@ export default class GameRoom {
   }
 
   public joinRoom(player: User) {
-    if (this.player2 === null) {
+    if (this.player1 === null) {
+      this.player1 = player 
+    } else if (this.player2 === null) {
       this.player2 = player;
     }
     const existingPlayer = this.getPlayer(player.playerId);
@@ -242,11 +250,12 @@ export default class GameRoom {
       options: this.roomGameOptions,
       whitePlayer: this.convertUserToPlayer(whitePlayer),
       blackPlayer: this.convertUserToPlayer(blackPlayer),
+      isQuickPlay: this.isQuickPlay,
     };
   }
 
   public startGame() {
-    if (this.hostPlayer && this.player1 && this.player2) {
+    if (this.player1 && this.player2) {
       this.resetRoomForRematch();
       this.isOngoing = true;
       const coinFlip = Math.random() > 0.5;

@@ -3,7 +3,7 @@ import { Color } from "chess.js";
 import Modal from "../components/common/Modal/Modal";
 import { EndGameReason } from "../../shared/types/game";
 
-export type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | 'HOW_TO_PLAY' | 'OPTIONS' | 'CUSTOMIZE' | 'GENERIC' | '';
+export type ModalName = 'ROOM_CODE' | 'NAME_CHANGE' | 'CREATE_ROOM' | 'END_GAME' | 'HOW_TO_PLAY' | 'OPTIONS' | 'CUSTOMIZE' | 'GENERIC' | 'QUICK_MATCH' | '';
 
 export interface RoomCodeModalProps {
   roomId: string;
@@ -22,6 +22,7 @@ export interface GenericModalProps {
 
 type ModalStateAction = 
   { type: 'OPEN_ROOM_MODAL'; payload: { required?: boolean, modalProps: RoomCodeModalProps }; }
+  | { type: 'OPEN_QUICK_MATCH_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_NAME_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_OPTIONS_MODAL'; payload: { required?: boolean, modalProps?: {} }; }
   | { type: 'OPEN_GENERIC_MODAL'; payload: { required?: boolean, modalProps?: GenericModalProps }; }
@@ -46,6 +47,8 @@ export const ModalStateContext = createContext<ModalStateType | null>(null);
 
 export const modalStateReducer = (modalState: ModalState, action: ModalStateAction): ModalState => {
   switch (action.type) {
+    case 'OPEN_QUICK_MATCH_MODAL':
+      return { ...modalState, currentModal: 'QUICK_MATCH', required: action.payload.required };
     case 'OPEN_ROOM_MODAL':
       return { ...modalState, currentModal: 'ROOM_CODE', required: action.payload.required, modalProps: action.payload.modalProps as RoomCodeModalProps };
     case 'OPEN_OPTIONS_MODAL':

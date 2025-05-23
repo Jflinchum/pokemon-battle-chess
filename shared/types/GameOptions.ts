@@ -25,4 +25,5 @@ export interface GameSettings {
   seed?: PRNGSeed;
   color?: Color;
   options: GameOptions;
+  isQuickPlay?: boolean;
 }

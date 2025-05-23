@@ -20,25 +20,29 @@ const MenuOptions = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const handleQuickMatchClick = () => {
+    dispatch({ type: 'OPEN_QUICK_MATCH_MODAL', payload: {} });
+  };
+
   const handleCreateRoom = () => {
     dispatch({ type: 'OPEN_CREATE_ROOM_MODAL', payload: {} });
   };
 
   const handleCustomize = () => {
     dispatch({ type: 'OPEN_CUSTOMIZE_MODAL', payload: {} });
-  }
+  };
 
   const handleHowToPlay = () => {
     dispatch({ type: 'OPEN_HOW_TO_PLAY_MODAL', payload: {} });
-  }
+  };
 
   const handleUploadReplayClick = () => {
     inputRef.current?.click();
-  }
+  };
 
   const handleOptionsClick = () => {
     dispatch({ type: 'OPEN_OPTIONS_MODAL', payload: {} });
-  }
+  };
 
   const handleUploadReplay = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target?.files?.[0];
@@ -76,9 +80,9 @@ const MenuOptions = () => {
             </div>
           </div>
         )}
-        <NavOptionButton className='menuOptionButtonContainer' onClick={() => { }}>
+        <NavOptionButton className='menuOptionButtonContainer' onClick={handleQuickMatchClick}>
           <FontAwesomeIcon icon={faChessKing} />
-          <span>Find Match (todo)</span>
+          <span>Quick Play</span>
         </NavOptionButton>
         <NavOptionButton className='menuOptionButtonContainer' onClick={handleCreateRoom}>
           <FontAwesomeIcon icon={faDoorOpen} />
@@ -90,7 +94,7 @@ const MenuOptions = () => {
         </NavOptionButton>
         <NavOptionButton className='menuOptionButtonContainer' onClick={handleHowToPlay}>
           <FontAwesomeIcon icon={faNoteSticky} />
-          <span>How to play</span>
+          <span>How to Play</span>
         </NavOptionButton>
         <NavOptionButton className='menuOptionButtonContainer' onClick={handleUploadReplayClick}>
           <FontAwesomeIcon icon={faUpload} />

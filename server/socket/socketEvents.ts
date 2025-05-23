@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import GameRoomManager from "../models/GameRoomManager";
+import User from "../models/User";
 import { ClientToServerEvents, ServerToClientEvents } from "../../shared/types/Socket";
 
 export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToClientEvents>, gameRoomManager: GameRoomManager) => {
@@ -16,6 +17,14 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
         room.preparePlayerDisconnect(player);
         io.to(room.roomId).emit('connectedPlayers', room.getPublicPlayerList());
       }
+
+      gameRoomManager.removePlayerFromQueue(socket);
+    });
+
+    socket.on('matchSearch', ({ playerName, playerId, secretId, avatarId, matchQueue }) => {
+      const user = new User(playerName, playerId, avatarId || '1', secretId);
+      user.assignSocket(socket);
+      gameRoomManager.addPlayerToQueue(user, matchQueue);
     });
 
     socket.on('joinRoom', ({ roomId, playerId, roomCode, secretId }) => {

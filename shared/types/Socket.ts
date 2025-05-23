@@ -12,6 +12,7 @@ export interface ServerToClientEvents {
   chatMessage: (args: { playerName: string; message: string; }) => void;
   gameOutput: (log: MatchLog, ack: () => void) => void;
   endGameFromDisconnect: (args: { name: string, isHost?: boolean }) => void;
+  foundMatch: (args: { roomId: string }) => void;
   roomClosed: () => void;
   kickedFromRoom: (cb?: () => void) => void;
   health: (cb: () => void) => void;
@@ -31,6 +32,7 @@ export interface ClientToServerEvents {
   joinRoom: (args: RequestJoinGameArgs) => void;
   requestSync: (args: CommonClientArgs) => void;
   sendChatMessage: (args: SendChatMessageArgs) => void;
+  matchSearch: (args: MatchSearchArgs) => void;
 };
 
 export interface CommonClientArgs {
@@ -38,6 +40,14 @@ export interface CommonClientArgs {
   playerId: string;
   secretId: string;
 };
+
+interface MatchSearchArgs {
+  playerName: string;
+  playerId: string;
+  secretId: string;
+  avatarId: string;
+  matchQueue: 'random' | 'draft';
+}
 
 interface RequestChessMoveArgs extends CommonClientArgs {
   sanMove: string;

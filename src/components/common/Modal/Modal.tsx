@@ -9,11 +9,14 @@ import EndGameModal from "./Modals/EndGameModal/EndGameModal";
 import HowToPlayModal from "./Modals/HowToPlayModal/HowToPlayModal";
 import OptionsModal from "./Modals/OptionsModal/OptionsModal";
 import CustomizeModal from "./Modals/CustomizeModal/CustomizeModal";
-import './Modal.css';
 import GenericModal from "./Modals/GenericModal/GenericModal";
+import QuickMatchModal from "./Modals/QuickMatchModal/QuickMatchModal";
+import './Modal.css';
 
 const renderModal = (currentModal: ModalName) => {
   switch (currentModal) {
+    case 'QUICK_MATCH':
+      return (<QuickMatchModal />);
     case 'ROOM_CODE':
       return (<RoomCodeModal />);
     case 'OPTIONS':

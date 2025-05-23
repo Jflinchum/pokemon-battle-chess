@@ -1,0 +1,45 @@
+.quickMatchTitle {
+  margin-top: 0;
+  text-align: center;
+}
+
+.quickMatchContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quickMatchSearchOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quickMatchOptionContainer {
+  display: flex;
+  gap: 20px;
+
+  max-width: 500px;
+}
+
+.quickMatchSearchDescription {
+  height: 400px;
+  overflow-y: scroll;
+}
+
+.quickMatchActions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.quickMatchSubmit {
+  display: flex;
+  align-items: center;
+  justify-content: center;  
+  gap: 10px;
+
+  .quickMatchSpinner {
+    width: 20px;
+    height: 20px;
+  }
+}
