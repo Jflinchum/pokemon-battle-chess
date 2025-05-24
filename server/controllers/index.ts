@@ -90,6 +90,9 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
     res.status(200).send({ data: { roomId: roomId } });
   });
 
+  /**
+   * Leave Room
+   */
   app.post<Empty, APIResponse<Empty>, { roomId?: GameRoom['roomId'], playerId?: User['playerId'] }>('/api/leaveRoom', (req, res) => {
     const roomId = req.body.roomId;
     if (!roomId || !gameRoomManager.getRoom(roomId)) {
@@ -100,6 +103,9 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
     res.status(200).send();
   });
 
+  /**
+   * Get Rooms
+   */
   app.get<Empty, APIResponse<{ rooms: { roomId: GameRoom['roomId'], hostName: User['playerName'], hasPassword: boolean }[], pageCount: number  }>, Empty, { page?: number, limit?: number, searchTerm?: string }>('/api/getRooms', (req, res) => {
     const { page = 1, limit = 10, searchTerm = '' } = req.query || {};
 
@@ -127,5 +133,21 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
     .slice((page - 1) * limit, ((page - 1) * limit) + limit);
 
     res.status(200).send({ data: { rooms: roomResponse, pageCount: Math.floor(roomResponse.length / limit) + 1 } });
+  });
+
+  /**
+   * Get Room
+   */
+  app.get<Empty, APIResponse<{ roomId: GameRoom['roomId']; isOngoing: GameRoom['isOngoing']; hostName?: User['playerName']; hasPassword: boolean }>, Empty, { roomId?: GameRoom['roomId'] }>('/api/getRoom', (req, res) => {
+    const { roomId } = req.query || {};
+
+    const room = gameRoomManager.getRoom(roomId)
+
+    if (!room) {
+      res.status(404).send({ message: 'Room not found.' });
+      return;
+    }
+
+    res.status(200).send({ data: { roomId: room.roomId, isOngoing: room.isOngoing, hostName: room.hostPlayer?.playerName, hasPassword: !!room.password } });
   });
 };

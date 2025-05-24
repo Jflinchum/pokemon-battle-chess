@@ -1,5 +1,4 @@
 TODO:
-Matchmaking
 Queue up your draft and bans
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts

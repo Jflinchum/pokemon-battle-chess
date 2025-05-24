@@ -100,3 +100,34 @@ export const get2DSpritePreference = () => {
 export const set2DSpritePreference = (spritePreference: boolean) => {
   localStorage.setItem('spritePreference', `${spritePreference}`);
 };
+
+export const getMostRecentRoom = (): { roomId: string; roomCode: string; } | undefined => {
+  const mostRecentRoom = localStorage.getItem('mostRecentRoom');
+  if (!mostRecentRoom) {
+    return;
+  }
+  try {
+    const parsedJson = JSON.parse(mostRecentRoom);
+    const roomId = parsedJson.roomId;
+
+    if (!roomId) {
+      return;
+    }
+
+    const roomCode = parsedJson.roomCode || '';
+    return {
+      roomId,
+      roomCode
+    }
+  } catch (err) {
+    clearMostRecentRoom();
+  }
+}
+
+export const setMostRecentRoom = ({ roomId, roomCode }: { roomId: string; roomCode: string; }) => {
+  localStorage.setItem('mostRecentRoom', JSON.stringify({ roomId, roomCode }));
+}
+
+export const clearMostRecentRoom = () => {
+  localStorage.removeItem('mostRecentRoom');
+}

@@ -1,5 +1,5 @@
 import { useReducer, createContext, useContext, ReactElement, type Dispatch } from "react";
-import { get2DSpritePreference, getAnimationSpeedPreference, getAvatar, getName, getOrInitializeSecretUUID, getOrInitializeUUID, getVolumePreference, set2DSpritePreference, setAnimationSpeedPreference, setAvatar, setName, setVolumePreference } from "../util/localWebData.ts";
+import { clearMostRecentRoom, get2DSpritePreference, getAnimationSpeedPreference, getAvatar, getName, getOrInitializeSecretUUID, getOrInitializeUUID, getVolumePreference, set2DSpritePreference, setAnimationSpeedPreference, setAvatar, setMostRecentRoom, setName, setVolumePreference } from "../util/localWebData.ts";
 import { leaveRoom } from "../service/lobby";
 
 export interface VolumePreference {
@@ -58,8 +58,10 @@ export const userStateReducer = (userState: UserState, action: UserStateAction):
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode };
     case 'LEAVE_ROOM':
       leaveRoom(userState.currentRoomId, userState.id);
+      clearMostRecentRoom();
       return { ...userState, currentRoomId: '', currentRoomCode: '' };
     case 'JOIN_ROOM':
+      setMostRecentRoom({ roomId: action.payload.roomId, roomCode: action.payload.roomCode });
       return { ...userState, currentRoomId: action.payload.roomId, currentRoomCode: action.payload.roomCode } ;
     default:
       return userState;

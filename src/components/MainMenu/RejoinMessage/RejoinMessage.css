@@ -1,0 +1,17 @@
+
+.rejoinButtonContainer {
+  display: flex;
+  gap: 10px;
+
+  .rejoinSubmit {
+    display: flex;
+    align-items: center;
+    justify-content: center;  
+    gap: 10px;
+  }
+
+  .rejoinSpinner {
+    width: 20px;
+    height: 20px;
+  }
+}

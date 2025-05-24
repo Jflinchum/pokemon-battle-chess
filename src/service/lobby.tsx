@@ -60,3 +60,15 @@ export const getAvailableRooms = async (page = 1, limit = 10, searchTerm = '') =
 
   return response;
 };
+
+export const getRoom = async ({ roomId }: { roomId: string }, fetchOptions: RequestInit = {}) => {
+  const response = await fetch(`/api/getRoom?roomId=${roomId}`, {
+    method: 'GET',
+    headers: {
+      'Cache-Control': 'no-cache'
+    },
+    ...fetchOptions 
+  });
+
+  return response;
+}
