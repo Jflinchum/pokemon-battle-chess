@@ -59,7 +59,7 @@ const GameManagerActions = ({ matchHistory }: { matchHistory?: MatchHistory }) =
           )
         }
         {
-          gameState.matchEnded && gameState.inGame && !gameState.isWatchingReplay && (
+          gameState.matchEnded && gameState.inGame && !gameState.gameSettings.isQuickPlay && !gameState.isWatchingReplay && (
             <NavOptionButton className='gameManagerAction' onClick={handleReturn}>
               <span className='gameManagerActionIcon'><FontAwesomeIcon icon={faDoorOpen} /></span>
               <span className='gameManagerActionLabel'>Return to Room</span>
