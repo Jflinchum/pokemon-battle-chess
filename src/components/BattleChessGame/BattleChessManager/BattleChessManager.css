@@ -27,4 +27,6 @@
 
 .battleChessPlayerList {
   margin-top: 50px;
+  padding: 0 50px;
+  box-sizing: border-box;
 }
