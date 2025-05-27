@@ -134,6 +134,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
                 </p>
               </div>
               <select className='roomOptionBanTimer' name='banTimerDuration' value={gameOptions.banTimerDuration} onChange={(e) => setBanTimer(parseInt(e.target.value))} disabled={!isHost}>
+                <option value={1}>1 second</option>
                 <option value={15}>15 seconds</option>
                 <option value={30}>30 seconds</option>
                 <option value={45}>45 seconds</option>

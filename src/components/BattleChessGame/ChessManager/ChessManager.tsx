@@ -3,7 +3,7 @@ import { Chess, Square, Move } from 'chess.js';
 import ChessBoard from './ChessBoard/ChessBoard';
 import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
 import PokemonChessDetailsCard from '../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard';
-import { ChessBoardSquare, MoveAttempt, PokemonChessBoardSquare } from './types';
+import { MoveAttempt, PokemonChessBoardSquare } from './types';
 import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
 import { getVerboseChessMove, getVerboseSanChessMove, mergeBoardAndPokemonState } from './util';
 import { useGameState } from '../../../context/GameStateContext';
@@ -19,7 +19,7 @@ interface ChessManagerProps {
   pokemonManager: PokemonBattleChessManager;
   mostRecentMove: { from: Square, to: Square } | null;
   currentBattle?: CurrentBattle | null;
-  board: ChessBoardSquare[][];
+  board: PokemonChessBoardSquare[][];
   onMove: (san: string) => void;
   chessMoveHistory: ChessData[];
   battleSquare?: Square;

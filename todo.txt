@@ -53,7 +53,6 @@ Refactor TODOs:
 - Organize frontend types in a single dir and re-use more efficiently
 - Separate out draft/ban calls
 - Move logic in controller/index into GameRoom
-- Remove key from chessmanager since it's a hack to re-render pokemon after drafting
 - Prettier/eslint
 
 Issues:

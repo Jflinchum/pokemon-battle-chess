@@ -52,7 +52,6 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
 
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(null);
   const [battleStarted, setBattleStarted] = useState(false);
-  const [board, setBoard] = useState(chessManager.board());
   const [currentPokemonBoard, setCurrentPokemonBoard] = useState(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
   const [isDrafting, setIsDrafting] = useState<boolean>(gameState.gameSettings.options.format === 'draft');
   const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
@@ -232,7 +231,7 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       pokemonManager.tickSquareModifiers();
     }
     setMostRecentMove({ from: fromSquare, to: toSquare });
-    setBoard(chessManager.board());
+    setCurrentPokemonBoard(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
     if (capturedPieceSquare) {
       capturePieceAudio.play();
     } else {
@@ -272,7 +271,6 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
    * - Draft/ban phase
    * - Chess phase
    * - Pokemon battle phase
-   * - TODO - Remove key from chess manager. Hack to re-render chessmanager and display drafted pokemon
    */
   return (
     <>
@@ -298,13 +296,12 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
             }
             <div style={{ display: !battleStarted && !isDrafting ? 'block' : 'none' }}>
               <ChessManager
-                key={`${!isDrafting}`}
                 chessManager={chessManager}
                 pokemonManager={pokemonManager}
                 mostRecentMove={mostRecentMove}
                 currentBattle={currentBattle}
                 chessMoveHistory={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
-                board={board}
+                board={currentPokemonBoard}
                 battleSquare={battleSquare}
                 onError={(err) => {
                   handleError(err);

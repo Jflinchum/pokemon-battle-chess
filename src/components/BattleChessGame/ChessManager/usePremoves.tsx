@@ -1,9 +1,9 @@
 import { Chess, Square, PieceSymbol, Move, Color } from "chess.js";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import { useEffect, useMemo, useState } from "react";
-import { ChessBoardSquare } from "../../../../shared/models/PokemonBattleChessManager";
 import { getVerboseChessMove } from "./util";
 import { useGameState } from "../../../context/GameStateContext";
+import { PokemonChessBoardSquare } from "./types";
 
 const createChessManagerCopy = (chessManager: Chess, color: Color) => {
   const chessManagerCopy = new Chess(chessManager.fen(), { skipValidation: true });
@@ -20,7 +20,7 @@ const createPokemonManagerCopy = (pokemonManager: PokemonBattleChessManager) => 
   });
 }
 
-export const usePremoves = (board: ChessBoardSquare[][], chessManager: Chess, pokemonManager: PokemonBattleChessManager) => {
+export const usePremoves = (board: PokemonChessBoardSquare[][], chessManager: Chess, pokemonManager: PokemonBattleChessManager) => {
   const { gameState } = useGameState(); 
   const color = useMemo(() => gameState.gameSettings!.color!, [gameState]);
   const [preMoveQueue, setPreMoveQueue] = useState<{ from: Square; to: Square; promotion?: PieceSymbol; san: string; }[]>([])
