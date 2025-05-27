@@ -24,7 +24,7 @@ export const RejoinMessage = ({ data, closeToast }: { data: { roomId: string; ro
     if (response.status === 200) {
       dispatch({ type: 'JOIN_ROOM', payload: { roomId: data.roomId, roomCode: data.roomCode } });
     } else {
-      toast('Error: Failed to join room.');
+      toast('Error: Failed to join room.', { type: 'error' });
     }
   };
 

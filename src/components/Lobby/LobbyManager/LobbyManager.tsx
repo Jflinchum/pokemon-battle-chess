@@ -34,7 +34,7 @@ const LobbyManager = () => {
         setAvailableRooms(rooms || []);
         setTotalPages(pageCount);
       } else {
-        toast('Error: Could not get rooms.')
+        toast('Error: Could not get rooms.', { type: 'error' })
       }
     }
     fetchRooms();

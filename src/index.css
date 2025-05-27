@@ -31,6 +31,8 @@
   --chess-arrow-red: rgba(250, 40, 40, 0.6);
   --chess-arrow-orange: rgba(250, 170, 0, 0.6);
 
+  --toastify-color-progress-dark: var(--green-3);
+
   --red-1: rgb(230, 190, 190);
   --red-2: rgb(200, 150, 150);
   --red-3: rgb(180, 80, 80);

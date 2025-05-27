@@ -58,7 +58,7 @@ const MenuOptions = () => {
           gameStateDispatch({ type: 'START_REPLAY', payload: matchReplay });
         }
       } catch (err) {
-        toast('Error: Unable to read replay file');
+        toast('Error: Unable to read replay file', { type: 'error' });
         console.log(err);
       }
     };

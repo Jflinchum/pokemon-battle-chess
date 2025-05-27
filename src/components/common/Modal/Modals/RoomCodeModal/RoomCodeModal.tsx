@@ -18,10 +18,10 @@ const RoomCodeModal = () => {
     const roomCode = inputRef.current?.value || '';
     const response = await joinRoom(roomId, roomCode, userState.id, userState.name, userState.avatarId, userState.secretId);
     if (response.status === 401) {
-      toast('Incorrect Password');
+      toast('Incorrect Password', { type: 'error' });
       return;
     } else if (response.status > 399) {
-      toast('Error: Failed to join room.');
+      toast('Error: Failed to join room.', { type: 'error' });
       return;
     }
     userStateDispatch({ type: 'JOIN_ROOM', payload: { roomId, roomCode } });

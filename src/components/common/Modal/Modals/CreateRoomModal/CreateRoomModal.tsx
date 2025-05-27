@@ -23,7 +23,7 @@ const CreateRoomModal = () => {
       dispatchGameState({ type: 'CREATE_ROOM' });
       dispatch({ type: 'CLOSE_MODAL' });
     } else {
-      toast('Error: Could not create room.');
+      toast('Error: Could not create room.', { type: 'error' });
     }
     setCreateRoomLoading(false);
   }

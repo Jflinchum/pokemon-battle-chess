@@ -36,7 +36,7 @@ const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
       if (response.status === 200) {
         dispatch({ type: 'JOIN_ROOM', payload: { roomId: roomId, roomCode: '' } });
       } else {
-        toast('Error: Failed to join room.');
+        toast('Error: Failed to join room.', { type: 'error' });
       }
     }
   }

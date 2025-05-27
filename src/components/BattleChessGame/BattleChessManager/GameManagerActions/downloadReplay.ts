@@ -18,7 +18,7 @@ export const downloadReplay = (gameState: GameState, matchHistory: MatchHistory)
   const seed = gameState.gameSettings.seed;
 
   if (!whitePlayer || !blackPlayer || !seed) {
-    toast('Error: Unable to download replay');
+    toast('Error: Unable to download replay', { type: 'error' });
     return;
   }
   const replayData: ReplayData = {
