@@ -5,9 +5,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   containerType?: 'bordered' | 'underline'
   label?: string
   ref?: RefObject<HTMLInputElement | null>
+  valid?: boolean;
 };
 
-const Input = ({ containerType = 'bordered', label, children, className = '', ref, onFocus, onBlur, ...props }: InputProps) => {
+const Input = ({ containerType = 'bordered', label, valid, children, className = '', ref, onFocus, onBlur, ...props }: InputProps) => {
   const internalRef = useRef(null);
   const inputRef = ref || internalRef;
   const [labelShifted, setLabelShifted] = useState(false);
@@ -19,9 +20,10 @@ const Input = ({ containerType = 'bordered', label, children, className = '', re
   }, []);
 
   return (
-    <div className={`inputContainer ${containerType} ${className} ${labelShifted || inputRef?.current?.value?.length || 0 > 0 ? 'focused' : ''}`} onClick={() => { inputRef.current?.focus() }}>
+    <div className={`inputContainer ${valid === false ? 'invalidInput' : ''} ${containerType} ${className} ${labelShifted || inputRef?.current?.value?.length || 0 > 0 ? 'focused' : ''}`} onClick={() => { inputRef.current?.focus() }}>
       <label className='inputLabel'>{label}</label>
       <input
+        aria-invalid={`${valid === false ? 'true' : 'false'}`}
         className='input'
         onFocus={(e) => {
           setLabelShifted(true)

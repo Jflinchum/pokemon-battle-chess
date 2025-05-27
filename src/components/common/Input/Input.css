@@ -6,7 +6,16 @@
   padding: 20px 8px 8px 8px;
   display: flex;
   align-items: center;
+  transition: border-color, 0.25s;
 
+
+  &.invalidInput.focused {
+    border-color: var(--red-4);
+
+    .inputLabel {
+      color: var(--red-2);
+    }
+  }
 
   &.focused {
     border-color: var(--success-green);

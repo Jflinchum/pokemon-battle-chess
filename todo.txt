@@ -17,7 +17,6 @@ Download/upload replay
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
 Add more music and make music playlist w/ skip track button
 Pokemon Cries
-Profanity filter on names and chat
 Keyboard navigation and accessibility
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
 Add Pokedex on left nav to look up full descriptions?

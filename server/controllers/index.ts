@@ -3,6 +3,7 @@ import { Express } from 'express';
 import User from '../models/User';
 import GameRoom from '../models/GameRoom';
 import GameRoomManager from "../models/GameRoomManager";
+import { isStringProfane } from '../../shared/util/profanityFilter';
 
 interface APIResponse<Data> {
   data?: Data
@@ -35,6 +36,12 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
       res.status(400).send();
       return;
     }
+
+    if (isStringProfane(playerName)) {
+      res.status(400).send({ message: 'Name does not pass profanity filter.' });
+      return;
+    }
+
     // Player already owns a room
     const { room } = gameRoomManager.getPlayer(playerId);
     if (room) {
@@ -75,6 +82,9 @@ export const registerRoutes = (app: Express, gameRoomManager: GameRoomManager) =
       return;
     } else if (room?.password !== password) {
       res.status(401).send({ message: 'Invalid password' });
+      return;
+    } else if (isStringProfane(playerName)) {
+      res.status(400).send({ message: 'Name does not pass profanity filter.' });
       return;
     }
 

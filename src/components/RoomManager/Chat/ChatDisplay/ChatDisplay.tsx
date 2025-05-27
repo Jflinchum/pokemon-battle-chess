@@ -3,6 +3,7 @@ import { socket } from '../../../../socket';
 import { useUserState } from '../../../../context/UserStateContext';
 import { useSocketRequests } from '../../../../util/useSocketRequests';
 import './ChatDisplay.css';
+import { cleanString } from '../../../../../shared/util/profanityFilter';
 
 interface ChatDisplayProps {
   onMessage: (message: ChatMessage) => void;
@@ -43,7 +44,7 @@ const ChatDisplay = ({ className, onMessage, inputRef }: ChatDisplayProps) => {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      const userMessage = { playerName: userState.name, message: currentMessage };
+      const userMessage = { playerName: userState.name, message: cleanString(currentMessage) };
       setChatLog((curr) => [...curr, userMessage]);
       sendChatMessage(currentMessage);
       setCurrentMessage('');

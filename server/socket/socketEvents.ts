@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import GameRoomManager from "../models/GameRoomManager";
 import User from "../models/User";
 import { ClientToServerEvents, ServerToClientEvents } from "../../shared/types/Socket";
+import { cleanString } from "../../shared/util/profanityFilter";
 
 export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToClientEvents>, gameRoomManager: GameRoomManager) => {
   io.on('connection', (socket) => {
@@ -273,7 +274,7 @@ export const registerSocketEvents = (io: Server<ClientToServerEvents, ServerToCl
         return;
       }
 
-      socket.to(room.roomId).emit('chatMessage', { playerName: player.playerName, message })
+      socket.to(room.roomId).emit('chatMessage', { playerName: player.playerName, message: cleanString(message) })
     });
   });
 }

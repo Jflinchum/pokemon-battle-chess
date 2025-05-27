@@ -4,7 +4,7 @@ import { PRNG, PRNGSeed } from '@pkmn/sim'
 import { Dex } from "@pkmn/dex";
 import { PokeSimRandomGen } from './PokeSimRandomGen';
 import { WeatherId, TerrainId } from '../types/PokemonTypes';
-import { getWeightedRandom } from '../util';
+import { getWeightedRandom } from '../util/getWeightedRandom';
 
 export const WeatherNames: WeatherId[] = [
  'sandstorm',
