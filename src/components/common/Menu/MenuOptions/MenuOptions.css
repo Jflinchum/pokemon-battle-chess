@@ -7,7 +7,7 @@
   padding: 20px;
   cursor: pointer;
   font-size: 0.8em;
-  border-top: 2px solid rgb(50, 50, 50);
+  border-top: 2px solid var(--gray-6);
   
   & > * {
     vertical-align: middle;
@@ -22,14 +22,14 @@
   }
 
   &:hover {
-    background-color: rgb(50, 50, 50);
+    background-color: var(--gray-6);
   }
 
   &:last-child {
-    border-bottom: 2px solid rgb(50, 50, 50);
+    border-bottom: 2px solid var(--gray-6);
   }
 
   &.menuOptionsButtonActive {
-    background-color: rgb(75, 75, 75);
+    background-color: var(--gray-5)
   }
 }

@@ -8,7 +8,7 @@
 
   list-style: none;
   margin: 0;
-  background-color: rgb(70, 70, 70);
+  background-color: var(--gray-5);
   top: 0;
   z-index: var(--nav-actions-z-index);
   box-shadow: none;
@@ -49,7 +49,7 @@
   z-index: var(--mobile-nav-actions-z-index);
   position: sticky;
   width: 100%;
-  background-color: rgb(50, 50, 50);
+  background-color: var(--gray-6);
 
   @media (min-width: 600px) {
     display: none;

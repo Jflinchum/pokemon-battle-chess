@@ -1,6 +1,6 @@
 .inputContainer {
-  background-color: rgb(75,75,75);
-  border-color: rgb(100,100,100);
+  background-color: var(--gray-3);
+  border-color: var(--gray-2);
   border-radius: 5px;
   cursor: text;
   padding: 20px 8px 8px 8px;
@@ -9,7 +9,7 @@
 
 
   &.focused {
-    border-color: rgb(100, 100, 200);
+    border-color: var(--success-green);
 
     &.underline {
       .inputLabel {
@@ -18,7 +18,7 @@
     }
 
     .inputLabel {
-      color: rgb(200, 200, 255);
+      color: var(--green-2);
       transform: translate(-10%, -70%) scale(.75);
     }
   }

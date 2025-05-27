@@ -12,6 +12,49 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+
+  /**
+   * Various rgb colors used throughout the webapp
+   */
+  --danger-red: var(--red-4);
+  --success-green: var(--green-4);
+  --button-outline: rgb(100, 100, 200);
+  --dark-translucent-bg: rgba(70, 70, 70, .8);
+  --translucent-bg: rgba(255, 255, 255, .15);
+
+  --chess-square-white: var(--gray-1);
+  --chess-square-black: var(--gray-3);
+  --chess-square-battle-red: rgba(255, 51, 51, 0.75);
+  --chess-square-battle-transparent: rgba(255, 51, 51, 0);
+  --chess-square-recent-move-yellow: rgba(255, 255, 51, 0.75);
+  --chess-square-selected-blue: rgba(51, 51, 255, 0.75);
+  --chess-arrow-red: rgba(250, 40, 40, 0.6);
+  --chess-arrow-orange: rgba(250, 170, 0, 0.6);
+
+  --red-1: rgb(230, 190, 190);
+  --red-2: rgb(200, 150, 150);
+  --red-3: rgb(180, 80, 80);
+  --red-4: rgb(150, 70, 70);
+  --red-5: rgb(120, 60, 60);
+  --red-6: rgb(90, 50, 50);
+  --red-7: rgb(70, 40, 40);
+
+  --green-1: rgb(190, 230, 190);
+  --green-2: rgb(150, 200, 150);
+  --green-3: rgb(80, 180, 80);
+  --green-4: rgb(70, 150, 70);
+  --green-5: rgb(60, 120, 60);
+  --green-6: rgb(50, 90, 50);
+  --green-7: rgb(40, 70, 40);
+
+  --gray-1: rgb(200, 200, 200);
+  --gray-2: rgb(150, 150, 150);
+  --gray-3: rgb(100, 100, 100);
+  --gray-4: rgb(80, 80, 80);
+  --gray-5: rgb(70, 70, 70);
+  --gray-6: rgb(50, 50, 50);
+  --gray-7: rgb(40, 40, 40);
+
   /**
    * Various z-indexes which are necessary for absolute positioned elements throughout the webapp
    */

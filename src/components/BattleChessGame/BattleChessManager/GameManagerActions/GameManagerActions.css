@@ -1,7 +1,7 @@
 .gameManagerActionContainer {
   display: flex;
   flex-direction: column;
-  background-color: rgb(70, 70, 70);
+  background-color: var(--gray-5);
   z-index: var(--nav-actions-z-index);
   font-size: 0.7em;
 

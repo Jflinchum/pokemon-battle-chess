@@ -1,6 +1,6 @@
 
 .playerListContainer {
-  background-color: rgb(50, 50, 50);
+  background-color: var(--gray-6);
   margin-left: auto;
   overflow-y: scroll;
   border-radius: 4px;
@@ -33,10 +33,10 @@
     }
 
     &:nth-child(odd) {
-      background-color: rgb(100, 100, 100);
+      background-color: var(--gray-4);
     }
     &:nth-child(even) {
-      background-color: rgb(75, 75, 75);
+      background-color: var(--gray-5);
     }
   }
 }

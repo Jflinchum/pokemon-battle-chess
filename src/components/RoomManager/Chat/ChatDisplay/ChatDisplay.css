@@ -1,8 +1,8 @@
 .chatDisplayContainer {
   display: flex;
   flex-direction: column;
-  border-top: 3px solid rgb(50, 50, 50);
-  border-left: 3px solid rgb(50, 50, 50);
+  border-top: 3px solid var(--gray-6);
+  border-left: 3px solid var(--gray-6);
   background-color: #eeeeee;
   color: black;
   height: 30vh;
@@ -18,8 +18,8 @@
     width: 100%;
     border-radius: 0;
     border: 0;
-    border-top: 3px solid rgb(50, 50, 50);
-    border-right: 2px solid rgb(50, 50, 50);
+    border-top: 3px solid var(--gray-6);
+    border-right: 2px solid var(--gray-6);
     padding: 6px;
     outline: none;
   }

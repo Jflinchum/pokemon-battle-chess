@@ -11,9 +11,9 @@
 }
 
 .arrow {
-  fill: rgba(250, 170, 0, 0.6);
+  fill: var(--chess-arrow-orange);
 
   &.battle {
-    fill: rgba(250, 40, 40, 0.6);
+    fill: var(--chess-arrow-red);
   }
 }

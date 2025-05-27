@@ -1,6 +1,5 @@
 .pokemonDetailsContainer {
-  background-color: rgba(125, 125, 125, 0.5);
-  backdrop-filter: blur(5px);
+  background-color: var(--gray-4);
   border-bottom-right-radius: 10px;
   min-height: 250px;
   container-type: size;

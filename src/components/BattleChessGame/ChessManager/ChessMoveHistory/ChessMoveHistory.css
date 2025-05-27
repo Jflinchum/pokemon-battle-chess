@@ -15,10 +15,10 @@
     grid-template: auto 1fr / 1fr 2fr 2fr;
     margin-left: 4px;
     padding: 4px;
-    background-color: rgb(70,70,70);
+    background-color: var(--gray-5);
 
     &:nth-child(odd) {
-      background-color: rgb(60,60,60);
+      background-color: var(--gray-6);
     }
   }
 }
@@ -33,9 +33,9 @@
 }
 
 .moveHistoryFail {
-  color: rgb(200, 130, 130);
+  color: var(--red-2);
 }
 
 .moveHistoryWin {
-  color: rgb(130, 200, 130);
+  color: var(--green-2);
 }
