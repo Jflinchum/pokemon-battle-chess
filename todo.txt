@@ -49,7 +49,6 @@ Priority:
 Refactor TODOs:
 - Potentially lift game logic into new model
 - Lift weather out of pokemon manager
-- Move z index to variables at root
 - Put API request and response types in shared folder
 - Organize frontend types in a single dir and re-use more efficiently
 - Separate out draft/ban calls

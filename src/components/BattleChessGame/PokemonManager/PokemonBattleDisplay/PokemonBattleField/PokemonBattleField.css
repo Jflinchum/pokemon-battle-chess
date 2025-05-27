@@ -36,14 +36,14 @@
 
 .healthbar {
   display: block;
-  z-index: 1;
+  z-index: var(--pokemon-health-z-index);
 }
 
 .pokemonHealth {
   margin: 0;
   text-align: center;
   font-weight: bold;
-  z-index: 1;
+  z-index: var(--pokemon-health-z-index);
 }
 
 .pokemonSprite {

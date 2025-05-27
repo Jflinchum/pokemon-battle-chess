@@ -10,7 +10,7 @@
   margin: 0;
   background-color: rgb(70, 70, 70);
   top: 0;
-  z-index: 1;
+  z-index: var(--nav-actions-z-index);
   box-shadow: none;
   font-size: 1em;
 
@@ -46,7 +46,7 @@
 }
 
 .navMobileNav {
-  z-index: 2;
+  z-index: var(--mobile-nav-actions-z-index);
   position: sticky;
   width: 100%;
   background-color: rgb(50, 50, 50);
@@ -85,5 +85,5 @@
   left: 0;
   background-color: black;
   opacity: 80%;
-  z-index: 1;
+  z-index: var(--mobile-nav-bg-z-index);
 }

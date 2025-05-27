@@ -40,7 +40,7 @@
   padding: 0px 2px;
 
   .pokemonHealthProgress {
-    z-index: 3;
+    z-index: var(--pokemon-health-z-index);
 
     .progressBarFiller {
       transition: width 0.5s;
@@ -75,7 +75,7 @@
 }
 
 .pokemonSpriteInfo {
-  z-index: 2;
+  z-index: var(--pokemon-battle-info-z-index);
 }
 
 .pokemonStatus {
@@ -112,10 +112,6 @@
   @media (max-width: 900px) {
     transform: scale(50%) translateY(-50%);
   }
-}
-
-.p1PokemonSprite {
-  z-index: 1;
 }
 
 .pokemonTooltipTyping {
