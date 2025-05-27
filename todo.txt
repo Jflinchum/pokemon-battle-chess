@@ -20,6 +20,7 @@ Pokemon Cries
 Keyboard navigation and accessibility
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
 Add Pokedex on left nav to look up full descriptions?
+Lazy loading and preloading
 
 Room Options
 - Preserve damage after battle
