@@ -1,23 +1,27 @@
-import { useState, useMemo, useEffect } from 'react'
-import { Chess, Square, Move } from 'chess.js';
-import ChessBoard from './ChessBoard/ChessBoard';
-import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
-import PokemonChessDetailsCard from '../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard';
-import { MoveAttempt, PokemonChessBoardSquare } from './types';
-import ChessPawnPromotionChoice from './ChessPawnPromotionChoice/ChessPawnPromotionChoice';
-import { getVerboseChessMove, getVerboseSanChessMove, mergeBoardAndPokemonState } from './util';
-import { useGameState } from '../../../context/GameStateContext';
-import { CurrentBattle } from '../BattleChessManager/BattleChessManager';
-import { useDebounce } from '../../../utils';
-import { ChessData } from '../../../../shared/types/game';
-import { usePremoves } from './usePremoves';
-import { ArrowController } from './ArrowController/ArrowController';
-import './ChessManager.css';
+import { useState, useMemo, useEffect } from "react";
+import { Chess, Square, Move } from "chess.js";
+import ChessBoard from "./ChessBoard/ChessBoard";
+import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
+import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
+import { MoveAttempt, PokemonChessBoardSquare } from "./types";
+import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromotionChoice";
+import {
+  getVerboseChessMove,
+  getVerboseSanChessMove,
+  mergeBoardAndPokemonState,
+} from "./util";
+import { useGameState } from "../../../context/GameState/GameStateContext";
+import { CurrentBattle } from "../BattleChessManager/BattleChessManager";
+import { useDebounce } from "../../../utils";
+import { ChessData } from "../../../../shared/types/game";
+import { usePremoves } from "./usePremoves";
+import { ArrowController } from "./ArrowController/ArrowController";
+import "./ChessManager.css";
 
 interface ChessManagerProps {
   chessManager: Chess;
   pokemonManager: PokemonBattleChessManager;
-  mostRecentMove: { from: Square, to: Square } | null;
+  mostRecentMove: { from: Square; to: Square } | null;
   currentBattle?: CurrentBattle | null;
   board: PokemonChessBoardSquare[][];
   onMove: (san: string) => void;
@@ -38,16 +42,19 @@ const ChessManager = ({
   onError = () => {},
 }: ChessManagerProps) => {
   /**
-   * TODO: 
+   * TODO:
    *  - Set up context providers to handle pokemon manager state
    */
   const { gameState } = useGameState();
-  const color = useMemo(() => gameState.gameSettings!.color, [gameState])
+  const color = useMemo(() => gameState.gameSettings!.color, [gameState]);
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
-  const [hoveredSquare, setHoveredSquare] = useState<Square | null | undefined>(null);
+  const [hoveredSquare, setHoveredSquare] = useState<Square | null | undefined>(
+    null,
+  );
   const [highlightedSquares, setHighlightedSquare] = useState<Square[]>([]);
-  const [requestedPawnPromotion, setRequestedPawnPromotion] = useState<Move | null>(null);
+  const [requestedPawnPromotion, setRequestedPawnPromotion] =
+    useState<Move | null>(null);
 
   // Create a simulated copy of both managers to handle premoving
   const {
@@ -63,64 +70,105 @@ const ChessManager = ({
   useEffect(() => {
     if (color === chessManager.turn() && preMoveQueue.length > 0) {
       const { from, to, promotion, san } = preMoveQueue[0];
-      const verboseChessMove = getVerboseChessMove(from, to, chessManager, promotion);
+      const verboseChessMove = getVerboseChessMove(
+        from,
+        to,
+        chessManager,
+        promotion,
+      );
       if (verboseChessMove?.san === san) {
         setPreMoveQueue((curr) => curr.slice(1));
-        onMove(verboseChessMove.san)
+        onMove(verboseChessMove.san);
       } else {
         resetSimulators();
         setPreMoveQueue([]);
       }
     }
-  }, [board]);
+  }, [
+    board,
+    chessManager,
+    color,
+    onMove,
+    preMoveQueue,
+    resetSimulators,
+    setPreMoveQueue,
+  ]);
 
   useEffect(() => {
     const previousMove = chessMoveHistory[chessMoveHistory.length - 1];
-    if (previousMove && previousMove.data.color === color && previousMove.data.failed) {
+    if (
+      previousMove &&
+      previousMove.data.color === color &&
+      previousMove.data.failed
+    ) {
       resetSimulators();
       setPreMoveQueue([]);
     }
-  }, [chessMoveHistory]);
+  }, [chessMoveHistory, color, resetSimulators, setPreMoveQueue]);
 
   const cancelSelection = () => {
     setSelectedSquare(null);
     setHighlightedSquare([]);
-  }
+  };
 
   const updateSelection = (square: Square) => {
     setSelectedSquare(square);
 
-    const selectedSquareMoves = simulatedChessManager.moves({
-      square,
-      piece: simulatedChessManager.get(square)?.type,
-      verbose: true,
-      continueOnCheck: true
-    }).filter((move) => move.color === color);
-    setHighlightedSquare(selectedSquareMoves.map((squareMove) => squareMove.to) as Square[]);
-  }
+    const selectedSquareMoves = simulatedChessManager
+      .moves({
+        square,
+        piece: simulatedChessManager.get(square)?.type,
+        verbose: true,
+        continueOnCheck: true,
+      })
+      .filter((move) => move.color === color);
+    setHighlightedSquare(
+      selectedSquareMoves.map((squareMove) => squareMove.to) as Square[],
+    );
+  };
 
   const currentArrows = useMemo(() => {
-    let arrows = [];
+    const arrows = [];
 
     if (mostRecentMove) {
-      arrows.push({ from: mostRecentMove.from, to: mostRecentMove.to, type: 'default' as const });
+      arrows.push({
+        from: mostRecentMove.from,
+        to: mostRecentMove.to,
+        type: "default" as const,
+      });
     }
 
     if (currentBattle) {
-      const battleChessMove = getVerboseSanChessMove(currentBattle.attemptedMove.san, chessManager);
+      const battleChessMove = getVerboseSanChessMove(
+        currentBattle.attemptedMove.san,
+        chessManager,
+      );
       if (battleChessMove) {
-        arrows.push({ from: battleChessMove.from, to: battleChessMove.to, type: 'battle' as const });
+        arrows.push({
+          from: battleChessMove.from,
+          to: battleChessMove.to,
+          type: "battle" as const,
+        });
       }
     }
     return arrows;
-  }, [mostRecentMove, currentBattle]);
+  }, [mostRecentMove, currentBattle, chessManager]);
 
   const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
-    if (gameState.isSpectator || gameState.matchEnded || gameState.isCatchingUp) {
+    if (
+      gameState.isSpectator ||
+      gameState.matchEnded ||
+      gameState.isCatchingUp
+    ) {
       return;
     }
     if (chessManager.turn() !== color) {
-      const move = getVerboseChessMove(fromSquare, toSquare, simulatedChessManager, promotion);
+      const move = getVerboseChessMove(
+        fromSquare,
+        toSquare,
+        simulatedChessManager,
+        promotion,
+      );
       if (move) {
         if (move?.isPromotion() && !promotion) {
           setRequestedPawnPromotion(move);
@@ -128,7 +176,15 @@ const ChessManager = ({
         }
         try {
           simulateMove(move);
-          setPreMoveQueue((curr) => [...curr, { from: move.from, to: move.to, promotion: move.promotion, san: move.san }]);
+          setPreMoveQueue((curr) => [
+            ...curr,
+            {
+              from: move.from,
+              to: move.to,
+              promotion: move.promotion,
+              san: move.san,
+            },
+          ]);
           setSelectedSquare(null);
           setHighlightedSquare([]);
         } catch (err) {
@@ -136,25 +192,30 @@ const ChessManager = ({
         }
         return;
       } else {
-        onError(new Error('Premove simulation is undefined'));
+        onError(new Error("Premove simulation is undefined"));
         return;
       }
     }
-    const verboseChessMove = getVerboseChessMove(fromSquare, toSquare, chessManager, promotion);
+    const verboseChessMove = getVerboseChessMove(
+      fromSquare,
+      toSquare,
+      chessManager,
+      promotion,
+    );
     // Before attempting the move, ask the player for their pawn promotion choice
     if (verboseChessMove?.isPromotion() && !promotion) {
       setRequestedPawnPromotion(verboseChessMove);
       return;
     }
-  
+
     if (!verboseChessMove) {
       return;
     }
 
-    onMove(verboseChessMove.san)
+    onMove(verboseChessMove.san);
     setSelectedSquare(null);
     setHighlightedSquare([]);
-  }
+  };
 
   const handleSquareClick = ({ square }: PokemonChessBoardSquare) => {
     setRequestedPawnPromotion(null);
@@ -166,35 +227,46 @@ const ChessManager = ({
       // Set the current square in state and highlight any potential moves for that square
       updateSelection(square);
     }
-    if (selectedSquare && getVerboseChessMove(selectedSquare, square, simulatedChessManager)?.color === color) {
+    if (
+      selectedSquare &&
+      getVerboseChessMove(selectedSquare, square, simulatedChessManager)
+        ?.color === color
+    ) {
       movePiece({ fromSquare: selectedSquare, toSquare: square });
     }
   };
 
-  const handleSquareHover = useDebounce((pkmnChessSquare?: PokemonChessBoardSquare | null) => {
-    setHoveredSquare(pkmnChessSquare?.square);
-  }, 100)
+  const handleSquareHover = useDebounce(
+    (pkmnChessSquare?: PokemonChessBoardSquare | null) => {
+      setHoveredSquare(pkmnChessSquare?.square);
+    },
+    100,
+  );
 
   const handlePieceDrop = ({ square }: PokemonChessBoardSquare) => {
-    if (selectedSquare && getVerboseChessMove(selectedSquare, square, simulatedChessManager)?.color === color) {
+    if (
+      selectedSquare &&
+      getVerboseChessMove(selectedSquare, square, simulatedChessManager)
+        ?.color === color
+    ) {
       movePiece({ fromSquare: selectedSquare, toSquare: square });
     }
-  }
+  };
 
   const handlePieceDrag = ({ square }: PokemonChessBoardSquare) => {
     setRequestedPawnPromotion(null);
     updateSelection(square);
-  }
+  };
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
 
     resetSimulators();
     setPreMoveQueue([]);
-  }
+  };
 
   return (
-    <div className='gameContainer' onContextMenu={handleContextMenu}>
+    <div className="gameContainer" onContextMenu={handleContextMenu}>
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice
           pawnPromotionMove={requestedPawnPromotion}
@@ -205,21 +277,30 @@ const ChessManager = ({
           }}
           onPromotionChoice={(type) => {
             setRequestedPawnPromotion(null);
-            movePiece({ fromSquare: requestedPawnPromotion.from, toSquare: requestedPawnPromotion.to, promotion: type });
+            movePiece({
+              fromSquare: requestedPawnPromotion.from,
+              toSquare: requestedPawnPromotion.to,
+              promotion: type,
+            });
           }}
         />
       )}
-      <div className='turnNotification'>
-        {
-          chessManager.turn() === gameState.gameSettings.color ?
-          (<strong className='highPriorityNotification'>Your turn to move!</strong>) :
-          (<strong>Waiting for opponent...</strong>)
-        }
+      <div className="turnNotification">
+        {chessManager.turn() === gameState.gameSettings.color ? (
+          <strong className="highPriorityNotification">
+            Your turn to move!
+          </strong>
+        ) : (
+          <strong>Waiting for opponent...</strong>
+        )}
       </div>
-      <div className='chessGameContainer'>
-        <ArrowController arrows={currentArrows} perspective={color || 'w'}>
+      <div className="chessGameContainer">
+        <ArrowController arrows={currentArrows} perspective={color || "w"}>
           <ChessBoard
-            boardState={mergeBoardAndPokemonState(simulatedBoard, simulatedPokemonManager)}
+            boardState={mergeBoardAndPokemonState(
+              simulatedBoard,
+              simulatedPokemonManager,
+            )}
             onSquareClick={handleSquareClick}
             onSquareHover={handleSquareHover}
             onPieceDrag={handlePieceDrag}
@@ -244,7 +325,7 @@ const ChessManager = ({
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ChessManager;

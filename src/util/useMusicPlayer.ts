@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { useAudio } from "../context/AudioContext"
-import { useUserState } from "../context/UserStateContext";
+import { useCallback, useEffect } from "react";
+import { useAudio } from "../context/AudioState/AudioContext";
+import { useUserState } from "../context/UserState/UserStateContext";
 import { getRandomBattleMusic, getRandomOutOfBattleMusic } from "./getMusic";
 
 export const useMusicPlayer = () => {
@@ -9,35 +9,40 @@ export const useMusicPlayer = () => {
 
   useEffect(() => {
     global.volume = userState.volumePreference.musicVolume;
-    battle.volume = userState.volumePreference.musicVolume; 
-  }, [userState.volumePreference.musicVolume]);
+    battle.volume = userState.volumePreference.musicVolume;
+  }, [userState.volumePreference.musicVolume, battle, global]);
 
-
-  const playGlobalSong = () => {
+  const playGlobalSong = useCallback(() => {
     battle.pause();
     global.play();
-  };
+  }, [battle, global]);
 
-  const playBattleSong = () => {
+  const playBattleSong = useCallback(() => {
     global.pause();
     battle.play();
-  };
+  }, [battle, global]);
 
-  const playRandomGlobalSong = ({ force = false, loop = true } = {}) => {
-    if (global.paused || force) {
-      global.src = getRandomOutOfBattleMusic();
-      global.loop = loop;
-      playGlobalSong();
-    }
-  }
+  const playRandomGlobalSong = useCallback(
+    ({ force = false, loop = true } = {}) => {
+      if (global.paused || force) {
+        global.src = getRandomOutOfBattleMusic();
+        global.loop = loop;
+        playGlobalSong();
+      }
+    },
+    [global, playGlobalSong],
+  );
 
-  const playRandomBattleSong = ({ force = false, loop = true } = {}) => {
-    if (battle.paused || force) {
-      battle.src = getRandomBattleMusic();
-      battle.loop = loop;
-      playBattleSong();
-    }
-  }
+  const playRandomBattleSong = useCallback(
+    ({ force = false, loop = true } = {}) => {
+      if (battle.paused || force) {
+        battle.src = getRandomBattleMusic();
+        battle.loop = loop;
+        playBattleSong();
+      }
+    },
+    [battle, playBattleSong],
+  );
 
   const stopSongs = () => {
     global.pause();
@@ -48,5 +53,5 @@ export const useMusicPlayer = () => {
     playRandomGlobalSong,
     playRandomBattleSong,
     stopSongs,
-  }
-}
+  };
+};

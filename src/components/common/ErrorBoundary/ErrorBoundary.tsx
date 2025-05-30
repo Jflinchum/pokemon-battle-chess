@@ -1,8 +1,11 @@
-import * as React from 'react';
-import sadPikachu from '../../../assets/pokemonAssets/sadPikachu.png';
-import './ErrorBoundary.css';
+import * as React from "react";
+import sadPikachu from "../../../assets/pokemonAssets/sadPikachu.png";
+import "./ErrorBoundary.css";
 
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
   constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false };
@@ -23,10 +26,14 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (
-        <div className='errorBoundaryContainer'>
+        <div className="errorBoundaryContainer">
           <img src={sadPikachu} />
           <p>Uh oh! Something went wrong!</p>
-          <p>Please open up the dev console and send a screenshot to the silly dev that made a mistake. Then, refresh the page and go back to what you were doing.</p>
+          <p>
+            Please open up the dev console and send a screenshot to the silly
+            dev that made a mistake. Then, refresh the page and go back to what
+            you were doing.
+          </p>
         </div>
       );
     }

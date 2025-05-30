@@ -3,7 +3,12 @@ import { ReplayData } from "../../BattleChessGame/BattleChessManager/GameManager
 export const validateReplay = (replayData: ReplayData) => {
   try {
     // Check top level attr
-    if (!replayData.players || !replayData.options || !replayData.seed || !replayData.matchHistory) {
+    if (
+      !replayData.players ||
+      !replayData.options ||
+      !replayData.seed ||
+      !replayData.matchHistory
+    ) {
       return false;
     }
 
@@ -13,8 +18,12 @@ export const validateReplay = (replayData: ReplayData) => {
     }
 
     // Check to see if we have a white player and black player
-    const whitePlayer = replayData.players.find(player => player.color === 'w');
-    const blackPlayer = replayData.players.find(player => player.color === 'b');
+    const whitePlayer = replayData.players.find(
+      (player) => player.color === "w",
+    );
+    const blackPlayer = replayData.players.find(
+      (player) => player.color === "b",
+    );
     if (!(whitePlayer && blackPlayer)) {
       return false;
     }
@@ -26,6 +35,8 @@ export const validateReplay = (replayData: ReplayData) => {
      */
     return true;
   } catch (err) {
+    console.log("Unable to parse replay data");
+    console.log(err);
     return false;
   }
-}
+};

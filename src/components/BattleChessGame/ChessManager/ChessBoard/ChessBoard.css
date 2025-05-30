@@ -7,7 +7,7 @@
   @media (orientation: portrait) {
     width: 90vw;
     height: 90vw;
-  
+
     @media (min-width: 600px) {
       width: 60vw;
       height: 60vw;

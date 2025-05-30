@@ -5,17 +5,15 @@ const StylizedText = ({ text }: { text: string }) => {
 
   return (
     <span>
-      {
-        boldParts.map((part, index) => {
-          if (index % 2 === 1) {
-            return <strong key={index}>{part}</strong>;
-          } else {
-            return <Fragment key={index}>{part}</Fragment>
-          }
-        })
-      }
+      {boldParts.map((part, index) => {
+        if (index % 2 === 1) {
+          return <strong key={index}>{part}</strong>;
+        } else {
+          return <Fragment key={index}>{part}</Fragment>;
+        }
+      })}
     </span>
-  )
-}
+  );
+};
 
 export default StylizedText;

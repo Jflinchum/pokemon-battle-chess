@@ -1,11 +1,11 @@
-import { PokemonChessBoardSquare } from '../../types';
-import PokemonChessPieceSprite from '../PokemonChessPieceSprite/PokemonChessPieceSprite';
-import { PokemonWeatherBackground } from '../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground';
-import './ChessSquare.css';
+import { PokemonChessBoardSquare } from "../../types";
+import PokemonChessPieceSprite from "../PokemonChessPieceSprite/PokemonChessPieceSprite";
+import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
+import "./ChessSquare.css";
 
 interface ChessSquareProps {
   square: PokemonChessBoardSquare;
-  backgroundColor: 'white' | 'black';
+  backgroundColor: "white" | "black";
   onClick: (arg0: PokemonChessBoardSquare) => void;
   onSquareHover?: (arg0?: PokemonChessBoardSquare | null) => void;
   onPieceDrop: (arg0: PokemonChessBoardSquare) => void;
@@ -17,21 +17,26 @@ interface ChessSquareProps {
   isBattleSquare: boolean;
 }
 
-const getSquareHighlightClass = (selected: boolean, possibleMove: boolean, mostRecentMove: boolean, isBattleSquare: boolean, isPremove: boolean) => { 
+const getSquareHighlightClass = (
+  selected: boolean,
+  possibleMove: boolean,
+  mostRecentMove: boolean,
+  isBattleSquare: boolean,
+  isPremove: boolean,
+) => {
   if (selected) {
-    return 'selected';
+    return "selected";
   } else if (isBattleSquare) {
-    return 'battleSquare'; 
+    return "battleSquare";
   } else if (possibleMove) {
-    return 'highlighted';
+    return "highlighted";
   } else if (isPremove) {
-    return 'premove';
+    return "premove";
   } else if (mostRecentMove) {
-    return 'mostRecentMove';
+    return "mostRecentMove";
   }
-  return '';
-}
-
+  return "";
+};
 
 const ChessSquare = ({
   square,
@@ -44,10 +49,10 @@ const ChessSquare = ({
   selected,
   mostRecentMove,
   isPreMove,
-  isBattleSquare
+  isBattleSquare,
 }: ChessSquareProps) => {
   return (
-    <div 
+    <div
       id={`chessSquare-${square.square}`}
       className={`chessSquare ${backgroundColor}ChessSquare`}
       onMouseEnter={() => {
@@ -66,16 +71,24 @@ const ChessSquare = ({
         e.preventDefault();
       }}
     >
-      <div className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${(square?.pokemon || square?.type) ? 'pieceSquare' : ''}`} />
-      <div className='squareWeatherContainer'>
-        {
-          square?.modifiers?.weather &&
-            (<PokemonWeatherBackground key={square.modifiers.weather.id} className='squareWeather' weatherType={square.modifiers.weather.id} />)
-        }
-        {
-          square?.modifiers?.terrain &&
-            (<PokemonWeatherBackground key={square.modifiers.terrain.id} className='squareWeather' weatherType={square.modifiers.terrain.id} />)
-        }
+      <div
+        className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${square?.pokemon || square?.type ? "pieceSquare" : ""}`}
+      />
+      <div className="squareWeatherContainer">
+        {square?.modifiers?.weather && (
+          <PokemonWeatherBackground
+            key={square.modifiers.weather.id}
+            className="squareWeather"
+            weatherType={square.modifiers.weather.id}
+          />
+        )}
+        {square?.modifiers?.terrain && (
+          <PokemonWeatherBackground
+            key={square.modifiers.terrain.id}
+            className="squareWeather"
+            weatherType={square.modifiers.terrain.id}
+          />
+        )}
       </div>
       <PokemonChessPieceSprite
         type={square?.type}
@@ -85,20 +98,14 @@ const ChessSquare = ({
           onPieceDrag(square);
         }}
       />
-      {
-        square.square[0] === 'a' &&
-        (
-          <span className='squareText squareNum'>{square.square[1]}</span>
-        )
-      }
-      {
-        square.square[1] === '1' &&
-        (
-          <span className='squareText squareChar'>{square.square[0]}</span>
-        )
-      }
+      {square.square[0] === "a" && (
+        <span className="squareText squareNum">{square.square[1]}</span>
+      )}
+      {square.square[1] === "1" && (
+        <span className="squareText squareChar">{square.square[0]}</span>
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default ChessSquare;

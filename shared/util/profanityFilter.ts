@@ -1,9 +1,9 @@
 import {
-	RegExpMatcher,
-	TextCensor,
-	englishDataset,
-	englishRecommendedTransformers,
-} from 'obscenity';
+  RegExpMatcher,
+  TextCensor,
+  englishDataset,
+  englishRecommendedTransformers,
+} from "obscenity";
 
 const filter = new RegExpMatcher({
   ...englishDataset.build(),

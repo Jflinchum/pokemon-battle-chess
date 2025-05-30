@@ -18,7 +18,7 @@ export default class User {
     this.socket = null;
   }
 
-  public assignSocket(socket:Socket) {
+  public assignSocket(socket: Socket) {
     this.socket = socket;
   }
 

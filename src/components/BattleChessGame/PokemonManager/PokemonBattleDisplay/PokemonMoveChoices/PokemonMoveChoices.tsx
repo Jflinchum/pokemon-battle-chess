@@ -1,5 +1,5 @@
 import PokemonMoveInfoButton from "./PokemonMoveInfoButton";
-import './PokemonMoveChoices.css';
+import "./PokemonMoveChoices.css";
 import { Pokemon } from "@pkmn/client";
 
 export interface PokemonMoveChoice {
@@ -17,26 +17,48 @@ interface PokemonMoveChoicesProps {
   currentPokemon?: Pokemon | null;
 }
 
-const PokemonMoveChoices = ({ moves, onMoveSelect = () => {}, currentPokemon, opponentPokemon }: PokemonMoveChoicesProps) => {
-
+const PokemonMoveChoices = ({
+  moves,
+  onMoveSelect = () => {},
+  currentPokemon,
+  opponentPokemon,
+}: PokemonMoveChoicesProps) => {
   return (
-    <div className='movesContainer'>
-      <div className='subMoveContainer'>
+    <div className="movesContainer">
+      <div className="subMoveContainer">
         {moves.slice(0, 2).map((move, index) => {
           return (
-            <PokemonMoveInfoButton key={index} move={move.id} pp={move.pp} maxpp={move.maxpp} currentPokemon={currentPokemon} opponentPokemon={opponentPokemon} disabled={move.disabled} onMoveSelect={onMoveSelect}/>
-          )
+            <PokemonMoveInfoButton
+              key={index}
+              move={move.id}
+              pp={move.pp}
+              maxpp={move.maxpp}
+              currentPokemon={currentPokemon}
+              opponentPokemon={opponentPokemon}
+              disabled={move.disabled}
+              onMoveSelect={onMoveSelect}
+            />
+          );
         })}
       </div>
-      <div className='subMoveContainer'>
+      <div className="subMoveContainer">
         {moves.slice(2, 4).map((move, index) => {
           return (
-            <PokemonMoveInfoButton key={index} move={move.id} pp={move.pp} maxpp={move.maxpp} currentPokemon={currentPokemon} opponentPokemon={opponentPokemon} disabled={move.disabled} onMoveSelect={onMoveSelect}/>
-          )
+            <PokemonMoveInfoButton
+              key={index}
+              move={move.id}
+              pp={move.pp}
+              maxpp={move.maxpp}
+              currentPokemon={currentPokemon}
+              opponentPokemon={opponentPokemon}
+              disabled={move.disabled}
+              onMoveSelect={onMoveSelect}
+            />
+          );
         })}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default PokemonMoveChoices;

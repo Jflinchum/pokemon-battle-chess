@@ -1,4 +1,4 @@
-import './ProgressBar.css'
+import "./ProgressBar.css";
 
 interface ProgressBarProps {
   className: string;
@@ -9,10 +9,12 @@ interface ProgressBarProps {
 const ProgressBar = ({ filled, color, className }: ProgressBarProps) => {
   return (
     <div className={`${className} progressBarContainer`}>
-      <div className='progressBarFiller' style={{ backgroundColor: color, width: `${filled}%` }}>
-      </div>
+      <div
+        className="progressBarFiller"
+        style={{ backgroundColor: color, width: `${filled}%` }}
+      ></div>
     </div>
   );
-}
+};
 
 export default ProgressBar;

@@ -1,9 +1,9 @@
-import { toast } from 'react-toastify';
-import { PRNGSeed } from '@pkmn/sim';
+import { toast } from "react-toastify";
+import { PRNGSeed } from "@pkmn/sim";
 import { MatchHistory } from "../../../../../shared/types/game";
-import { GameState } from "../../../../context/GameStateContext";
+import { GameState } from "../../../../context/GameState/GameStateContext";
 import { Player } from "../../../../../shared/types/Player";
-import { GameOptions } from '../../../../../shared/types/GameOptions';
+import { GameOptions } from "../../../../../shared/types/GameOptions";
 
 export interface ReplayData {
   players: Player[];
@@ -12,13 +12,16 @@ export interface ReplayData {
   matchHistory: MatchHistory;
 }
 
-export const downloadReplay = (gameState: GameState, matchHistory: MatchHistory) => {
+export const downloadReplay = (
+  gameState: GameState,
+  matchHistory: MatchHistory,
+) => {
   const whitePlayer = gameState.gameSettings.whitePlayer;
   const blackPlayer = gameState.gameSettings.blackPlayer;
   const seed = gameState.gameSettings.seed;
 
   if (!whitePlayer || !blackPlayer || !seed) {
-    toast('Error: Unable to download replay', { type: 'error' });
+    toast("Error: Unable to download replay", { type: "error" });
     return;
   }
   const replayData: ReplayData = {
@@ -29,7 +32,7 @@ export const downloadReplay = (gameState: GameState, matchHistory: MatchHistory)
       timersEnabled: false,
     },
     matchHistory,
-  }
+  };
 
   const fileName = `${new Date().getFullYear()}-${new Date().getDate()}-${new Date().getDay()}-${new Date().getHours()}${new Date().getMinutes()}${new Date().getSeconds()}`;
   const json = JSON.stringify(replayData, null, 2);
@@ -44,4 +47,4 @@ export const downloadReplay = (gameState: GameState, matchHistory: MatchHistory)
 
   document.body.removeChild(link);
   URL.revokeObjectURL(href);
-}
+};

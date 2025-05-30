@@ -8,7 +8,7 @@
   cursor: pointer;
   font-size: 0.8em;
   border-top: 2px solid var(--gray-6);
-  
+
   & > * {
     vertical-align: middle;
   }
@@ -30,6 +30,6 @@
   }
 
   &.menuOptionsButtonActive {
-    background-color: var(--gray-5)
+    background-color: var(--gray-5);
   }
 }

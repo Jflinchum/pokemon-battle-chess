@@ -1,8 +1,8 @@
-import UserStateProvider from './context/UserStateContext';
-import GameStateProvider from './context/GameStateContext';
-import ModalStateProvider from './context/ModalStateContext';
-import AudioProvider from './context/AudioContext';
-import MainMenu from './components/MainMenu/MainMenu';
+import UserStateProvider from "./context/UserState/UserStateProvider";
+import GameStateProvider from "./context/GameState/GameStateProvider";
+import ModalStateProvider from "./context/ModalState/ModalStateProvider";
+import AudioProvider from "./context/AudioState/AudioProvider";
+import MainMenu from "./components/MainMenu/MainMenu";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         </ModalStateProvider>
       </GameStateProvider>
     </UserStateProvider>
-  )
+  );
 }
 
 export default App;

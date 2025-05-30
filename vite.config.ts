@@ -1,9 +1,13 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import fs from 'fs';
-import { config } from './server/config';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import fs from "fs";
+import { config } from "./server/config";
+import { SecureContextOptions } from "tls";
 
-const httpsOptions: { key?: any; cert?: any } = {}
+const httpsOptions: {
+  key?: SecureContextOptions["key"];
+  cert?: SecureContextOptions["cert"];
+} = {};
 
 try {
   httpsOptions.key = fs.readFileSync(config.devConfig.keyLocation);
@@ -19,10 +23,10 @@ export default defineConfig({
     https: httpsOptions,
     open: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
+      "/api": {
+        target: "http://localhost:3000",
         secure: false,
       },
-    }
+    },
   },
-})
+});

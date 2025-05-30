@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { useModalState } from "../../../../../../context/ModalStateContext";
-import { useUserState } from "../../../../../../context/UserStateContext";
+import { useModalState } from "../../../../../../context/ModalState/ModalStateContext";
+import { useUserState } from "../../../../../../context/UserState/UserStateContext";
 import Button from "../../../../Button/Button";
 import Input from "../../../../Input/Input";
-import './NameChangeForm.css';
+import "./NameChangeForm.css";
 import { isStringProfane } from "../../../../../../../shared/util/profanityFilter";
 import { toast } from "react-toastify";
 
@@ -29,21 +29,38 @@ export const NameChangeForm = ({ closeModalOnSubmit }: NameChangeFormProps) => {
   const handleChangeName = (e: React.FormEvent) => {
     e.preventDefault();
     if (isStringProfane(name)) {
-      toast('Error: Cannot accept this name due to our profanity filters.', { type: 'error' });
+      toast("Error: Cannot accept this name due to our profanity filters.", {
+        type: "error",
+      });
       return;
     }
-    userStateDispatch({ type: 'SET_NAME', payload: name });
+    userStateDispatch({ type: "SET_NAME", payload: name });
     if (closeModalOnSubmit) {
-      dispatch({ type: 'CLOSE_MODAL' });
+      dispatch({ type: "CLOSE_MODAL" });
     } else {
-      toast('Name set!', { type: 'success' });
+      toast("Name set!", { type: "success" });
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleChangeName} className='nameChangeForm'>
-      <Input className='nameChangeInput' label='Name' ref={inputRef} value={name} onChange={(e) => setName(e.target.value)} maxLength={30} valid={isNameValid(name)} />
-      <Button className='nameChangeActions' type='submit' disabled={name.length === 0} color='primary'>Submit</Button>
+    <form onSubmit={handleChangeName} className="nameChangeForm">
+      <Input
+        className="nameChangeInput"
+        label="Name"
+        ref={inputRef}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        maxLength={30}
+        valid={isNameValid(name)}
+      />
+      <Button
+        className="nameChangeActions"
+        type="submit"
+        disabled={name.length === 0}
+        color="primary"
+      >
+        Submit
+      </Button>
     </form>
   );
-}
+};

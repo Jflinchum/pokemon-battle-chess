@@ -7,7 +7,7 @@
   container-name: menuContainer;
 
   @media (min-width: 800px) {
-    width: 60vw
+    width: 60vw;
   }
 }
 

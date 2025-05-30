@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Button from "../../../../Button/Button";
 import PasscodeInput from "../../../../PasscodeInput/PasscodeInput";
-import './CreateRoomForm.css'
+import "./CreateRoomForm.css";
 
 interface CreateRoomFormProps {
   createRoomLoading: boolean;
@@ -9,12 +9,16 @@ interface CreateRoomFormProps {
   handleCancelRoomCreation: () => void;
 }
 
-const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation, createRoomLoading }: CreateRoomFormProps) => {
-  const inputRef = useRef<HTMLInputElement>(null)
+const CreateRoomForm = ({
+  handleCreateRoom,
+  handleCancelRoomCreation,
+  createRoomLoading,
+}: CreateRoomFormProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) =>{ 
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleCreateRoom({ password: inputRef?.current?.value || '' });
+    handleCreateRoom({ password: inputRef?.current?.value || "" });
   };
 
   useEffect(() => {
@@ -23,12 +27,16 @@ const CreateRoomForm = ({ handleCreateRoom, handleCancelRoomCreation, createRoom
 
   return (
     <form autoComplete="off" onSubmit={handleSubmit}>
-      <div className='roomFormOptions'>
+      <div className="roomFormOptions">
         <PasscodeInput label="Room Code" ref={inputRef} />
       </div>
-      <div className='roomFormActions'>
-        <Button  type='button' onClick={handleCancelRoomCreation}>Cancel</Button>
-        <Button disabled={createRoomLoading} type='submit' color='primary'>Create Room</Button>
+      <div className="roomFormActions">
+        <Button type="button" onClick={handleCancelRoomCreation}>
+          Cancel
+        </Button>
+        <Button disabled={createRoomLoading} type="submit" color="primary">
+          Create Room
+        </Button>
       </div>
     </form>
   );

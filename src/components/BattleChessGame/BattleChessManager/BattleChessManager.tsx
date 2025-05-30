@@ -1,44 +1,64 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { Chess, Color, Square } from 'chess.js';
-import { PokemonSet, SideID } from '@pkmn/data';
-import { ArgType, KWArgType } from '@pkmn/protocol';
-import { PokemonBattleChessManager } from '../../../../shared/models/PokemonBattleChessManager';
-import ChessManager from '../ChessManager/ChessManager';
-import PokemonBattleManager from '../PokemonManager/PokemonBattleManager/PokemonBattleManager';
-import DraftPokemonManager from '../DraftPokemonManager/DraftPokemonManager';
-import { useUserState } from '../../../context/UserStateContext';
-import { useGameState } from '../../../context/GameStateContext';
-import { useModalState } from '../../../context/ModalStateContext';
-import { getCastledRookSquare, getVerboseSanChessMove, mergeBoardAndPokemonState } from '../ChessManager/util';
-import { ChessData, MatchHistory } from '../../../../shared/types/game';
-import PlayerInGameDisplay from './PlayerInGameDisplay/PlayerInGameDisplay';
-import useBattleHistory from './useBattleHistory';
-import Spinner from '../../common/Spinner/Spinner';
-import { Timer } from '../../../../shared/types/game';
-import movePieceMP3 from '../../../assets/chessAssets/audio/movePiece.mp3';
-import capturePieceMP3 from '../../../assets/chessAssets/audio/capturePiece.mp3';
-import GameManagerActions from './GameManagerActions/GameManagerActions';
-import { useMusicPlayer } from '../../../util/useMusicPlayer';
-import PlayerList from '../../RoomManager/Room/PlayerList/PlayerList';
-import { useSocketRequests } from '../../../util/useSocketRequests';
-import './BattleChessManager.css';
-import { toast } from 'react-toastify';
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { toast } from "react-toastify";
+import { Chess, Color, Square } from "chess.js";
+import { PokemonSet, SideID } from "@pkmn/data";
+import { ArgType, KWArgType } from "@pkmn/protocol";
+import {
+  PokemonBattleChessManager,
+  SquareModifier,
+} from "../../../../shared/models/PokemonBattleChessManager";
+import ChessManager from "../ChessManager/ChessManager";
+import PokemonBattleManager from "../PokemonManager/PokemonBattleManager/PokemonBattleManager";
+import DraftPokemonManager from "../DraftPokemonManager/DraftPokemonManager";
+import { useUserState } from "../../../context/UserState/UserStateContext";
+import { useGameState } from "../../../context/GameState/GameStateContext";
+import { useModalState } from "../../../context/ModalState/ModalStateContext";
+import {
+  getCastledRookSquare,
+  getVerboseSanChessMove,
+  mergeBoardAndPokemonState,
+} from "../ChessManager/util";
+import {
+  ChessData,
+  EndGameReason,
+  MatchHistory,
+} from "../../../../shared/types/game";
+import PlayerInGameDisplay from "./PlayerInGameDisplay/PlayerInGameDisplay";
+import useBattleHistory from "./useBattleHistory";
+import Spinner from "../../common/Spinner/Spinner";
+import { Timer } from "../../../../shared/types/game";
+import movePieceMP3 from "../../../assets/chessAssets/audio/movePiece.mp3";
+import capturePieceMP3 from "../../../assets/chessAssets/audio/capturePiece.mp3";
+import GameManagerActions from "./GameManagerActions/GameManagerActions";
+import { useMusicPlayer } from "../../../util/useMusicPlayer";
+import PlayerList from "../../RoomManager/Room/PlayerList/PlayerList";
+import { useSocketRequests } from "../../../util/useSocketRequests";
+import "./BattleChessManager.css";
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;
   p2Pokemon: PokemonSet;
-  attemptedMove: { san: string, color: Color };
+  attemptedMove: { san: string; color: Color };
   offensivePlayer: SideID;
 }
 
-function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHistory, timers?: Timer }) {
+function BattleChessManager({
+  matchHistory,
+  timers,
+}: {
+  matchHistory?: MatchHistory;
+  timers?: Timer;
+}) {
   const { userState } = useUserState();
   const { dispatch: modalStateDispatch } = useModalState();
   const { gameState, dispatch } = useGameState();
 
   const whitePlayer = gameState.gameSettings.whitePlayer;
   const blackPlayer = gameState.gameSettings.blackPlayer;
-  const color = useMemo(() => gameState.gameSettings!.color, []);
+  const color = useMemo(
+    () => gameState.gameSettings.color,
+    [gameState.gameSettings.color],
+  );
   const chessManager = useMemo(() => {
     return new Chess();
   }, []);
@@ -48,15 +68,30 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       format: gameState.gameSettings.options.format,
       weatherWars: gameState.gameSettings.options.weatherWars,
     });
-  }, []);
+  }, [
+    gameState.gameSettings.seed,
+    gameState.gameSettings.options.format,
+    gameState.gameSettings.options.weatherWars,
+  ]);
 
-  const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(null);
+  const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(
+    null,
+  );
   const [battleStarted, setBattleStarted] = useState(false);
-  const [currentPokemonBoard, setCurrentPokemonBoard] = useState(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
-  const [isDrafting, setIsDrafting] = useState<boolean>(gameState.gameSettings.options.format === 'draft');
-  const [draftTurnPick, setDraftTurnPick] = useState<Color>('w');
-  const [mostRecentMove, setMostRecentMove] = useState<{ from: Square, to: Square } | null>(null);
-  const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<{ args: ArgType, kwArgs: KWArgType }[]>([]);
+  const [currentPokemonBoard, setCurrentPokemonBoard] = useState(
+    mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
+  );
+  const [isDrafting, setIsDrafting] = useState<boolean>(
+    gameState.gameSettings.options.format === "draft",
+  );
+  const [draftTurnPick, setDraftTurnPick] = useState<Color>("w");
+  const [mostRecentMove, setMostRecentMove] = useState<{
+    from: Square;
+    to: Square;
+  } | null>(null);
+  const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<
+    { args: ArgType; kwArgs: KWArgType }[]
+  >([]);
   const [errorRecoveryAttempts, setErrorRecoveryAttempts] = useState(0);
   // The timeout to start/end the pokemon battle when initiating one.
   const battleTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -85,32 +120,163 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     requestChessMove,
     requestDraftPokemon,
     requestBanPokemon,
+    requestSync,
   } = useSocketRequests();
 
-  const { catchingUp, currentMatchLog, resetMatchHistory } = useBattleHistory({
-    matchHistory,
-    currentBattle,
-    onBan: (draftPokemonIndex) => {
+  const onBan = useCallback(
+    (draftPokemonIndex: number) => {
       pokemonManager.banDraftPiece(draftPokemonIndex);
-      setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
+      setDraftTurnPick((curr) => (curr === "w" ? "b" : "w"));
     },
-    onDraft: (square, draftPokemonIndex, color) => {
+    [pokemonManager],
+  );
+
+  const onDraft = useCallback(
+    (square: Square, draftPokemonIndex: number, color: Color) => {
       const chessSquare = chessManager.get(square)!;
-      pokemonManager.assignPokemonToSquare(draftPokemonIndex, square, chessSquare.type, color)
-      setCurrentPokemonBoard(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
-      setDraftTurnPick((curr) =>  curr === 'w' ? 'b' : 'w');
+      pokemonManager.assignPokemonToSquare(
+        draftPokemonIndex,
+        square,
+        chessSquare.type,
+        color,
+      );
+      setCurrentPokemonBoard(
+        mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
+      );
+      setDraftTurnPick((curr) => (curr === "w" ? "b" : "w"));
       setIsDrafting(!!pokemonManager.draftPieces.length);
     },
-    onMove: (sanMove, moveFailed) => {
-      return handleMove({ sanMove, moveFailed });
+    [chessManager, pokemonManager],
+  );
+
+  const matchLogIndex = useRef(0);
+  const pokemonLogIndex = useRef(0);
+
+  const resetMatchHistory = useCallback(() => {
+    matchLogIndex.current = 0;
+    pokemonLogIndex.current = 0;
+    dispatch({ type: "SET_SKIPPING_AHEAD", payload: true });
+    requestSync();
+  }, [dispatch, requestSync]);
+
+  const handleError = useCallback(
+    (err: Error) => {
+      if (errorRecoveryAttempts < 3) {
+        toast("Oops! We encountered an error. Attempting to recover...", {
+          type: "error",
+        });
+        console.log(`Encountered error: ${err.message}. Attempting resync.`);
+        console.log(err.stack);
+        chessManager.reset();
+        pokemonManager.reset();
+        resetMatchHistory();
+        setErrorRecoveryAttempts((attempts) => ++attempts);
+      } else {
+        toast(
+          "Error: Could not recover from game bug. Please refresh and try to reconnect.",
+          { type: "error" },
+        );
+        console.log("Max error recovery attempts reached.");
+      }
     },
-    onPokemonBattleStart: (p1Pokemon, p2Pokemon, attemptedMove) => {
+    [pokemonManager, chessManager, errorRecoveryAttempts, resetMatchHistory],
+  );
+
+  const onMove = useCallback(
+    ({ sanMove, moveFailed }: { sanMove: string; moveFailed?: boolean }) => {
+      let castledRookSquare;
+
+      const verboseChessMove = getVerboseSanChessMove(sanMove, chessManager);
+
+      if (!verboseChessMove) {
+        const err = new Error("Verbose chess move undefined.");
+        handleError(err);
+        return err;
+      }
+
+      const fromSquare = verboseChessMove.from;
+      const toSquare = verboseChessMove.to;
+      const promotion = verboseChessMove.promotion;
+
+      if (
+        verboseChessMove?.isKingsideCastle() ||
+        verboseChessMove?.isQueensideCastle()
+      ) {
+        castledRookSquare = getCastledRookSquare(
+          verboseChessMove.color,
+          verboseChessMove?.isKingsideCastle(),
+        );
+      }
+      const fromCastledRookSquare = castledRookSquare?.from;
+      const toCastledRookSquare = castledRookSquare?.to;
+
+      let capturedPieceSquare;
+      if (verboseChessMove.isEnPassant()) {
+        capturedPieceSquare =
+          `${verboseChessMove.to[0] + (parseInt(verboseChessMove.to[1]) + (verboseChessMove.color === "w" ? -1 : 1))}` as Square;
+      } else if (verboseChessMove.isCapture()) {
+        capturedPieceSquare = verboseChessMove.to;
+      }
+
+      if (moveFailed && capturedPieceSquare) {
+        pokemonManager.getPokemonFromSquare(verboseChessMove.from)!.square =
+          null;
+        chessManager.remove(verboseChessMove.from);
+        chessManager.forceAdvanceTurn();
+      } else {
+        try {
+          chessManager.move(
+            { from: fromSquare, to: toSquare, promotion },
+            { continueOnCheck: true },
+          );
+        } catch (err) {
+          handleError(err as Error);
+          return err as Error;
+        }
+        pokemonManager.movePokemonToSquare(fromSquare, toSquare);
+      }
+
+      if (fromCastledRookSquare && toCastledRookSquare) {
+        pokemonManager.movePokemonToSquare(
+          fromCastledRookSquare,
+          toCastledRookSquare,
+        );
+      }
+
+      if (chessManager.turn() === "w") {
+        pokemonManager.tickSquareModifiers();
+      }
+      setMostRecentMove({ from: fromSquare, to: toSquare });
+      setCurrentPokemonBoard(
+        mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
+      );
+      if (capturedPieceSquare) {
+        capturePieceAudio.play();
+      } else {
+        movePieceAudio.play();
+      }
+    },
+    [
+      capturePieceAudio,
+      chessManager,
+      movePieceAudio,
+      pokemonManager,
+      handleError,
+    ],
+  );
+
+  const onPokemonBattleStart = useCallback(
+    (
+      p1Pokemon: PokemonSet<string>,
+      p2Pokemon: PokemonSet<string>,
+      attemptedMove: { san: string; color: Color },
+    ) => {
       setCurrentPokemonMoveHistory([]);
       setCurrentBattle({
         p1Pokemon,
         p2Pokemon,
         attemptedMove,
-        offensivePlayer: chessManager.turn() === 'w' ? 'p1' : 'p2'
+        offensivePlayer: chessManager.turn() === "w" ? "p1" : "p2",
       });
       if (gameState.isSkippingAhead) {
         setBattleStarted(true);
@@ -121,8 +287,16 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
         }, userState.animationSpeedPreference);
       }
     },
-    onPokemonBattleOutput: (parsedChunk) => {
-      if (parsedChunk.args[0] === 'win') {
+    [
+      chessManager,
+      gameState.isSkippingAhead,
+      userState.animationSpeedPreference,
+    ],
+  );
+
+  const onPokemonBattleOutput = useCallback(
+    (parsedChunk: { args: ArgType; kwArgs: KWArgType }) => {
+      if (parsedChunk.args[0] === "win") {
         setBattleStarted(false);
         setCurrentPokemonMoveHistory([]);
 
@@ -136,39 +310,49 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
       }
       setCurrentPokemonMoveHistory((curr) => [...curr, parsedChunk]);
     },
-    onWeatherChange: (squareModifiers) => {
+    [userState.animationSpeedPreference, gameState.isSkippingAhead],
+  );
+
+  const onWeatherChange = useCallback(
+    (squareModifiers: SquareModifier[]) => {
       pokemonManager.setSquareModifiers(squareModifiers);
     },
-    onGameEnd: (color, reason) => {
-      modalStateDispatch({ type: 'OPEN_END_GAME_MODAL', payload: { modalProps: { victor: color, reason } } })
-      dispatch({ type: 'END_MATCH' });
+    [pokemonManager],
+  );
+
+  const onGameEnd = useCallback(
+    (victor: Color | "", reason: EndGameReason) => {
+      modalStateDispatch({
+        type: "OPEN_END_GAME_MODAL",
+        payload: { modalProps: { victor, reason } },
+      });
+      dispatch({ type: "END_MATCH" });
     },
+    [modalStateDispatch, dispatch],
+  );
+
+  const { catchingUp, currentMatchLog } = useBattleHistory({
+    matchHistory,
+    currentBattle,
+    onBan,
+    onDraft,
+    onMove,
+    onPokemonBattleStart,
+    onPokemonBattleOutput,
+    onWeatherChange,
+    onGameEnd,
     skipToEndOfSync: gameState.isSkippingAhead,
+    matchLogIndex,
+    pokemonLogIndex,
   });
 
-  const handleError = (err: Error) => {
-    if (errorRecoveryAttempts < 3) {
-      toast('Oops! We encountered an error. Attempting to recover...', { type: 'error' });
-      console.log(`Encountered error: ${err.message}. Attempting resync.`);
-      console.log(err.stack);
-      chessManager.reset();
-      pokemonManager.reset();
-      resetMatchHistory();
-      setErrorRecoveryAttempts((attempts) => ++attempts);
-    } else {
-      // Error toast message
-      toast('Error: Could not recover from game bug. Please refresh and try to reconnect.', { type: 'error' });
-      console.log('Max error recovery attempts reached.');
-    }
-  }
-
   useEffect(() => {
-    dispatch({ type: 'SET_CATCHING_UP', payload: catchingUp });
+    dispatch({ type: "SET_CATCHING_UP", payload: catchingUp });
 
     if (!catchingUp && gameState.isSkippingAhead) {
-      dispatch({ type: 'SET_SKIPPING_AHEAD', payload: false });
+      dispatch({ type: "SET_SKIPPING_AHEAD", payload: false });
     }
-  }, [catchingUp]);
+  }, [gameState.isSkippingAhead, catchingUp, dispatch]);
 
   /**
    * Clear out the timeout for starting and ending a battle if we start skipping ahead.
@@ -180,91 +364,55 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
     }
   }, [gameState.isSkippingAhead]);
 
-  const handleMove = ({ sanMove, moveFailed }: { sanMove: string; moveFailed?: boolean }) => {
-    let castledRookSquare;
-
-    const verboseChessMove = getVerboseSanChessMove(sanMove, chessManager);
-
-    if (!verboseChessMove) {
-      const err = new Error('Verbose chess move undefined.');
-      handleError(err);
-      return err;
-    }
-
-    const fromSquare = verboseChessMove.from;
-    const toSquare = verboseChessMove.to;
-    const promotion = verboseChessMove.promotion;
-
-    if (verboseChessMove?.isKingsideCastle() || verboseChessMove?.isQueensideCastle()) {
-      castledRookSquare = getCastledRookSquare(verboseChessMove.color, verboseChessMove?.isKingsideCastle());
-    }
-    const fromCastledRookSquare = castledRookSquare?.from;
-    const toCastledRookSquare = castledRookSquare?.to;
-
-    let capturedPieceSquare;
-    if (verboseChessMove.isEnPassant()) {
-      capturedPieceSquare = `${verboseChessMove.to[0] + (parseInt(verboseChessMove.to[1]) + (verboseChessMove.color === 'w' ? -1 : 1))}` as Square;
-    } else if (verboseChessMove.isCapture()) {
-      capturedPieceSquare = verboseChessMove.to;  
-    }
-    
-    if (moveFailed && capturedPieceSquare) {
-      pokemonManager.getPokemonFromSquare(verboseChessMove.from)!.square = null;
-      chessManager.remove(verboseChessMove.from);
-      chessManager.forceAdvanceTurn();
-    } else {
-      try {
-        chessManager.move({ from: fromSquare, to: toSquare, promotion }, { continueOnCheck: true });
-      } catch (err) {
-        handleError(err as Error);
-        return err as Error;
+  const validateDraftPick = useCallback(
+    (square: Square, draftColor: Color) => {
+      if (draftTurnPick !== color || gameState.isSpectator) {
+        return false;
       }
-      pokemonManager.movePokemonToSquare(fromSquare, toSquare);
-    }
-
-
-    if (fromCastledRookSquare && toCastledRookSquare) {
-      pokemonManager.movePokemonToSquare(fromCastledRookSquare, toCastledRookSquare);
-    }
-
-    if (chessManager.turn() === 'w') {
-      pokemonManager.tickSquareModifiers();
-    }
-    setMostRecentMove({ from: fromSquare, to: toSquare });
-    setCurrentPokemonBoard(mergeBoardAndPokemonState(chessManager.board(), pokemonManager));
-    if (capturedPieceSquare) {
-      capturePieceAudio.play();
-    } else {
-      movePieceAudio.play();
-    }
-  }
-
-  const validateDraftPick = ((square: Square, draftColor: Color) => {
-    if (draftTurnPick !== color || gameState.isSpectator) {
-      return false;
-    }
-    const chessSquare = chessManager.get(square);
-    return (chessSquare && chessSquare.color === draftColor && chessSquare.type && !pokemonManager.getPokemonFromSquare(square));
-  });
+      const chessSquare = chessManager.get(square);
+      return (
+        chessSquare &&
+        chessSquare.color === draftColor &&
+        chessSquare.type &&
+        !pokemonManager.getPokemonFromSquare(square)
+      );
+    },
+    [pokemonManager, chessManager, gameState.isSpectator, color, draftTurnPick],
+  );
 
   const battleSquare = useMemo(() => {
-    if (currentBattle && (!catchingUp || userState.animationSpeedPreference >= 1000) && !gameState.isSkippingAhead) {
+    if (
+      currentBattle &&
+      (!catchingUp || userState.animationSpeedPreference >= 1000) &&
+      !gameState.isSkippingAhead
+    ) {
       playRandomBattleSong();
     } else {
       playRandomGlobalSong();
     }
 
     if (currentBattle?.attemptedMove.san) {
-      const chessMove = getVerboseSanChessMove(currentBattle?.attemptedMove.san, chessManager);
+      const chessMove = getVerboseSanChessMove(
+        currentBattle?.attemptedMove.san,
+        chessManager,
+      );
       if (chessMove) {
         if (chessMove.isEnPassant()) {
-          return `${chessMove.to[0] + (parseInt(chessMove.to[1]) + (chessMove.color === 'w' ? -1 : 1))}` as Square;
+          return `${chessMove.to[0] + (parseInt(chessMove.to[1]) + (chessMove.color === "w" ? -1 : 1))}` as Square;
         } else {
-          return chessMove.to;  
+          return chessMove.to;
         }
       }
     }
-  }, [currentBattle]);
+  }, [
+    catchingUp,
+    chessManager,
+    gameState.isSkippingAhead,
+    playRandomBattleSong,
+    playRandomGlobalSong,
+    userState.animationSpeedPreference,
+    currentBattle,
+  ]);
 
   /**
    * Rendering the three different states of the game
@@ -274,33 +422,53 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
    */
   return (
     <>
-      <div className='battleChessAndActionContainer'>
+      <div className="battleChessAndActionContainer">
         <GameManagerActions matchHistory={currentMatchLog} />
-        <div className='battleChessContainer'>
+        <div className="battleChessContainer">
           <PlayerInGameDisplay
-            player={color === 'w' ? blackPlayer : whitePlayer}
-            takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'w' : 'b')}
-            timer={color === 'w' ? timers?.black : timers?.white}
+            player={color === "w" ? blackPlayer : whitePlayer}
+            takenChessPieces={pokemonManager.getTakenChessPieces(
+              gameState.gameSettings.color === "w" ? "w" : "b",
+            )}
+            timer={color === "w" ? timers?.black : timers?.white}
           />
-          <div style={{ display: catchingUp && gameState.isSkippingAhead ? 'none' : 'block' }}>
-            {
-              battleStarted && currentBattle &&
-              (
-                <PokemonBattleManager
-                  p1Pokemon={color === 'w' ? currentBattle.p1Pokemon : currentBattle.p2Pokemon}
-                  p2Pokemon={color === 'w' ? currentBattle.p2Pokemon : currentBattle.p1Pokemon}
-                  currentPokemonMoveHistory={currentPokemonMoveHistory}
-                  perspective={color === 'w' ? 'p1' : 'p2'}
-                />
-              )
-            }
-            <div style={{ display: !battleStarted && !isDrafting ? 'block' : 'none' }}>
+          <div
+            style={{
+              display:
+                catchingUp && gameState.isSkippingAhead ? "none" : "block",
+            }}
+          >
+            {battleStarted && currentBattle && (
+              <PokemonBattleManager
+                p1Pokemon={
+                  color === "w"
+                    ? currentBattle.p1Pokemon
+                    : currentBattle.p2Pokemon
+                }
+                p2Pokemon={
+                  color === "w"
+                    ? currentBattle.p2Pokemon
+                    : currentBattle.p1Pokemon
+                }
+                currentPokemonMoveHistory={currentPokemonMoveHistory}
+                perspective={color === "w" ? "p1" : "p2"}
+              />
+            )}
+            <div
+              style={{
+                display: !battleStarted && !isDrafting ? "block" : "none",
+              }}
+            >
               <ChessManager
                 chessManager={chessManager}
                 pokemonManager={pokemonManager}
                 mostRecentMove={mostRecentMove}
                 currentBattle={currentBattle}
-                chessMoveHistory={currentMatchLog.filter((log) => log.type === 'chess') as ChessData[]}
+                chessMoveHistory={
+                  currentMatchLog.filter(
+                    (log) => log.type === "chess",
+                  ) as ChessData[]
+                }
                 board={currentPokemonBoard}
                 battleSquare={battleSquare}
                 onError={(err) => {
@@ -315,48 +483,49 @@ function BattleChessManager({ matchHistory, timers }: { matchHistory?: MatchHist
                 }}
               />
             </div>
-            {
-              isDrafting && (
-                <DraftPokemonManager
-                  draftTurnPick={draftTurnPick}
-                  chessManager={chessManager}
-                  pokemonManager={pokemonManager}
-                  boardState={currentPokemonBoard}
-                  onDraftPokemon={(sq, pkmnIndex) => {
-                    if (validateDraftPick(sq, color!)) {
-                      requestDraftPokemon(sq, pkmnIndex);
-                      setIsDrafting(!!pokemonManager.draftPieces.length);
-                    }
-                  }}
-                  onBanPokemon={(pkmnIndex) => {
-                    if (gameState.isSpectator) {
-                      return;
-                    }
-                    requestBanPokemon(pkmnIndex);
-                  }}
-                />
-              )
-            }
+            {isDrafting && (
+              <DraftPokemonManager
+                draftTurnPick={draftTurnPick}
+                chessManager={chessManager}
+                pokemonManager={pokemonManager}
+                boardState={currentPokemonBoard}
+                onDraftPokemon={(sq, pkmnIndex) => {
+                  if (validateDraftPick(sq, color!)) {
+                    requestDraftPokemon(sq, pkmnIndex);
+                    setIsDrafting(!!pokemonManager.draftPieces.length);
+                  }
+                }}
+                onBanPokemon={(pkmnIndex) => {
+                  if (gameState.isSpectator) {
+                    return;
+                  }
+                  requestBanPokemon(pkmnIndex);
+                }}
+              />
+            )}
           </div>
-          {
-            gameState.isCatchingUp && gameState.isSkippingAhead && (
-              <div className='skipSpinnerContainer'>
-                <Spinner />
-                Skipping ahead...
-              </div>
-            )
-          }
+          {gameState.isCatchingUp && gameState.isSkippingAhead && (
+            <div className="skipSpinnerContainer">
+              <Spinner />
+              Skipping ahead...
+            </div>
+          )}
           <PlayerInGameDisplay
-            player={color === 'w' ? whitePlayer : blackPlayer}
-            takenChessPieces={pokemonManager.getTakenChessPieces(gameState.gameSettings.color === 'w' ? 'b' : 'w')}
-            timer={color === 'w' ? timers?.white : timers?.black}
+            player={color === "w" ? whitePlayer : blackPlayer}
+            takenChessPieces={pokemonManager.getTakenChessPieces(
+              gameState.gameSettings.color === "w" ? "b" : "w",
+            )}
+            timer={color === "w" ? timers?.white : timers?.black}
           />
 
-          <PlayerList players={gameState.players} className='battleChessPlayerList' />
+          <PlayerList
+            players={gameState.players}
+            className="battleChessPlayerList"
+          />
         </div>
       </div>
     </>
-  )
+  );
 }
 
 export default BattleChessManager;

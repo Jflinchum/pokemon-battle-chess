@@ -16,7 +16,7 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
     border-radius: 50%;
-    border:white solid 1px;
+    border: white solid 1px;
     position: relative;
   }
 }
@@ -92,7 +92,7 @@
 
 .battleSquare {
   background-color: var(--chess-square-battle-red);
-  background-image: url('/src/assets/vs.svg');
+  background-image: url("/src/assets/vs.svg");
   background-size: contain;
   background-repeat: no-repeat;
   animation: blinkColor;

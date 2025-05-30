@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
-import { Dex } from '@pkmn/dex';
+import { useMemo } from "react";
+import { Dex } from "@pkmn/dex";
 import { PokemonSet, Generations, SideID } from "@pkmn/data";
-import { KWArgType } from '@pkmn/protocol';
-import { Battle } from '@pkmn/client';
+import { KWArgType } from "@pkmn/protocol";
+import { Battle } from "@pkmn/client";
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
-import { CustomArgTypes } from '../../../../../shared/types/PokemonTypes';
+import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 
 interface PokemonBattleManagerProps {
   p1Pokemon: PokemonSet;
@@ -13,27 +13,37 @@ interface PokemonBattleManagerProps {
   perspective: SideID;
 }
 
-
-const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory, perspective }: PokemonBattleManagerProps) => {
+const PokemonBattleManager = ({
+  p1Pokemon,
+  p2Pokemon,
+  currentPokemonMoveHistory,
+  perspective,
+}: PokemonBattleManagerProps) => {
   // TODO - optimize this so we pass primitives down instead of recreating the class every time
-  const battle = useMemo(
-    () => {
-      const newGeneration = new Generations(Dex);
-      const newBattle = new Battle(newGeneration, null, [[perspective === 'p1' ? p1Pokemon : p2Pokemon], [perspective === 'p1' ? p2Pokemon : p1Pokemon]], undefined);
-      for (const { args, kwArgs } of currentPokemonMoveHistory) {
-        // Custom handling for forfeit
-        if (args[0] === '-forfeit') {
-          const side = args[1];
-          if (newBattle[side]?.active[0]?.hp) {
-            newBattle[side].active[0].hp = 0;
-          }
-        } else {
-          newBattle.add(args, kwArgs)
+  const battle = useMemo(() => {
+    const newGeneration = new Generations(Dex);
+    const newBattle = new Battle(
+      newGeneration,
+      null,
+      [
+        [perspective === "p1" ? p1Pokemon : p2Pokemon],
+        [perspective === "p1" ? p2Pokemon : p1Pokemon],
+      ],
+      undefined,
+    );
+    for (const { args, kwArgs } of currentPokemonMoveHistory) {
+      // Custom handling for forfeit
+      if (args[0] === "-forfeit") {
+        const side = args[1];
+        if (newBattle[side]?.active[0]?.hp) {
+          newBattle[side].active[0].hp = 0;
         }
+      } else {
+        newBattle.add(args, kwArgs);
       }
-      return newBattle;
     }
-  , [currentPokemonMoveHistory]);
+    return newBattle;
+  }, [p1Pokemon, p2Pokemon, perspective, currentPokemonMoveHistory]);
 
   return (
     <PokemonBattleDisplay
@@ -43,7 +53,7 @@ const PokemonBattleManager = ({ p1Pokemon, p2Pokemon, currentPokemonMoveHistory,
       p2Pokemon={p2Pokemon}
       perspective={perspective}
     />
-  )
-}
+  );
+};
 
 export default PokemonBattleManager;

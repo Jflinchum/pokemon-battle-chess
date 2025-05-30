@@ -35,6 +35,6 @@
     margin: 0;
     &:nth-child(odd) {
       background-color: #dcdcdc;
-    } 
+    }
   }
 }

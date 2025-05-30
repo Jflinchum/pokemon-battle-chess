@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
-import { useModalState } from "../../../../../context/ModalStateContext";
-import './NameChangeModal.css';
+import { useModalState } from "../../../../../context/ModalState/ModalStateContext";
+import "./NameChangeModal.css";
 import { NameChangeForm } from "./components/NameChangeForm";
 
 const NameChangeModal = () => {
@@ -13,16 +13,16 @@ const NameChangeModal = () => {
   }, []);
 
   return (
-    <div className='nameChangeModalContainer'>
-      <h2 className='nameChangeTitle'>Enter Name</h2>
-      {
-        modalState.required && (
-          <span className='nameChangeNotification'>Before you can play any games, you need to enter a name!</span>
-        )
-      }
-      <NameChangeForm closeModalOnSubmit/>
+    <div className="nameChangeModalContainer">
+      <h2 className="nameChangeTitle">Enter Name</h2>
+      {modalState.required && (
+        <span className="nameChangeNotification">
+          Before you can play any games, you need to enter a name!
+        </span>
+      )}
+      <NameChangeForm closeModalOnSubmit />
     </div>
-  )
+  );
 };
 
 export default NameChangeModal;

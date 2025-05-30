@@ -4,54 +4,66 @@ import { faEye, faX } from "@fortawesome/free-solid-svg-icons";
 import PlayerName from "../PlayerName/PlayerName";
 import { Player } from "../../../../../shared/types/Player";
 import Button from "../../../common/Button/Button";
-import { useGameState } from "../../../../context/GameStateContext";
-import { useUserState } from "../../../../context/UserStateContext";
+import { useGameState } from "../../../../context/GameState/GameStateContext";
+import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
-import './PlayerList.css';
+import "./PlayerList.css";
 
 interface PlayerListProps extends React.HTMLAttributes<HTMLDivElement> {
-  players: Player[]
+  players: Player[];
 }
 
-const PlayerList = ({ players, className = '', ...props }: PlayerListProps) => {
+const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
   const { gameState } = useGameState();
   const { userState } = useUserState();
-  const { requestKickPlayer, requestMovePlayerToSpectator } = useSocketRequests();
+  const { requestKickPlayer, requestMovePlayerToSpectator } =
+    useSocketRequests();
 
   const handleKickClick = (playerId: string) => {
-    requestKickPlayer(playerId)
+    requestKickPlayer(playerId);
   };
 
   const handleMovePlayerToSpectator = (playerId: string) => {
     requestMovePlayerToSpectator(playerId);
-  }
+  };
 
   return (
     <div {...props} className={`playerListContainer ${className}`}>
-      <div className='playerList'>
+      <div className="playerList">
         <span>Players</span>
-        <hr/>
+        <hr />
         <ul>
           {players.map((player) => (
             <li key={player.playerId}>
-              <img className='playerListSprite' src={Sprites.getAvatar(player.avatarId || '1')} />
-              <PlayerName className='playerListName' player={player} />
+              <img
+                className="playerListSprite"
+                src={Sprites.getAvatar(player.avatarId || "1")}
+              />
+              <PlayerName className="playerListName" player={player} />
 
-              {
-                gameState.isHost && player.playerId !== userState.id && (
-                  <span className='playerActions'>
-                    {
-                      (player.isPlayer1 || player.isPlayer2) && !gameState.inGame &&
-                      <Button className='playerAction' title='Move Player To Spectator' onClick={() => handleMovePlayerToSpectator(player.playerId)}>
-                        <FontAwesomeIcon icon={faEye}/>
+              {gameState.isHost && player.playerId !== userState.id && (
+                <span className="playerActions">
+                  {(player.isPlayer1 || player.isPlayer2) &&
+                    !gameState.inGame && (
+                      <Button
+                        className="playerAction"
+                        title="Move Player To Spectator"
+                        onClick={() =>
+                          handleMovePlayerToSpectator(player.playerId)
+                        }
+                      >
+                        <FontAwesomeIcon icon={faEye} />
                       </Button>
-                    }
-                    <Button className='playerAction' title='Kick Player' onClick={() => handleKickClick(player.playerId)}>
-                      <FontAwesomeIcon icon={faX}/>
-                    </Button>
-                  </span>
-                )
-              }
+                    )}
+                  <Button
+                    className="playerAction"
+                    title="Kick Player"
+                    onClick={() => handleKickClick(player.playerId)}
+                  >
+                    <FontAwesomeIcon icon={faX} />
+                  </Button>
+                </span>
+              )}
             </li>
           ))}
         </ul>

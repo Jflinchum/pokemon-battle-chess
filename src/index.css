@@ -12,15 +12,14 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-
   /**
    * Various rgb colors used throughout the webapp
    */
   --danger-red: var(--red-4);
   --success-green: var(--green-4);
   --button-outline: rgb(100, 100, 200);
-  --dark-translucent-bg: rgba(70, 70, 70, .8);
-  --translucent-bg: rgba(255, 255, 255, .15);
+  --dark-translucent-bg: rgba(70, 70, 70, 0.8);
+  --translucent-bg: rgba(255, 255, 255, 0.15);
 
   --chess-square-white: var(--gray-1);
   --chess-square-black: var(--gray-3);

@@ -1,11 +1,13 @@
-import './NavOptionButton.css';
+import "./NavOptionButton.css";
 
-interface NavOptionButton extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
-
-export const NavOptionButton = ({ children, className = '', ...props }: NavOptionButton) => {
+export const NavOptionButton = ({
+  children,
+  className = "",
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
     <button {...props} className={`navOptionButton ${className}`}>
       {children}
     </button>
   );
-}
+};

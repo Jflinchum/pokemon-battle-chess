@@ -36,6 +36,6 @@
   right: 25px;
 
   &:hover {
-    background-color: var(--gray-5)
+    background-color: var(--gray-5);
   }
 }

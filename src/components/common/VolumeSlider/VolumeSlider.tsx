@@ -1,15 +1,24 @@
-import { faVolumeHigh, faVolumeLow, faVolumeMute } from "@fortawesome/free-solid-svg-icons";
+import {
+  faVolumeHigh,
+  faVolumeLow,
+  faVolumeMute,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMemo, useState } from "react";
 import { useDebounce } from "../../../utils";
-import './VolumeSlider.css';
+import "./VolumeSlider.css";
 
-interface VolumeSliderProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface VolumeSliderProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   initialVolume?: number;
   onVolumeUpdate?: (volume: number) => void;
 }
 
-export const VolumeSlider = ({ initialVolume = 100, onVolumeUpdate = () => {}, ...props }: VolumeSliderProps) => {
+export const VolumeSlider = ({
+  initialVolume = 100,
+  onVolumeUpdate = () => {},
+  ...props
+}: VolumeSliderProps) => {
   const [volume, setVolume] = useState(initialVolume);
   const [previousVolume, setPreviousVolume] = useState(initialVolume);
 
@@ -41,9 +50,18 @@ export const VolumeSlider = ({ initialVolume = 100, onVolumeUpdate = () => {}, .
   }, [volume]);
 
   return (
-    <span className='volumeSliderContainer'>
-      <FontAwesomeIcon icon={volumeIcon} size="xs" onClick={handleVolumeIconClick}/>
-      <input type='range' value={volume} onChange={(e) => handleChange(parseInt(e.target.value))} {...props}/>
+    <span className="volumeSliderContainer">
+      <FontAwesomeIcon
+        icon={volumeIcon}
+        size="xs"
+        onClick={handleVolumeIconClick}
+      />
+      <input
+        type="range"
+        value={volume}
+        onChange={(e) => handleChange(parseInt(e.target.value))}
+        {...props}
+      />
     </span>
   );
 };

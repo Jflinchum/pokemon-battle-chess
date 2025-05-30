@@ -1,34 +1,48 @@
 import { Field, WeatherName } from "@pkmn/client";
-import { getSquareModifierMapping } from "../../../PokemonChessDetailsCard/PokemonChessDetailsCard";
-import './PokemonBattleConditions.css';
+import { getSquareModifierMapping } from "../../../PokemonChessDetailsCard/getSquareModifierMapping";
+import "./PokemonBattleConditions.css";
 
-const PokemonBattleConditionLabel = ({ condition }: { condition?: Field['terrainState'] | Field['weatherState'] }) => {
+const PokemonBattleConditionLabel = ({
+  condition,
+}: {
+  condition?: Field["terrainState"] | Field["weatherState"];
+}) => {
   if (!condition || !condition.id) return null;
 
   return (
     <p>
-      <span>{getSquareModifierMapping(condition.id as WeatherName)?.label} </span>
+      <span>
+        {getSquareModifierMapping(condition.id as WeatherName)?.label}{" "}
+      </span>
       <span>({condition.minDuration} </span>
-      {condition.maxDuration > 0 && (
-        <span>or {condition.maxDuration} </span>
-      )}
+      {condition.maxDuration > 0 && <span>or {condition.maxDuration} </span>}
       <span>turns)</span>
     </p>
   );
-}
+};
 
-export const PokemonBattleConditions = ({ battleField }: { battleField: Field }) => {
+export const PokemonBattleConditions = ({
+  battleField,
+}: {
+  battleField: Field;
+}) => {
   if (!battleField.weatherState.id && !battleField.terrainState.id) return null;
 
   return (
-    <div className='pokemonBattleConditions'>
+    <div className="pokemonBattleConditions">
       <PokemonBattleConditionLabel condition={battleField.weatherState} />
       <PokemonBattleConditionLabel condition={battleField.terrainState} />
-      { battleField.pseudoWeather && Object.keys(battleField.pseudoWeather).map((weather) => {
-        return (
-          <PokemonBattleConditionLabel key={weather} condition={battleField.pseudoWeather[weather] as Field['weatherState']}/>
-        )
-      })}
+      {battleField.pseudoWeather &&
+        Object.keys(battleField.pseudoWeather).map((weather) => {
+          return (
+            <PokemonBattleConditionLabel
+              key={weather}
+              condition={
+                battleField.pseudoWeather[weather] as Field["weatherState"]
+              }
+            />
+          );
+        })}
     </div>
   );
-}
+};

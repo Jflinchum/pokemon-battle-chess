@@ -1,4 +1,3 @@
-
 @keyframes floating {
   from {
     transform: translateY(0%) rotate(0deg) scale(var(--scale));
@@ -30,7 +29,7 @@
 }
 
 .backgroundChess {
-  display: inline-block; 
+  display: inline-block;
   min-width: 5vw;
   min-height: 5vw;
   background-size: contain;

@@ -1,59 +1,137 @@
 import { Square } from "chess.js";
 import { socket } from "../socket";
-import { useUserState } from "../context/UserStateContext";
+import { useUserState } from "../context/UserState/UserStateContext";
 import { GameOptions } from "../../shared/types/GameOptions";
 import { CommonClientArgs } from "../../shared/types/Socket";
+import { useCallback, useMemo } from "react";
 
 export const useSocketRequests = () => {
   const { userState } = useUserState();
-  const commonClientArgs: CommonClientArgs = {
-    playerId: userState.id,
-    roomId: userState.currentRoomId,
-    secretId: userState.secretId,
-  };
+  const commonClientArgs: CommonClientArgs = useMemo(
+    () => ({
+      playerId: userState.id,
+      roomId: userState.currentRoomId,
+      secretId: userState.secretId,
+    }),
+    [userState.id, userState.currentRoomId, userState.secretId],
+  );
+
+  const requestChessMove = useCallback(
+    (san: string) => {
+      socket.emit("requestChessMove", { sanMove: san, ...commonClientArgs });
+    },
+    [commonClientArgs],
+  );
+
+  const requestDraftPokemon = useCallback(
+    (square: Square, draftPokemonIndex: number) => {
+      socket.emit("requestDraftPokemon", {
+        square,
+        draftPokemonIndex,
+        ...commonClientArgs,
+      });
+    },
+    [commonClientArgs],
+  );
+
+  const requestBanPokemon = useCallback(
+    (draftPokemonIndex: number) => {
+      socket.emit("requestDraftPokemon", {
+        draftPokemonIndex,
+        isBan: true,
+        ...commonClientArgs,
+      });
+    },
+    [commonClientArgs],
+  );
+
+  const requestPokemonMove = useCallback(
+    (pokemonMove: string, cb: (err?: Error) => void) => {
+      socket
+        .timeout(10000)
+        .emit("requestPokemonMove", { pokemonMove, ...commonClientArgs }, cb);
+    },
+    [commonClientArgs],
+  );
+
+  const requestSetViewingResults = useCallback(
+    (viewingResults: boolean) => {
+      socket.emit("setViewingResults", { viewingResults, ...commonClientArgs });
+    },
+    [commonClientArgs],
+  );
+
+  const requestReturnEveryoneToRoom = useCallback(() => {
+    socket.emit("requestEndGameAsHost", commonClientArgs);
+  }, [commonClientArgs]);
+
+  const requestStartGame = useCallback(() => {
+    socket.emit("requestStartGame", commonClientArgs);
+  }, [commonClientArgs]);
+
+  const requestToggleSpectating = useCallback(() => {
+    socket.emit("requestToggleSpectating", commonClientArgs);
+  }, [commonClientArgs]);
+
+  const requestChangeGameOptions = useCallback(
+    (options: GameOptions) => {
+      socket.emit("requestChangeGameOptions", { options, ...commonClientArgs });
+    },
+    [commonClientArgs],
+  );
+
+  const requestKickPlayer = useCallback(
+    (playerId: string) => {
+      socket.emit("requestKickPlayer", {
+        kickedPlayerId: playerId,
+        ...commonClientArgs,
+      });
+    },
+    [commonClientArgs],
+  );
+
+  const requestMovePlayerToSpectator = useCallback(
+    (playerId: string) => {
+      socket.emit("requestMovePlayerToSpectator", {
+        spectatorPlayerId: playerId,
+        ...commonClientArgs,
+      });
+    },
+    [commonClientArgs],
+  );
+
+  const requestJoinGame = useCallback(() => {
+    socket.emit("joinRoom", {
+      roomCode: userState.currentRoomCode,
+      ...commonClientArgs,
+    });
+  }, [userState.currentRoomCode, commonClientArgs]);
+
+  const requestSync = useCallback(() => {
+    socket.emit("requestSync", commonClientArgs);
+  }, [commonClientArgs]);
+
+  const sendChatMessage = useCallback(
+    (message: string) => {
+      socket.emit("sendChatMessage", { message, ...commonClientArgs });
+    },
+    [commonClientArgs],
+  );
 
   return {
-    requestChessMove: (san: string) => {
-      socket.emit('requestChessMove', { sanMove: san, ...commonClientArgs });
-    },
-    requestDraftPokemon: (square: Square, draftPokemonIndex: number) => {
-      socket.emit('requestDraftPokemon', { square, draftPokemonIndex, ...commonClientArgs });
-    },
-    requestBanPokemon: (draftPokemonIndex: number) => {
-      socket.emit('requestDraftPokemon', { draftPokemonIndex, isBan: true, ...commonClientArgs });
-    },
-    requestPokemonMove: (pokemonMove: string, cb: (err?: Error) => void) => {
-      socket.timeout(10000).emit('requestPokemonMove', { pokemonMove, ...commonClientArgs }, cb);
-    },
-    requestSetViewingResults: (viewingResults: boolean) => {
-      socket.emit('setViewingResults', { viewingResults, ...commonClientArgs });
-    },
-    requestReturnEveryoneToRoom: () => {
-      socket.emit('requestEndGameAsHost', commonClientArgs);
-    },
-    requestStartGame: () => {
-      socket.emit('requestStartGame', commonClientArgs);
-    },
-    requestToggleSpectating: () => {
-      socket.emit('requestToggleSpectating', commonClientArgs);
-    },
-    requestChangeGameOptions: (options: GameOptions) => {
-      socket.emit('requestChangeGameOptions', { options, ...commonClientArgs });
-    },
-    requestKickPlayer: (playerId: string) => {
-      socket.emit('requestKickPlayer', { kickedPlayerId: playerId, ...commonClientArgs });
-    },
-    requestMovePlayerToSpectator: (playerId: string) => {
-      socket.emit('requestMovePlayerToSpectator', { spectatorPlayerId: playerId, ...commonClientArgs });
-    },
-    requestJoinGame: () => {
-      socket.emit('joinRoom', { roomCode: userState.currentRoomCode, ...commonClientArgs });
-    },
-    requestSync: () => {
-      socket.emit('requestSync', commonClientArgs);
-    },
-    sendChatMessage: (message: string) => {
-      socket.emit('sendChatMessage', { message, ...commonClientArgs });
-    }
+    requestChessMove,
+    requestDraftPokemon,
+    requestBanPokemon,
+    requestPokemonMove,
+    requestSetViewingResults,
+    requestReturnEveryoneToRoom,
+    requestStartGame,
+    requestToggleSpectating,
+    requestChangeGameOptions,
+    requestKickPlayer,
+    requestMovePlayerToSpectator,
+    requestJoinGame,
+    requestSync,
+    sendChatMessage,
   };
 };

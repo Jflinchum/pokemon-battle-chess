@@ -1,14 +1,14 @@
-import { BoostsTable } from '@pkmn/data';
-import { PRNGSeed } from '@pkmn/sim';
-import { Color } from 'chess.js';
-import { Player } from './Player';
-type FormatID = 'random' | 'draft';
+import { BoostsTable } from "@pkmn/data";
+import { PRNGSeed } from "@pkmn/sim";
+import { Color } from "chess.js";
+import { Player } from "./Player";
+type FormatID = "random" | "draft";
 
 export interface GameOptions {
   format: FormatID;
   offenseAdvantage: BoostsTable;
   weatherWars: boolean;
-  timersEnabled: boolean,
+  timersEnabled: boolean;
   // In seconds
   banTimerDuration: number;
   // In minutes

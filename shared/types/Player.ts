@@ -1,4 +1,4 @@
-import { Color } from 'chess.js';
+import { Color } from "chess.js";
 
 export interface Player {
   playerName: string;
