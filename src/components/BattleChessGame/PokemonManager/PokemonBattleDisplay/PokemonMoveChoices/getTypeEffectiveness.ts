@@ -22,6 +22,7 @@ export const getTypeEffectiveness = (
   const abilityImmunity = immunityAbilities[
     opponentPokemon.set?.ability.toLowerCase() || ""
   ]?.(move, currentPokemon);
+
   let notImmune;
   if (abilityImmunity === false) {
     notImmune = abilityImmunity;

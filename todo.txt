@@ -57,6 +57,9 @@ Refactor TODOs:
 Issues:
 - Weather from weather squares says "5 or 8 turns" when it's always 5
 - Pokemon damage numbers in battle log don't make sense
+- Some pokemon moves do not show type effectiveness correctly
+  - Judgement with Arceus
+  - Likely more. Will need to keep an eye out
 - Draft picking timer does not reset exactly to max time. It goes as little above or below it
 - Wrong music playing after skipping to current turn when catching up
 - Premoves:

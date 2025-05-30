@@ -13,6 +13,8 @@
 }
 
 .battleMoveContainer {
+  max-width: 640px;
+  margin: auto;
   padding: 10px;
   flex-grow: 1;
   align-self: stretch;
