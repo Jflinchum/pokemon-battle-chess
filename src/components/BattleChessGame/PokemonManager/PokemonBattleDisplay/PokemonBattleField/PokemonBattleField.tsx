@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Battle } from "@pkmn/client";
 import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet } from "@pkmn/data";
@@ -49,6 +49,12 @@ const PokemonBattleField = ({
     ],
   );
 
+  const [selectedSide, setSelectedSide] = useState<"p1" | "p2" | undefined>();
+
+  const handlePokemonClick = (side: "p1" | "p2") => {
+    setSelectedSide((curr) => (curr === side ? undefined : side));
+  };
+
   return (
     <div
       className="pokemonBattleBackground"
@@ -65,10 +71,24 @@ const PokemonBattleField = ({
       <PokemonWeatherBackground weatherType={battleState.field.terrain} />
       <PokemonBattleConditions battleField={battleState.field} />
       {p1Pokemon && (
-        <PokemonFieldSprite pokemon={p1Pokemon} set={p1PokemonSet} side="p1" />
+        <PokemonFieldSprite
+          pokemon={p1Pokemon}
+          set={p1PokemonSet}
+          side="p1"
+          onClick={() => handlePokemonClick("p1")}
+          shouldShowDetails={selectedSide === "p1"}
+          shouldHide={selectedSide === "p2"}
+        />
       )}
       {p2Pokemon && (
-        <PokemonFieldSprite pokemon={p2Pokemon} set={p2PokemonSet} side="p2" />
+        <PokemonFieldSprite
+          pokemon={p2Pokemon}
+          set={p2PokemonSet}
+          side="p2"
+          onClick={() => handlePokemonClick("p2")}
+          shouldShowDetails={selectedSide === "p2"}
+          shouldHide={selectedSide === "p1"}
+        />
       )}
     </div>
   );

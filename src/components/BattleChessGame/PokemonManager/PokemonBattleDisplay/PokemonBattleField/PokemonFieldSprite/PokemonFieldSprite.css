@@ -8,8 +8,8 @@
   @media (max-width: 900px) {
     width: 50%;
     height: 50%;
-    bottom: 10px;
-    left: 20px;
+    bottom: 50px;
+    left: 10px;
   }
 }
 
@@ -23,7 +23,7 @@
   @media (max-width: 900px) {
     width: 50%;
     height: 50%;
-    top: 50px;
+    top: 60px;
     right: 10px;
   }
 }
@@ -129,4 +129,33 @@
 .pokemonTooltipTyping {
   max-width: 80px;
   margin-right: 8px;
+}
+
+.pokemonSprite:hover {
+  transition: 0.5s filter;
+  filter: drop-shadow(2px 2px var(--green-4))
+    drop-shadow(2px -2px var(--green-4)) drop-shadow(-2px -2px var(--green-4))
+    drop-shadow(-2px 2px var(--green-4)) drop-shadow(3px 3px var(--green-2))
+    drop-shadow(3px -3px var(--green-2)) drop-shadow(-3px -3px var(--green-2))
+    drop-shadow(-3px 3px var(--green-2));
+  cursor: pointer;
+}
+
+.pokemonFieldSprite {
+  transition:
+    0.5s transform,
+    0.5s opacity,
+    0.5s visibility;
+
+  &.inspect {
+    transform: scale(150%);
+  }
+  &.hide {
+    opacity: 0%;
+    visibility: hidden;
+  }
+}
+
+.tooltip.pokemonDetailsTooltip {
+  background-color: var(--gray-7);
 }

@@ -1,35 +1,7 @@
-.pokemonBattleDetailsContainer {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  font-size: 0.7em;
-  flex-wrap: wrap;
-
-  @media (min-width: 600px) {
-    font-size: 1em;
-  }
-
-  @media (min-width: 500px) {
-    flex-wrap: nowrap;
-  }
-}
-
-.pokemonBattleDetailsChild {
-  width: 100%;
-  order: 3;
-
-  @media (min-width: 500px) {
-    order: inherit;
-  }
-}
-
 .pokemonBattleDetailsCard {
-  width: 50%;
-  background-color: var(--gray-6);
   display: flex;
   flex-direction: row;
-  padding: 8px;
-  font-size: 0.8em;
+  font-size: 1em;
   box-sizing: border-box;
   overflow-y: scroll;
   overflow-x: hidden;

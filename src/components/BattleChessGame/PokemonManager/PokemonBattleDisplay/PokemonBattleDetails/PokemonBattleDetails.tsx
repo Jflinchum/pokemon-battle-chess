@@ -8,27 +8,11 @@ import { GenderIcon } from "../../../../common/GenderIcon/GenderIcon";
 import { PokemonMoveTooltip } from "../PokemonMoveTooltip/PokemonMoveTooltip";
 import "./PokemonBattleDetails.css";
 
-interface PokemonBattleDetailsProps {
-  p1Pokemon: Pokemon | null;
-  p2Pokemon: Pokemon | null;
-  children: React.ReactNode;
-}
-
-export const PokemonBattleDetails = ({
-  p1Pokemon,
-  p2Pokemon,
-  children,
-}: PokemonBattleDetailsProps) => {
-  return (
-    <div className="pokemonBattleDetailsContainer">
-      <PokemonBattleDetailsCard pokemon={p1Pokemon} />
-      <span className="pokemonBattleDetailsChild">{children}</span>
-      <PokemonBattleDetailsCard pokemon={p2Pokemon} />
-    </div>
-  );
-};
-
-const PokemonBattleDetailsCard = ({ pokemon }: { pokemon: Pokemon | null }) => {
+export const PokemonBattleDetailsCard = ({
+  pokemon,
+}: {
+  pokemon: Pokemon | null;
+}) => {
   const dexPokemon = Dex.species.get(pokemon?.speciesForme || "");
 
   const { weaknesses, resistances, immunities } = useMemo(() => {

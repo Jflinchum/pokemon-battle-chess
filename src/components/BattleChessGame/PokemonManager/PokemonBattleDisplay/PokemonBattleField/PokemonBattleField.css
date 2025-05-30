@@ -1,19 +1,15 @@
 .pokemonBattleBackground {
-  width: 100%;
-  min-width: 600px;
-  min-height: 400px;
+  width: 640px;
+  height: 360px;
   background-repeat: no-repeat;
   background-size: 100% 100%;
   position: relative;
   box-sizing: border-box;
   border: solid black 4px;
-  flex-grow: 1;
 
   @media (max-width: 900px) {
-    width: 100%;
-    height: 200px;
-    min-width: 300px;
-    min-height: 200px;
+    width: 320px;
+    height: 180px;
     margin: auto;
   }
 }

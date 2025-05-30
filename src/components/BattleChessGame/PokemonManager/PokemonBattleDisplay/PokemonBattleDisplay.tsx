@@ -9,7 +9,6 @@ import PokemonMoveChoices, {
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
-import { PokemonBattleDetails } from "./PokemonBattleDetails/PokemonBattleDetails";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./PokemonBattleDisplay.css";
 
@@ -71,17 +70,12 @@ const PokemonBattleDisplay = ({
         <>
           <div className="battlefieldAndLog">
             <span className="battleContainer">
-              <PokemonBattleDetails
-                p1Pokemon={battleState.p1.active[0]}
-                p2Pokemon={battleState.p2.active[0]}
-              >
-                <PokemonBattleField
-                  battleHistory={fullBattleLog}
-                  battleState={battleState}
-                  p1PokemonSet={p1Pokemon}
-                  p2PokemonSet={p2Pokemon}
-                />
-              </PokemonBattleDetails>
+              <PokemonBattleField
+                battleHistory={fullBattleLog}
+                battleState={battleState}
+                p1PokemonSet={p1Pokemon}
+                p2PokemonSet={p2Pokemon}
+              />
               <PokemonBattleLog
                 battleHistory={fullBattleLog}
                 simple={true}
