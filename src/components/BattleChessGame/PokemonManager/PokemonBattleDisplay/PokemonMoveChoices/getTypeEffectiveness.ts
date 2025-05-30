@@ -19,14 +19,15 @@ export const getTypeEffectiveness = (
       )
     : move.type;
   const effectiveness = Dex.getEffectiveness(type, opponentPokemon);
-  const notImmune = immunityAbilities[
+  const abilityImmunity = immunityAbilities[
     opponentPokemon.set?.ability.toLowerCase() || ""
-  ]
-    ? immunityAbilities[opponentPokemon.set!.ability.toLowerCase()](
-        move,
-        currentPokemon,
-      )
-    : Dex.getImmunity(move, opponentPokemon);
+  ]?.(move, currentPokemon);
+  let notImmune;
+  if (abilityImmunity === false) {
+    notImmune = abilityImmunity;
+  } else {
+    notImmune = Dex.getImmunity(move, opponentPokemon);
+  }
 
   return {
     effectiveness,
