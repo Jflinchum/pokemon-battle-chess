@@ -1,4 +1,6 @@
 .chessBoard {
+  min-width: 320px;
+
   @media (orientation: landscape) {
     width: 60vh;
     height: 60vh;
@@ -17,6 +19,7 @@
 
 .chessRow {
   display: flex;
+  justify-content: center;
   height: 12.5%;
 
   &:nth-child(1) {

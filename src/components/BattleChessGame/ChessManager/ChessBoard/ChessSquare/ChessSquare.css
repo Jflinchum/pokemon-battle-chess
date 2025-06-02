@@ -1,5 +1,5 @@
 .chessSquare {
-  width: 12.5%;
+  aspect-ratio: 1/1;
   position: relative;
   font-size: 10px;
 

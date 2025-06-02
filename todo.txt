@@ -1,4 +1,9 @@
 TODO:
+Change Pokemon weather from turns to battle
+Weather/Terrain definitions on hover in battle
+Remove back ranks from weather generation. Maybe pawn ranks too
+Same probability of weather generation for each file in a given rank
+Position pokemon sprites in battle based on bottom middle point instead of top left
 Queue up your draft and bans
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
@@ -37,13 +42,13 @@ Room Options
   - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Priority:
+- (better) How to Play
 - Better logging
   - Use winston + prometheus + grafana?
 - More detailed modals in game
   - Are you sure you want to leave? modal when returning to menu in game
   - Add server disconnect
 - (better) Error boundary
-- (better) How to Play
 
 Refactor TODOs:
 - Potentially lift game logic into new model

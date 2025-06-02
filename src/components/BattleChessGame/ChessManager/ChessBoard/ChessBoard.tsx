@@ -1,11 +1,11 @@
-import { PieceSymbol, Square } from "chess.js";
+import { Color, PieceSymbol, Square } from "chess.js";
 import { PokemonChessBoardSquare } from "../types";
 import { getSquareColor } from "../util";
 import ChessSquare from "./ChessSquare/ChessSquare";
 import "./ChessBoard.css";
-import { useGameState } from "../../../../context/GameState/GameStateContext";
 
 interface ChessBoardProps {
+  color: Color;
   boardState: PokemonChessBoardSquare[][];
   onSquareClick: (arg0: PokemonChessBoardSquare) => void;
   onSquareHover?: (arg0?: PokemonChessBoardSquare | null) => void;
@@ -19,6 +19,7 @@ interface ChessBoardProps {
 }
 
 const ChessBoard = ({
+  color,
   boardState,
   onSquareClick,
   onSquareHover,
@@ -30,10 +31,8 @@ const ChessBoard = ({
   preMoveQueue = [],
   battleSquare,
 }: ChessBoardProps) => {
-  const { gameState } = useGameState();
-
   const boardColumnPerspective = (squares: PokemonChessBoardSquare[][]) => {
-    if (gameState.gameSettings?.color === "w") {
+    if (color === "w") {
       return squares;
     } else {
       return [...squares].reverse();
@@ -41,7 +40,7 @@ const ChessBoard = ({
   };
 
   const normalizedRowIndex = (index: number) => {
-    if (gameState.gameSettings?.color === "w") {
+    if (color === "w") {
       return index;
     } else {
       return (index - 7) * -1;

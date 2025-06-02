@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCog,
@@ -11,21 +12,21 @@ import { useUserState } from "../../../../context/UserState/UserStateContext";
 import NavOptions from "../../../common/NavOptions/NavOptions";
 import { NavOptionButton } from "../../../common/NavOptions/NavOptionButton/NavOptionButton";
 import { useModalState } from "../../../../context/ModalState/ModalStateContext";
-import { MatchHistory } from "../../../../../shared/types/game";
 import { downloadReplay } from "./downloadReplay";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./GameManagerActions.css";
 
-const GameManagerActions = ({
-  matchHistory,
-}: {
-  matchHistory?: MatchHistory;
-}) => {
+const GameManagerActions = () => {
   const { dispatch } = useUserState();
   const { gameState, dispatch: dispatchGameState } = useGameState();
   const { dispatch: dispatchModalState } = useModalState();
   const { requestSetViewingResults, requestReturnEveryoneToRoom } =
     useSocketRequests();
+
+  const matchHistory = useMemo(
+    () => gameState.matchHistory,
+    [gameState.matchHistory],
+  );
 
   const handleLeaveRoom = () => {
     dispatch({ type: "LEAVE_ROOM" });
@@ -42,9 +43,7 @@ const GameManagerActions = ({
   };
 
   const handleDownloadReplay = () => {
-    if (matchHistory) {
-      downloadReplay(gameState, matchHistory);
-    }
+    downloadReplay(gameState, matchHistory);
   };
 
   const handleReturnEveryoneToRoom = () => {

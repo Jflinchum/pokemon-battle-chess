@@ -74,7 +74,7 @@ const useBattleHistory = ({
   pokemonLogIndex,
 }: BattleHistoryProps) => {
   const { userState } = useUserState();
-  const { gameState } = useGameState();
+  const { gameState, dispatch } = useGameState();
 
   const [matchLog, setCurrentMatchLog] = useState(matchHistory || []);
 
@@ -96,6 +96,10 @@ const useBattleHistory = ({
       setCurrentMatchLog(matchHistory);
     }
   }, [matchHistory]);
+
+  useEffect(() => {
+    dispatch({ type: "SET_MATCH_HISTORY", payload: matchLog });
+  }, [matchLog, dispatch]);
 
   useEffect(() => {
     let catchUpTimer:
@@ -145,8 +149,8 @@ const useBattleHistory = ({
               sanMove: currentLog.data.san,
               moveFailed: currentLog.data.failed,
             });
+            matchLogIndex.current++;
             if (!err) {
-              matchLogIndex.current++;
               catchUpTimer = timer(timeBetweenSteps);
               await catchUpTimer.start();
             }
@@ -242,7 +246,7 @@ const useBattleHistory = ({
 };
 
 const shouldDelayBeforeContinuing = (logType: string) => {
-  const delayLogs = ["move", "-damage", "-heal", "-forfeit"];
+  const delayLogs = ["move", "-damage", "-heal", "-forfeit", "win"];
   if (delayLogs.includes(logType)) {
     return true;
   }

@@ -8,6 +8,7 @@ interface ArrowControllerProps {
   children: React.ReactNode;
   arrows: Arrow[];
   perspective: Color;
+  className?: string;
 }
 
 const buildArrowPointsFromSquare = (
@@ -139,9 +140,10 @@ export const ArrowController = ({
   children,
   arrows,
   perspective,
+  className = "",
 }: ArrowControllerProps) => {
   return (
-    <div className="arrowControllerContainer">
+    <div className={`arrowControllerContainer ${className}`}>
       <svg viewBox="0 0 100 100" className="arrowContainer">
         {arrows.map((arrow, index) => {
           const vector = buildArrowPointsFromSquare(arrow, perspective);

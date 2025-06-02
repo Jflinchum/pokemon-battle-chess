@@ -11,6 +11,7 @@ interface PokemonBattleManagerProps {
   p2Pokemon: PokemonSet;
   currentPokemonMoveHistory: { args: CustomArgTypes; kwArgs: KWArgType }[];
   perspective: SideID;
+  demoMode?: boolean;
 }
 
 const PokemonBattleManager = ({
@@ -18,6 +19,7 @@ const PokemonBattleManager = ({
   p2Pokemon,
   currentPokemonMoveHistory,
   perspective,
+  demoMode,
 }: PokemonBattleManagerProps) => {
   // TODO - optimize this so we pass primitives down instead of recreating the class every time
   const battle = useMemo(() => {
@@ -47,6 +49,7 @@ const PokemonBattleManager = ({
 
   return (
     <PokemonBattleDisplay
+      demoMode={demoMode}
       battleState={battle}
       fullBattleLog={currentPokemonMoveHistory}
       p1Pokemon={p1Pokemon}

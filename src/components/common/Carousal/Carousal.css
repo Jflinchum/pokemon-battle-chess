@@ -1,0 +1,13 @@
+.carousal {
+  .carousalItems {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .carousalActions {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+  }
+}

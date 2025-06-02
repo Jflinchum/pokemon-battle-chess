@@ -1,5 +1,8 @@
 import { createContext, useContext, type Dispatch } from "react";
-import { getGameOptions } from "../../util/localWebData.ts";
+import {
+  getDefaultGameOptions,
+  getGameOptions,
+} from "../../util/localWebData.ts";
 import { Player } from "../../../shared/types/Player.ts";
 import { ReplayData } from "../../components/BattleChessGame/BattleChessManager/GameManagerActions/downloadReplay.ts";
 import { MatchHistory } from "../../../shared/types/game.ts";
@@ -16,6 +19,7 @@ export interface GameState {
   isSpectator: boolean;
   isWatchingReplay: boolean;
   replayHistory: MatchHistory;
+  matchHistory: MatchHistory;
   players: Player[];
   gameSettings: GameSettings;
 }
@@ -30,6 +34,7 @@ type GameStateAction =
   | { type: "CREATE_ROOM" }
   | { type: "SET_SKIPPING_AHEAD"; payload: boolean }
   | { type: "SET_CATCHING_UP"; payload: boolean }
+  | { type: "SET_MATCH_HISTORY"; payload: MatchHistory }
   | {
       type: "SET_PLAYERS";
       payload: { players: Player[]; isSpectator: boolean; isHost: boolean };
@@ -37,6 +42,7 @@ type GameStateAction =
   | { type: "RETURN_TO_ROOM" }
   | { type: "END_MATCH" }
   | { type: "START_REPLAY"; payload: ReplayData }
+  | { type: "START_DEMO" }
   | { type: "START_MATCH"; payload: GameSettings };
 
 export const GameStateContext = createContext<GameStateType | null>(null);
@@ -54,6 +60,7 @@ export const getInitialGameState = (): GameState => ({
   gameSettings: {
     options: getGameOptions(),
   },
+  matchHistory: [],
 });
 
 export const gameStateReducer = (
@@ -76,6 +83,8 @@ export const gameStateReducer = (
       return { ...gameState, isSkippingAhead: action.payload };
     case "SET_CATCHING_UP":
       return { ...gameState, isCatchingUp: action.payload };
+    case "SET_MATCH_HISTORY":
+      return { ...gameState, matchHistory: action.payload };
     case "END_MATCH":
       return { ...gameState, matchEnded: true };
     case "START_REPLAY":
@@ -89,6 +98,19 @@ export const gameStateReducer = (
           seed: action.payload.seed,
           color: "w",
           options: action.payload.options,
+        },
+      };
+    case "START_DEMO":
+      return {
+        ...gameState,
+        matchEnded: false,
+        gameSettings: {
+          ...gameState.gameSettings,
+          options: {
+            ...getDefaultGameOptions(),
+          },
+          seed: "1234,tutorial",
+          color: "w",
         },
       };
     case "START_MATCH":
@@ -106,6 +128,7 @@ export const gameStateReducer = (
         ...gameState,
         inGame: false,
         replayHistory: [],
+        matchHistory: [],
         isWatchingReplay: false,
         players: [],
       };

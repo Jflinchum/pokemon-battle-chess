@@ -43,8 +43,8 @@ export const setAvatar = (avatarId: string) => {
   localStorage.setItem("avatarId", avatarId);
 };
 
-export const getGameOptions = () => {
-  const defaultGameOptions: GameOptions = {
+export const getDefaultGameOptions = (): GameOptions => {
+  return {
     format: "random",
     offenseAdvantage: {
       atk: 0,
@@ -62,6 +62,10 @@ export const getGameOptions = () => {
     pokemonTimerIncrement: 1,
     chessTimerIncrement: 5,
   };
+};
+
+export const getGameOptions = () => {
+  const defaultGameOptions = getDefaultGameOptions();
   const localStorageGameOptions = localStorage.getItem(
     "localStorageGameOptions",
   );

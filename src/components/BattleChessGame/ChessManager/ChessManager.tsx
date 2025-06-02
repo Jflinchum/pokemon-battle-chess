@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Chess, Square, Move } from "chess.js";
+import { Chess, Square, Move, Color } from "chess.js";
 import ChessBoard from "./ChessBoard/ChessBoard";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
@@ -19,6 +19,8 @@ import { ArrowController } from "./ArrowController/ArrowController";
 import "./ChessManager.css";
 
 interface ChessManagerProps {
+  demoMode?: boolean;
+  color: Color;
   chessManager: Chess;
   pokemonManager: PokemonBattleChessManager;
   mostRecentMove: { from: Square; to: Square } | null;
@@ -31,6 +33,8 @@ interface ChessManagerProps {
 }
 
 const ChessManager = ({
+  demoMode,
+  color,
   chessManager,
   pokemonManager,
   mostRecentMove,
@@ -46,7 +50,6 @@ const ChessManager = ({
    *  - Set up context providers to handle pokemon manager state
    */
   const { gameState } = useGameState();
-  const color = useMemo(() => gameState.gameSettings!.color, [gameState]);
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [hoveredSquare, setHoveredSquare] = useState<Square | null | undefined>(
@@ -285,18 +288,25 @@ const ChessManager = ({
           }}
         />
       )}
-      <div className="turnNotification">
-        {chessManager.turn() === gameState.gameSettings.color ? (
-          <strong className="highPriorityNotification">
-            Your turn to move!
-          </strong>
-        ) : (
-          <strong>Waiting for opponent...</strong>
-        )}
-      </div>
+      {!demoMode && (
+        <div className="turnNotification">
+          {chessManager.turn() === color ? (
+            <strong className="highPriorityNotification">
+              Your turn to move!
+            </strong>
+          ) : (
+            <strong>Waiting for opponent...</strong>
+          )}
+        </div>
+      )}
       <div className="chessGameContainer">
-        <ArrowController arrows={currentArrows} perspective={color || "w"}>
+        <ArrowController
+          className="chessArrowController"
+          arrows={currentArrows}
+          perspective={color || "w"}
+        >
           <ChessBoard
+            color={color}
             boardState={mergeBoardAndPokemonState(
               simulatedBoard,
               simulatedPokemonManager,

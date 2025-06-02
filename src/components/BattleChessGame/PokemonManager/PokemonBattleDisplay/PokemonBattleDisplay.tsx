@@ -18,6 +18,7 @@ interface PokemonBattleDisplayProps {
   p1Pokemon: PokemonSet;
   p2Pokemon: PokemonSet;
   perspective: SideID;
+  demoMode?: boolean;
 }
 
 const PokemonBattleDisplay = ({
@@ -26,6 +27,7 @@ const PokemonBattleDisplay = ({
   p1Pokemon,
   p2Pokemon,
   perspective,
+  demoMode,
 }: PokemonBattleDisplayProps) => {
   const { gameState } = useGameState();
   const [moveChosen, setMoveChosen] = useState<string>();
@@ -82,28 +84,30 @@ const PokemonBattleDisplay = ({
                 battleState={battleState}
                 perspective={perspective}
               />
-              <div className="battleMoveContainer">
-                <BattleMoveContainer
-                  hideMoves={
-                    !["turn", "request"].includes(
-                      fullBattleLog[fullBattleLog.length - 1]?.args?.[0],
-                    ) ||
-                    fullBattleLog.some((log) => log.args[0] === "win") ||
-                    gameState.isSpectator ||
-                    gameState.isCatchingUp
-                  }
-                  moveChosen={moveChosen}
-                  onMoveSelect={handleMoveSelect}
-                  setMoveChosen={setMoveChosen}
-                  moves={moves}
-                  currentPokemon={
-                    battleState[perspective === "p1" ? "p1" : "p2"].active[0]
-                  }
-                  opponentPokemon={
-                    battleState[perspective === "p1" ? "p2" : "p1"].active[0]
-                  }
-                />
-              </div>
+              {!demoMode && (
+                <div className="battleMoveContainer">
+                  <BattleMoveContainer
+                    hideMoves={
+                      !["turn", "request"].includes(
+                        fullBattleLog[fullBattleLog.length - 1]?.args?.[0],
+                      ) ||
+                      fullBattleLog.some((log) => log.args[0] === "win") ||
+                      gameState.isSpectator ||
+                      gameState.isCatchingUp
+                    }
+                    moveChosen={moveChosen}
+                    onMoveSelect={handleMoveSelect}
+                    setMoveChosen={setMoveChosen}
+                    moves={moves}
+                    currentPokemon={
+                      battleState[perspective === "p1" ? "p1" : "p2"].active[0]
+                    }
+                    opponentPokemon={
+                      battleState[perspective === "p1" ? "p2" : "p1"].active[0]
+                    }
+                  />
+                </div>
+              )}
             </span>
             <PokemonBattleLog
               battleHistory={fullBattleLog}

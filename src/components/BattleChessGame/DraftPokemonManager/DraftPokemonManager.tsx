@@ -9,7 +9,7 @@ import { PokemonChessBoardSquare } from "../ChessManager/types";
 import Button from "../../common/Button/Button";
 import "./DraftPokemonManager.css";
 
-interface DraftPokemonManager {
+interface DraftPokemonManagerProps {
   chessManager: Chess;
   pokemonManager: PokemonBattleChessManager;
   onDraftPokemon: (square: Square, draftPokemonIndex: number) => void;
@@ -24,7 +24,7 @@ const DraftPokemonManager = ({
   boardState,
   draftTurnPick,
   onBanPokemon,
-}: DraftPokemonManager) => {
+}: DraftPokemonManagerProps) => {
   const { gameState } = useGameState();
 
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
@@ -46,7 +46,6 @@ const DraftPokemonManager = ({
       draftPokemonSelected !== null &&
       pokemonManager.draftPieces.length <= 32
     ) {
-      // draft piece
       onDraftPokemon(square, draftPokemonSelected);
       setDraftPokemonSelected(null);
     }
@@ -62,6 +61,7 @@ const DraftPokemonManager = ({
     <div className="draftManagerContainer">
       <div className="draftGameContainer">
         <ChessBoard
+          color={gameState.gameSettings.color || "w"}
           boardState={boardState}
           onSquareClick={handleSquareClick}
           onPieceDrop={handleSquareClick}
