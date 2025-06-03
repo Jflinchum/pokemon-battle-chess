@@ -4,7 +4,7 @@
   min-height: 250px;
   container-type: size;
   container-name: pokemonDetails;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   @media (orientation: portrait) {
     width: 90vw;

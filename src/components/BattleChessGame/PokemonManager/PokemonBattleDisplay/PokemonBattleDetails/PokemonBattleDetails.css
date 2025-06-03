@@ -3,7 +3,7 @@
   flex-direction: row;
   font-size: 1em;
   box-sizing: border-box;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   max-height: 100px;
 
