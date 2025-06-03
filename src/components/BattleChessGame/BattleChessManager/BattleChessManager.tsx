@@ -75,6 +75,7 @@ function BattleChessManager({
             matchLogIndex={matchLogIndex}
             pokemonLogIndex={pokemonLogIndex}
             color={color || "w"}
+            draftMode={gameState.gameSettings.options.format === "draft"}
           />
           <PlayerInGameDisplay
             player={color === "w" ? whitePlayer : blackPlayer}

@@ -46,11 +46,13 @@ export const BattleChessGame = ({
   color,
   matchLogIndex,
   pokemonLogIndex,
+  draftMode,
 }: {
   matchHistory?: MatchHistory;
   pokemonManager: PokemonBattleChessManager;
   chessManager: Chess;
   demoMode?: boolean;
+  draftMode?: boolean;
   color: Color;
   matchLogIndex: RefObject<number>;
   pokemonLogIndex: RefObject<number>;
@@ -66,9 +68,7 @@ export const BattleChessGame = ({
   const [currentPokemonBoard, setCurrentPokemonBoard] = useState(
     mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
   );
-  const [isDrafting, setIsDrafting] = useState<boolean>(
-    gameState.gameSettings.options.format === "draft",
-  );
+  const [isDrafting, setIsDrafting] = useState<boolean>(!!draftMode);
   const [draftTurnPick, setDraftTurnPick] = useState<Color>("w");
   const [mostRecentMove, setMostRecentMove] = useState<{
     from: Square;

@@ -25,7 +25,6 @@ const HowToPlayModal = () => {
       <h2 className="howToPlayTitle">How To Play</h2>
       <Carousal
         screens={[
-          <p>Test</p>,
           <HowToPlayScreen1 />,
           <HowToPlayScreen2 />,
           <HowToPlayScreen3 />,
