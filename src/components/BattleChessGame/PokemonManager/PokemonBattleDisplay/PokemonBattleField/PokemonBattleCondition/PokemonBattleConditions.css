@@ -1,24 +1,24 @@
 .pokemonBattleConditions {
   position: absolute;
-  text-shadow:
-    -1px -1px 0 black,
-    1px -1px 0 black,
-    -1px 1px 0 black,
-    1px 1px 0 black;
-  font-size: 0.7em;
-  font-weight: 800;
-  opacity: 70%;
-  background-color: var(--gray-5);
+  background-color: var(--dark-translucent-bg);
   border-radius: 8px;
   padding: 8px;
   margin: 8px;
 
   p {
+    font-size: 0.7em;
+    font-weight: 800;
     margin: 0;
     padding: 0;
-  }
+    opacity: 80%;
+    text-shadow:
+      -1px -1px 0 black,
+      1px -1px 0 black,
+      -1px 1px 0 black,
+      1px 1px 0 black;
 
-  @media (min-width: 900px) {
-    font-size: 1.2em;
+    @media (min-width: 900px) {
+      font-size: 1.2em;
+    }
   }
 }

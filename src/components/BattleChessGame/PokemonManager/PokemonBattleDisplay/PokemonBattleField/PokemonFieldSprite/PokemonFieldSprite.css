@@ -155,7 +155,3 @@
     visibility: hidden;
   }
 }
-
-.tooltip.pokemonDetailsTooltip {
-  background-color: var(--gray-7);
-}

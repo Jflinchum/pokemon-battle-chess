@@ -1,5 +1,4 @@
 TODO:
-Weather/Terrain definitions on hover in battle
 Position pokemon sprites in battle based on bottom middle point instead of top left
 Add option to disable animated background
 Queue up your draft and bans

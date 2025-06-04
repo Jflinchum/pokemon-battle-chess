@@ -37,9 +37,7 @@ const PokemonMoveButton = ({
       >
         {children}
       </button>
-      <Tooltip anchorSelect={`#${id}`} className="pokemonMoveTooltip">
-        {toolTip}
-      </Tooltip>
+      <Tooltip anchorSelect={`#${id}`}>{toolTip}</Tooltip>
     </>
   );
 };

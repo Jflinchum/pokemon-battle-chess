@@ -1,6 +1,7 @@
-import { Field, WeatherName } from "@pkmn/client";
+import { Field, TerrainName, WeatherName } from "@pkmn/client";
 import { getSquareModifierMapping } from "../../../PokemonChessDetailsCard/getSquareModifierMapping";
 import "./PokemonBattleConditions.css";
+import Tooltip from "../../../../../common/Tooltip/Tooltip";
 
 const PokemonBattleConditionLabel = ({
   condition,
@@ -10,14 +11,25 @@ const PokemonBattleConditionLabel = ({
   if (!condition || !condition.id) return null;
 
   return (
-    <p>
-      <span>
-        {getSquareModifierMapping(condition.id as WeatherName)?.label}{" "}
-      </span>
-      <span>({condition.minDuration} </span>
-      {condition.maxDuration > 0 && <span>or {condition.maxDuration} </span>}
-      <span>turns)</span>
-    </p>
+    <>
+      <p id={`battleCondition-${condition.id}`}>
+        <span>
+          {
+            getSquareModifierMapping(condition.id as WeatherName | TerrainName)
+              ?.label
+          }{" "}
+        </span>
+        <span>({condition.minDuration} </span>
+        {condition.maxDuration > 0 && <span>or {condition.maxDuration} </span>}
+        <span>turns)</span>
+      </p>
+      <Tooltip darkBG anchorSelect={`#battleCondition-${condition.id}`}>
+        {
+          getSquareModifierMapping(condition.id as WeatherName | TerrainName)
+            ?.desc
+        }
+      </Tooltip>
+    </>
   );
 };
 

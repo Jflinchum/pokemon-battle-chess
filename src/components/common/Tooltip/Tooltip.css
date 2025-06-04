@@ -22,3 +22,7 @@
     margin: 2px 0px;
   }
 }
+
+.darkTooltip .tooltip {
+  background-color: var(--gray-7);
+}

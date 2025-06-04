@@ -64,8 +64,8 @@ const PokemonTooltip = ({
       place={side === "p1" ? "right" : "left"}
       isOpen={isOpen}
       clickable={isOpen}
-      className="pokemonDetailsTooltip"
       opacity="100"
+      darkBG
     >
       <PokemonBattleDetailsCard pokemon={pokemon} />
     </Tooltip>
