@@ -50,7 +50,7 @@ export const HowToPlayScreen1 = () => {
   }, [currentMatchHistory, chessManager, pokemonManager]);
 
   return (
-    <div>
+    <>
       <p>Welcome to Pokemon Gambit!</p>
       <p>
         This game makes an attempt to merge both Pokemon's battle system and
@@ -69,7 +69,7 @@ export const HowToPlayScreen1 = () => {
           pokemonLogIndex={pokemonLogIndex}
         />
       </div>
-    </div>
+    </>
   );
 };
 

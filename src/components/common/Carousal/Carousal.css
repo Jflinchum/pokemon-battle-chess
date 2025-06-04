@@ -1,5 +1,9 @@
 .carousal {
+  display: flex;
+  flex-direction: column;
+
   .carousalItems {
+    flex-grow: 1;
     display: flex;
     flex-direction: row;
     justify-content: center;

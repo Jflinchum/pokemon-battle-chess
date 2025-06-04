@@ -419,35 +419,30 @@ export const BattleChessGame = ({
           demoMode={demoMode}
         />
       )}
-      <div
-        style={{
-          display: !battleStarted && !isDrafting ? "block" : "none",
+      <ChessManager
+        demoMode={demoMode}
+        hide={battleStarted || isDrafting}
+        color={color}
+        chessManager={chessManager}
+        pokemonManager={pokemonManager}
+        mostRecentMove={mostRecentMove}
+        currentBattle={currentBattle}
+        chessMoveHistory={
+          currentMatchLog.filter((log) => log.type === "chess") as ChessData[]
+        }
+        board={currentPokemonBoard}
+        battleSquare={battleSquare}
+        onError={(err) => {
+          handleError(err);
         }}
-      >
-        <ChessManager
-          demoMode={demoMode}
-          color={color}
-          chessManager={chessManager}
-          pokemonManager={pokemonManager}
-          mostRecentMove={mostRecentMove}
-          currentBattle={currentBattle}
-          chessMoveHistory={
-            currentMatchLog.filter((log) => log.type === "chess") as ChessData[]
+        onMove={(san) => {
+          if (gameState.isSpectator) {
+            return;
           }
-          board={currentPokemonBoard}
-          battleSquare={battleSquare}
-          onError={(err) => {
-            handleError(err);
-          }}
-          onMove={(san) => {
-            if (gameState.isSpectator) {
-              return;
-            }
 
-            requestChessMove(san);
-          }}
-        />
-      </div>
+          requestChessMove(san);
+        }}
+      />
       {isDrafting && (
         <DraftPokemonManager
           draftTurnPick={draftTurnPick}

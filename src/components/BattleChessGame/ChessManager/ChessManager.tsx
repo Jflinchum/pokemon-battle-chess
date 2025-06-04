@@ -20,6 +20,7 @@ import "./ChessManager.css";
 
 interface ChessManagerProps {
   demoMode?: boolean;
+  hide?: boolean;
   color: Color;
   chessManager: Chess;
   pokemonManager: PokemonBattleChessManager;
@@ -34,6 +35,7 @@ interface ChessManagerProps {
 
 const ChessManager = ({
   demoMode,
+  hide,
   color,
   chessManager,
   pokemonManager,
@@ -269,7 +271,13 @@ const ChessManager = ({
   };
 
   return (
-    <div className="gameContainer" onContextMenu={handleContextMenu}>
+    <div
+      style={{
+        display: hide ? "none" : "block",
+      }}
+      className="gameContainer"
+      onContextMenu={handleContextMenu}
+    >
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice
           pawnPromotionMove={requestedPawnPromotion}

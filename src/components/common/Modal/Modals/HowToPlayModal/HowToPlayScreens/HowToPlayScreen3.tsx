@@ -63,7 +63,7 @@ export const HowToPlayScreen3 = () => {
   }, [currentMatchHistory.length, chessManager, pokemonManager]);
 
   return (
-    <div>
+    <>
       <b>Winning and Losing</b>
       <p>
         Check and Checkmate work a little differently in this game! If you're in
@@ -81,7 +81,7 @@ export const HowToPlayScreen3 = () => {
           pokemonLogIndex={pokemonLogIndex}
         />
       </div>
-    </div>
+    </>
   );
 };
 

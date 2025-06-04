@@ -6,13 +6,14 @@ import "./Carousal.css";
 
 interface CarousalProps {
   screens: React.ReactNode[];
+  className?: string;
 }
 
-export const Carousal = ({ screens }: CarousalProps) => {
+export const Carousal = ({ screens, className = "" }: CarousalProps) => {
   const [screenIndex, setScreenIndex] = useState(0);
 
   return (
-    <div className="carousal">
+    <div className={`carousal ${className}`}>
       <div className="carousalItems">
         {screens.map(
           (screen, index) =>

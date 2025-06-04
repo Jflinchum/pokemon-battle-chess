@@ -67,7 +67,7 @@ export const HowToPlayScreen2 = () => {
   }, [currentMatchHistory.length, chessManager, pokemonManager]);
 
   return (
-    <div>
+    <>
       <b>Taking a Piece</b>
       <p>
         Whenever you attempt to attack another Chess piece with your piece,{" "}
@@ -86,7 +86,7 @@ export const HowToPlayScreen2 = () => {
           pokemonLogIndex={pokemonLogIndex}
         />
       </div>
-    </div>
+    </>
   );
 };
 

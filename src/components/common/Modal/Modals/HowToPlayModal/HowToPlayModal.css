@@ -6,8 +6,11 @@
   margin-top: 0;
 }
 
+.howToPlayCarousal {
+  max-height: 80vh;
+}
+
 .gameDemoContainer {
-  height: 50vh;
   text-align: initial;
 
   .chessBoard {
