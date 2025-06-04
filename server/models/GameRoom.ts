@@ -516,9 +516,6 @@ export default class GameRoom {
 
     this.currentTurnWhite = !this.currentTurnWhite;
 
-    if (this.currentTurnWhite) {
-      this.pokemonGameManager.tickSquareModifiers();
-    }
     if (this.roomGameOptions.weatherWars && this.currentTurnWhite) {
       if (this.chessManager.moveNumber() % 10 === 0) {
         this.squareModifierTarget = this.secretPRNG.random(10, 20);
@@ -952,26 +949,34 @@ export default class GameRoom {
             },
             onWeatherChange(target, _, sourceEffect) {
               if (
-                sourceEffect &&
-                (target.battle.field.weather === "" ||
+                sourceEffect.effectType === "Ability" ||
+                sourceEffect.effectType === "Move"
+              ) {
+                if (
+                  target.battle.field.weather === "" ||
                   WeatherNames.includes(
                     target.battle.field.weather as WeatherId,
-                  ))
-              ) {
-                weatherChanges =
-                  (target.battle.field.weather as WeatherId) || "unset";
+                  )
+                ) {
+                  weatherChanges =
+                    (target.battle.field.weather as WeatherId) || "unset";
+                }
               }
             },
             onTerrainChange(target, _, sourceEffect) {
               if (
-                sourceEffect &&
-                (target.battle.field.terrain === "" ||
+                sourceEffect.effectType === "Ability" ||
+                sourceEffect.effectType === "Move"
+              ) {
+                if (
+                  target.battle.field.terrain === "" ||
                   TerrainNames.includes(
                     target.battle.field.terrain as TerrainId,
-                  ))
-              ) {
-                terrainChanges =
-                  (target.battle.field.terrain as TerrainId) || "unset";
+                  )
+                ) {
+                  terrainChanges =
+                    (target.battle.field.terrain as TerrainId) || "unset";
+                }
               }
             },
             onSwitchIn(pokemon) {
@@ -1041,6 +1046,7 @@ export default class GameRoom {
           for (const { args } of Protocol.parse(chunk)) {
             if (args[0] === "win") {
               this.gameTimer?.stopTimers();
+              this.pokemonGameManager.tickSquareModifiers(battleSquare);
 
               if (
                 (weatherChanges !== undefined ||
@@ -1055,18 +1061,16 @@ export default class GameRoom {
                   battleSquare,
                   terrainChanges,
                 );
-                const squareModifierData: MatchLog = {
-                  type: "weather",
-                  data: {
-                    event: "weatherChange",
-                    squareModifiers: this.pokemonGameManager.squareModifiers,
-                  },
-                };
-                this.pushHistory(
-                  JSON.parse(JSON.stringify(squareModifierData)),
-                );
-                this.emitGameOutput(squareModifierData);
               }
+              const squareModifierData: MatchLog = {
+                type: "weather",
+                data: {
+                  event: "weatherChange",
+                  squareModifiers: this.pokemonGameManager.squareModifiers,
+                },
+              };
+              this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
+              this.emitGameOutput(squareModifierData);
 
               if (
                 (this.currentTurnWhite &&

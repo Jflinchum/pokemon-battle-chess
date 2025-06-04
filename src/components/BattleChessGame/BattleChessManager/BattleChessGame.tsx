@@ -225,9 +225,6 @@ export const BattleChessGame = ({
         );
       }
 
-      if (chessManager.turn() === "w") {
-        pokemonManager.tickSquareModifiers();
-      }
       setMostRecentMove({ from: fromSquare, to: toSquare });
       setCurrentPokemonBoard(
         mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
@@ -278,22 +275,23 @@ export const BattleChessGame = ({
 
   const onPokemonBattleOutput = useCallback(
     (parsedChunk: { args: ArgType; kwArgs: KWArgType }) => {
-      if (parsedChunk.args[0] === "win") {
-        setBattleStarted(false);
-        setCurrentPokemonMoveHistory([]);
-
-        if (gameState.isSkippingAhead) {
-          setCurrentBattle(null);
-        } else {
-          battleTimeout.current = setTimeout(() => {
-            setCurrentBattle(null);
-          }, userState.animationSpeedPreference);
-        }
-      }
       setCurrentPokemonMoveHistory((curr) => [...curr, parsedChunk]);
     },
-    [userState.animationSpeedPreference, gameState.isSkippingAhead],
+    [],
   );
+
+  const onPokemonBattleEnd = useCallback(() => {
+    setBattleStarted(false);
+    setCurrentPokemonMoveHistory([]);
+
+    if (gameState.isSkippingAhead) {
+      setCurrentBattle(null);
+    } else {
+      battleTimeout.current = setTimeout(() => {
+        setCurrentBattle(null);
+      }, userState.animationSpeedPreference);
+    }
+  }, [userState.animationSpeedPreference, gameState.isSkippingAhead]);
 
   const onWeatherChange = useCallback(
     (squareModifiers: SquareModifier[]) => {
@@ -321,6 +319,7 @@ export const BattleChessGame = ({
     onMove,
     onPokemonBattleStart,
     onPokemonBattleOutput,
+    onPokemonBattleEnd,
     onWeatherChange,
     onGameEnd,
     skipToEndOfSync: gameState.isSkippingAhead,

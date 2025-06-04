@@ -228,12 +228,12 @@ export class PokemonBattleChessManager {
         if (currentSquareWeather.modifiers.terrain) {
           currentSquareWeather.modifiers.weather = {
             id: this.prng.sample(WeatherNames),
-            duration: this.prng.random(5, 15),
+            duration: this.prng.random(2, 5),
           };
         } else {
           currentSquareWeather.modifiers.terrain = {
             id: this.prng.sample(TerrainNames),
-            duration: this.prng.random(5, 15),
+            duration: this.prng.random(2, 5),
           };
         }
       } else {
@@ -245,7 +245,7 @@ export class PokemonBattleChessManager {
             modifiers: {
               terrain: {
                 id: this.prng.sample(TerrainNames),
-                duration: this.prng.random(5, 15),
+                duration: this.prng.random(2, 5),
               },
             },
           };
@@ -255,7 +255,7 @@ export class PokemonBattleChessManager {
             modifiers: {
               weather: {
                 id: this.prng.sample(WeatherNames),
-                duration: this.prng.random(5, 15),
+                duration: this.prng.random(2, 5),
               },
             },
           };
@@ -266,18 +266,44 @@ export class PokemonBattleChessManager {
     }
   }
 
-  public tickSquareModifiers() {
+  public tickSquareModifiers(square: Square) {
+    const squareMod = this.squareModifiers.find(
+      (squareMod) => squareMod.square === square,
+    );
+    if (!squareMod) {
+      return;
+    }
+
+    if (squareMod.modifiers.weather) {
+      squareMod.modifiers.weather.duration--;
+      if (squareMod.modifiers.weather.duration <= 0) {
+        delete squareMod.modifiers.weather;
+      }
+    }
+    if (squareMod.modifiers.terrain) {
+      squareMod.modifiers.terrain.duration--;
+      if (squareMod.modifiers.terrain.duration <= 0) {
+        delete squareMod.modifiers.terrain;
+      }
+    }
+
+    this.squareModifiers.filter(
+      (squareMod) => squareMod.modifiers.terrain || squareMod.modifiers.weather,
+    );
+  }
+
+  public tickAllSquareModifiers() {
     this.squareModifiers = this.squareModifiers
       .map((squareMod) => {
         if (squareMod.modifiers.weather) {
           squareMod.modifiers.weather.duration--;
-          if (squareMod.modifiers.weather.duration === 0) {
+          if (squareMod.modifiers.weather.duration <= 0) {
             delete squareMod.modifiers.weather;
           }
         }
         if (squareMod.modifiers.terrain) {
           squareMod.modifiers.terrain.duration--;
-          if (squareMod.modifiers.terrain.duration === 0) {
+          if (squareMod.modifiers.terrain.duration <= 0) {
             delete squareMod.modifiers.terrain;
           }
         }
@@ -304,7 +330,7 @@ export class PokemonBattleChessManager {
     } else {
       const newWeather = {
         id: weather,
-        duration: this.prng.random(5, 15),
+        duration: this.prng.random(2, 5),
       };
       if (squareMod) {
         squareMod.modifiers.weather = newWeather;
@@ -333,7 +359,7 @@ export class PokemonBattleChessManager {
     } else {
       const newTerrain = {
         id: terrain,
-        duration: this.prng.random(5, 15),
+        duration: this.prng.random(2, 5),
       };
       if (squareMod) {
         squareMod.modifiers.terrain = newTerrain;

@@ -90,7 +90,7 @@ const PokemonChessDetailsCard = ({
                       />
                       <span>
                         {getSquareModifierMapping(squareMod.id)?.label} -{" "}
-                        {squareMod.duration} turns
+                        {squareMod.duration} battles
                       </span>
                     </div>
                   ),
