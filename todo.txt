@@ -1,8 +1,7 @@
 TODO:
 Weather/Terrain definitions on hover in battle
-Remove back ranks from weather generation. Maybe pawn ranks too
-Same probability of weather generation for each file in a given rank
 Position pokemon sprites in battle based on bottom middle point instead of top left
+Add option to disable animated background
 Queue up your draft and bans
   - Queue up drafts but not bans? Bans seem tough to convey queues with
   - Drafts
