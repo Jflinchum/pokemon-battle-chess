@@ -300,7 +300,7 @@ export class PokeSimRandomGen {
   };
 
   public buildRandomPokemon = (filter?: (pkmn: string) => boolean) => {
-    let pool = [];
+    let pool: SpeciesName[] = [];
     if (filter) {
       pool = this.pokemonPool.filter(filter);
     } else {
@@ -395,7 +395,7 @@ export class PokeSimRandomGen {
     const teraType = this.sampleIfArray(teraTypes) as TypeName;
 
     let ability = "";
-    let item = undefined;
+    let item: string | undefined = undefined;
 
     const evs = { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 };
     const ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
@@ -628,7 +628,7 @@ export class PokeSimRandomGen {
       ].includes(role) ||
       PRIORITY_POKEMON.includes(species.id)
     ) {
-      const priorityMoves = [];
+      const priorityMoves: string[] = [];
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         const moveType = this.getMoveType(move, species, abilities, teraType);
@@ -650,7 +650,7 @@ export class PokeSimRandomGen {
     // Enforce STAB
     for (const type of types) {
       // Check if a STAB move of that type should be required
-      const stabMoves = [];
+      const stabMoves: string[] = [];
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         const moveType = this.getMoveType(move, species, abilities, teraType);
@@ -662,7 +662,7 @@ export class PokeSimRandomGen {
 
     // Enforce Tera STAB
     if (!["Bulky Support", "Doubles Support"].includes(role)) {
-      const stabMoves = [];
+      const stabMoves: string[] = [];
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         const moveType = this.getMoveType(move, species, abilities, teraType);
@@ -683,7 +683,7 @@ export class PokeSimRandomGen {
 
     // If no STAB move was added, add a STAB move
     if (!counter.stab.length) {
-      const stabMoves = [];
+      const stabMoves: string[] = [];
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         const moveType = this.getMoveType(move, species, abilities, teraType);
@@ -773,7 +773,7 @@ export class PokeSimRandomGen {
     // Enforce a move not on the noSTAB list
     if (!counter.damagingMoves.length) {
       // Choose an attacking move
-      const attackingMoves = [];
+      const attackingMoves: string[] = [];
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         if (!NO_STAB.includes(moveid) && move.category !== "Status")
@@ -800,7 +800,7 @@ export class PokeSimRandomGen {
         // Find the type of the current attacking move
         const currentAttackType = counter.damagingMoves[0].type;
         // Choose an attacking move that is of different type to the current single attack
-        const coverageMoves = [];
+        const coverageMoves: string[] = [];
         for (const moveid of movePool) {
           const move = this.dex.moves.get(moveid);
           const moveType = this.getMoveType(move, species, abilities, teraType);
