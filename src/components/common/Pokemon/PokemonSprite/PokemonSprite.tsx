@@ -26,7 +26,10 @@ export const PokemonSprite = ({
   const { userState } = useUserState();
   const dexPokemon = Dex.species.get(pokemonIdentifier);
   const sprite = isSubstitute
-    ? Sprites.getSubstitute().url
+    ? Sprites.getSubstitute({
+        gen: userState.use2DSprites ? "gen5ani" : "ani",
+        side,
+      }).url
     : Sprites.getPokemon(speciesOverride(dexPokemon.id), {
         gen: userState.use2DSprites ? "gen5ani" : "ani",
         shiny,

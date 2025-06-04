@@ -19,7 +19,7 @@
 
 .chessRow {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   height: 12.5%;
 
   &:nth-child(1) {

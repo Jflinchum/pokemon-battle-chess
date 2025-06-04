@@ -24,6 +24,7 @@ Keyboard navigation and accessibility
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
 Add Pokedex on left nav to look up full descriptions?
 Lazy loading and preloading
+Add "copy code" button in lobby if room code is available
 
 Room Options
 - Preserve damage after battle
@@ -57,10 +58,8 @@ Refactor TODOs:
 - Organize frontend types in a single dir and re-use more efficiently
 - Separate out draft/ban calls
 - Move logic in controller/index into GameRoom
-- Prettier/eslint
 
 Issues:
-- Substitute facing the wrong way
 - Weather from weather squares says "5 or 8 turns" when it's always 5
 - Pokemon damage numbers in battle log don't make sense
 - Some pokemon moves do not show type effectiveness correctly
