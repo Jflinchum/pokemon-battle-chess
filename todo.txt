@@ -51,6 +51,7 @@ Priority:
 - (better) Error boundary
 
 Refactor TODOs:
+- Optimize weather change diff in server
 - Potentially lift game logic into new model
 - Lift weather out of pokemon manager model
 - Put API request and response types in shared folder

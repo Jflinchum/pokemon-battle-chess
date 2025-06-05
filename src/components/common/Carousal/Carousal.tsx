@@ -6,10 +6,15 @@ import "./Carousal.css";
 
 interface CarousalProps {
   screens: React.ReactNode[];
+  wrapScreens?: boolean;
   className?: string;
 }
 
-export const Carousal = ({ screens, className = "" }: CarousalProps) => {
+export const Carousal = ({
+  screens,
+  wrapScreens,
+  className = "",
+}: CarousalProps) => {
   const [screenIndex, setScreenIndex] = useState(0);
 
   return (
@@ -23,19 +28,23 @@ export const Carousal = ({ screens, className = "" }: CarousalProps) => {
       <div className="carousalActions">
         <Button
           color="primary"
-          onClick={() =>
+          disabled={!wrapScreens && screenIndex === 0}
+          onClick={() => {
+            if (!wrapScreens && screenIndex === 0) return;
             setScreenIndex((curr) =>
               curr - 1 < 0 ? screens.length - 1 : --curr,
-            )
-          }
+            );
+          }}
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </Button>
         <Button
           color="primary"
-          onClick={() =>
-            setScreenIndex((curr) => (curr + 1 >= screens.length ? 0 : ++curr))
-          }
+          disabled={!wrapScreens && screenIndex === screens.length - 1}
+          onClick={() => {
+            if (!wrapScreens && screenIndex === screens.length - 1) return;
+            setScreenIndex((curr) => (curr + 1 >= screens.length ? 0 : ++curr));
+          }}
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </Button>
