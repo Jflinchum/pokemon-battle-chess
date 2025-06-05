@@ -1,5 +1,4 @@
 TODO:
-Position pokemon sprites in battle based on bottom middle point instead of top left
 Add option to disable animated background
 Queue up your draft and bans
   - Queue up drafts but not bans? Bans seem tough to convey queues with
@@ -59,7 +58,6 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
-- Weather from weather squares says "5 or 8 turns" when it's always 5
 - If spectators "Return to Room" after a new match has started, they do not start spectating the new match immediately
 - Pokemon damage numbers in battle log don't make sense
 - Some pokemon moves do not show type effectiveness correctly

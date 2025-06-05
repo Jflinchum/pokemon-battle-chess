@@ -20,7 +20,6 @@ const PokemonBattleConditionLabel = ({
           }{" "}
         </span>
         <span>({condition.minDuration} </span>
-        {condition.maxDuration > 0 && <span>or {condition.maxDuration} </span>}
         <span>turns)</span>
       </p>
       <Tooltip darkBG anchorSelect={`#battleCondition-${condition.id}`}>
