@@ -22,6 +22,15 @@ export const GameSettings = () => {
     dispatch({ type: "SET_2D_SPRITE_PREFERENCE", payload: use2DSprites });
   };
 
+  const handleAnimatedBackgroundChange = (
+    animatedBackgroundPreference: boolean,
+  ) => {
+    dispatch({
+      type: "SET_ANIMATED_BACKGROUND_PREFERENCE",
+      payload: animatedBackgroundPreference,
+    });
+  };
+
   return (
     <div className="optionsActions">
       <ul>
@@ -41,12 +50,25 @@ export const GameSettings = () => {
           </select>
         </li>
         <li>
-          <label>Use Pokemon 2D Sprites</label>
+          <label htmlFor="2dSpritesOption">Use Pokemon 2D Sprites</label>
           <input
+            id="2dSpritesOption"
             className="gameSettingsInput"
             type="checkbox"
             checked={userState.use2DSprites}
             onChange={(e) => handle2DSpriteChange(e.target.checked)}
+          />
+        </li>
+        <li>
+          <label htmlFor="disableAnimatedBackground">
+            Disable Animated Background
+          </label>
+          <input
+            id="disableAnimatedBackground"
+            className="gameSettingsInput"
+            type="checkbox"
+            checked={!userState.animatedBackgroundEnabled}
+            onChange={(e) => handleAnimatedBackgroundChange(!e.target.checked)}
           />
         </li>
       </ul>

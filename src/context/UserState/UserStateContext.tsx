@@ -2,6 +2,7 @@ import { createContext, useContext, type Dispatch } from "react";
 import {
   clearMostRecentRoom,
   set2DSpritePreference,
+  setAnimatedBackgroundPreference,
   setAnimationSpeedPreference,
   setAvatar,
   setMostRecentRoom,
@@ -23,6 +24,7 @@ interface UserState {
   animationSpeedPreference: number;
   volumePreference: VolumePreference;
   use2DSprites: boolean;
+  animatedBackgroundEnabled: boolean;
   currentRoomId: string;
   currentRoomCode: string;
 }
@@ -38,6 +40,7 @@ type UserStateAction =
   | { type: "SET_ANIMATION_SPEED_PREFERENCE"; payload: number }
   | { type: "SET_VOLUME_PREFERENCE"; payload: Partial<VolumePreference> }
   | { type: "SET_2D_SPRITE_PREFERENCE"; payload: boolean }
+  | { type: "SET_ANIMATED_BACKGROUND_PREFERENCE"; payload: boolean }
   | { type: "SET_ROOM"; payload: { roomId: string; roomCode: string } }
   | { type: "JOIN_ROOM"; payload: { roomId: string; roomCode: string } }
   | { type: "LEAVE_ROOM" };
@@ -69,6 +72,9 @@ export const userStateReducer = (
     case "SET_2D_SPRITE_PREFERENCE":
       set2DSpritePreference(action.payload);
       return { ...userState, use2DSprites: action.payload };
+    case "SET_ANIMATED_BACKGROUND_PREFERENCE":
+      setAnimatedBackgroundPreference(action.payload);
+      return { ...userState, animatedBackgroundEnabled: action.payload };
     case "SET_ROOM":
       setMostRecentRoom({
         roomId: action.payload.roomId,

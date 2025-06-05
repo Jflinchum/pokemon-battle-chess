@@ -18,6 +18,7 @@ const getRandomChessPiece = () => {
     piece: randomPiece,
     color: randomColor,
     left: `${Math.random() * 95}%`,
+    staticBottom: `${Math.random() * 95}%`,
     bottom: `${Math.floor(Math.random() * -300 - 300)}px`,
     scale: Math.random() * 2 + 1,
     rotation: `${(Math.random() > 0.5 ? 1 : -1) * (Math.random() * 60 + 20)}deg`,
@@ -32,6 +33,7 @@ const getRandomBackgroundPokemon = (availablePokemon: string[]) => {
     pkmn: randomPokemon,
     shiny: Math.random() < 0.004096,
     left: `${Math.random() * 95}%`,
+    staticBottom: `${Math.random() * 95}%`,
     bottom: `${Math.floor(Math.random() * -300 - 300)}px`,
     scale: Math.random() * 2 + 1,
     rotation: `${(Math.random() > 0.5 ? 1 : -1) * (Math.random() * 60 + 20)}deg`,
@@ -39,9 +41,11 @@ const getRandomBackgroundPokemon = (availablePokemon: string[]) => {
 };
 
 const RandomPokemonBackground = ({
+  animated,
   delay,
   availablePokemon,
 }: {
+  animated: boolean;
   delay: number;
   availablePokemon: string[];
 }) => {
@@ -58,7 +62,10 @@ const RandomPokemonBackground = ({
       style={
         {
           left: pkmn.left,
-          bottom: pkmn.bottom,
+          bottom: animated ? pkmn.bottom : pkmn.staticBottom,
+          transform: animated
+            ? ""
+            : `rotate(${pkmn.rotation}) scale(${pkmn.scale})`,
           "--scale": pkmn.scale,
           "--rotation": pkmn.rotation,
           animationDelay: `${delay}s`,
@@ -71,12 +78,18 @@ const RandomPokemonBackground = ({
           shiny: pkmn.shiny,
         }).url
       }
-      className="float backgroundPokemon"
+      className={`${animated ? "backgroundFloat" : "backgroundStatic"} backgroundPokemon`}
     />
   );
 };
 
-const RandomChessPieceBackground = ({ delay }: { delay: number }) => {
+const RandomChessPieceBackground = ({
+  animated,
+  delay,
+}: {
+  animated: boolean;
+  delay: number;
+}) => {
   const [piece, setPiece] = useState(getRandomChessPiece());
 
   return (
@@ -85,7 +98,10 @@ const RandomChessPieceBackground = ({ delay }: { delay: number }) => {
       style={
         {
           left: piece.left,
-          bottom: piece.bottom,
+          bottom: animated ? piece.bottom : piece.staticBottom,
+          transform: animated
+            ? ""
+            : `rotate(${piece.rotation}) scale(${piece.scale})`,
           "--scale": piece.scale,
           "--rotation": piece.rotation,
           animationDelay: `${delay}s`,
@@ -94,12 +110,15 @@ const RandomChessPieceBackground = ({ delay }: { delay: number }) => {
       }
       type={piece.piece}
       color={piece.color}
-      className="float backgroundChess"
+      className={`${animated ? "backgroundFloat" : "backgroundStatic"} backgroundChess`}
     />
   );
 };
 
 const AnimatedBackground = () => {
+  const { userState } = useUserState();
+
+  const animationEnabled = userState.animatedBackgroundEnabled;
   // Doing this so we're not constantly fetching all 1000 pokemon images to save client bandwidth
   const availablePokemon = useMemo(() => {
     const pkmn = [];
@@ -111,15 +130,20 @@ const AnimatedBackground = () => {
 
   return (
     <div className="backgroundContainer">
-      {[...Array(6)].map((_, index) => (
+      {[...Array(animationEnabled ? 6 : 3)].map((_, index) => (
         <RandomPokemonBackground
+          animated={animationEnabled}
           availablePokemon={availablePokemon}
           delay={-5 + index * 3 - 1}
           key={index}
         />
       ))}
-      {[...Array(6)].map((_, index) => (
-        <RandomChessPieceBackground delay={-5 + index * 3} key={index} />
+      {[...Array(animationEnabled ? 6 : 3)].map((_, index) => (
+        <RandomChessPieceBackground
+          animated={animationEnabled}
+          delay={-5 + index * 3}
+          key={index}
+        />
       ))}
     </div>
   );

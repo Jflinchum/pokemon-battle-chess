@@ -1,6 +1,7 @@
 import { useReducer, ReactElement } from "react";
 import {
   get2DSpritePreference,
+  getAnimatedBackgroundPreference,
   getAnimationSpeedPreference,
   getAvatar,
   getName,
@@ -19,6 +20,7 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     animationSpeedPreference: getAnimationSpeedPreference(),
     volumePreference: getVolumePreference(),
     use2DSprites: get2DSpritePreference(),
+    animatedBackgroundEnabled: getAnimatedBackgroundPreference(),
     currentRoomId: "",
     currentRoomCode: "",
   });

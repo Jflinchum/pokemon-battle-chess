@@ -9,9 +9,13 @@
   }
 }
 
-.float {
+.backgroundFloat {
   position: absolute;
   animation: floating infinite linear 20s;
+}
+
+.backgroundStatic {
+  position: absolute;
 }
 
 .backgroundContainer {

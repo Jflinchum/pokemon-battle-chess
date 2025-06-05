@@ -118,6 +118,25 @@ export const set2DSpritePreference = (spritePreference: boolean) => {
   localStorage.setItem("spritePreference", `${spritePreference}`);
 };
 
+export const getAnimatedBackgroundPreference = () => {
+  const defaultAnimatedBackgroundPreference = true;
+  const animatedBackgroundPreference = localStorage.getItem(
+    "aniBackgroundPreference",
+  );
+  return animatedBackgroundPreference
+    ? animatedBackgroundPreference === "true"
+    : defaultAnimatedBackgroundPreference;
+};
+
+export const setAnimatedBackgroundPreference = (
+  animatedBackgroundPreference: boolean,
+) => {
+  localStorage.setItem(
+    "aniBackgroundPreference",
+    `${animatedBackgroundPreference}`,
+  );
+};
+
 export const getMostRecentRoom = ():
   | { roomId: string; roomCode: string }
   | undefined => {
