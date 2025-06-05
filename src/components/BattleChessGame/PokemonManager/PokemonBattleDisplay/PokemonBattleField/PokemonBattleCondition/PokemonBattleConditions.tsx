@@ -1,12 +1,19 @@
-import { Field, TerrainName, WeatherName } from "@pkmn/client";
+import { TerrainName, WeatherName } from "@pkmn/client";
 import { getSquareModifierMapping } from "../../../PokemonChessDetailsCard/getSquareModifierMapping";
 import "./PokemonBattleConditions.css";
 import Tooltip from "../../../../../common/Tooltip/Tooltip";
+import {
+  TerrainId,
+  WeatherId,
+} from "../../../../../../../shared/types/PokemonTypes";
 
 const PokemonBattleConditionLabel = ({
   condition,
 }: {
-  condition?: Field["terrainState"] | Field["weatherState"];
+  condition?: {
+    id: WeatherName | WeatherId | TerrainName | TerrainId;
+    turns: number;
+  };
 }) => {
   if (!condition || !condition.id) return null;
 
@@ -19,7 +26,7 @@ const PokemonBattleConditionLabel = ({
               ?.label
           }{" "}
         </span>
-        <span>({condition.minDuration} </span>
+        <span>({condition.turns} </span>
         <span>turns)</span>
       </p>
       <Tooltip darkBG anchorSelect={`#battleCondition-${condition.id}`}>
@@ -33,27 +40,24 @@ const PokemonBattleConditionLabel = ({
 };
 
 export const PokemonBattleConditions = ({
-  battleField,
+  weatherState,
+  terrainState,
 }: {
-  battleField: Field;
+  weatherState?: {
+    id: WeatherName | WeatherId;
+    turns: number;
+  };
+  terrainState?: {
+    id: TerrainName | TerrainId;
+    turns: number;
+  };
 }) => {
-  if (!battleField.weatherState.id && !battleField.terrainState.id) return null;
+  if (!weatherState && !terrainState) return null;
 
   return (
     <div className="pokemonBattleConditions">
-      <PokemonBattleConditionLabel condition={battleField.weatherState} />
-      <PokemonBattleConditionLabel condition={battleField.terrainState} />
-      {battleField.pseudoWeather &&
-        Object.keys(battleField.pseudoWeather).map((weather) => {
-          return (
-            <PokemonBattleConditionLabel
-              key={weather}
-              condition={
-                battleField.pseudoWeather[weather] as Field["weatherState"]
-              }
-            />
-          );
-        })}
+      <PokemonBattleConditionLabel condition={weatherState} />
+      <PokemonBattleConditionLabel condition={terrainState} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { Battle, Pokemon } from "@pkmn/client";
+import { useState, useEffect } from "react";
+import { Pokemon, TerrainName, WeatherName } from "@pkmn/client";
 import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet, SideID } from "@pkmn/data";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
@@ -7,25 +7,47 @@ import PokemonMoveChoices, {
   PokemonMoveChoice,
 } from "./PokemonMoveChoices/PokemonMoveChoices";
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
-import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
+import {
+  CustomArgTypes,
+  TerrainId,
+  WeatherId,
+} from "../../../../../shared/types/PokemonTypes";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./PokemonBattleDisplay.css";
+import { toast } from "react-toastify";
+import { LogFormatter } from "@pkmn/view";
 
 interface PokemonBattleDisplayProps {
-  battleState: Battle | null;
   fullBattleLog: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType }[];
-  p1Pokemon: PokemonSet;
-  p2Pokemon: PokemonSet;
+  weatherState?: {
+    id: WeatherName | WeatherId;
+    turns: number;
+  };
+  terrainState?: {
+    id: TerrainName | TerrainId;
+    turns: number;
+  };
+  p1ActivePokemon: Pokemon | null;
+  p2ActivePokemon: Pokemon | null;
+  moves: PokemonMoveChoice[];
+  logFormatter: LogFormatter;
+  p1PokemonSet: PokemonSet;
+  p2PokemonSet: PokemonSet;
   perspective: SideID;
   demoMode?: boolean;
 }
 
 const PokemonBattleDisplay = ({
-  battleState,
   fullBattleLog,
-  p1Pokemon,
-  p2Pokemon,
+  moves,
+  logFormatter,
+  weatherState,
+  terrainState,
+  p1ActivePokemon,
+  p2ActivePokemon,
+  p1PokemonSet,
+  p2PokemonSet,
   perspective,
   demoMode,
 }: PokemonBattleDisplayProps) => {
@@ -42,81 +64,55 @@ const PokemonBattleDisplay = ({
     requestPokemonMove(move, (err) => {
       if (err) {
         setMoveChosen(undefined);
-        // display error toast notification
+        toast("Error: Please reselect your move.", { type: "error" });
       }
     });
   };
 
-  const moves = useMemo(() => {
-    if (
-      battleState?.request?.requestType === "move" &&
-      battleState.request.active[0]?.moves
-    ) {
-      return (
-        battleState.request.active[0]?.moves.map((move) => {
-          // Typescript oddity. The union typings for the request don't match well
-          if ("disabled" in move) {
-            return move;
-          } else {
-            return move;
-          }
-        }) || []
-      );
-    }
-    return [];
-  }, [battleState?.request]);
-
   return (
-    <div>
-      {battleState && (
-        <>
-          <div className="battlefieldAndLog">
-            <span className="battleContainer">
-              <PokemonBattleField
-                battleHistory={fullBattleLog}
-                battleState={battleState}
-                p1PokemonSet={p1Pokemon}
-                p2PokemonSet={p2Pokemon}
-              />
-              <PokemonBattleLog
-                battleHistory={fullBattleLog}
-                simple={true}
-                battleState={battleState}
-                perspective={perspective}
-              />
-              {!demoMode && (
-                <div className="battleMoveContainer">
-                  <BattleMoveContainer
-                    hideMoves={
-                      !["turn", "request"].includes(
-                        fullBattleLog[fullBattleLog.length - 1]?.args?.[0],
-                      ) ||
-                      fullBattleLog.some((log) => log.args[0] === "win") ||
-                      gameState.isSpectator ||
-                      gameState.isCatchingUp
-                    }
-                    moveChosen={moveChosen}
-                    onMoveSelect={handleMoveSelect}
-                    setMoveChosen={setMoveChosen}
-                    moves={moves}
-                    currentPokemon={
-                      battleState[perspective === "p1" ? "p1" : "p2"].active[0]
-                    }
-                    opponentPokemon={
-                      battleState[perspective === "p1" ? "p2" : "p1"].active[0]
-                    }
-                  />
-                </div>
-              )}
-            </span>
-            <PokemonBattleLog
-              battleHistory={fullBattleLog}
-              battleState={battleState}
-              perspective={perspective}
+    <div className="battlefieldAndLog">
+      <span className="battleContainer">
+        <PokemonBattleField
+          battleHistory={fullBattleLog}
+          p1ActivePokemon={p1ActivePokemon}
+          p2ActivePokemon={p2ActivePokemon}
+          weatherState={weatherState}
+          terrainState={terrainState}
+          p1PokemonSet={p1PokemonSet}
+          p2PokemonSet={p2PokemonSet}
+        />
+        <PokemonBattleLog
+          battleHistory={fullBattleLog}
+          logFormatter={logFormatter}
+          simple={true}
+          perspective={perspective}
+        />
+        {!demoMode && (
+          <div className="battleMoveContainer">
+            <BattleMoveContainer
+              hideMoves={
+                !["turn", "request"].includes(
+                  fullBattleLog[fullBattleLog.length - 1]?.args?.[0],
+                ) ||
+                fullBattleLog.some((log) => log.args[0] === "win") ||
+                gameState.isSpectator ||
+                gameState.isCatchingUp
+              }
+              moveChosen={moveChosen}
+              onMoveSelect={handleMoveSelect}
+              setMoveChosen={setMoveChosen}
+              moves={moves}
+              currentPokemon={p1ActivePokemon}
+              opponentPokemon={p2ActivePokemon}
             />
           </div>
-        </>
-      )}
+        )}
+      </span>
+      <PokemonBattleLog
+        battleHistory={fullBattleLog}
+        logFormatter={logFormatter}
+        perspective={perspective}
+      />
     </div>
   );
 };

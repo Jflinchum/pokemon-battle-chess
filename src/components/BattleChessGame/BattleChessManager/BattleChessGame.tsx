@@ -408,10 +408,10 @@ export const BattleChessGame = ({
     >
       {battleStarted && currentBattle && (
         <PokemonBattleManager
-          p1Pokemon={
+          p1PokemonSet={
             color === "w" ? currentBattle.p1Pokemon : currentBattle.p2Pokemon
           }
-          p2Pokemon={
+          p2PokemonSet={
             color === "w" ? currentBattle.p2Pokemon : currentBattle.p1Pokemon
           }
           currentPokemonMoveHistory={currentPokemonMoveHistory}

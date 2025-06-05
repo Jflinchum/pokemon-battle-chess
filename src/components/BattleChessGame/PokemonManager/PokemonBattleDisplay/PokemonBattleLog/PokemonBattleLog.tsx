@@ -1,18 +1,17 @@
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect } from "react";
 import { BattleArgsKWArgType, Protocol } from "@pkmn/protocol";
+import { SideID } from "@pkmn/data";
 import { LogFormatter } from "@pkmn/view";
 import StylizedText from "../../../../common/StylizedText/StylizedText";
-import "./PokemonBattleLog.css";
 import { useGameState } from "../../../../../context/GameState/GameStateContext";
-import { Battle } from "@pkmn/client";
-import { SideID } from "@pkmn/data";
 import { CustomArgTypes } from "../../../../../../shared/types/PokemonTypes";
+import "./PokemonBattleLog.css";
 
 interface PokemonBattleLogProps {
   battleHistory: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType }[];
   simple?: boolean;
   perspective: SideID;
-  battleState: Battle;
+  logFormatter: LogFormatter;
 }
 
 const getClassnameFromBattleArg = (args: CustomArgTypes) => {
@@ -32,14 +31,9 @@ const formatTextFromBattleArg = (text: string, args: CustomArgTypes) => {
 const PokemonBattleLog = ({
   battleHistory,
   simple,
-  perspective,
-  battleState,
+  logFormatter,
 }: PokemonBattleLogProps) => {
   const { gameState } = useGameState();
-  const formatter = useMemo(
-    () => new LogFormatter(perspective, battleState),
-    [battleState, perspective],
-  );
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,7 +50,7 @@ const PokemonBattleLog = ({
     >
       {battleHistory.map(({ args, kwArgs }, index) => {
         const totalLog: { text: string; args: string[] }[] = [];
-        let formattedText = formatter.formatText(
+        let formattedText = logFormatter.formatText(
           args as Protocol.ArgType,
           kwArgs,
         );
