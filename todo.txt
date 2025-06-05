@@ -59,9 +59,6 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
-- Replay System
-  - Seed is incorrectly set
-  - Player names do not appear above and below board
 - If spectators "Return to Room" after a new match has started, they do not start spectating the new match immediately
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus

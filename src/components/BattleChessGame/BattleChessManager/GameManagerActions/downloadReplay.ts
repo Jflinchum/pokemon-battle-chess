@@ -7,6 +7,8 @@ import { GameOptions } from "../../../../../shared/types/GameOptions";
 
 export interface ReplayData {
   players: Player[];
+  whitePlayer: Player;
+  blackPlayer: Player;
   seed: PRNGSeed;
   options: GameOptions;
   matchHistory: MatchHistory;
@@ -26,6 +28,8 @@ export const downloadReplay = (
   }
   const replayData: ReplayData = {
     players: [whitePlayer, blackPlayer],
+    whitePlayer: whitePlayer,
+    blackPlayer: blackPlayer,
     seed,
     options: {
       ...gameState.gameSettings.options,

@@ -95,6 +95,8 @@ export const gameStateReducer = (
         replayHistory: action.payload.matchHistory,
         gameSettings: {
           ...gameState.gameSettings,
+          whitePlayer: action.payload.whitePlayer,
+          blackPlayer: action.payload.blackPlayer,
           seed: action.payload.seed,
           color: "w",
           options: action.payload.options,
