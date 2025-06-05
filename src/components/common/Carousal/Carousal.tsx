@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faArrowRight,
+  faDotCircle,
+} from "@fortawesome/free-solid-svg-icons";
 import Button from "../Button/Button";
 import "./Carousal.css";
 
@@ -38,6 +42,18 @@ export const Carousal = ({
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </Button>
+        <div className="carousalScreenSelector">
+          {screens.map((_, index) => (
+            <button
+              onClick={() => setScreenIndex(index)}
+              className={`carousalScreenSelectorItem ${index === screenIndex ? "carousalScreenSelectorActive" : ""}`}
+              key={index}
+              aria-label={`Slide ${index + 1}`}
+            >
+              <FontAwesomeIcon icon={faDotCircle} />
+            </button>
+          ))}
+        </div>
         <Button
           color="primary"
           disabled={!wrapScreens && screenIndex === screens.length - 1}
