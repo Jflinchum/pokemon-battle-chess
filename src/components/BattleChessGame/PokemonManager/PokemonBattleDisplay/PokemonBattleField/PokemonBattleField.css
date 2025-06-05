@@ -14,22 +14,6 @@
   }
 }
 
-.player1Pokemon {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  bottom: 20%;
-  left: 15%;
-}
-
-.player2Pokemon {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  top: 30%;
-  right: 20%;
-}
-
 .healthbar {
   display: block;
   z-index: var(--pokemon-health-z-index);
@@ -40,9 +24,4 @@
   text-align: center;
   font-weight: bold;
   z-index: var(--pokemon-health-z-index);
-}
-
-.pokemonSprite {
-  width: fit-content;
-  margin: auto;
 }

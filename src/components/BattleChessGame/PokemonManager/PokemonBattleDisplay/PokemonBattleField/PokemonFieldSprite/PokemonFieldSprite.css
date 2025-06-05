@@ -1,15 +1,36 @@
+.pokemonFieldSprite {
+  transition:
+    0.5s transform,
+    0.5s opacity,
+    0.5s visibility;
+
+  @media (max-width: 900px) {
+    transform: scale(50%) translate(-50%, 50%);
+  }
+
+  &.inspect {
+    transform: scale(150%);
+    @media (max-width: 900px) {
+      transform: scale(75%) translate(-25%, 25%);
+    }
+  }
+
+  &.hide {
+    opacity: 0%;
+    visibility: hidden;
+  }
+}
+
 .p1Pokemon {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 100px;
-  left: 100px;
+  bottom: 50px;
+  left: 50px;
 
   @media (max-width: 900px) {
-    width: 50%;
-    height: 50%;
-    bottom: 50px;
-    left: 10px;
+    bottom: 30px;
+    left: 30px;
   }
 }
 
@@ -17,14 +38,12 @@
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 120px;
-  right: 100px;
+  bottom: 100px;
+  left: 400px;
 
   @media (max-width: 900px) {
-    width: 50%;
-    height: 50%;
-    top: 60px;
-    right: 10px;
+    bottom: 50px;
+    left: 180px;
   }
 }
 
@@ -120,10 +139,8 @@
 
 .pokemonSprite {
   margin: auto;
-
-  @media (max-width: 900px) {
-    transform: scale(50%) translateY(-50%);
-  }
+  width: auto;
+  height: auto;
 }
 
 .pokemonTooltipTyping {
@@ -139,19 +156,4 @@
     drop-shadow(3px -3px var(--green-2)) drop-shadow(-3px -3px var(--green-2))
     drop-shadow(-3px 3px var(--green-2));
   cursor: pointer;
-}
-
-.pokemonFieldSprite {
-  transition:
-    0.5s transform,
-    0.5s opacity,
-    0.5s visibility;
-
-  &.inspect {
-    transform: scale(150%);
-  }
-  &.hide {
-    opacity: 0%;
-    visibility: hidden;
-  }
 }
