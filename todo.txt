@@ -62,9 +62,6 @@ Issues:
 - Replay System
   - Seed is incorrectly set
   - Player names do not appear above and below board
-- Pokemon Battle Log
-  - Height increases as it gains content instead of being at 100%
-  - Height should remain consistent, and shouldn't look awkward in How To Play Modal
 - If spectators "Return to Room" after a new match has started, they do not start spectating the new match immediately
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
