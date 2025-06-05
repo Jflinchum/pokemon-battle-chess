@@ -52,17 +52,23 @@ Priority:
 
 Refactor TODOs:
 - Potentially lift game logic into new model
-- Lift weather out of pokemon manager
+- Lift weather out of pokemon manager model
 - Put API request and response types in shared folder
 - Organize frontend types in a single dir and re-use more efficiently
 - Separate out draft/ban calls
 - Move logic in controller/index into GameRoom
 
 Issues:
-- If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render
+- Replay System
+  - Seed is incorrectly set
+  - Player names do not appear above and below board
+- Pokemon Battle Log
+  - Height increases as it gains content instead of being at 100%
+  - Height should remain consistent, and shouldn't look awkward in How To Play Modal
 - If spectators "Return to Room" after a new match has started, they do not start spectating the new match immediately
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
+  - If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render
   - Likely more. Will need to keep an eye out
 - Draft picking timer does not reset exactly to max time. It goes as little above or below it
 - Wrong music playing after skipping to current turn when catching up
