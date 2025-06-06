@@ -6,7 +6,7 @@ import "./ChatDisplay.css";
 import { cleanString } from "../../../../../shared/util/profanityFilter";
 
 interface ChatDisplayProps {
-  onMessage: (message: ChatMessage) => void;
+  onMessage?: (message: ChatMessage) => void;
   className?: string;
   inputRef?: RefObject<HTMLInputElement | null>;
 }
@@ -16,7 +16,11 @@ interface ChatMessage {
   message: string;
 }
 
-const ChatDisplay = ({ className, onMessage, inputRef }: ChatDisplayProps) => {
+const ChatDisplay = ({
+  className = "",
+  onMessage = () => {},
+  inputRef,
+}: ChatDisplayProps) => {
   const { userState } = useUserState();
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);

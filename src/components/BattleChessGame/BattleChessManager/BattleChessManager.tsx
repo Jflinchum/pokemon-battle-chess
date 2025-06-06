@@ -9,6 +9,7 @@ import { BattleChessGame } from "./BattleChessGame";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import "./BattleChessManager.css";
+import ChatDisplay from "../../RoomManager/Chat/ChatDisplay/ChatDisplay";
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;
@@ -57,41 +58,47 @@ function BattleChessManager({
    * - Pokemon battle phase
    */
   return (
-    <>
-      <div className="battleChessAndActionContainer">
-        <GameManagerActions />
-        <div className="battleChessContainer">
-          <PlayerInGameDisplay
-            player={color === "w" ? blackPlayer : whitePlayer}
-            takenChessPieces={pokemonManager.getTakenChessPieces(
-              gameState.gameSettings.color === "w" ? "w" : "b",
-            )}
-            timer={color === "w" ? timers?.black : timers?.white}
-          />
-          <BattleChessGame
-            pokemonManager={pokemonManager}
-            chessManager={chessManager}
-            matchHistory={matchHistory}
-            matchLogIndex={matchLogIndex}
-            pokemonLogIndex={pokemonLogIndex}
-            color={color || "w"}
-            draftMode={gameState.gameSettings.options.format === "draft"}
-          />
-          <PlayerInGameDisplay
-            player={color === "w" ? whitePlayer : blackPlayer}
-            takenChessPieces={pokemonManager.getTakenChessPieces(
-              gameState.gameSettings.color === "w" ? "b" : "w",
-            )}
-            timer={color === "w" ? timers?.white : timers?.black}
-          />
+    <div className="battleChessAndActionContainer">
+      <GameManagerActions />
+      <div className="battleChessContainer">
+        <PlayerInGameDisplay
+          player={color === "w" ? blackPlayer : whitePlayer}
+          takenChessPieces={pokemonManager.getTakenChessPieces(
+            gameState.gameSettings.color === "w" ? "w" : "b",
+          )}
+          timer={color === "w" ? timers?.black : timers?.white}
+          className="topPlayerDisplay"
+        />
+        <BattleChessGame
+          pokemonManager={pokemonManager}
+          chessManager={chessManager}
+          matchHistory={matchHistory}
+          matchLogIndex={matchLogIndex}
+          pokemonLogIndex={pokemonLogIndex}
+          color={color || "w"}
+          draftMode={gameState.gameSettings.options.format === "draft"}
+        />
+        <PlayerInGameDisplay
+          player={color === "w" ? whitePlayer : blackPlayer}
+          takenChessPieces={pokemonManager.getTakenChessPieces(
+            gameState.gameSettings.color === "w" ? "b" : "w",
+          )}
+          timer={color === "w" ? timers?.white : timers?.black}
+          className="bottomPlayerDisplay"
+        />
 
+        <div className="playerAndChatContainer">
           <PlayerList
             players={gameState.players}
             className="battleChessPlayerList"
           />
+          <div className="inGameChatContainer">
+            <span className="inGameChatHeader">Chat</span>
+            <ChatDisplay className="inGameChat" />
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

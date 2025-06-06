@@ -66,6 +66,7 @@
   --pokemon-battle-info-z-index: 1;
   --pokemon-health-z-index: 3;
 
+  --player-ingame-display-z-index: 9;
   --mobile-nav-bg-z-index: 10;
   --nav-actions-z-index: 11;
   --mobile-nav-actions-z-index: 12;

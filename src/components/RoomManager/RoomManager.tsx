@@ -166,7 +166,7 @@ const RoomManager = () => {
           <Room />
         )}
       </div>
-      <ChatToggle className="chatToggleAction" />
+      {!gameState.inGame ? <ChatToggle className="chatToggleAction" /> : null}
     </>
   );
 };

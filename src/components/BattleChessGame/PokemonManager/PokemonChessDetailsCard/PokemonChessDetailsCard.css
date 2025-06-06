@@ -30,8 +30,7 @@
     width: 30%;
     min-width: 20vw;
     max-width: 600px;
-    height: inherit;
-    align-self: stretch;
+    align-self: center;
   }
 }
 

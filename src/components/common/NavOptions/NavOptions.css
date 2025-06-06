@@ -47,7 +47,7 @@
 
 .navMobileNav {
   z-index: var(--mobile-nav-actions-z-index);
-  position: sticky;
+  position: fixed;
   width: 100%;
   background-color: var(--gray-6);
 

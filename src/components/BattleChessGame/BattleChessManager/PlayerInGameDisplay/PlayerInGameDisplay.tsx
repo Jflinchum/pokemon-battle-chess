@@ -13,19 +13,21 @@ interface PlayerInGameDisplayProps {
   player?: Player;
   takenChessPieces: PokemonPiece[];
   timer?: TimerType["white"] | TimerType["black"];
+  className?: string;
 }
 
 const PlayerInGameDisplay = ({
   player,
   takenChessPieces,
   timer,
+  className = "",
 }: PlayerInGameDisplayProps) => {
   const { gameState } = useGameState();
   if (!player) {
     return null;
   }
   return (
-    <div className="playerGameDisplayContainer">
+    <div className={`playerGameDisplayContainer ${className}`}>
       <img
         className="playerGameDisplaySprite"
         src={Sprites.getAvatar(player.avatarId || 1)}

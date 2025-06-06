@@ -62,7 +62,7 @@ Issues:
   - Judgement with Arceus
   - If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render
   - Likely more. Will need to keep an eye out
-- Draft picking timer does not reset exactly to max time. It goes as little above or below it
+- Draft picking timer does not reset exactly to max time. It goes a little above or below it
 - Wrong music playing after skipping to current turn when catching up
 - Premoves:
   - Occasionally clearing when it shouldn't
