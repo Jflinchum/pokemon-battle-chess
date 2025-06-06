@@ -63,6 +63,7 @@ const RandomPokemonBackground = ({
         {
           left: pkmn.left,
           bottom: animated ? pkmn.bottom : pkmn.staticBottom,
+          opacity: animated ? "" : "30%",
           transform: animated
             ? ""
             : `rotate(${pkmn.rotation}) scale(${pkmn.scale})`,
@@ -99,6 +100,7 @@ const RandomChessPieceBackground = ({
         {
           left: piece.left,
           bottom: animated ? piece.bottom : piece.staticBottom,
+          opacity: animated ? "" : "20%",
           transform: animated
             ? ""
             : `rotate(${piece.rotation}) scale(${piece.scale})`,
