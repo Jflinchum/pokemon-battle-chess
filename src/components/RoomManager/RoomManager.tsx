@@ -26,6 +26,7 @@ const RoomManager = () => {
   useEffect(() => {
     if (!gameState.inGame) {
       stopSongs();
+      toast.dismiss("new-game-notification");
     }
   }, [gameState.inGame, stopSongs]);
 
@@ -96,7 +97,7 @@ const RoomManager = () => {
       if (!isSyncing) {
         setMatchHistory(undefined);
       }
-      if (gameState.inGame) {
+      if (gameState.matchEnded && gameState.inGame) {
         /**
          * If the user is still viewing results from the previous game, let them know that returning to the room
          * will make them start spectating.
