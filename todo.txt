@@ -58,6 +58,7 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- Chat log clears between room and game
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
   - If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render

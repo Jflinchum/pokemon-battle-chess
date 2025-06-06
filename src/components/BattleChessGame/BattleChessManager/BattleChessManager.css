@@ -32,9 +32,12 @@
   width: 100%;
   z-index: var(--player-ingame-display-z-index);
   top: 50px;
+  left: 0;
+  box-sizing: border-box;
 
   @media (min-width: 600px) {
     top: 0;
+    padding-left: 70px;
   }
 }
 
@@ -43,6 +46,12 @@
   width: 100%;
   z-index: var(--player-ingame-display-z-index);
   bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+
+  @media (min-width: 600px) {
+    padding-left: 70px;
+  }
 }
 
 .playerAndChatContainer {
