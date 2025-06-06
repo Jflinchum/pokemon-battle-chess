@@ -316,6 +316,26 @@ export const registerSocketEvents = (
 
         room.getPlayer(playerId)?.setViewingResults(!!viewingResults);
         io.to(room.roomId).emit("connectedPlayers", room.getPublicPlayerList());
+
+        /**
+         * If a new match has already started after the player has returned to the room, sync them up to the current turn
+         */
+        if (room.isOngoing && room.whitePlayer && room.blackPlayer) {
+          room
+            .getPlayer(playerId)
+            ?.socket?.emit("startSync", { history: room.getHistory(playerId) });
+          if (room.roomGameOptions.timersEnabled && room.gameTimer) {
+            socket.emit(
+              "currentTimers",
+              room.gameTimer.getTimersWithLastMoveShift(),
+            );
+          }
+          socket.emit(
+            "startGame",
+            room.buildStartGameArgs("w", room.whitePlayer, room.blackPlayer),
+            true,
+          );
+        }
       },
     );
 

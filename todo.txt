@@ -42,7 +42,6 @@ Priority:
 - Better logging
   - Use winston + prometheus + grafana?
 - (better) How to Play
-  - Improve Styling
   - Add more info screens
 - More detailed modals in game
   - Are you sure you want to leave? modal when returning to menu in game
@@ -59,7 +58,6 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
-- If spectators "Return to Room" after a new match has started, they do not start spectating the new match immediately
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
   - If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render

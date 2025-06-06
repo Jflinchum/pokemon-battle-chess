@@ -605,6 +605,7 @@ export default class GameRoom {
     this.broadcastAll("connectedPlayers", this.getPublicPlayerList());
     this.gameTimer?.stopTimers();
     this.broadcastTimers();
+    this.resetRoomForRematch();
   }
 
   public resetRoomForRematch() {

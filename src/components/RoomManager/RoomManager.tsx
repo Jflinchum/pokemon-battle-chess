@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
 import { useGameState } from "../../context/GameState/GameStateContext";
 import { useUserState } from "../../context/UserState/UserStateContext";
@@ -95,6 +96,20 @@ const RoomManager = () => {
       if (!isSyncing) {
         setMatchHistory(undefined);
       }
+      if (gameState.inGame) {
+        /**
+         * If the user is still viewing results from the previous game, let them know that returning to the room
+         * will make them start spectating.
+         */
+        toast(
+          "A new game has already started. Return to the room to begin spectating.",
+          {
+            type: "info",
+            autoClose: false,
+            toastId: "new-game-notification",
+          },
+        );
+      }
       dispatch({ type: "START_MATCH", payload: settings });
     });
 
@@ -128,6 +143,7 @@ const RoomManager = () => {
     };
   }, [
     gameState.matchEnded,
+    gameState.inGame,
     dispatch,
     dispatchModalState,
     dispatchUserState,

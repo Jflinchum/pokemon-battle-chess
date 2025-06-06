@@ -89,6 +89,13 @@ const useBattleHistory = ({
     };
   }, []);
 
+  useEffect(() => {
+    // Stop listening for gameOutput once the match has ended
+    if (gameState.matchEnded) {
+      socket.off("gameOutput");
+    }
+  }, [gameState.matchEnded]);
+
   const [catchingUp, setCatchingUp] = useState(false);
 
   useEffect(() => {
