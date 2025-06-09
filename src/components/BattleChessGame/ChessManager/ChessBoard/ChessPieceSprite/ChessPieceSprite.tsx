@@ -46,6 +46,20 @@ const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
   }
 };
 
+const pieceTypeToLabelMapping: Record<PieceSymbol, string> = {
+  p: "Pawn",
+  r: "Rook",
+  n: "Knight",
+  b: "Bishop",
+  q: "Queen",
+  k: "King",
+};
+
+const colorToLabelMapping: Record<Color, string> = {
+  w: "White",
+  b: "Black",
+};
+
 interface ChessPieceSpriteProps extends React.HTMLAttributes<HTMLDivElement> {
   color: Color;
   type: PieceSymbol;
@@ -59,7 +73,12 @@ const ChessPieceSprite = ({
   ...props
 }: ChessPieceSpriteProps) => {
   return (
-    <img src={getPieceImage(type, color)} className={className} {...props} />
+    <img
+      alt={`${colorToLabelMapping[color]} ${pieceTypeToLabelMapping[type]}`}
+      src={getPieceImage(type, color)}
+      className={className}
+      {...props}
+    />
   );
 };
 

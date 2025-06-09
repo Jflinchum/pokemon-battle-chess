@@ -40,6 +40,7 @@ export const PokemonSprite = ({
   if (useDiv) {
     return (
       <div
+        title={pokemonIdentifier}
         style={{
           backgroundImage: `url(${sprite})`,
           backgroundPosition: "center",
@@ -50,6 +51,6 @@ export const PokemonSprite = ({
       />
     );
   } else {
-    return <img src={sprite} {...props} />;
+    return <img alt={pokemonIdentifier} src={sprite} {...props} />;
   }
 };
