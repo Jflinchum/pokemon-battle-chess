@@ -14,7 +14,7 @@
   top: 20%;
   left: 50%;
   transform: translate(-50%, -20%);
-  background-color: var(--translucent-bg);
+  background-color: var(--dark-translucent-bg);
   backdrop-filter: blur(5px);
   box-shadow: 5px 5px 20px 5px black;
   z-index: var(--modal-z-index);
