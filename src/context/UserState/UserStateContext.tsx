@@ -10,6 +10,7 @@ import {
   setVolumePreference,
 } from "../../util/localWebData.ts";
 import { leaveRoom } from "../../service/lobby.tsx";
+import { ChatMessage } from "../../components/RoomManager/Chat/ChatDisplay/ChatDisplay.tsx";
 
 export interface VolumePreference {
   pieceVolume: number;
@@ -27,6 +28,7 @@ interface UserState {
   animatedBackgroundEnabled: boolean;
   currentRoomId: string;
   currentRoomCode: string;
+  chatHistory: ChatMessage[];
 }
 
 interface UserStateType {
@@ -41,6 +43,7 @@ type UserStateAction =
   | { type: "SET_VOLUME_PREFERENCE"; payload: Partial<VolumePreference> }
   | { type: "SET_2D_SPRITE_PREFERENCE"; payload: boolean }
   | { type: "SET_ANIMATED_BACKGROUND_PREFERENCE"; payload: boolean }
+  | { type: "PUSH_CHAT_HISTORY"; payload: ChatMessage }
   | { type: "SET_ROOM"; payload: { roomId: string; roomCode: string } }
   | { type: "JOIN_ROOM"; payload: { roomId: string; roomCode: string } }
   | { type: "LEAVE_ROOM" };
@@ -84,11 +87,17 @@ export const userStateReducer = (
         ...userState,
         currentRoomId: action.payload.roomId,
         currentRoomCode: action.payload.roomCode,
+        chatHistory: [],
       };
     case "LEAVE_ROOM":
       leaveRoom(userState.currentRoomId, userState.id);
       clearMostRecentRoom();
-      return { ...userState, currentRoomId: "", currentRoomCode: "" };
+      return {
+        ...userState,
+        currentRoomId: "",
+        currentRoomCode: "",
+        chatHistory: [],
+      };
     case "JOIN_ROOM":
       setMostRecentRoom({
         roomId: action.payload.roomId,
@@ -98,6 +107,12 @@ export const userStateReducer = (
         ...userState,
         currentRoomId: action.payload.roomId,
         currentRoomCode: action.payload.roomCode,
+        chatHistory: [],
+      };
+    case "PUSH_CHAT_HISTORY":
+      return {
+        ...userState,
+        chatHistory: [...userState.chatHistory, action.payload],
       };
     default:
       return userState;

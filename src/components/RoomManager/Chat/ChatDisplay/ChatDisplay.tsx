@@ -11,7 +11,7 @@ interface ChatDisplayProps {
   inputRef?: RefObject<HTMLInputElement | null>;
 }
 
-interface ChatMessage {
+export interface ChatMessage {
   playerName: string;
   message: string;
 }
@@ -21,22 +21,23 @@ const ChatDisplay = ({
   onMessage = () => {},
   inputRef,
 }: ChatDisplayProps) => {
-  const { userState } = useUserState();
+  const { userState, dispatch } = useUserState();
   const [currentMessage, setCurrentMessage] = useState<string>("");
-  const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
+  const [chatLog, setChatLog] = useState<ChatMessage[]>(userState.chatHistory);
   const { sendChatMessage } = useSocketRequests();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     socket.on("chatMessage", (chatMessage: ChatMessage) => {
       setChatLog((curr) => [...curr, chatMessage]);
+      dispatch({ type: "PUSH_CHAT_HISTORY", payload: chatMessage });
       onMessage(chatMessage);
     });
 
     return () => {
       socket.off("chatMessage");
     };
-  }, [onMessage]);
+  }, [onMessage, dispatch]);
 
   useEffect(() => {
     const element = containerRef.current;
@@ -52,6 +53,7 @@ const ChatDisplay = ({
         message: cleanString(currentMessage),
       };
       setChatLog((curr) => [...curr, userMessage]);
+      dispatch({ type: "PUSH_CHAT_HISTORY", payload: userMessage });
       sendChatMessage(currentMessage);
       setCurrentMessage("");
       onMessage(userMessage);

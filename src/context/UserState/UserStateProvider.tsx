@@ -23,6 +23,7 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     animatedBackgroundEnabled: getAnimatedBackgroundPreference(),
     currentRoomId: "",
     currentRoomCode: "",
+    chatHistory: [],
   });
 
   return (
