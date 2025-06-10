@@ -1,20 +1,15 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Chess, Square, Move, Color } from "chess.js";
 import ChessBoard from "./ChessBoard/ChessBoard";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
 import { MoveAttempt, PokemonChessBoardSquare } from "./types";
 import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromotionChoice";
-import {
-  getVerboseChessMove,
-  getVerboseSanChessMove,
-  mergeBoardAndPokemonState,
-} from "./util";
+import { getVerboseChessMove, getVerboseSanChessMove } from "./util";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { CurrentBattle } from "../BattleChessManager/BattleChessManager";
 import { useDebounce } from "../../../utils";
 import { ChessData } from "../../../../shared/types/game";
-import { usePremoves } from "./usePremoves";
 import { ArrowController } from "./ArrowController/ArrowController";
 import "./ChessManager.css";
 
@@ -30,7 +25,6 @@ interface ChessManagerProps {
   onMove: (san: string) => void;
   chessMoveHistory: ChessData[];
   battleSquare?: Square;
-  onError?: (err: Error) => void;
 }
 
 const ChessManager = ({
@@ -45,7 +39,6 @@ const ChessManager = ({
   board,
   onMove,
   chessMoveHistory,
-  onError = () => {},
 }: ChessManagerProps) => {
   /**
    * TODO:
@@ -61,56 +54,6 @@ const ChessManager = ({
   const [requestedPawnPromotion, setRequestedPawnPromotion] =
     useState<Move | null>(null);
 
-  // Create a simulated copy of both managers to handle premoving
-  const {
-    simulatedChessManager,
-    simulatedPokemonManager,
-    preMoveQueue,
-    setPreMoveQueue,
-    resetSimulators,
-    simulateMove,
-    simulatedBoard,
-  } = usePremoves(board, chessManager, pokemonManager);
-
-  useEffect(() => {
-    if (color === chessManager.turn() && preMoveQueue.length > 0) {
-      const { from, to, promotion, san } = preMoveQueue[0];
-      const verboseChessMove = getVerboseChessMove(
-        from,
-        to,
-        chessManager,
-        promotion,
-      );
-      if (verboseChessMove?.san === san) {
-        setPreMoveQueue((curr) => curr.slice(1));
-        onMove(verboseChessMove.san);
-      } else {
-        resetSimulators();
-        setPreMoveQueue([]);
-      }
-    }
-  }, [
-    board,
-    chessManager,
-    color,
-    onMove,
-    preMoveQueue,
-    resetSimulators,
-    setPreMoveQueue,
-  ]);
-
-  useEffect(() => {
-    const previousMove = chessMoveHistory[chessMoveHistory.length - 1];
-    if (
-      previousMove &&
-      previousMove.data.color === color &&
-      previousMove.data.failed
-    ) {
-      resetSimulators();
-      setPreMoveQueue([]);
-    }
-  }, [chessMoveHistory, color, resetSimulators, setPreMoveQueue]);
-
   const cancelSelection = () => {
     setSelectedSquare(null);
     setHighlightedSquare([]);
@@ -119,10 +62,10 @@ const ChessManager = ({
   const updateSelection = (square: Square) => {
     setSelectedSquare(square);
 
-    const selectedSquareMoves = simulatedChessManager
+    const selectedSquareMoves = chessManager
       .moves({
         square,
-        piece: simulatedChessManager.get(square)?.type,
+        piece: chessManager.get(square)?.type,
         verbose: true,
         continueOnCheck: true,
       })
@@ -168,38 +111,7 @@ const ChessManager = ({
       return;
     }
     if (chessManager.turn() !== color) {
-      const move = getVerboseChessMove(
-        fromSquare,
-        toSquare,
-        simulatedChessManager,
-        promotion,
-      );
-      if (move) {
-        if (move?.isPromotion() && !promotion) {
-          setRequestedPawnPromotion(move);
-          return;
-        }
-        try {
-          simulateMove(move);
-          setPreMoveQueue((curr) => [
-            ...curr,
-            {
-              from: move.from,
-              to: move.to,
-              promotion: move.promotion,
-              san: move.san,
-            },
-          ]);
-          setSelectedSquare(null);
-          setHighlightedSquare([]);
-        } catch (err) {
-          onError(err as Error);
-        }
-        return;
-      } else {
-        onError(new Error("Premove simulation is undefined"));
-        return;
-      }
+      return;
     }
     const verboseChessMove = getVerboseChessMove(
       fromSquare,
@@ -234,8 +146,7 @@ const ChessManager = ({
     }
     if (
       selectedSquare &&
-      getVerboseChessMove(selectedSquare, square, simulatedChessManager)
-        ?.color === color
+      getVerboseChessMove(selectedSquare, square, chessManager)?.color === color
     ) {
       movePiece({ fromSquare: selectedSquare, toSquare: square });
     }
@@ -251,8 +162,7 @@ const ChessManager = ({
   const handlePieceDrop = ({ square }: PokemonChessBoardSquare) => {
     if (
       selectedSquare &&
-      getVerboseChessMove(selectedSquare, square, simulatedChessManager)
-        ?.color === color
+      getVerboseChessMove(selectedSquare, square, chessManager)?.color === color
     ) {
       movePiece({ fromSquare: selectedSquare, toSquare: square });
     }
@@ -265,9 +175,6 @@ const ChessManager = ({
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-
-    resetSimulators();
-    setPreMoveQueue([]);
   };
 
   return (
@@ -315,10 +222,7 @@ const ChessManager = ({
         >
           <ChessBoard
             color={color}
-            boardState={mergeBoardAndPokemonState(
-              simulatedBoard,
-              simulatedPokemonManager,
-            )}
+            boardState={board}
             onSquareClick={handleSquareClick}
             onSquareHover={handleSquareHover}
             onPieceDrag={handlePieceDrag}
@@ -327,18 +231,18 @@ const ChessManager = ({
             selectedSquare={selectedSquare}
             mostRecentMove={mostRecentMove}
             battleSquare={battleSquare}
-            preMoveQueue={preMoveQueue}
+            preMoveQueue={[]}
           />
         </ArrowController>
         <PokemonChessDetailsCard
           chessMoveHistory={chessMoveHistory}
           squareModifier={
-            simulatedPokemonManager.getWeatherFromSquare(hoveredSquare) ||
-            simulatedPokemonManager.getWeatherFromSquare(selectedSquare)
+            pokemonManager.getWeatherFromSquare(hoveredSquare) ||
+            pokemonManager.getWeatherFromSquare(selectedSquare)
           }
           pokemon={
-            simulatedPokemonManager.getPokemonFromSquare(hoveredSquare)?.pkmn ||
-            simulatedPokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn
+            pokemonManager.getPokemonFromSquare(hoveredSquare)?.pkmn ||
+            pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn
           }
         />
       </div>

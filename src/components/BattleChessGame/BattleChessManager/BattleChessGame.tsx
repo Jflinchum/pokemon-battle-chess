@@ -432,9 +432,6 @@ export const BattleChessGame = ({
         }
         board={currentPokemonBoard}
         battleSquare={battleSquare}
-        onError={(err) => {
-          handleError(err);
-        }}
         onMove={(san) => {
           if (gameState.isSpectator) {
             return;

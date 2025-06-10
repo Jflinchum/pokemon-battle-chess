@@ -23,6 +23,7 @@ Battle conclusion animation? Needs to be a little short and skippable for bullet
 Add Pokedex on left nav to look up full descriptions?
 Lazy loading and preloading
 Add "copy code" button in lobby if room code is available
+Redo Premove implementation
 
 Room Options
 - Preserve damage after battle
@@ -64,8 +65,6 @@ Issues:
   - Likely more. Will need to keep an eye out
 - Draft picking timer does not reset exactly to max time. It goes a little above or below it
 - Wrong music playing after skipping to current turn when catching up
-- Premoves:
-  - Occasionally clearing when it shouldn't
 - Pokemon sprites occasionally disappearing
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't
