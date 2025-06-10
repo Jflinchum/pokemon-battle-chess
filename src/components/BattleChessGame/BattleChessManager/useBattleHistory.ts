@@ -124,6 +124,7 @@ const useBattleHistory = ({
         }
 
         const currentLog = matchLog[matchLogIndex.current];
+        console.log(currentLog);
         switch (currentLog.type) {
           case "generic":
             switch (currentLog.data.event) {
@@ -202,10 +203,6 @@ const useBattleHistory = ({
                 break;
               }
               case "victory":
-                catchUpTimer = timer(
-                  timeBetweenSteps * (skipToEndOfSync ? 0 : 1),
-                );
-                await catchUpTimer.start();
                 onPokemonBattleEnd?.(currentLog.data.color);
                 matchLogIndex.current++;
                 catchUpTimer = timer(timeBetweenSteps);
@@ -257,7 +254,7 @@ const useBattleHistory = ({
 };
 
 const shouldDelayBeforeContinuing = (logType: string) => {
-  const delayLogs = ["move", "-damage", "-heal", "-forfeit", "win"];
+  const delayLogs = ["move", "-damage", "-heal", "-forfeit"];
   if (delayLogs.includes(logType)) {
     return true;
   }

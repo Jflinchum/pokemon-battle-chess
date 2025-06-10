@@ -173,17 +173,12 @@ const ChessManager = ({
     updateSelection(square);
   };
 
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-  };
-
   return (
     <div
       style={{
         display: hide ? "none" : "block",
       }}
       className="gameContainer"
-      onContextMenu={handleContextMenu}
     >
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice

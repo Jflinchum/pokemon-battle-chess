@@ -276,22 +276,22 @@ export const BattleChessGame = ({
   const onPokemonBattleOutput = useCallback(
     (parsedChunk: { args: ArgType; kwArgs: KWArgType }) => {
       setCurrentPokemonMoveHistory((curr) => [...curr, parsedChunk]);
+
+      if (parsedChunk.args[0] === "win") {
+        setBattleStarted(false);
+        setCurrentPokemonMoveHistory([]);
+
+        if (gameState.isSkippingAhead) {
+          setCurrentBattle(null);
+        } else {
+          battleTimeout.current = setTimeout(() => {
+            setCurrentBattle(null);
+          }, userState.animationSpeedPreference);
+        }
+      }
     },
-    [],
+    [userState.animationSpeedPreference, gameState.isSkippingAhead],
   );
-
-  const onPokemonBattleEnd = useCallback(() => {
-    setBattleStarted(false);
-    setCurrentPokemonMoveHistory([]);
-
-    if (gameState.isSkippingAhead) {
-      setCurrentBattle(null);
-    } else {
-      battleTimeout.current = setTimeout(() => {
-        setCurrentBattle(null);
-      }, userState.animationSpeedPreference);
-    }
-  }, [userState.animationSpeedPreference, gameState.isSkippingAhead]);
 
   const onWeatherChange = useCallback(
     (squareModifiers: SquareModifier[]) => {
@@ -319,7 +319,6 @@ export const BattleChessGame = ({
     onMove,
     onPokemonBattleStart,
     onPokemonBattleOutput,
-    onPokemonBattleEnd,
     onWeatherChange,
     onGameEnd,
     skipToEndOfSync: gameState.isSkippingAhead,
