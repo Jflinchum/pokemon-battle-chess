@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Chess, Square, Move, Color } from "chess.js";
+import { Chess, Square, Move, Color, PieceSymbol } from "chess.js";
 import ChessBoard from "./ChessBoard/ChessBoard";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
@@ -14,7 +14,6 @@ import { ArrowController } from "./ArrowController/ArrowController";
 import "./ChessManager.css";
 
 interface ChessManagerProps {
-  demoMode?: boolean;
   hide?: boolean;
   color: Color;
   chessManager: Chess;
@@ -25,10 +24,10 @@ interface ChessManagerProps {
   onMove: (san: string) => void;
   chessMoveHistory: ChessData[];
   battleSquare?: Square;
+  preMoveQueue?: { from: Square; to: Square; promotion?: PieceSymbol }[];
 }
 
 const ChessManager = ({
-  demoMode,
   hide,
   color,
   chessManager,
@@ -39,6 +38,7 @@ const ChessManager = ({
   board,
   onMove,
   chessMoveHistory,
+  preMoveQueue,
 }: ChessManagerProps) => {
   /**
    * TODO:
@@ -198,17 +198,6 @@ const ChessManager = ({
           }}
         />
       )}
-      {!demoMode && (
-        <div className="turnNotification">
-          {chessManager.turn() === color ? (
-            <strong className="highPriorityNotification">
-              Your turn to move!
-            </strong>
-          ) : (
-            <strong>Waiting for opponent...</strong>
-          )}
-        </div>
-      )}
       <div className="chessGameContainer">
         <ArrowController
           className="chessArrowController"
@@ -226,7 +215,7 @@ const ChessManager = ({
             selectedSquare={selectedSquare}
             mostRecentMove={mostRecentMove}
             battleSquare={battleSquare}
-            preMoveQueue={[]}
+            preMoveQueue={preMoveQueue}
           />
         </ArrowController>
         <PokemonChessDetailsCard

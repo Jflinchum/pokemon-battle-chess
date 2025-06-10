@@ -37,6 +37,7 @@ import {
   MatchHistory,
 } from "../../../../shared/types/game";
 import DraftPokemonManager from "../DraftPokemonManager/DraftPokemonManager";
+import { usePremoves } from "./usePremove";
 
 export const BattleChessGame = ({
   matchHistory,
@@ -108,6 +109,17 @@ export const BattleChessGame = ({
     requestSync,
   } = useSocketRequests();
 
+  const {
+    preMoveQueue,
+    setPreMoveQueue,
+    resetSimulators,
+    simulatedChessManager,
+    simulatedPokemonManager,
+    simulateMove,
+    simulatedBoard,
+    validatePremoveQueue,
+  } = usePremoves(chessManager, pokemonManager);
+
   const onBan = useCallback(
     (draftPokemonIndex: number) => {
       pokemonManager.banDraftPiece(draftPokemonIndex);
@@ -163,6 +175,26 @@ export const BattleChessGame = ({
     },
     [pokemonManager, chessManager, errorRecoveryAttempts, resetMatchHistory],
   );
+
+  const handleOnMove = (san: string) => {
+    if (chessManager.turn() !== color) {
+      const verboseChessMove = getVerboseSanChessMove(
+        san,
+        simulatedChessManager,
+      );
+      if (verboseChessMove) {
+        simulateMove(verboseChessMove);
+      }
+    } else {
+      requestChessMove(san);
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setPreMoveQueue([]);
+    resetSimulators();
+  };
 
   const onMove = useCallback(
     ({ sanMove, moveFailed }: { sanMove: string; moveFailed?: boolean }) => {
@@ -229,6 +261,12 @@ export const BattleChessGame = ({
       setCurrentPokemonBoard(
         mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
       );
+      if (validatePremoveQueue()) {
+        if (chessManager.turn() === color && preMoveQueue.length > 0) {
+          requestChessMove(preMoveQueue[0].san);
+          setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
+        }
+      }
       if (capturedPieceSquare) {
         capturePieceAudio.play();
       } else {
@@ -238,9 +276,14 @@ export const BattleChessGame = ({
     [
       capturePieceAudio,
       chessManager,
+      color,
       movePieceAudio,
       pokemonManager,
       handleError,
+      validatePremoveQueue,
+      preMoveQueue,
+      setPreMoveQueue,
+      requestChessMove,
     ],
   );
 
@@ -404,6 +447,7 @@ export const BattleChessGame = ({
       style={{
         display: catchingUp && gameState.isSkippingAhead ? "none" : "block",
       }}
+      onContextMenu={handleContextMenu}
     >
       {battleStarted && currentBattle && (
         <PokemonBattleManager
@@ -418,25 +462,36 @@ export const BattleChessGame = ({
           demoMode={demoMode}
         />
       )}
+      {!demoMode && !battleStarted && !isDrafting && (
+        <div className="turnNotification">
+          {chessManager.turn() === color ? (
+            <strong className="highPriorityNotification">
+              Your turn to move!
+            </strong>
+          ) : (
+            <strong>Waiting for opponent...</strong>
+          )}
+        </div>
+      )}
       <ChessManager
-        demoMode={demoMode}
         hide={battleStarted || isDrafting}
         color={color}
-        chessManager={chessManager}
-        pokemonManager={pokemonManager}
+        chessManager={simulatedChessManager}
+        pokemonManager={simulatedPokemonManager}
         mostRecentMove={mostRecentMove}
         currentBattle={currentBattle}
+        preMoveQueue={preMoveQueue}
         chessMoveHistory={
           currentMatchLog.filter((log) => log.type === "chess") as ChessData[]
         }
-        board={currentPokemonBoard}
+        board={simulatedBoard}
         battleSquare={battleSquare}
         onMove={(san) => {
           if (gameState.isSpectator) {
             return;
           }
 
-          requestChessMove(san);
+          handleOnMove(san);
         }}
       />
       {isDrafting && (
