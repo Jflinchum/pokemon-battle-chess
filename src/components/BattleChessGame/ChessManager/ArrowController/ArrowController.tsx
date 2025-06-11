@@ -2,7 +2,7 @@ import { Color, Square } from "chess.js";
 import { getNumberFromSquareLetter } from "../util";
 import "./ArrowControler.css";
 
-type Arrow = { from: Square; to: Square; type?: "default" | "battle" };
+export type Arrow = { from: Square; to: Square; type?: "default" | "battle" };
 
 interface ArrowControllerProps {
   children: React.ReactNode;

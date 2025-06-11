@@ -153,6 +153,33 @@ export const BattleChessGame = ({
     requestSync();
   }, [dispatch, requestSync, matchLogIndex, pokemonLogIndex]);
 
+  const arrows = useMemo(() => {
+    const finalArrows = [];
+
+    if (mostRecentMove) {
+      finalArrows.push({
+        from: mostRecentMove.from,
+        to: mostRecentMove.to,
+        type: "default" as const,
+      });
+    }
+
+    if (currentBattle) {
+      const battleChessMove = getVerboseSanChessMove(
+        currentBattle.attemptedMove.san,
+        chessManager,
+      );
+      if (battleChessMove) {
+        finalArrows.push({
+          from: battleChessMove.from,
+          to: battleChessMove.to,
+          type: "battle" as const,
+        });
+      }
+    }
+    return finalArrows;
+  }, [mostRecentMove, currentBattle, chessManager]);
+
   const handleError = useCallback(
     (err: Error) => {
       if (errorRecoveryAttempts.current < 3) {
@@ -482,12 +509,12 @@ export const BattleChessGame = ({
         </div>
       )}
       <ChessManager
+        arrows={arrows}
         hide={battleStarted || isDrafting}
         color={color}
         chessManager={simulatedChessManager}
         pokemonManager={simulatedPokemonManager}
         mostRecentMove={mostRecentMove}
-        currentBattle={currentBattle}
         preMoveQueue={preMoveQueue}
         chessMoveHistory={
           currentMatchLog.filter((log) => log.type === "chess") as ChessData[]

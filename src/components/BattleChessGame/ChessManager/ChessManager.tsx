@@ -1,16 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Chess, Square, Move, Color, PieceSymbol } from "chess.js";
 import ChessBoard from "./ChessBoard/ChessBoard";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
 import { MoveAttempt, PokemonChessBoardSquare } from "./types";
 import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromotionChoice";
-import { getVerboseChessMove, getVerboseSanChessMove } from "./util";
+import { getVerboseChessMove } from "./util";
 import { useGameState } from "../../../context/GameState/GameStateContext";
-import { CurrentBattle } from "../BattleChessManager/BattleChessManager";
 import { useDebounce } from "../../../utils";
 import { ChessData } from "../../../../shared/types/game";
-import { ArrowController } from "./ArrowController/ArrowController";
+import { Arrow, ArrowController } from "./ArrowController/ArrowController";
 import "./ChessManager.css";
 
 interface ChessManagerProps {
@@ -19,7 +18,7 @@ interface ChessManagerProps {
   chessManager: Chess;
   pokemonManager: PokemonBattleChessManager;
   mostRecentMove: { from: Square; to: Square } | null;
-  currentBattle?: CurrentBattle | null;
+  arrows: Arrow[];
   board: PokemonChessBoardSquare[][];
   onMove: (san: string) => void;
   chessMoveHistory: ChessData[];
@@ -33,7 +32,7 @@ const ChessManager = ({
   chessManager,
   pokemonManager,
   mostRecentMove,
-  currentBattle,
+  arrows,
   battleSquare,
   board,
   onMove,
@@ -74,33 +73,6 @@ const ChessManager = ({
       selectedSquareMoves.map((squareMove) => squareMove.to) as Square[],
     );
   };
-
-  const currentArrows = useMemo(() => {
-    const arrows = [];
-
-    if (mostRecentMove) {
-      arrows.push({
-        from: mostRecentMove.from,
-        to: mostRecentMove.to,
-        type: "default" as const,
-      });
-    }
-
-    if (currentBattle) {
-      const battleChessMove = getVerboseSanChessMove(
-        currentBattle.attemptedMove.san,
-        chessManager,
-      );
-      if (battleChessMove) {
-        arrows.push({
-          from: battleChessMove.from,
-          to: battleChessMove.to,
-          type: "battle" as const,
-        });
-      }
-    }
-    return arrows;
-  }, [mostRecentMove, currentBattle, chessManager]);
 
   const movePiece = ({ fromSquare, toSquare, promotion }: MoveAttempt) => {
     if (
@@ -201,7 +173,7 @@ const ChessManager = ({
       <div className="chessGameContainer">
         <ArrowController
           className="chessArrowController"
-          arrows={currentArrows}
+          arrows={arrows}
           perspective={color || "w"}
         >
           <ChessBoard
