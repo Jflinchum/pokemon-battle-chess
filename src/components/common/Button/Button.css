@@ -9,20 +9,14 @@
   color: white;
   transition: filter 0.25s;
   box-sizing: border-box;
-
-  &.danger {
-    background-color: var(--danger-red);
-  }
-  &.primary {
-    background-color: var(--success-green);
+  &:hover {
+    background-color: var(--gray-6);
   }
 
   &:active {
     outline: var(--button-outline);
   }
-  &:hover {
-    filter: brightness(130%);
-  }
+
   &:disabled {
     filter: grayscale(50%) brightness(70%);
     cursor: default;
@@ -30,5 +24,21 @@
 
   &.highlightedButton {
     border: 4px solid var(--success-green);
+  }
+
+  &.danger {
+    background-color: var(--danger-red);
+
+    &:hover {
+      background-color: var(--red-3);
+    }
+  }
+
+  &.primary {
+    background-color: var(--success-green);
+
+    &:hover {
+      background-color: var(--green-3);
+    }
   }
 }
