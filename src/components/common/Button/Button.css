@@ -19,6 +19,7 @@
 
   &:disabled {
     filter: grayscale(50%) brightness(70%);
+    background-color: var(--gray-7);
     cursor: default;
   }
 
@@ -32,6 +33,10 @@
     &:hover {
       background-color: var(--red-3);
     }
+
+    &:disabled {
+      background-color: var(--danger-red);
+    }
   }
 
   &.primary {
@@ -39,6 +44,10 @@
 
     &:hover {
       background-color: var(--green-3);
+    }
+
+    &:disabled {
+      background-color: var(--success-green);
     }
   }
 }
