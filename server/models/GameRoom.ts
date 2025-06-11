@@ -520,16 +520,19 @@ export default class GameRoom {
       if (this.chessManager.moveNumber() % 10 === 0) {
         this.squareModifierTarget = this.secretPRNG.random(10, 20);
       }
-      const numSquares = this.pokemonGameManager.createNewSquareModifiers(
+      const generatedSquares = this.pokemonGameManager.createNewSquareModifiers(
         this.squareModifierTarget,
         this.secretPRNG,
       );
-      if (numSquares && numSquares > 0) {
+      if (generatedSquares && generatedSquares.length > 0) {
         const squareModifierData: MatchLog = {
           type: "weather",
           data: {
             event: "weatherChange",
-            squareModifiers: this.pokemonGameManager.squareModifiers,
+            modifier: {
+              type: "modify",
+              squareModifiers: generatedSquares,
+            },
           },
         };
         this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
@@ -1063,15 +1066,42 @@ export default class GameRoom {
                   terrainChanges,
                 );
               }
-              const squareModifierData: MatchLog = {
-                type: "weather",
-                data: {
-                  event: "weatherChange",
-                  squareModifiers: this.pokemonGameManager.squareModifiers,
-                },
-              };
-              this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
-              this.emitGameOutput(squareModifierData);
+              const squareMod =
+                this.pokemonGameManager.getWeatherFromSquare(battleSquare);
+              if (
+                squareMod &&
+                (squareMod.modifiers.weather || squareMod.modifiers.terrain)
+              ) {
+                const squareModifierData: MatchLog = {
+                  type: "weather",
+                  data: {
+                    event: "weatherChange",
+                    modifier: {
+                      type: "modify",
+                      squareModifiers: [squareMod],
+                    },
+                  },
+                };
+                this.pushHistory(
+                  JSON.parse(JSON.stringify(squareModifierData)),
+                );
+                this.emitGameOutput(squareModifierData);
+              } else {
+                const squareModifierData: MatchLog = {
+                  type: "weather",
+                  data: {
+                    event: "weatherChange",
+                    modifier: {
+                      type: "remove",
+                      squares: [battleSquare],
+                    },
+                  },
+                };
+                this.pushHistory(
+                  JSON.parse(JSON.stringify(squareModifierData)),
+                );
+                this.emitGameOutput(squareModifierData);
+              }
 
               if (
                 (this.currentTurnWhite &&

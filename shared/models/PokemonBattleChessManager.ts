@@ -185,8 +185,10 @@ export class PokemonBattleChessManager {
   /**
    * Generates n square modifiers and pushes them onto this.squareModifiers.
    * @param numSquares Number of squares to generate
+   * @returns The new squares generated, or previously generated squares with new modifiers
    */
   private generateSquareModifiers(numSquares: number) {
+    const generatedSquares: SquareModifier[] = [];
     const xDistanceProbabilities = [
       { value: 0.5, weight: 0.4 },
       { value: 1.5, weight: 0.3 },
@@ -240,6 +242,7 @@ export class PokemonBattleChessManager {
             duration: this.prng.random(2, 5),
           };
         }
+        generatedSquares.push(currentSquareWeather);
       } else {
         const isTerrainModifier = this.prng.random() > 0.5;
         let newSquareModifier;
@@ -265,9 +268,11 @@ export class PokemonBattleChessManager {
           };
         }
         this.squareModifiers.push(newSquareModifier);
+        generatedSquares.push(newSquareModifier);
       }
       i++;
     }
+    return generatedSquares;
   }
 
   public tickSquareModifiers(square: Square) {
@@ -392,12 +397,30 @@ export class PokemonBattleChessManager {
     const numSquares = secretPrng.random(
       target - this.squareModifiers.length + 1,
     );
-    this.generateSquareModifiers(numSquares);
-    return numSquares;
+    return this.generateSquareModifiers(numSquares);
   }
 
   public setSquareModifiers(newModifiers: SquareModifier[]) {
     this.squareModifiers = newModifiers;
+  }
+
+  public updateSquareModifiers(modifiers: SquareModifier[]) {
+    modifiers.forEach((squareMod) => {
+      const updatedSquare = this.squareModifiers.find(
+        (currSquareMod) => currSquareMod.square === squareMod.square,
+      );
+      if (updatedSquare) {
+        updatedSquare.modifiers = squareMod.modifiers;
+      } else {
+        this.squareModifiers.push(squareMod);
+      }
+    });
+  }
+
+  public removeSquareModifiers(squares: Square[]) {
+    this.squareModifiers = this.squareModifiers.filter(
+      (squareMod) => !squares.includes(squareMod.square),
+    );
   }
 
   public getWeatherFromSquare(

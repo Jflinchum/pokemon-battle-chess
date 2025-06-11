@@ -338,7 +338,14 @@ export const BattleChessGame = ({
 
   const onWeatherChange = useCallback(
     (squareModifiers: SquareModifier[]) => {
-      pokemonManager.setSquareModifiers(squareModifiers);
+      pokemonManager.updateSquareModifiers(squareModifiers);
+    },
+    [pokemonManager],
+  );
+
+  const onWeatherRemove = useCallback(
+    (squares: Square[]) => {
+      pokemonManager.removeSquareModifiers(squares);
     },
     [pokemonManager],
   );
@@ -363,6 +370,7 @@ export const BattleChessGame = ({
     onPokemonBattleStart,
     onPokemonBattleOutput,
     onWeatherChange,
+    onWeatherRemove,
     onGameEnd,
     skipToEndOfSync: gameState.isSkippingAhead,
     matchLogIndex,

@@ -41,9 +41,19 @@ export type WeatherData = {
   type: "weather";
   data: {
     event: "weatherChange";
-    squareModifiers: SquareModifier[];
+    modifier: WeatherChangeModifiers;
   };
 };
+
+type WeatherChangeModifiers =
+  | {
+      type: "remove";
+      squares: Square[];
+    }
+  | {
+      type: "modify";
+      squareModifiers: SquareModifier[];
+    };
 
 export type PokemonData = {
   type: "pokemon";

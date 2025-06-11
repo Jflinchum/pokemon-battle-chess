@@ -23,7 +23,6 @@ Battle conclusion animation? Needs to be a little short and skippable for bullet
 Add Pokedex on left nav to look up full descriptions?
 Lazy loading and preloading
 Add "copy code" button in lobby if room code is available
-Redo Premove implementation
 
 Room Options
 - Preserve damage after battle
@@ -50,7 +49,6 @@ Priority:
 - (better) Error boundary
 
 Refactor TODOs:
-- Optimize weather change diff in server
 - Potentially lift game logic into new model
 - Lift weather out of pokemon manager model
 - Put API request and response types in shared folder
@@ -59,17 +57,16 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- Draft picking timer does not reset exactly to max time. It goes a little above or below it
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
   - If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render
   - Likely more. Will need to keep an eye out
-- Draft picking timer does not reset exactly to max time. It goes a little above or below it
 - Wrong music playing after skipping to current turn when catching up
 - Pokemon sprites occasionally disappearing
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't
   - Can test on mobile by turning off the screen and waiting for timeout to occur
-- OG/Twitter meta tags do not support svg
 
 Dropping features:
 - Global Chat

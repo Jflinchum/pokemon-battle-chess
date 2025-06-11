@@ -39,6 +39,7 @@ interface BattleHistoryProps {
   }) => void;
   onPokemonBattleEnd?: (victor: Color) => void;
   onWeatherChange?: (squareModifiers: SquareModifier[]) => void;
+  onWeatherRemove?: (square: Square[]) => void;
   onGameEnd: (victor: Color | "", reason: EndGameReason) => void;
   skipToEndOfSync: boolean;
   matchLogIndex: React.RefObject<number>;
@@ -67,6 +68,7 @@ const useBattleHistory = ({
   onPokemonBattleStart,
   onPokemonBattleOutput,
   onPokemonBattleEnd,
+  onWeatherRemove,
   onWeatherChange,
   onGameEnd,
   skipToEndOfSync,
@@ -213,7 +215,11 @@ const useBattleHistory = ({
           case "weather":
             switch (currentLog.data.event) {
               case "weatherChange":
-                onWeatherChange?.(currentLog.data.squareModifiers);
+                if (currentLog.data.modifier.type === "remove") {
+                  onWeatherRemove?.(currentLog.data.modifier.squares);
+                } else if (currentLog.data.modifier.type === "modify") {
+                  onWeatherChange?.(currentLog.data.modifier.squareModifiers);
+                }
                 matchLogIndex.current++;
                 break;
             }
@@ -242,6 +248,7 @@ const useBattleHistory = ({
     onPokemonBattleEnd,
     onPokemonBattleOutput,
     onPokemonBattleStart,
+    onWeatherRemove,
     onWeatherChange,
     matchLogIndex,
     pokemonLogIndex,
