@@ -67,8 +67,8 @@ export const HowToPlayScreen3 = () => {
       <b>Winning and Losing</b>
       <p>
         Check and Checkmate work a little differently in this game! If you're in
-        Check, you can still remain in Check after your next move.{" "}
-        <b>You only lose once your King piece gets taken!</b>
+        Check, you can still remain in Check after your moves.{" "}
+        <b>You only win once the opponent's King piece gets taken!</b>
       </p>
       <div className="gameDemoContainer">
         <BattleChessGame
