@@ -4,14 +4,17 @@
   border-radius: 5px;
   cursor: text;
   padding: 20px 8px 8px 8px;
-  display: flex;
-  align-items: center;
   transition: border-color, 0.25s;
+
+  .inputLabel {
+    display: flex;
+    align-items: center;
+  }
 
   &.invalidInput.focused {
     border-color: var(--red-4);
 
-    .inputLabel {
+    .inputLabelText {
       color: var(--red-2);
     }
   }
@@ -20,12 +23,12 @@
     border-color: var(--success-green);
 
     &.underline {
-      .inputLabel {
+      .inputLabelText {
         transform: translate(-10%, -90%) scale(0.75);
       }
     }
 
-    .inputLabel {
+    .inputLabelText {
       color: var(--green-2);
       transform: translate(-10%, -70%) scale(0.75);
     }
@@ -42,12 +45,12 @@
 }
 
 .underline {
-  .inputLabel {
+  .inputLabelText {
     transform: translate(0%, 0%) scale(1);
   }
 }
 
-.inputLabel {
+.inputLabelText {
   cursor: text;
   position: absolute;
   transform: translate(0%, -25%) scale(1);

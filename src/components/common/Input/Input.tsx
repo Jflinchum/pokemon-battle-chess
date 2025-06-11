@@ -36,21 +36,23 @@ const Input = ({
         inputRef.current?.focus();
       }}
     >
-      <label className="inputLabel">{label}</label>
-      <input
-        aria-invalid={`${valid === false ? "true" : "false"}`}
-        className="input"
-        onFocus={(e) => {
-          setLabelShifted(true);
-          onFocus?.(e);
-        }}
-        onBlur={(e) => {
-          setLabelShifted(false);
-          onBlur?.(e);
-        }}
-        ref={inputRef}
-        {...props}
-      />
+      <label className="inputLabel">
+        <span className="inputLabelText">{label}</span>
+        <input
+          aria-invalid={`${valid === false ? "true" : "false"}`}
+          className="input"
+          onFocus={(e) => {
+            setLabelShifted(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setLabelShifted(false);
+            onBlur?.(e);
+          }}
+          ref={inputRef}
+          {...props}
+        />
+      </label>
       {children}
     </div>
   );
