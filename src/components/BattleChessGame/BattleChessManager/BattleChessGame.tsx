@@ -9,6 +9,7 @@ import {
 import { toast } from "react-toastify";
 import { Color, Chess, Square } from "chess.js";
 import { ArgType, KWArgType } from "@pkmn/protocol";
+import { PRNG } from "@pkmn/sim";
 import { PokemonSet } from "@pkmn/data";
 import {
   PokemonBattleChessManager,
@@ -78,6 +79,10 @@ export const BattleChessGame = ({
   const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<
     { args: ArgType; kwArgs: KWArgType }[]
   >([]);
+  const prng = useMemo(
+    () => new PRNG(gameState.gameSettings.seed || "1234,1234"),
+    [gameState.gameSettings.seed],
+  );
   const errorRecoveryAttempts = useRef(0);
   // The timeout to start/end the pokemon battle when initiating one.
   const battleTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -486,6 +491,7 @@ export const BattleChessGame = ({
     >
       {battleStarted && currentBattle && (
         <PokemonBattleManager
+          prng={prng}
           p1PokemonSet={
             color === "w" ? currentBattle.p1Pokemon : currentBattle.p2Pokemon
           }

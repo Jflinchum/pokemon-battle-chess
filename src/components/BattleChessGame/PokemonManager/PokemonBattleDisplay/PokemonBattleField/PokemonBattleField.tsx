@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pokemon, TerrainName, WeatherName } from "@pkmn/client";
 import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet } from "@pkmn/data";
-import pokemonBattleBackgroundImage from "../../../../../assets/pokemonBattleBackground.png";
+import { PRNG } from "@pkmn/sim";
 import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";
 import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
 import {
@@ -11,9 +11,11 @@ import {
   WeatherId,
 } from "../../../../../../shared/types/PokemonTypes";
 import { PokemonBattleConditions } from "./PokemonBattleCondition/PokemonBattleConditions";
+import { PokemonBattleBackground } from "./PokemonBattleBackground/PokemonBattleBackground";
 import "./PokemonBattleField.css";
 
 interface PokemonBattleFieldProps {
+  prng: PRNG;
   battleHistory: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType }[];
   p1ActivePokemon: Pokemon | null;
   p2ActivePokemon: Pokemon | null;
@@ -30,6 +32,7 @@ interface PokemonBattleFieldProps {
 }
 
 const PokemonBattleField = ({
+  prng,
   p1ActivePokemon,
   p2ActivePokemon,
   weatherState,
@@ -44,12 +47,7 @@ const PokemonBattleField = ({
   };
 
   return (
-    <div
-      className="pokemonBattleBackground"
-      style={{
-        backgroundImage: `url(${pokemonBattleBackgroundImage})`,
-      }}
-    >
+    <PokemonBattleBackground prng={prng}>
       <PokemonWeatherBackground weatherType={weatherState?.id} />
       <PokemonWeatherBackground weatherType={terrainState?.id} />
       <PokemonBattleConditions
@@ -76,7 +74,7 @@ const PokemonBattleField = ({
           shouldHide={selectedSide === "p1"}
         />
       )}
-    </div>
+    </PokemonBattleBackground>
   );
 };
 

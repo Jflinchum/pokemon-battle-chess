@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { LogFormatter } from "@pkmn/view";
+import { PRNG } from "@pkmn/sim";
 import { Pokemon, TerrainName, WeatherName } from "@pkmn/client";
 import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet, SideID } from "@pkmn/data";
@@ -15,8 +18,6 @@ import {
 import { useGameState } from "../../../../context/GameState/GameStateContext";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./PokemonBattleDisplay.css";
-import { toast } from "react-toastify";
-import { LogFormatter } from "@pkmn/view";
 
 interface PokemonBattleDisplayProps {
   fullBattleLog: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType }[];
@@ -36,6 +37,7 @@ interface PokemonBattleDisplayProps {
   p2PokemonSet: PokemonSet;
   perspective: SideID;
   demoMode?: boolean;
+  prng: PRNG;
 }
 
 const PokemonBattleDisplay = ({
@@ -50,6 +52,7 @@ const PokemonBattleDisplay = ({
   p2PokemonSet,
   perspective,
   demoMode,
+  prng,
 }: PokemonBattleDisplayProps) => {
   const { gameState } = useGameState();
   const [moveChosen, setMoveChosen] = useState<string>();
@@ -73,6 +76,7 @@ const PokemonBattleDisplay = ({
     <div className="battlefieldAndLog">
       <span className="battleContainer">
         <PokemonBattleField
+          prng={prng}
           battleHistory={fullBattleLog}
           p1ActivePokemon={p1ActivePokemon}
           p2ActivePokemon={p2ActivePokemon}

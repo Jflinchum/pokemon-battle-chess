@@ -3,6 +3,7 @@ import { Dex } from "@pkmn/dex";
 import { PokemonSet, Generations, SideID } from "@pkmn/data";
 import { KWArgType } from "@pkmn/protocol";
 import { Battle, Pokemon, TerrainName, WeatherName } from "@pkmn/client";
+import { PRNG } from "@pkmn/sim";
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
 import {
   CustomArgTypes,
@@ -13,6 +14,7 @@ import { LogFormatter } from "@pkmn/view";
 import { PokemonMoveChoice } from "../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices";
 
 interface PokemonBattleManagerProps {
+  prng: PRNG;
   p1PokemonSet: PokemonSet;
   p2PokemonSet: PokemonSet;
   currentPokemonMoveHistory: { args: CustomArgTypes; kwArgs: KWArgType }[];
@@ -75,6 +77,7 @@ const getPokemonMoveChoicesFromBattle = (battle: Battle) => {
 };
 
 const PokemonBattleManager = ({
+  prng,
   p1PokemonSet,
   p2PokemonSet,
   currentPokemonMoveHistory,
@@ -146,6 +149,7 @@ const PokemonBattleManager = ({
   return (
     <PokemonBattleDisplay
       demoMode={demoMode}
+      prng={prng}
       fullBattleLog={currentPokemonMoveHistory}
       moves={moves}
       logFormatter={formatter}

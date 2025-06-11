@@ -16,7 +16,6 @@ Download/upload replay
   - Offer "Download Replay" button on Error Boundary if player was in game?
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
 Add more music and make music playlist w/ skip track button
-Add more backgrounds to cycle between
 Pokemon Cries
 Keyboard navigation and accessibility
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
