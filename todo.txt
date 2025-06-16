@@ -22,6 +22,8 @@ Battle conclusion animation? Needs to be a little short and skippable for bullet
 Add Pokedex on left nav to look up full descriptions?
 Lazy loading and preloading
 Add "copy code" button in lobby if room code is available
+Credits modal
+Changelog at bottom of main menu
 
 Room Options
 - Preserve damage after battle
@@ -39,7 +41,7 @@ Room Options
 
 Priority:
 - Better logging
-  - Use winston + prometheus + grafana?
+  - Use winston + prometheus/loki + grafana?
 - (better) How to Play
   - Add more info screens
 - More detailed modals in game
