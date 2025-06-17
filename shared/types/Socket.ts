@@ -1,7 +1,7 @@
 import { Square } from "chess.js";
-import { GameOptions, GameSettings } from "./GameOptions";
-import { Player } from "./Player";
-import { MatchLog, Timer } from "./game";
+import { GameOptions, GameSettings } from "./GameOptions.js";
+import { Player } from "./Player.js";
+import { MatchLog, Timer } from "./Game.js";
 
 export interface ServerToClientEvents {
   connectedPlayers: (players: Player[]) => void;

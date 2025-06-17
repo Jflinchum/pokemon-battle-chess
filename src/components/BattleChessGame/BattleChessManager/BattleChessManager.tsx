@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { Color, Chess } from "chess.js";
 import { PokemonSet, SideID } from "@pkmn/data";
 import PlayerInGameDisplay from "./PlayerInGameDisplay/PlayerInGameDisplay";
-import { MatchHistory, Timer } from "../../../../shared/types/game";
+import { MatchHistory, Timer } from "../../../../shared/types/Game";
 import GameManagerActions from "./GameManagerActions/GameManagerActions";
 import PlayerList from "../../RoomManager/Room/PlayerList/PlayerList";
 import { BattleChessGame } from "./BattleChessGame";

@@ -6,7 +6,7 @@ import {
   EndGameReason,
   MatchLog,
   PokemonBeginBattleData,
-} from "../../../../shared/types/game";
+} from "../../../../shared/types/Game";
 import { timer } from "../../../utils";
 import { CurrentBattle } from "./BattleChessManager";
 import { useGameState } from "../../../context/GameState/GameStateContext";

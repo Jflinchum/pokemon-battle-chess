@@ -1,7 +1,7 @@
 import { BoostsTable } from "@pkmn/data";
 import { PRNGSeed } from "@pkmn/sim";
 import { Color } from "chess.js";
-import { Player } from "./Player";
+import { Player } from "./Player.js";
 type FormatID = "random" | "draft";
 
 export interface GameOptions {

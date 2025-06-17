@@ -1,11 +1,11 @@
 import { Server } from "socket.io";
-import GameRoomManager from "../models/GameRoomManager";
-import User from "../models/User";
+import GameRoomManager from "../models/GameRoomManager.js";
+import User from "../models/User.js";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
-} from "../../shared/types/Socket";
-import { cleanString } from "../../shared/util/profanityFilter";
+} from "../../shared/types/Socket.js";
+import { cleanString } from "../../shared/util/profanityFilter.js";
 
 export const registerSocketEvents = (
   io: Server<ClientToServerEvents, ServerToClientEvents>,

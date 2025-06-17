@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "shared/util/profanityFilter.ts"]
+  "include": ["**/*.ts"]
 }

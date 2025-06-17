@@ -7,7 +7,7 @@ import PokemonMoveChoices from "../PokemonBattleDisplay/PokemonMoveChoices/Pokem
 import PokemonType from "../../../common/Pokemon/PokemonType/PokemonType";
 import ChessMoveHistory from "../../ChessManager/ChessMoveHistory/ChessMoveHistory";
 import Tooltip from "../../../common/Tooltip/Tooltip";
-import { ChessData } from "../../../../../shared/types/game";
+import { ChessData } from "../../../../../shared/types/Game";
 import { GenderIcon } from "../../../common/GenderIcon/GenderIcon";
 import { SquareModifier } from "../../../../../shared/models/PokemonBattleChessManager";
 import { PokemonWeatherBackground } from "../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";

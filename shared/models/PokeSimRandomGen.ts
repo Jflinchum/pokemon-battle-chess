@@ -2,7 +2,7 @@ import { PokemonSet } from "@pkmn/dex";
 import { Dex, Species } from "@pkmn/dex";
 import { PRNG } from "@pkmn/sim";
 import { Move, SpeciesName, TypeName } from "@pkmn/data";
-import { fastPop } from "../../src/utils";
+import { fastPop } from "../util/fastPop.js";
 
 type RandomSet = {
   level: number;

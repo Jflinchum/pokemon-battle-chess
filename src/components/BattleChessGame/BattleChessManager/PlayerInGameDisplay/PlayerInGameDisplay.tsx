@@ -4,7 +4,7 @@ import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { Player } from "../../../../../shared/types/Player";
 import TakenChessPieces from "../../ChessManager/TakenChessPieces/TakenChessPieces";
 import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessManager";
-import { Timer as TimerType } from "../../../../../shared/types/game";
+import { Timer as TimerType } from "../../../../../shared/types/Game";
 import Timer from "../../../common/Timer/Timer";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
 import "./PlayerInGameDisplay.css";

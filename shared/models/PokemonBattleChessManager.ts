@@ -2,9 +2,9 @@ import { PieceSymbol, Color, Square, SQUARES } from "chess.js";
 import { PokemonSet } from "@pkmn/data";
 import { PRNG, PRNGSeed } from "@pkmn/sim";
 import { Dex } from "@pkmn/dex";
-import { PokeSimRandomGen } from "./PokeSimRandomGen";
-import { WeatherId, TerrainId } from "../types/PokemonTypes";
-import { getWeightedRandom } from "../util/getWeightedRandom";
+import { PokeSimRandomGen } from "./PokeSimRandomGen.js";
+import { WeatherId, TerrainId } from "../types/PokemonTypes.js";
+import { getWeightedRandom } from "../util/getWeightedRandom.js";
 
 export const WeatherNames: WeatherId[] = [
   "sandstorm",

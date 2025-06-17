@@ -11,19 +11,23 @@ import { BoostID, PokemonSet } from "@pkmn/data";
 import { PRNG } from "@pkmn/sim";
 import { Protocol } from "@pkmn/protocol";
 import { ObjectReadWriteStream } from "@pkmn/streams";
-import User from "./User";
-import GameRoomManager from "./GameRoomManager";
+import User from "./User.js";
+import GameRoomManager from "./GameRoomManager.js";
 import {
   PokemonBattleChessManager,
   SquareModifier,
   TerrainNames,
   WeatherNames,
-} from "../../shared/models/PokemonBattleChessManager";
-import { EndGameReason, MatchHistory, MatchLog } from "../../shared/types/game";
-import { GameOptions } from "../../shared/types/GameOptions";
-import GameTimer from "./GameTimer";
-import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes";
-import { Player } from "../../shared/types/Player";
+} from "../../shared/models/PokemonBattleChessManager.js";
+import {
+  EndGameReason,
+  MatchHistory,
+  MatchLog,
+} from "../../shared/types/Game.js";
+import { GameOptions } from "../../shared/types/GameOptions.js";
+import GameTimer from "./GameTimer.js";
+import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes.js";
+import { Player } from "../../shared/types/Player.js";
 
 export default class GameRoom {
   public roomId: string;

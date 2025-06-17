@@ -1,4 +1,4 @@
-import { WeatherId, TerrainId } from "../../shared/types/PokemonTypes";
+import { WeatherId, TerrainId } from "../../shared/types/PokemonTypes.js";
 
 export const mapWeatherIdToName = (weatherId: WeatherId): string => {
   switch (weatherId) {

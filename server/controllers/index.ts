@@ -1,9 +1,9 @@
 import path from "path";
 import { Express } from "express";
-import User from "../models/User";
-import GameRoom from "../models/GameRoom";
-import GameRoomManager from "../models/GameRoomManager";
-import { isStringProfane } from "../../shared/util/profanityFilter";
+import User from "../models/User.js";
+import GameRoom from "../models/GameRoom.js";
+import GameRoomManager from "../models/GameRoomManager.js";
+import { isStringProfane } from "../../shared/util/profanityFilter.js";
 
 interface APIResponse<Data> {
   data?: Data;

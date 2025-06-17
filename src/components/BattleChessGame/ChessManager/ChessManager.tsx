@@ -8,7 +8,7 @@ import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromot
 import { getVerboseChessMove } from "./util";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useDebounce } from "../../../utils";
-import { ChessData } from "../../../../shared/types/game";
+import { ChessData } from "../../../../shared/types/Game";
 import { Arrow, ArrowController } from "./ArrowController/ArrowController";
 import "./ChessManager.css";
 

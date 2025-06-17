@@ -6,15 +6,15 @@ import http from "http";
 import https from "https";
 import { SecureContextOptions } from "tls";
 import fs from "fs";
-import GameRoomManager from "./models/GameRoomManager";
-import { config } from "./config";
-import { registerSocketEvents } from "./socket/socketEvents";
-import { registerRoutes } from "./controllers";
-import { registerSocketIoAdmin } from "./socket/socketIoAdmin";
+import GameRoomManager from "./models/GameRoomManager.js";
+import { config } from "./config.js";
+import { registerSocketEvents } from "./socket/socketEvents.js";
+import { registerRoutes } from "./controllers/index.js";
+import { registerSocketIoAdmin } from "./socket/socketIoAdmin.js";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
-} from "../shared/types/Socket";
+} from "../shared/types/Socket.js";
 
 const configSettings =
   process.env.NODE_ENV === "production" ? config.prodConfig : config.devConfig;

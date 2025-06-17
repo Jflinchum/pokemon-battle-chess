@@ -1,11 +1,11 @@
 import { Server, Socket } from "socket.io";
-import GameRoom from "./GameRoom";
-import User from "./User";
-import { GameOptions } from "../../shared/types/GameOptions";
+import GameRoom from "./GameRoom.js";
+import User from "./User.js";
+import { GameOptions } from "../../shared/types/GameOptions.js";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
-} from "../../shared/types/Socket";
+} from "../../shared/types/Socket.js";
 
 interface GameRoomList {
   [roomId: string]: GameRoom;

@@ -1,5 +1,5 @@
 import { Color } from "chess.js";
-import { Timer } from "../../shared/types/game";
+import { Timer } from "../../shared/types/Game.js";
 
 export default class GameTimer {
   private whitePlayerTimerExpiration: number;
