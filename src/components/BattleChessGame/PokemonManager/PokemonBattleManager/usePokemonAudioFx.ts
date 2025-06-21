@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect } from "react";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
 import damageEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-effective.wav";
 import damageNotEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-not-very-effective.wav";
@@ -33,20 +33,12 @@ export const usePokemonAudioFx = ({
 
   const audioEffects = useMemo(() => {
     const damageEffective = new Audio(damageEffectivePokemon);
-    damageEffective.volume = userState.volumePreference.pokemonBattleVolume;
     const damageNotEffective = new Audio(damageNotEffectivePokemon);
-    damageNotEffective.volume = userState.volumePreference.pokemonBattleVolume;
     const damageSuperEffective = new Audio(damageSuperEffectivePokemon);
-    damageSuperEffective.volume =
-      userState.volumePreference.pokemonBattleVolume;
     const statIncreaseEffect = new Audio(statIncreaseEffectPokemon);
-    statIncreaseEffect.volume = userState.volumePreference.pokemonBattleVolume;
     const statDecreaseEffect = new Audio(statDecreaseEffectPokemon);
-    statDecreaseEffect.volume = userState.volumePreference.pokemonBattleVolume;
     const healEffect = new Audio(healEffectPokemon);
-    healEffect.volume = userState.volumePreference.pokemonBattleVolume;
     const faintEffect = new Audio(faintEffectPokemon);
-    faintEffect.volume = userState.volumePreference.pokemonBattleVolume;
 
     const p1PokemonCryUrl = fetchPokemonCryUrl(p1PokemonSpecies);
     const p2PokemonCryUrl = fetchPokemonCryUrl(p2PokemonSpecies);
@@ -74,6 +66,23 @@ export const usePokemonAudioFx = ({
       p1PokemonCry,
       p2PokemonCry,
     };
+  }, []);
+
+  useEffect(() => {
+    audioEffects.damageEffective.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.damageNotEffective.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.damageSuperEffective.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.statIncreaseEffect.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.statDecreaseEffect.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.healEffect.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.faintEffect.volume =
+      userState.volumePreference.pokemonBattleVolume;
   }, [userState.volumePreference.pokemonBattleVolume]);
 
   const playAudio = (audio?: HTMLAudioElement) => {
