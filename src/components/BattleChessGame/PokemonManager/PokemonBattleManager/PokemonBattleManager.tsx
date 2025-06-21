@@ -69,7 +69,10 @@ const PokemonBattleManager = ({
    * https://github.com/pkmn/ps/blob/e9c53799548ca8ba182efed51449d56afbb21f03/view/README.md
    */
   const formatter = useMemo(() => new LogFormatter(perspective), [perspective]);
-  const playAudioEffect = usePokemonAudioFx();
+  const playAudioEffect = usePokemonAudioFx({
+    p1PokemonSpecies: p1PokemonSet["species"],
+    p2PokemonSpecies: p2PokemonSet["species"],
+  });
 
   useEffect(() => {
     let catchUpTimer:
@@ -167,6 +170,7 @@ const PokemonBattleManager = ({
 
 const shouldDelayBeforeContinuing = (logType: CustomArgTypes[0]) => {
   const delayLogs: CustomArgTypes[0][] = [
+    "player",
     "move",
     "-damage",
     "-heal",
