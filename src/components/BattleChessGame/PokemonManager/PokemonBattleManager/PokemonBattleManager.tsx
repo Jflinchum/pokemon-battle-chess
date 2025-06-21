@@ -13,8 +13,8 @@ import {
 } from "../../../../../shared/types/PokemonTypes";
 import { PokemonMoveChoice } from "../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
-import { timer } from "../../../../utils";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
+import { timer } from "../../../../utils";
 import { usePokemonAudioFx } from "./usePokemonAudioFx";
 
 interface PokemonBattleManagerProps {

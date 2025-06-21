@@ -1,4 +1,5 @@
 import { useMemo, useCallback, useEffect } from "react";
+import { Dex } from "@pkmn/dex";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
 import damageEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-effective.wav";
 import damageNotEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-not-very-effective.wav";
@@ -8,7 +9,6 @@ import statDecreaseEffectPokemon from "../../../../assets/pokemonAssets/audio/fx
 import healEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/heal-effect.wav";
 import faintEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/pokemon-faint.wav";
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
-import { Dex } from "@pkmn/dex";
 
 const fetchPokemonCryUrl = (pokemon?: string) => {
   if (!pokemon) {
@@ -125,7 +125,6 @@ export const usePokemonAudioFx = ({
         audioEffects.statIncreaseEffect.pause();
         playAudio(audioEffects.statDecreaseEffect);
       } else if (args[0] === "switch") {
-        console.log(args);
         if (args[1].slice(0, 2) === "p1") {
           playAudio(audioEffects.p1PokemonCry);
         } else {
