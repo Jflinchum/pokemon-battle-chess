@@ -43,7 +43,6 @@ interface BattleHistoryProps {
   onGameEnd: (victor: Color | "", reason: EndGameReason) => void;
   skipToEndOfSync: boolean;
   matchLogIndex: React.RefObject<number>;
-  pokemonLogIndex: React.RefObject<number>;
 }
 
 /**
@@ -73,7 +72,6 @@ const useBattleHistory = ({
   onGameEnd,
   skipToEndOfSync,
   matchLogIndex,
-  pokemonLogIndex,
 }: BattleHistoryProps) => {
   const { userState } = useUserState();
   const { gameState, dispatch } = useGameState();
@@ -127,6 +125,16 @@ const useBattleHistory = ({
 
         const currentLog = matchLog[matchLogIndex.current];
         console.log(currentLog);
+
+        /**
+         * Hold off on processing chess moves while a battle is still
+         * in progress so that battle animations can continue playing out.
+         * Current Battle gets reset from PokemonBattleManager
+         */
+        if (currentBattle && currentLog.type === "chess") {
+          break;
+        }
+
         switch (currentLog.type) {
           case "generic":
             switch (currentLog.data.event) {
@@ -169,7 +177,6 @@ const useBattleHistory = ({
           case "pokemon":
             switch (currentLog.data.event) {
               case "battleStart":
-                pokemonLogIndex.current = 0;
                 onPokemonBattleStart(
                   currentLog.data.p1Pokemon,
                   currentLog.data.p2Pokemon,
@@ -184,23 +191,9 @@ const useBattleHistory = ({
                 const currentPokemonLog = [];
                 for (const { args, kwArgs } of parsedChunk) {
                   currentPokemonLog.push({ args, kwArgs });
-                }
-
-                while (pokemonLogIndex.current < currentPokemonLog.length) {
-                  const { args, kwArgs } =
-                    currentPokemonLog[pokemonLogIndex.current];
                   onPokemonBattleOutput({ args, kwArgs });
-
-                  pokemonLogIndex.current++;
-                  if (shouldDelayBeforeContinuing(args[0])) {
-                    catchUpTimer = timer(
-                      timeBetweenSteps * (skipToEndOfSync ? 0 : 1),
-                    );
-                    await catchUpTimer.start();
-                  }
                 }
 
-                pokemonLogIndex.current = 0;
                 matchLogIndex.current++;
                 break;
               }
@@ -226,7 +219,9 @@ const useBattleHistory = ({
         }
       }
 
-      setCatchingUp(false);
+      if (matchLogIndex.current === matchLog.length) {
+        setCatchingUp(false);
+      }
     };
 
     catchUpToCurrentState();
@@ -251,21 +246,12 @@ const useBattleHistory = ({
     onWeatherRemove,
     onWeatherChange,
     matchLogIndex,
-    pokemonLogIndex,
   ]);
 
   return {
     catchingUp,
     currentMatchLog: matchLog.slice(0, matchLogIndex.current),
   };
-};
-
-const shouldDelayBeforeContinuing = (logType: string) => {
-  const delayLogs = ["move", "-damage", "-heal", "-forfeit"];
-  if (delayLogs.includes(logType)) {
-    return true;
-  }
-  return false;
 };
 
 export default useBattleHistory;

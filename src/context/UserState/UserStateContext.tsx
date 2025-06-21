@@ -14,6 +14,7 @@ import { ChatMessage } from "../../components/RoomManager/Chat/ChatDisplay/ChatD
 
 export interface VolumePreference {
   pieceVolume: number;
+  pokemonBattleVolume: number;
   musicVolume: number;
 }
 
