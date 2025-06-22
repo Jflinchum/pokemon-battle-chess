@@ -8,6 +8,12 @@ import statIncreaseEffectPokemon from "../../../../assets/pokemonAssets/audio/fx
 import statDecreaseEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/stat-decrease.mp3";
 import healEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/heal-effect.wav";
 import faintEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/pokemon-faint.wav";
+import statusBurnPokemon from "../../../../assets/pokemonAssets/audio/fx/status-burn.mp3";
+import statusConfusePokemon from "../../../../assets/pokemonAssets/audio/fx/status-confuse.mp3";
+import statusFrozenPokemon from "../../../../assets/pokemonAssets/audio/fx/status-frozen.mp3";
+import statusParaPokemon from "../../../../assets/pokemonAssets/audio/fx/status-para.mp3";
+import statusPoisonPokemon from "../../../../assets/pokemonAssets/audio/fx/status-poison.mp3";
+import statusSleepPokemon from "../../../../assets/pokemonAssets/audio/fx/status-sleep.mp3";
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 
 const fetchPokemonCryUrl = (pokemon?: string) => {
@@ -39,6 +45,12 @@ export const usePokemonAudioFx = ({
     const statDecreaseEffect = new Audio(statDecreaseEffectPokemon);
     const healEffect = new Audio(healEffectPokemon);
     const faintEffect = new Audio(faintEffectPokemon);
+    const statusBurn = new Audio(statusBurnPokemon);
+    const statusConfuse = new Audio(statusConfusePokemon);
+    const statusFrozen = new Audio(statusFrozenPokemon);
+    const statusPara = new Audio(statusParaPokemon);
+    const statusPoison = new Audio(statusPoisonPokemon);
+    const statusSleep = new Audio(statusSleepPokemon);
 
     const p1PokemonCryUrl = fetchPokemonCryUrl(p1PokemonSpecies);
     const p2PokemonCryUrl = fetchPokemonCryUrl(p2PokemonSpecies);
@@ -65,6 +77,12 @@ export const usePokemonAudioFx = ({
       faintEffect,
       p1PokemonCry,
       p2PokemonCry,
+      statusBurn,
+      statusConfuse,
+      statusFrozen,
+      statusPara,
+      statusPoison,
+      statusSleep,
     };
   }, []);
 
@@ -83,6 +101,18 @@ export const usePokemonAudioFx = ({
       userState.volumePreference.pokemonBattleVolume;
     audioEffects.faintEffect.volume =
       userState.volumePreference.pokemonBattleVolume;
+    audioEffects.statusBurn.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.statusConfuse.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.statusFrozen.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.statusPara.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.statusPoison.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.statusSleep.volume =
+      userState.volumePreference.pokemonBattleVolume;
   }, [userState.volumePreference.pokemonBattleVolume]);
 
   const playAudio = (audio?: HTMLAudioElement) => {
@@ -95,41 +125,93 @@ export const usePokemonAudioFx = ({
 
   const playAudioEffect = useCallback(
     (args: CustomArgTypes, previousArgs: CustomArgTypes | undefined) => {
-      if (args[0] === "-heal") {
-        playAudio(audioEffects.healEffect);
-      } else if (args[0] === "-damage") {
-        if (previousArgs?.[0] === "-resisted") {
-          playAudio(audioEffects.damageNotEffective);
-        } else if (previousArgs?.[0] === "-supereffective") {
-          playAudio(audioEffects.damageSuperEffective);
-        } else {
-          playAudio(audioEffects.damageEffective);
-        }
-      } else if (args[0] === "-forfeit" || args[0] === "faint") {
-        if (args[1].slice(0, 2) === "p1") {
-          playAudio(audioEffects.p1PokemonCry);
-        } else {
-          playAudio(audioEffects.p2PokemonCry);
-        }
-        playAudio(audioEffects.faintEffect);
-      } else if (
-        args[0] === "-boost" ||
-        (args[0] === "-setboost" && parseInt(args[3]) > 0)
-      ) {
-        audioEffects.statDecreaseEffect.pause();
-        playAudio(audioEffects.statIncreaseEffect);
-      } else if (
-        args[0] === "-unboost" ||
-        (args[0] === "-setboost" && parseInt(args[3]) < 0)
-      ) {
-        audioEffects.statIncreaseEffect.pause();
-        playAudio(audioEffects.statDecreaseEffect);
-      } else if (args[0] === "switch") {
-        if (args[1].slice(0, 2) === "p1") {
-          playAudio(audioEffects.p1PokemonCry);
-        } else {
-          playAudio(audioEffects.p2PokemonCry);
-        }
+      switch (args[0]) {
+        case "-heal":
+          playAudio(audioEffects.healEffect);
+          break;
+        case "-damage":
+          switch (previousArgs?.[0]) {
+            case "-resisted":
+              playAudio(audioEffects.damageNotEffective);
+              break;
+            case "-supereffective":
+              playAudio(audioEffects.damageSuperEffective);
+              break;
+            default:
+              playAudio(audioEffects.damageEffective);
+          }
+          console.log(args);
+          if (args[2].includes("tox") || args[2].includes("psn")) {
+            playAudio(audioEffects.statusPoison);
+          } else if (args[2].includes("burn")) {
+            playAudio(audioEffects.statusBurn);
+          }
+          break;
+        case "-forfeit":
+        case "faint":
+          if (args[1].slice(0, 2) === "p1") {
+            playAudio(audioEffects.p1PokemonCry);
+          } else {
+            playAudio(audioEffects.p2PokemonCry);
+          }
+          playAudio(audioEffects.faintEffect);
+          break;
+        case "-boost":
+          audioEffects.statDecreaseEffect.pause();
+          playAudio(audioEffects.statIncreaseEffect);
+          break;
+        case "-setboost":
+          if (parseInt(args[3]) > 0) {
+            audioEffects.statDecreaseEffect.pause();
+            playAudio(audioEffects.statIncreaseEffect);
+          } else if (parseInt(args[3]) < 0) {
+            audioEffects.statIncreaseEffect.pause();
+            playAudio(audioEffects.statDecreaseEffect);
+          }
+          break;
+        case "-unboost":
+          audioEffects.statIncreaseEffect.pause();
+          playAudio(audioEffects.statDecreaseEffect);
+          break;
+        case "switch":
+          if (args[1].slice(0, 2) === "p1") {
+            playAudio(audioEffects.p1PokemonCry);
+          } else {
+            playAudio(audioEffects.p2PokemonCry);
+          }
+          break;
+        case "-status":
+          switch (args[2]) {
+            case "brn":
+              playAudio(audioEffects.statusBurn);
+              break;
+            case "frz":
+              playAudio(audioEffects.statusFrozen);
+              break;
+            case "par":
+              playAudio(audioEffects.statusPara);
+              break;
+            case "psn":
+            case "tox":
+              playAudio(audioEffects.statusPoison);
+              break;
+            case "slp":
+              playAudio(audioEffects.statusSleep);
+              break;
+          }
+          break;
+        case "-start":
+          if (args[2] === "confusion") {
+            playAudio(audioEffects.statusConfuse);
+          }
+          break;
+        case "cant":
+          if (args[2] === "par") {
+            playAudio(audioEffects.statusPara);
+          } else if (args[2] === "frz") {
+            playAudio(audioEffects.statusFrozen);
+          }
+          break;
       }
     },
     [audioEffects],

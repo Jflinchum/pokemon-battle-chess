@@ -23,6 +23,7 @@ Lazy loading and preloading
 Add "copy code" button in lobby if room code is available
 Credits modal
 Changelog at bottom of main menu
+Dev tool to fetch seed in case of encountering bug or issue
 
 Room Options
 - Preserve damage after battle
@@ -57,6 +58,7 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- Some pokemon can generate with only status moves (full support) (meowstic)
 - Draft picking timer does not reset exactly to max time. It goes a little above or below it
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
