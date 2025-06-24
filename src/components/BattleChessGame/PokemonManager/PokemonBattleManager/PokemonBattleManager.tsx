@@ -70,8 +70,10 @@ const PokemonBattleManager = ({
    */
   const formatter = useMemo(() => new LogFormatter(perspective), [perspective]);
   const playAudioEffect = usePokemonAudioFx({
-    p1PokemonSpecies: p1PokemonSet["species"],
-    p2PokemonSpecies: p2PokemonSet["species"],
+    p1PokemonSpecies:
+      perspective === "p1" ? p1PokemonSet["species"] : p2PokemonSet["species"],
+    p2PokemonSpecies:
+      perspective === "p1" ? p2PokemonSet["species"] : p1PokemonSet["species"],
   });
 
   useEffect(() => {
@@ -172,14 +174,14 @@ const shouldDelayBeforeContinuing = (logType: CustomArgTypes[0]) => {
   const delayLogs: CustomArgTypes[0][] = [
     "player",
     "move",
+    "faint",
+    "switch",
     "-damage",
     "-heal",
     "-forfeit",
-    "faint",
     "-boost",
     "-unboost",
     "-setboost",
-    "switch",
     "-weather",
   ];
   if (delayLogs.includes(logType)) {

@@ -119,7 +119,7 @@ const PokemonFieldSprite = ({
         </div>
 
         <PokemonSprite
-          className={`pokemonSprite ${side}PokemonSprite`}
+          className={`pokemonSprite ${side}PokemonSprite ${pokemon.status}`}
           isSubstitute={!!pokemon.volatiles["substitute"]}
           side={side}
           pokemonIdentifier={pokemon.speciesForme}

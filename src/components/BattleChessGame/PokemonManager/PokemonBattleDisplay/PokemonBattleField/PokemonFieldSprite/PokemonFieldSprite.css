@@ -141,6 +141,23 @@
   margin: auto;
   width: auto;
   height: auto;
+
+  &.brn {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px red);
+  }
+  &.frz {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px lightblue);
+  }
+  &.par {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px yellow);
+  }
+  &.tox,
+  &.psn {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px purple);
+  }
+  &.slp {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px blue);
+  }
 }
 
 .pokemonTooltipTyping {
