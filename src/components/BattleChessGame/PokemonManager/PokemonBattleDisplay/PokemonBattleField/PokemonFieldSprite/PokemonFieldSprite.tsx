@@ -118,15 +118,25 @@ const PokemonFieldSprite = ({
           </div>
         </div>
 
-        <PokemonSprite
-          className={`pokemonSprite ${side}PokemonSprite ${pokemon.status}`}
-          isSubstitute={!!pokemon.volatiles["substitute"]}
-          side={side}
-          pokemonIdentifier={pokemon.speciesForme}
-          gender={pokemon.gender as GenderName}
-          shiny={pokemon.shiny}
-          onClick={onClick}
-        />
+        <div className="pokemonSpriteContainer">
+          <PokemonSprite
+            className={`pokemonSprite ${side}PokemonSprite ${pokemon.status || ""}`}
+            isSubstitute={!!pokemon.volatiles["substitute"]}
+            side={side}
+            pokemonIdentifier={pokemon.speciesForme}
+            gender={pokemon.gender as GenderName}
+            shiny={pokemon.shiny}
+            onClick={onClick}
+          />
+          <PokemonSprite
+            className={`pokemonShadow`}
+            isSubstitute={!!pokemon.volatiles["substitute"]}
+            side={side}
+            pokemonIdentifier={pokemon.speciesForme}
+            gender={pokemon.gender as GenderName}
+            shiny={pokemon.shiny}
+          />
+        </div>
       </div>
       <PokemonTooltip
         side={side}
