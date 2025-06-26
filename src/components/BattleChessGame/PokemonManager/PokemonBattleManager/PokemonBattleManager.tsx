@@ -183,6 +183,7 @@ const shouldDelayBeforeContinuing = (logType: CustomArgTypes[0]) => {
     "-unboost",
     "-setboost",
     "-weather",
+    "-activate",
   ];
   if (delayLogs.includes(logType)) {
     return true;

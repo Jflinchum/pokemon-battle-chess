@@ -62,6 +62,7 @@ Issues:
 - Draft picking timer does not reset exactly to max time. It goes a little above or below it
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
+  - Revelation Dance
   - If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render
   - Likely more. Will need to keep an eye out
 - Wrong music playing after skipping to current turn when catching up

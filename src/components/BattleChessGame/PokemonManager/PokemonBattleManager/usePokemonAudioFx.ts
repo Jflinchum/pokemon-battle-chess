@@ -201,6 +201,7 @@ export const usePokemonAudioFx = ({
           }
           break;
         case "-start":
+        case "-activate":
           if (args[2] === "confusion") {
             playAudio(audioEffects.statusConfuse);
           }
