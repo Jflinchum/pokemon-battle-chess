@@ -14,7 +14,10 @@ import statusFrozenPokemon from "../../../../assets/pokemonAssets/audio/fx/statu
 import statusParaPokemon from "../../../../assets/pokemonAssets/audio/fx/status-para.mp3";
 import statusPoisonPokemon from "../../../../assets/pokemonAssets/audio/fx/status-poison.mp3";
 import statusSleepPokemon from "../../../../assets/pokemonAssets/audio/fx/status-sleep.mp3";
+import eatBerryPokemon from "../../../../assets/pokemonAssets/audio/fx/berry-eat.mp3";
+import activateItemPokemon from "../../../../assets/pokemonAssets/audio/fx/item-activate.mp3";
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
+import { BattleArgsKWArgsTypes } from "@pkmn/protocol";
 
 const fetchPokemonCryUrl = (pokemon?: string) => {
   if (!pokemon) {
@@ -51,6 +54,8 @@ export const usePokemonAudioFx = ({
     const statusPara = new Audio(statusParaPokemon);
     const statusPoison = new Audio(statusPoisonPokemon);
     const statusSleep = new Audio(statusSleepPokemon);
+    const eatBerry = new Audio(eatBerryPokemon);
+    const activateItem = new Audio(activateItemPokemon);
 
     const p1PokemonCryUrl = fetchPokemonCryUrl(p1PokemonSpecies);
     const p2PokemonCryUrl = fetchPokemonCryUrl(p2PokemonSpecies);
@@ -83,6 +88,8 @@ export const usePokemonAudioFx = ({
       statusPara,
       statusPoison,
       statusSleep,
+      eatBerry,
+      activateItem,
     };
   }, []);
 
@@ -113,6 +120,10 @@ export const usePokemonAudioFx = ({
       userState.volumePreference.pokemonBattleVolume;
     audioEffects.statusSleep.volume =
       userState.volumePreference.pokemonBattleVolume;
+    audioEffects.eatBerry.volume =
+      userState.volumePreference.pokemonBattleVolume;
+    audioEffects.activateItem.volume =
+      userState.volumePreference.pokemonBattleVolume;
   }, [userState.volumePreference.pokemonBattleVolume]);
 
   const playAudio = (audio?: HTMLAudioElement) => {
@@ -124,7 +135,10 @@ export const usePokemonAudioFx = ({
   };
 
   const playAudioEffect = useCallback(
-    (args: CustomArgTypes, previousArgs: CustomArgTypes | undefined) => {
+    (
+      { args, kwArgs }: { args: CustomArgTypes; kwArgs: BattleArgsKWArgsTypes },
+      { args: previousArgs }: { args: CustomArgTypes | undefined },
+    ) => {
       switch (args[0]) {
         case "-heal":
           playAudio(audioEffects.healEffect);
@@ -140,7 +154,6 @@ export const usePokemonAudioFx = ({
             default:
               playAudio(audioEffects.damageEffective);
           }
-          console.log(args);
           if (args[2].includes("tox") || args[2].includes("psn")) {
             playAudio(audioEffects.statusPoison);
           } else if (args[2].includes("burn")) {
@@ -211,6 +224,13 @@ export const usePokemonAudioFx = ({
             playAudio(audioEffects.statusPara);
           } else if (args[2] === "frz") {
             playAudio(audioEffects.statusFrozen);
+          }
+          break;
+        case "-enditem":
+          if (kwArgs.eat) {
+            playAudio(audioEffects.eatBerry);
+          } else {
+            playAudio(audioEffects.activateItem);
           }
           break;
       }

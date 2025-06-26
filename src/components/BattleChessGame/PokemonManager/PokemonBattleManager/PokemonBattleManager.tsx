@@ -122,7 +122,7 @@ const PokemonBattleManager = ({
         currentPokemonMoveHistoryIndex.current++;
 
         if (!gameState.isSkippingAhead) {
-          playAudioEffect(args, previousArgs);
+          playAudioEffect({ args, kwArgs }, { args: previousArgs });
           if (shouldDelayBeforeContinuing(args[0])) {
             catchUpTimer = timer(timeBetweenSteps * (skipToEndOfSync ? 0 : 1));
             await catchUpTimer.start();
@@ -184,6 +184,7 @@ const shouldDelayBeforeContinuing = (logType: CustomArgTypes[0]) => {
     "-setboost",
     "-weather",
     "-activate",
+    "-enditem",
   ];
   if (delayLogs.includes(logType)) {
     return true;
