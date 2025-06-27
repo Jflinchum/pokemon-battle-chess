@@ -34,7 +34,6 @@ export const HowToPlayScreen2 = () => {
   );
 
   const matchLogIndex = useRef(0);
-  const pokemonLogIndex = useRef(0);
 
   const [currentMatchHistory, setCurrentMatchHistory] = useState<MatchHistory>(
     [],
@@ -61,7 +60,6 @@ export const HowToPlayScreen2 = () => {
     if (currentMatchHistory.length === 0) {
       chessManager.reset();
       pokemonManager.reset();
-      pokemonLogIndex.current = 0;
       matchLogIndex.current = 0;
     }
   }, [currentMatchHistory.length, chessManager, pokemonManager]);
@@ -83,7 +81,6 @@ export const HowToPlayScreen2 = () => {
           chessManager={chessManager}
           matchHistory={currentMatchHistory}
           matchLogIndex={matchLogIndex}
-          pokemonLogIndex={pokemonLogIndex}
         />
       </div>
     </>

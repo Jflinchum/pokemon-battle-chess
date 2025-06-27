@@ -21,6 +21,13 @@
   }
 }
 
+.pokemonShadow {
+  position: absolute;
+  filter: brightness(0) blur(1px);
+  z-index: var(--pokemon-battle-sprite-shadow);
+  transform: translate(-130%, 45%) skew(80deg) scaleY(10%);
+}
+
 .p1Pokemon {
   display: flex;
   flex-direction: column;
@@ -116,7 +123,7 @@
   gap: 2px;
   width: 150px;
 
-  .boost {
+  .effects {
     font-size: 10px;
     line-height: 12px;
     height: 12px;
@@ -129,18 +136,40 @@
       background-color: lightgreen;
     }
     &.negative {
-      color: red;
-      border: 1px solid red;
+      color: var(--red-5);
+      border: 1px solid var(--red-5);
       border-radius: 4px;
-      background-color: pink;
+      background-color: var(--red-1);
     }
   }
 }
 
-.pokemonSprite {
+.pokemonSpriteContainer {
   margin: auto;
+}
+
+.pokemonSprite {
+  position: relative;
   width: auto;
   height: auto;
+  z-index: var(--pokemon-battle-sprite);
+
+  &.brn {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px red);
+  }
+  &.frz {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px lightblue);
+  }
+  &.par {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px yellow);
+  }
+  &.tox,
+  &.psn {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px purple);
+  }
+  &.slp {
+    filter: opacity(0.8) drop-shadow(0px 0px 1px blue);
+  }
 }
 
 .pokemonTooltipTyping {

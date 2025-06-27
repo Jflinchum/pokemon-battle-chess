@@ -5,6 +5,7 @@ import {
   useUserState,
 } from "../../../../../../context/UserState/UserStateContext";
 import movePieceMP3 from "../../../../../../assets/chessAssets/audio/movePiece.mp3";
+import damageEffectivePokemon from "../../../../../../assets/pokemonAssets/audio/fx/damage-effective.wav";
 
 export const SoundSettings = () => {
   const { userState, dispatch } = useUserState();
@@ -13,10 +14,23 @@ export const SoundSettings = () => {
     return movePieceAudio;
   }, []);
 
+  const damageEffectAudio = useMemo(() => {
+    const damageEffectAudio = new Audio(damageEffectivePokemon);
+    return damageEffectAudio;
+  }, []);
+
   const handleVolumeChange = (volumePreference: Partial<VolumePreference>) => {
     if (volumePreference.pieceVolume) {
+      movePieceAudio.pause();
+      movePieceAudio.currentTime = 0;
       movePieceAudio.volume = volumePreference.pieceVolume;
       movePieceAudio.play();
+    }
+    if (volumePreference.pokemonBattleVolume) {
+      damageEffectAudio.pause();
+      damageEffectAudio.currentTime = 0;
+      damageEffectAudio.volume = volumePreference.pokemonBattleVolume;
+      damageEffectAudio.play();
     }
     dispatch({ type: "SET_VOLUME_PREFERENCE", payload: volumePreference });
   };
@@ -42,6 +56,17 @@ export const SoundSettings = () => {
             onVolumeUpdate={(volume) =>
               handleVolumeChange({
                 pieceVolume: parseFloat((volume / 100).toFixed(2)),
+              })
+            }
+          />
+        </li>
+        <li>
+          <label>Pokemon Sound Effects</label>
+          <VolumeSlider
+            initialVolume={userState.volumePreference.pokemonBattleVolume * 100}
+            onVolumeUpdate={(volume) =>
+              handleVolumeChange({
+                pokemonBattleVolume: parseFloat((volume / 100).toFixed(2)),
               })
             }
           />

@@ -48,6 +48,16 @@ const boostToLabel: Record<BoostID, string> = {
   accuracy: "Acc",
 };
 
+const volatileToLabelMap: Record<
+  string,
+  { label: string; benefit: "positive" | "negative" }
+> = {
+  confusion: {
+    label: "Confused",
+    benefit: "negative",
+  },
+};
+
 const PokemonTooltip = ({
   pokemon,
   side,
@@ -104,11 +114,21 @@ const PokemonFieldSprite = ({
           </div>
           <div className="pokemonStatus">
             <PokemonStatus status={pokemon.status} />
+            {Object.keys(pokemon.volatiles).map((volatile, index) =>
+              volatileToLabelMap[volatile] ? (
+                <span
+                  key={index}
+                  className={`effects ${volatileToLabelMap[volatile].benefit}`}
+                >
+                  {volatileToLabelMap[volatile].label}
+                </span>
+              ) : null,
+            )}
             {Object.keys(pokemon.boosts).map((boost, index) =>
               pokemon.boosts[boost as BoostID] ? (
                 <span
                   key={index}
-                  className={`boost ${(pokemon.boosts[boost as BoostID] || 0) > 0 ? "positive" : "negative"}`}
+                  className={`effects ${(pokemon.boosts[boost as BoostID] || 0) > 0 ? "positive" : "negative"}`}
                 >
                   {mapBoostStageToMultiplier(pokemon.boosts[boost as BoostID])}{" "}
                   x {boostToLabel[boost as BoostID]}
@@ -118,15 +138,25 @@ const PokemonFieldSprite = ({
           </div>
         </div>
 
-        <PokemonSprite
-          className={`pokemonSprite ${side}PokemonSprite`}
-          isSubstitute={!!pokemon.volatiles["substitute"]}
-          side={side}
-          pokemonIdentifier={pokemon.speciesForme}
-          gender={pokemon.gender as GenderName}
-          shiny={pokemon.shiny}
-          onClick={onClick}
-        />
+        <div className="pokemonSpriteContainer">
+          <PokemonSprite
+            className={`pokemonSprite ${side}PokemonSprite ${pokemon.status || ""}`}
+            isSubstitute={!!pokemon.volatiles["substitute"]}
+            side={side}
+            pokemonIdentifier={pokemon.speciesForme}
+            gender={pokemon.gender as GenderName}
+            shiny={pokemon.shiny}
+            onClick={onClick}
+          />
+          <PokemonSprite
+            className={`pokemonShadow`}
+            isSubstitute={!!pokemon.volatiles["substitute"]}
+            side={side}
+            pokemonIdentifier={pokemon.speciesForme}
+            gender={pokemon.gender as GenderName}
+            shiny={pokemon.shiny}
+          />
+        </div>
       </div>
       <PokemonTooltip
         side={side}

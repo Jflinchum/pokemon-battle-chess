@@ -15,7 +15,6 @@ export const HowToPlayScreen1 = () => {
   );
   const chessManager = useMemo(() => new Chess(), []);
   const matchLogIndex = useRef(0);
-  const pokemonLogIndex = useRef(0);
 
   const matchGenerator = useMemo(() => getExampleMatchHistoryGenerator(), []);
 
@@ -44,7 +43,6 @@ export const HowToPlayScreen1 = () => {
     if (currentMatchHistory.length === 0) {
       chessManager.reset();
       pokemonManager.reset();
-      pokemonLogIndex.current = 0;
       matchLogIndex.current = 0;
     }
   }, [currentMatchHistory, chessManager, pokemonManager]);
@@ -66,7 +64,6 @@ export const HowToPlayScreen1 = () => {
           chessManager={chessManager}
           matchHistory={currentMatchHistory}
           matchLogIndex={matchLogIndex}
-          pokemonLogIndex={pokemonLogIndex}
         />
       </div>
     </>

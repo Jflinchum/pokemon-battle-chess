@@ -94,6 +94,7 @@ export const setAnimationSpeedPreference = (
 export const getVolumePreference = () => {
   const defaultVolumePreferences: VolumePreference = {
     pieceVolume: 0.25,
+    pokemonBattleVolume: 0.25,
     musicVolume: 0.25,
   };
   const volumePreference = localStorage.getItem("volumePreference");

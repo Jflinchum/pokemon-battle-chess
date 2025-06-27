@@ -47,7 +47,6 @@ export const BattleChessGame = ({
   demoMode,
   color,
   matchLogIndex,
-  pokemonLogIndex,
   draftMode,
 }: {
   matchHistory?: MatchHistory;
@@ -57,7 +56,6 @@ export const BattleChessGame = ({
   draftMode?: boolean;
   color: Color;
   matchLogIndex: RefObject<number>;
-  pokemonLogIndex: RefObject<number>;
 }) => {
   const { userState } = useUserState();
   const { dispatch: modalStateDispatch } = useModalState();
@@ -153,10 +151,9 @@ export const BattleChessGame = ({
 
   const resetMatchHistory = useCallback(() => {
     matchLogIndex.current = 0;
-    pokemonLogIndex.current = 0;
     dispatch({ type: "SET_SKIPPING_AHEAD", payload: true });
     requestSync();
-  }, [dispatch, requestSync, matchLogIndex, pokemonLogIndex]);
+  }, [dispatch, requestSync, matchLogIndex]);
 
   const arrows = useMemo(() => {
     const finalArrows = [];
@@ -351,21 +348,8 @@ export const BattleChessGame = ({
   const onPokemonBattleOutput = useCallback(
     (parsedChunk: { args: ArgType; kwArgs: KWArgType }) => {
       setCurrentPokemonMoveHistory((curr) => [...curr, parsedChunk]);
-
-      if (parsedChunk.args[0] === "win") {
-        setBattleStarted(false);
-        setCurrentPokemonMoveHistory([]);
-
-        if (gameState.isSkippingAhead) {
-          setCurrentBattle(null);
-        } else {
-          battleTimeout.current = setTimeout(() => {
-            setCurrentBattle(null);
-          }, userState.animationSpeedPreference);
-        }
-      }
     },
-    [userState.animationSpeedPreference, gameState.isSkippingAhead],
+    [],
   );
 
   const onWeatherChange = useCallback(
@@ -406,7 +390,6 @@ export const BattleChessGame = ({
     onGameEnd,
     skipToEndOfSync: gameState.isSkippingAhead,
     matchLogIndex,
-    pokemonLogIndex,
   });
 
   useEffect(() => {
@@ -483,84 +466,98 @@ export const BattleChessGame = ({
   ]);
 
   return (
-    <div
-      style={{
-        display: catchingUp && gameState.isSkippingAhead ? "none" : "block",
-      }}
-      onContextMenu={handleContextMenu}
-    >
-      {battleStarted && currentBattle && (
-        <PokemonBattleManager
-          prng={prng}
-          p1PokemonSet={
-            color === "w" ? currentBattle.p1Pokemon : currentBattle.p2Pokemon
-          }
-          p2PokemonSet={
-            color === "w" ? currentBattle.p2Pokemon : currentBattle.p1Pokemon
-          }
-          currentPokemonMoveHistory={currentPokemonMoveHistory}
-          perspective={color === "w" ? "p1" : "p2"}
-          demoMode={demoMode}
-        />
-      )}
-      {!demoMode && !battleStarted && !isDrafting && (
-        <div className="turnNotification">
-          {chessManager.turn() === color ? (
-            <strong className="highPriorityNotification">
-              Your turn to move!
-            </strong>
-          ) : (
-            <strong>Waiting for opponent...</strong>
-          )}
-        </div>
-      )}
-      <ChessManager
-        arrows={arrows}
-        hide={battleStarted || isDrafting}
-        color={color}
-        chessManager={simulatedChessManager}
-        pokemonManager={simulatedPokemonManager}
-        mostRecentMove={mostRecentMove}
-        preMoveQueue={preMoveQueue}
-        chessMoveHistory={
-          currentMatchLog.filter((log) => log.type === "chess") as ChessData[]
-        }
-        board={simulatedBoard}
-        battleSquare={battleSquare}
-        onMove={(san) => {
-          if (gameState.isSpectator) {
-            return;
-          }
-
-          handleOnMove(san);
+    <>
+      <div
+        style={{
+          display: gameState.isSkippingAhead ? "none" : "block",
         }}
-      />
-      {isDrafting && (
-        <DraftPokemonManager
-          draftTurnPick={draftTurnPick}
-          chessManager={chessManager}
-          pokemonManager={pokemonManager}
-          boardState={currentPokemonBoard}
-          onDraftPokemon={(sq, pkmnIndex) => {
-            if (validateDraftPick(sq, color!)) {
-              requestDraftPokemon(sq, pkmnIndex);
-              setIsDrafting(!!pokemonManager.draftPieces.length);
+        onContextMenu={handleContextMenu}
+      >
+        {battleStarted && currentBattle && (
+          <PokemonBattleManager
+            prng={prng}
+            p1PokemonSet={
+              color === "w" ? currentBattle.p1Pokemon : currentBattle.p2Pokemon
             }
-          }}
-          onBanPokemon={(pkmnIndex) => {
+            p2PokemonSet={
+              color === "w" ? currentBattle.p2Pokemon : currentBattle.p1Pokemon
+            }
+            currentPokemonMoveHistory={currentPokemonMoveHistory}
+            perspective={color === "w" ? "p1" : "p2"}
+            demoMode={demoMode}
+            onBattleEnd={() => {
+              setBattleStarted(false);
+              setCurrentPokemonMoveHistory([]);
+
+              if (gameState.isSkippingAhead) {
+                setCurrentBattle(null);
+              } else {
+                battleTimeout.current = setTimeout(() => {
+                  setCurrentBattle(null);
+                }, userState.animationSpeedPreference);
+              }
+            }}
+          />
+        )}
+        {!demoMode && !battleStarted && !isDrafting && (
+          <div className="turnNotification">
+            {chessManager.turn() === color ? (
+              <strong className="highPriorityNotification">
+                Your turn to move!
+              </strong>
+            ) : (
+              <strong>Waiting for opponent...</strong>
+            )}
+          </div>
+        )}
+        <ChessManager
+          arrows={arrows}
+          hide={battleStarted || isDrafting}
+          color={color}
+          chessManager={simulatedChessManager}
+          pokemonManager={simulatedPokemonManager}
+          mostRecentMove={mostRecentMove}
+          preMoveQueue={preMoveQueue}
+          chessMoveHistory={
+            currentMatchLog.filter((log) => log.type === "chess") as ChessData[]
+          }
+          board={simulatedBoard}
+          battleSquare={battleSquare}
+          onMove={(san) => {
             if (gameState.isSpectator) {
               return;
             }
-            requestBanPokemon(pkmnIndex);
+
+            handleOnMove(san);
           }}
         />
-      )}
-      {gameState.isCatchingUp && gameState.isSkippingAhead && (
+        {isDrafting && (
+          <DraftPokemonManager
+            draftTurnPick={draftTurnPick}
+            chessManager={chessManager}
+            pokemonManager={pokemonManager}
+            boardState={currentPokemonBoard}
+            onDraftPokemon={(sq, pkmnIndex) => {
+              if (validateDraftPick(sq, color!)) {
+                requestDraftPokemon(sq, pkmnIndex);
+                setIsDrafting(!!pokemonManager.draftPieces.length);
+              }
+            }}
+            onBanPokemon={(pkmnIndex) => {
+              if (gameState.isSpectator) {
+                return;
+              }
+              requestBanPokemon(pkmnIndex);
+            }}
+          />
+        )}
+      </div>
+      {gameState.isSkippingAhead && (
         <div className="skipSpinnerContainer">
           <Spinner />
           Skipping ahead...
         </div>
       )}
-    </div>
+    </>
   );
 };

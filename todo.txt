@@ -17,11 +17,8 @@ Download/upload replay
     - On error, would need to set the match history in state somewhere. Maybe some sort of error context?
 Add more music and make music playlist w/ skip track button
 More effects in battle
-  - Stat decreases/increases visual and sound effects
-  - Healing effects
-  - Pokemon Cries
-    - On entry and on faint
-  - Add a shadow backdrop to pokemon? Test how that would look
+  - Stat decreases/increases visual effects
+  - Healing visual effects
 Keyboard navigation and accessibility
 Battle conclusion animation? Needs to be a little short and skippable for bullet chess
 Add Pokedex on left nav to look up full descriptions?
@@ -29,6 +26,7 @@ Lazy loading and preloading
 Add "copy code" button in lobby if room code is available
 Credits modal
 Changelog at bottom of main menu
+Dev tool to fetch seed in case of encountering bug or issue
 
 Room Options
 - Preserve damage after battle
@@ -63,9 +61,11 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- Some pokemon can generate with only status moves (full support) (meowstic)
 - Draft picking timer does not reset exactly to max time. It goes a little above or below it
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
+  - Revelation Dance
   - If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render
   - Likely more. Will need to keep an eye out
 - Wrong music playing after skipping to current turn when catching up
