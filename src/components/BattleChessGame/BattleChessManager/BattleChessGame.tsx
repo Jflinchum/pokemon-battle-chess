@@ -36,7 +36,7 @@ import {
   ChessData,
   EndGameReason,
   MatchHistory,
-} from "../../../../shared/types/Game";
+} from "../../../../shared/types/Game.js";
 import DraftPokemonManager from "../DraftPokemonManager/DraftPokemonManager";
 import { usePremoves } from "./usePremove";
 

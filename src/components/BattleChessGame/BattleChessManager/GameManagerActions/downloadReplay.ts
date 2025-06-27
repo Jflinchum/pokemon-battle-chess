@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { PRNGSeed } from "@pkmn/sim";
-import { MatchHistory } from "../../../../../shared/types/Game";
+import { MatchHistory } from "../../../../../shared/types/Game.js";
 import { GameState } from "../../../../context/GameState/GameStateContext";
 import { Player } from "../../../../../shared/types/Player";
 import { GameOptions } from "../../../../../shared/types/GameOptions";

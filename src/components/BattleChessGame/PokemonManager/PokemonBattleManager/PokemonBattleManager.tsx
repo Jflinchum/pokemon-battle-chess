@@ -147,6 +147,7 @@ const PokemonBattleManager = ({
     gameState.isSkippingAhead,
     onBattleEnd,
     userState.animationSpeedPreference,
+    playAudioEffect,
   ]);
 
   return (

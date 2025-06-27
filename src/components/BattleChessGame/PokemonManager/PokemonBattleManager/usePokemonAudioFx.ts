@@ -17,7 +17,7 @@ import statusSleepPokemon from "../../../../assets/pokemonAssets/audio/fx/status
 import eatBerryPokemon from "../../../../assets/pokemonAssets/audio/fx/berry-eat.mp3";
 import activateItemPokemon from "../../../../assets/pokemonAssets/audio/fx/item-activate.mp3";
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
-import { BattleArgsKWArgsTypes } from "@pkmn/protocol";
+import { BattleArgsKWArgsTypes, BattleArgsKWArgType } from "@pkmn/protocol";
 
 const fetchPokemonCryUrl = (pokemon?: string) => {
   if (!pokemon) {
@@ -91,7 +91,11 @@ export const usePokemonAudioFx = ({
       eatBerry,
       activateItem,
     };
-  }, []);
+  }, [
+    p1PokemonSpecies,
+    p2PokemonSpecies,
+    userState.volumePreference.pokemonBattleVolume,
+  ]);
 
   useEffect(() => {
     audioEffects.damageEffective.volume =
@@ -124,7 +128,24 @@ export const usePokemonAudioFx = ({
       userState.volumePreference.pokemonBattleVolume;
     audioEffects.activateItem.volume =
       userState.volumePreference.pokemonBattleVolume;
-  }, [userState.volumePreference.pokemonBattleVolume]);
+  }, [
+    audioEffects.activateItem,
+    audioEffects.damageEffective,
+    audioEffects.damageNotEffective,
+    audioEffects.damageSuperEffective,
+    audioEffects.eatBerry,
+    audioEffects.faintEffect,
+    audioEffects.healEffect,
+    audioEffects.statDecreaseEffect,
+    audioEffects.statIncreaseEffect,
+    audioEffects.statusBurn,
+    audioEffects.statusConfuse,
+    audioEffects.statusFrozen,
+    audioEffects.statusPara,
+    audioEffects.statusPoison,
+    audioEffects.statusSleep,
+    userState.volumePreference.pokemonBattleVolume,
+  ]);
 
   const playAudio = (audio?: HTMLAudioElement) => {
     if (!audio) {
@@ -136,7 +157,7 @@ export const usePokemonAudioFx = ({
 
   const playAudioEffect = useCallback(
     (
-      { args, kwArgs }: { args: CustomArgTypes; kwArgs: BattleArgsKWArgsTypes },
+      { args, kwArgs }: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType },
       { args: previousArgs }: { args: CustomArgTypes | undefined },
     ) => {
       switch (args[0]) {
@@ -227,7 +248,7 @@ export const usePokemonAudioFx = ({
           }
           break;
         case "-enditem":
-          if (kwArgs.eat) {
+          if ((kwArgs as unknown as BattleArgsKWArgsTypes).eat) {
             playAudio(audioEffects.eatBerry);
           } else {
             playAudio(audioEffects.activateItem);

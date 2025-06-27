@@ -1,6 +1,6 @@
 import { createContext, useContext, type Dispatch } from "react";
 import { Color } from "chess.js";
-import { EndGameReason } from "../../../shared/types/Game";
+import { EndGameReason } from "../../../shared/types/Game.js";
 
 export type ModalName =
   | "ROOM_CODE"
