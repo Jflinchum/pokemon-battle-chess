@@ -1,9 +1,18 @@
 services:
   express:
-    build: .
+    build:
+      context: .
+      target: development
     ports:
       - "3000:3000"
       - "3001:3001"
+      # Port for debugger
+      - "9229:9229"
+    environment:
+      # Required for tsx hot module reloading - https://github.com/privatenumber/tsx/issues/266
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./server:/app/server
     depends_on:
       - redis
   redis:
