@@ -4,6 +4,16 @@ import User from "../models/User.js";
 import GameRoom from "../models/GameRoom.js";
 import GameRoomManager from "../models/GameRoomManager.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
+import {
+  addPlayerIdToRoom,
+  createRoom,
+  getRoomIdFromHostname,
+  getRoomListDetails,
+  getRoomPasscode,
+  removePlayerIdFromRoom,
+  roomExists,
+  scanRoomNames,
+} from "../cache/redis.js";
 
 interface APIResponse<Data> {
   data?: Data;
@@ -38,7 +48,7 @@ export const registerRoutes = (
       avatarId: User["avatarId"];
       playerSecret: User["playerSecret"];
     }
-  >("/api/createRoom", (req, res) => {
+  >("/api/createRoom", async (req, res) => {
     const playerName = req.body.playerName;
     const playerId = req.body.playerId;
     const password = req.body.password;
@@ -72,6 +82,9 @@ export const registerRoutes = (
     );
     gameRoomManager.addRoom(newRoomId, gameRoom);
 
+    await createRoom(newRoomId, password, host.playerName, host.playerId);
+    await addPlayerIdToRoom(newRoomId, playerId);
+
     res.status(200).send({
       data: { roomId: newRoomId },
     });
@@ -95,7 +108,7 @@ export const registerRoutes = (
       password?: GameRoom["password"];
       avatarId?: User["avatarId"];
     }
-  >("/api/joinRoom", (req, res) => {
+  >("/api/joinRoom", async (req, res) => {
     const roomId = req.body.roomId;
     const playerId = req.body.playerId;
     const playerName = req.body.playerName;
@@ -103,21 +116,32 @@ export const registerRoutes = (
     const avatarId = req.body.avatarId;
     const playerSecret = req.body.playerSecret;
     const room = gameRoomManager.getRoom(roomId);
+    const doesRoomExist = await roomExists(roomId);
 
     if (!roomId || !playerId || !playerName) {
       res.status(400).send({ message: "Missing parameters" });
       return;
-    } else if (!room) {
+    } else if (!doesRoomExist) {
       res.status(400).send({ message: "Room is no longer available" });
-      return;
-    } else if (room?.password !== password) {
-      res.status(401).send({ message: "Invalid password" });
       return;
     } else if (isStringProfane(playerName)) {
       res.status(400).send({ message: "Name does not pass profanity filter." });
       return;
     }
 
+    const roomPasscode = await getRoomPasscode(roomId);
+    if (roomPasscode !== password) {
+      res.status(401).send({ message: "Invalid password" });
+      return;
+    }
+
+    /**
+     * Call game service to join room and let game service handle transient player
+     */
+    if (!room) {
+      res.status(400).send({ message: "Room is no longer available" });
+      return;
+    }
     const existingPlayer = room.getPlayer(playerId);
     if (existingPlayer) {
       if (room.transientPlayerList[playerId]) {
@@ -125,7 +149,7 @@ export const registerRoutes = (
       }
       existingPlayer.setViewingResults(false);
     } else {
-      room.joinRoom(
+      room?.joinRoom(
         new User(playerName, playerId, avatarId || "1", playerSecret),
       );
     }
@@ -141,16 +165,27 @@ export const registerRoutes = (
     { roomId?: GameRoom["roomId"]; playerId?: User["playerId"] }
   >("/api/leaveRoom", (req, res) => {
     const roomId = req.body.roomId;
-    if (!roomId || !gameRoomManager.getRoom(roomId)) {
+    const playerId = req.body.playerId;
+    const doesRoomExist = roomExists(roomId);
+    if (!roomId || !playerId || !doesRoomExist) {
       res.status(204).send();
       return;
     }
     gameRoomManager.playerLeaveRoom(roomId, req.body.playerId);
+    removePlayerIdFromRoom(roomId, playerId);
     res.status(200).send();
   });
 
   /**
-   * Get Rooms
+   * Get Rooms:
+   *  Given a page number, a limit, and a search term, return a list of rooms that
+   *  - Pattern matches the host name with the search term
+   *  - Paginates the response using the page number and limit
+   *
+   * The room response should be an array of "rooms" that contains:
+   *  - The room id
+   *  - The name of the host for the room
+   *  - Whether or not it has a passcode
    */
   app.get<
     Empty,
@@ -164,33 +199,55 @@ export const registerRoutes = (
     }>,
     Empty,
     { page?: number; limit?: number; searchTerm?: string }
-  >("/api/getRooms", (req, res) => {
+  >("/api/getRooms", async (req, res) => {
     const { page = 1, limit = 10, searchTerm = "" } = req.query || {};
 
-    const roomResponse = gameRoomManager
-      .getAllRooms()
-      .filter((id) => {
-        const hostPlayerName =
-          gameRoomManager.getRoom(id)?.hostPlayer?.playerName;
-        if (!hostPlayerName) {
-          return false;
+    const getRoomNamesFromSearchTerm = await scanRoomNames(
+      page,
+      limit,
+      searchTerm,
+    );
+
+    const cachedRoomResponse = getRoomNamesFromSearchTerm.keys.map(
+      async (hostName) => {
+        try {
+          const roomId = await getRoomIdFromHostname(hostName);
+          const roomListDetails = await getRoomListDetails(roomId);
+          return roomListDetails;
+        } catch {
+          return Promise.resolve(null);
         }
-        if (gameRoomManager.getRoom(id)?.isQuickPlay) {
-          return false;
-        }
-        return hostPlayerName.toLowerCase().includes(searchTerm.toLowerCase());
-      })
-      .map((id) => {
-        const room = gameRoomManager.getRoom(id);
-        return {
-          roomId: id,
-          hostName: room!.hostPlayer!.playerName,
-          hasPassword: !!room?.password,
-          playerCount: room?.getPlayers()?.length,
-          matchInProgress: room?.isOngoing,
-        };
-      })
-      .slice((page - 1) * limit, (page - 1) * limit + limit);
+      },
+    );
+
+    const roomResponse = (await Promise.all(cachedRoomResponse)).filter(
+      (room) => room !== null,
+    );
+
+    // const roomResponse = gameRoomManager
+    //   .getAllRooms()
+    //   .filter(async (id) => {
+    //     const hostPlayerName =
+    //       gameRoomManager.getRoom(id)?.hostPlayer?.playerName;
+    //     if (!hostPlayerName) {
+    //       return false;
+    //     }
+    //     if (gameRoomManager.getRoom(id)?.isQuickPlay) {
+    //       return false;
+    //     }
+    //     return hostPlayerName.toLowerCase().includes(searchTerm.toLowerCase());
+    //   })
+    //   .map((id) => {
+    //     const room = gameRoomManager.getRoom(id);
+    //     return {
+    //       roomId: id,
+    //       hostName: room!.hostPlayer!.playerName,
+    //       hasPassword: !!room?.password,
+    //       playerCount: room?.getPlayers()?.length,
+    //       matchInProgress: room?.isOngoing,
+    //     };
+    //   })
+    //   .slice((page - 1) * limit, (page - 1) * limit + limit);
 
     res.status(200).send({
       data: {
@@ -213,23 +270,18 @@ export const registerRoutes = (
     }>,
     Empty,
     { roomId?: GameRoom["roomId"] }
-  >("/api/getRoom", (req, res) => {
+  >("/api/getRoom", async (req, res) => {
     const { roomId } = req.query || {};
 
-    const room = gameRoomManager.getRoom(roomId);
+    const roomListDetails = await getRoomListDetails(roomId);
 
-    if (!room) {
+    if (!roomListDetails) {
       res.status(404).send({ message: "Room not found." });
       return;
     }
 
     res.status(200).send({
-      data: {
-        roomId: room.roomId,
-        isOngoing: room.isOngoing,
-        hostName: room.hostPlayer?.playerName,
-        hasPassword: !!room.password,
-      },
+      data: roomListDetails,
     });
   });
 };
