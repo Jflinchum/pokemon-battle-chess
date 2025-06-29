@@ -28,20 +28,6 @@ Credits modal
 Changelog at bottom of main menu
 Dev tool to fetch seed in case of encountering bug or issue
 
-Room Options
-- Preserve damage after battle
-- Tera enabled
-  - A Pokemon can only tera once in a match, and then they can't tera again
-- Set player colors before starting
-- Closed Team Sheets
-  - Hide opposing Pokemon information 
-  - In draft mode, don't show pokemon information until after drafting it to your side
-- Custom Teams
-- (maybe) Preserve item usage after battle
-- (maybe) Change pokemon on piece promotion
-- (maybe) Level Up Progression
-  - piece starts out weak, but gains levels/evolutions as you beat other pieces
-
 Priority:
 - Better logging
   - Use winston + prometheus/loki + grafana?
@@ -53,6 +39,9 @@ Priority:
 - (better) Error boundary
 
 Refactor TODOs:
+- Split out lobby and game server into two separate servers
+- Create separate docker file for frontend and two backend servers
+- Add argument for docker compose to attach debugger
 - Potentially lift game logic into new model
 - Lift weather out of pokemon manager model
 - Put API request and response types in shared folder
@@ -73,6 +62,20 @@ Issues:
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't
   - Can test on mobile by turning off the screen and waiting for timeout to occur
+
+Room Options
+- Preserve damage after battle
+- Tera enabled
+  - A Pokemon can only tera once in a match, and then they can't tera again
+- Set player colors before starting
+- Closed Team Sheets
+  - Hide opposing Pokemon information 
+  - In draft mode, don't show pokemon information until after drafting it to your side
+- Custom Teams
+- (maybe) Preserve item usage after battle
+- (maybe) Change pokemon on piece promotion
+- (maybe) Level Up Progression
+  - piece starts out weak, but gains levels/evolutions as you beat other pieces
 
 Dropping features:
 - Global Chat

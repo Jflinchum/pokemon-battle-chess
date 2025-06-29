@@ -7,7 +7,7 @@ RUN npm install
 EXPOSE 3000 3001 9229
 
 COPY . .
-CMD ["npm", "run", "server:docker:debug"]
+CMD ["npm", "run", "server:watch"]
 
 # Production
 FROM node:lts-alpine AS production

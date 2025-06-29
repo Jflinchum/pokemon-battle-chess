@@ -1,8 +1,43 @@
-import { createClient } from "redis";
+import { createClient, SCHEMA_FIELD_TYPE, SearchReply } from "redis";
+
+/**
+ *
+ * roomPlayerSet:{roomId} -> playerId[]
+ * room:{roomId} -> { roomCode, hostName, hostId, isOngoing }
+ */
 
 const redisClient = createClient({ url: "redis://host.docker.internal:6379" });
-redisClient.on("error", (err) => console.log("Redis Client Error", err));
-redisClient.connect();
+
+const connectAndIndexRedis = async () => {
+  redisClient.on("error", (err) => console.log("Redis Client Error", err));
+  await redisClient.connect();
+  await createRedisIndex();
+};
+
+const createRedisIndex = async () => {
+  const indexList = await redisClient.ft._list();
+  if (indexList.includes("hash-idx:rooms")) {
+    return;
+  }
+
+  redisClient.ft.create(
+    "hash-idx:rooms",
+    {
+      hostName: SCHEMA_FIELD_TYPE.TEXT,
+      hostId: SCHEMA_FIELD_TYPE.TEXT,
+      roomCode: SCHEMA_FIELD_TYPE.TEXT,
+      isOngoing: SCHEMA_FIELD_TYPE.NUMERIC,
+    },
+    {
+      ON: "HASH",
+      PREFIX: "room",
+    },
+  );
+};
+
+(async () => {
+  await connectAndIndexRedis();
+})();
 
 export const setKey = async (
   hash: string,
@@ -37,11 +72,16 @@ export const removePlayerIdFromRoom = async (
   roomId: string,
   playerId: string,
 ): Promise<void> => {
-  await redisClient
-    .multi()
-    .sRem(`roomPlayerSet:${roomId}`, playerId)
-    .del(`hostName:${playerId}`)
-    .exec();
+  const roomHostId = await redisClient.hGet(`room:${roomId}`, "hostId");
+  if (roomHostId === playerId) {
+    await redisClient
+      .multi()
+      .del(`roomPlayerSet:${roomId}`)
+      .del(`room:${roomId}`)
+      .exec();
+  } else {
+    await redisClient.sRem(`roomPlayerSet:${roomId}`, playerId);
+  }
 };
 
 export const getRoomSize = async (roomId: string): Promise<number> => {
@@ -59,9 +99,9 @@ export const createRoom = async (
     .hSet(`room:${roomId}`, {
       roomCode,
       hostName: host,
+      hostId,
       isOngoing: 0,
     })
-    .set(`hostName:${host}`, roomId)
     .sAdd(`roomPlayerSet:${roomId}`, hostId)
     .exec();
 };
@@ -79,15 +119,38 @@ export const getRoomPasscode = async (
   return redisClient.hGet(`room:${roomId}`, "roomCode");
 };
 
-export const scanRoomNames = async (
+export const getRoomFromName = async (
   page: number,
   limit: number,
   searchTerm: string,
-): Promise<{ cursor: string; keys: string[] }> => {
-  return redisClient.scan(`${page * limit}`, {
-    MATCH: `hostName:*${searchTerm}*`,
-    COUNT: limit,
-  });
+): Promise<
+  {
+    roomId: string;
+    hostName: string;
+    hasPassword: boolean;
+    isOngoing: boolean;
+  }[]
+> => {
+  try {
+    const results = await redisClient.ft.search(
+      "hash-idx:rooms",
+      `${searchTerm ? `@hostName:${searchTerm}` : "*"}`,
+      { LIMIT: { from: (page - 1) * limit, size: limit } },
+    );
+    if ((results as SearchReply)?.total) {
+      return (results as SearchReply).documents.map(({ id, value }) => ({
+        hostName: (value.hostName as string) || "",
+        hasPassword: !!value.roomCode,
+        isOngoing: !!value.isOngoing,
+        roomId: id.replace("room:", ""),
+      }));
+    }
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+
+  return [];
 };
 
 export const getRoomIdFromHostname = async (
@@ -123,4 +186,12 @@ export const getRoomListDetails = async (
     isOngoing: !!isOngoing,
     playerCount: playerCount as unknown as number,
   });
+};
+
+export const getHostNameFromRoomId = async (roomId?: string | null) => {
+  if (!roomId) {
+    return Promise.resolve(null);
+  }
+
+  return await redisClient.hGet(`room:${roomId}`, "hostName");
 };
