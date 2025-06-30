@@ -21,10 +21,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     https: httpsOptions,
-    open: true,
     proxy: {
       "/api": {
-        target: "http://localhost:3000",
+        target: process.env.DOCKER_HOST
+          ? "http://express:3000"
+          : "http://localhost:3000",
+        changeOrigin: process.env.DOCKER_HOST ? false : true,
         secure: false,
       },
     },

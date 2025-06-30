@@ -101,6 +101,7 @@ const validateVolumePreference = (
     return null;
   }
   if (
+    volumePref !== null &&
     typeof volumePref === "object" &&
     typeof volumePref.pieceVolume === "number" &&
     typeof volumePref.pokemonBattleVolume === "number" &&
