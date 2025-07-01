@@ -1,7 +1,5 @@
 import path from "path";
 import { Express } from "express";
-import User from "../models/User.js";
-import GameRoom from "../models/GameRoom.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
 import {
   addPlayerIdToRoom,
@@ -33,18 +31,20 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
   });
 
   /**
-   * Creates a room and adds it in memory.
+   * Creates a room.
    * The player that creates the room becomes the host.
    */
   app.post<
     Empty,
-    APIResponse<Partial<GameRoom>>,
+    APIResponse<{
+      roomId: string;
+    }>,
     {
-      playerName: User["playerName"];
-      playerId: User["playerId"];
+      playerId: string;
+      playerName: string;
       password: string;
-      avatarId: User["avatarId"];
-      playerSecret: User["playerSecret"];
+      avatarId: string;
+      playerSecret: string;
     }
   >("/lobby-service/create-room", async (req, res) => {
     const playerName = req.body.playerName;
@@ -133,12 +133,12 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     Empty,
     APIResponse<Empty>,
     {
-      roomId?: GameRoom["roomId"];
-      playerId?: User["playerId"];
-      playerName?: User["playerName"];
-      playerSecret: User["playerSecret"];
-      password?: GameRoom["password"];
-      avatarId?: User["avatarId"];
+      roomId?: string;
+      playerId?: string;
+      playerName?: string;
+      playerSecret?: string;
+      password?: string;
+      avatarId?: string;
     }
   >("/lobby-service/join-room", async (req, res) => {
     const roomId = req.body.roomId;
@@ -201,33 +201,32 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
   /**
    * Leave Room
    */
-  app.put<
-    Empty,
-    APIResponse<Empty>,
-    { roomId?: GameRoom["roomId"]; playerId?: User["playerId"] }
-  >("/lobby-service/leave-room", async (req, res) => {
-    const roomId = req.body.roomId;
-    const playerId = req.body.playerId;
-    const doesRoomExist = await roomExists(roomId);
-    if (!roomId || !playerId || !doesRoomExist) {
-      res.status(204).send();
-      return;
-    }
+  app.put<Empty, APIResponse<Empty>, { roomId?: string; playerId?: string }>(
+    "/lobby-service/leave-room",
+    async (req, res) => {
+      const roomId = req.body.roomId;
+      const playerId = req.body.playerId;
+      const doesRoomExist = await roomExists(roomId);
+      if (!roomId || !playerId || !doesRoomExist) {
+        res.status(204).send();
+        return;
+      }
 
-    fetch(`${config.gameServiceUrl}/game-service/leave-room`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        roomId,
-        playerId,
-      }),
-    });
-    removePlayerIdFromRoom(roomId, playerId);
+      fetch(`${config.gameServiceUrl}/game-service/leave-room`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId,
+          playerId,
+        }),
+      });
+      removePlayerIdFromRoom(roomId, playerId);
 
-    res.status(200).send();
-  });
+      res.status(200).send();
+    },
+  );
 
   /**
    * Get Rooms:
@@ -244,8 +243,8 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     Empty,
     APIResponse<{
       rooms: {
-        roomId: GameRoom["roomId"];
-        hostName: User["playerName"];
+        roomId: string;
+        hostName: string;
         hasPassword: boolean;
         playerCount: number;
         isOngoing: boolean;
@@ -283,13 +282,13 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
   app.get<
     Empty,
     APIResponse<{
-      roomId: GameRoom["roomId"];
-      isOngoing: GameRoom["isOngoing"];
-      hostName?: User["playerName"];
+      roomId: string;
+      isOngoing: boolean;
+      hostName?: string;
       hasPassword: boolean;
     }>,
     Empty,
-    { roomId?: GameRoom["roomId"] }
+    { roomId?: string }
   >("/lobby-service/get-room", async (req, res) => {
     const { roomId } = req.query || {};
 

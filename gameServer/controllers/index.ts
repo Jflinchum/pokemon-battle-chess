@@ -25,7 +25,7 @@ export const registerRoutes = (
    */
   app.post<
     Empty,
-    APIResponse<Partial<GameRoom>>,
+    APIResponse<{ roomId: GameRoom["roomId"] }>,
     {
       playerName: User["playerName"];
       playerId: User["playerId"];
