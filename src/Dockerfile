@@ -7,4 +7,4 @@ RUN npm install
 EXPOSE 5173
 
 COPY . .
-CMD ["npm", "run", "dev:docker"]
+CMD ["npm", "run", "client:docker"]

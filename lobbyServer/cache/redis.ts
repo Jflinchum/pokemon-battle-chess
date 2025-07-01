@@ -141,7 +141,7 @@ export const getRoomFromName = async (
       return (results as SearchReply).documents.map(({ id, value }) => ({
         hostName: (value.hostName as string) || "",
         hasPassword: !!value.roomCode,
-        isOngoing: !!value.isOngoing,
+        isOngoing: value.isOngoing === "1",
         roomId: id.replace("room:", ""),
       }));
     }
@@ -153,10 +153,22 @@ export const getRoomFromName = async (
   return [];
 };
 
-export const getRoomIdFromHostname = async (
-  hostName: string,
-): Promise<string | null> => {
-  return redisClient.get(`hostName:${hostName}`);
+export const getRoomIdFromHostId = async (hostId: string) => {
+  try {
+    const results = await redisClient.ft.search(
+      "hash-idx:rooms",
+      `@hostId:"${hostId}"`,
+    );
+    if ((results as SearchReply)?.total >= 1) {
+      return (results as SearchReply).documents.map(({ id }) =>
+        id.replace("room:", ""),
+      );
+    }
+  } catch {
+    return;
+  }
+
+  return;
 };
 
 export const getRoomListDetails = async (

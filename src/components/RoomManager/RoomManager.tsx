@@ -7,7 +7,7 @@ import { useModalState } from "../../context/ModalState/ModalStateContext";
 import { socket } from "../../socket";
 import Room from "./Room/Room";
 import ChatToggle from "./Chat/ChatToggle/ChatToggle";
-import { MatchHistory, Timer } from "../../../shared/types/game";
+import { MatchHistory, Timer } from "../../../shared/types/Game";
 import { Player } from "../../../shared/types/Player";
 import { useMusicPlayer } from "../../util/useMusicPlayer";
 import { useSocketRequests } from "../../util/useSocketRequests";

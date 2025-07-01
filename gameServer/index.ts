@@ -1,5 +1,4 @@
 import express from "express";
-import path from "path";
 import { Server } from "socket.io";
 import cors from "cors";
 import http from "http";
@@ -47,10 +46,10 @@ app.use(
 );
 
 https.createServer(options, app).listen(httpsPort, () => {
-  console.log(`HTTPS is listening on ${httpsPort}`);
+  console.log(`GameServer HTTPS is listening on ${httpsPort}`);
 });
 const server = http.createServer(app).listen(httpPort, () => {
-  console.log(`HTTP is listening on ${httpPort}`);
+  console.log(`GameServer HTTP is listening on ${httpPort}`);
 });
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
@@ -61,7 +60,6 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
 });
 
 app.use(express.json());
-app.use(express.static(path.join(path.resolve(), "./dist")));
 
 const gameRoomManager = new GameRoomManager({}, io);
 

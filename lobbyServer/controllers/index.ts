@@ -2,7 +2,6 @@ import path from "path";
 import { Express } from "express";
 import User from "../models/User.js";
 import GameRoom from "../models/GameRoom.js";
-import GameRoomManager from "../models/GameRoomManager.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
 import {
   addPlayerIdToRoom,
@@ -13,7 +12,9 @@ import {
   roomExists,
   getRoomFromName,
   getRoomSize,
+  getRoomIdFromHostId,
 } from "../cache/redis.js";
+import { InternalConfig } from "../config.js";
 
 interface APIResponse<Data> {
   data?: Data;
@@ -22,15 +23,12 @@ interface APIResponse<Data> {
 
 type Empty = object;
 
-export const registerRoutes = (
-  app: Express,
-  gameRoomManager: GameRoomManager,
-) => {
+export const registerRoutes = (app: Express, config: InternalConfig) => {
   app.get("/", (_, res) => {
     res.sendFile(path.join(path.resolve(), "./dist/index.html"));
   });
 
-  app.get("/healthz", (_, res) => {
+  app.get("/health", (_, res) => {
     res.status(200).send("Ok");
   });
 
@@ -48,12 +46,12 @@ export const registerRoutes = (
       avatarId: User["avatarId"];
       playerSecret: User["playerSecret"];
     }
-  >("/api/createRoom", async (req, res) => {
+  >("/lobby-service/create-room", async (req, res) => {
     const playerName = req.body.playerName;
     const playerId = req.body.playerId;
     const password = req.body.password;
     const avatarId = req.body.avatarId;
-    const secret = req.body.playerSecret;
+    const playerSecret = req.body.playerSecret;
 
     if (!playerName || !playerId) {
       res.status(400).send();
@@ -65,29 +63,63 @@ export const registerRoutes = (
       return;
     }
 
+    const roomIds = await getRoomIdFromHostId(playerId);
+
     // Player already owns a room
-    const { room } = gameRoomManager.getPlayer(playerId);
-    if (room) {
-      gameRoomManager.removeRoom(room.roomId);
+    if (roomIds) {
+      try {
+        await Promise.all(
+          roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId)),
+        );
+      } catch (err) {
+        console.log(err);
+        // attempt to continue with creating the new room, anyways
+      }
     }
-    const newRoomId = crypto.randomUUID();
 
-    const host = new User(playerName, playerId, avatarId || "1", secret);
-    const gameRoom = new GameRoom(
-      newRoomId,
-      host,
-      password,
-      gameRoomManager,
-      false,
+    const gameServerResp = await fetch(
+      `${config.gameServiceUrl}/game-service/create-room`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          playerId,
+          playerName,
+          password,
+          avatarId,
+          playerSecret,
+        }),
+      },
     );
-    gameRoomManager.addRoom(newRoomId, gameRoom);
 
-    await createRoom(newRoomId, password, host.playerName, host.playerId);
-    await addPlayerIdToRoom(newRoomId, playerId);
+    const gameServerRespBody = await gameServerResp.json();
+    if (gameServerResp.status === 200) {
+      const cacheCreateRoomPromise = createRoom(
+        gameServerRespBody.data.roomId,
+        password,
+        playerName,
+        playerId,
+      );
+      const cacheAddPlayerPromise = addPlayerIdToRoom(
+        gameServerRespBody.data.roomId,
+        playerId,
+      );
 
-    res.status(200).send({
-      data: { roomId: newRoomId },
-    });
+      try {
+        await Promise.all([cacheCreateRoomPromise, cacheAddPlayerPromise]);
+      } catch {
+        res.status(500).send({
+          data: { roomId: gameServerRespBody.data.roomId },
+        });
+      }
+      res.status(200).send({
+        data: { roomId: gameServerRespBody.data.roomId },
+      });
+    } else {
+      res.status(gameServerResp.status).send();
+    }
   });
 
   /**
@@ -97,7 +129,7 @@ export const registerRoutes = (
    * - Send room id back to user
    * - User joins on socket
    */
-  app.post<
+  app.put<
     Empty,
     APIResponse<Empty>,
     {
@@ -108,14 +140,13 @@ export const registerRoutes = (
       password?: GameRoom["password"];
       avatarId?: User["avatarId"];
     }
-  >("/api/joinRoom", async (req, res) => {
+  >("/lobby-service/join-room", async (req, res) => {
     const roomId = req.body.roomId;
     const playerId = req.body.playerId;
     const playerName = req.body.playerName;
     const password = req.body.password;
     const avatarId = req.body.avatarId;
     const playerSecret = req.body.playerSecret;
-    const room = gameRoomManager.getRoom(roomId);
     const doesRoomExist = await roomExists(roomId);
 
     if (!roomId || !playerId || !playerName) {
@@ -135,37 +166,46 @@ export const registerRoutes = (
       return;
     }
 
-    /**
-     * Call game service to join room and let game service handle transient player
-     */
+    const gameServerResp = await fetch(
+      `${config.gameServiceUrl}/game-service/join-room`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId,
+          password,
+          playerId,
+          playerName,
+          avatarId,
+          playerSecret,
+        }),
+      },
+    );
 
-    if (!room) {
-      res.status(400).send({ message: "Room is no longer available" });
-      return;
-    }
-    const existingPlayer = room.getPlayer(playerId);
-    if (existingPlayer) {
-      if (room.transientPlayerList[playerId]) {
-        clearTimeout(room.transientPlayerList[playerId]);
+    if (gameServerResp.status === 200) {
+      try {
+        await addPlayerIdToRoom(roomId, playerId);
+      } catch (err) {
+        console.log(err);
+        res.status(500).send();
+        return;
       }
-      existingPlayer.setViewingResults(false);
+      res.status(200).send({ data: { roomId: roomId } });
     } else {
-      await addPlayerIdToRoom(roomId, playerId);
-      room?.joinRoom(
-        new User(playerName, playerId, avatarId || "1", playerSecret),
-      );
+      res.status(gameServerResp.status).send(await gameServerResp.json());
     }
-    res.status(200).send({ data: { roomId: roomId } });
   });
 
   /**
    * Leave Room
    */
-  app.post<
+  app.put<
     Empty,
     APIResponse<Empty>,
     { roomId?: GameRoom["roomId"]; playerId?: User["playerId"] }
-  >("/api/leaveRoom", async (req, res) => {
+  >("/lobby-service/leave-room", async (req, res) => {
     const roomId = req.body.roomId;
     const playerId = req.body.playerId;
     const doesRoomExist = await roomExists(roomId);
@@ -174,8 +214,17 @@ export const registerRoutes = (
       return;
     }
 
-    gameRoomManager.playerLeaveRoom(roomId, req.body.playerId);
-    await removePlayerIdFromRoom(roomId, playerId);
+    fetch(`${config.gameServiceUrl}/game-service/leave-room`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        roomId,
+        playerId,
+      }),
+    });
+    removePlayerIdFromRoom(roomId, playerId);
 
     res.status(200).send();
   });
@@ -205,7 +254,7 @@ export const registerRoutes = (
     }>,
     Empty,
     { page?: number; limit?: number; searchTerm?: string }
-  >("/api/getRooms", async (req, res) => {
+  >("/lobby-service/get-rooms", async (req, res) => {
     const { page = 1, limit = 10, searchTerm = "" } = req.query || {};
 
     const roomDetails = await getRoomFromName(page, limit, searchTerm);
@@ -241,7 +290,7 @@ export const registerRoutes = (
     }>,
     Empty,
     { roomId?: GameRoom["roomId"] }
-  >("/api/getRoom", async (req, res) => {
+  >("/lobby-service/get-room", async (req, res) => {
     const { roomId } = req.query || {};
 
     const roomListDetails = await getRoomListDetails(roomId);

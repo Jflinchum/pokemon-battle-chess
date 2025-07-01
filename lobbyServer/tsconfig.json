@@ -5,7 +5,7 @@
     "types": ["node"],
     "importHelpers": true,
     "lib": ["es2023", "dom"],
-    "outDir": "../dist/backend",
+    "outDir": "../dist/lobbyService",
 
     /* Bundler mode */
     "moduleResolution": "NodeNext",

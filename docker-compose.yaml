@@ -1,26 +1,41 @@
 services:
-  express:
+  lobby-service:
     build:
       context: .
+      dockerfile: ./lobbyServer/Dockerfile
       target: development
     ports:
-      - "3000:3000"
       - "3001:3001"
       # Port for debugger
       - "9229:9229"
     environment:
       # Required for tsx hot module reloading - https://github.com/privatenumber/tsx/issues/266
       - CHOKIDAR_USEPOLLING=true
+      - DOCKER_HOST=true
     volumes:
-      - ./server:/app/server
+      - ./lobbyServer:/app/lobbyServer
     depends_on:
-      - redis
+      - game-service
     networks:
       - app-network
-  redis:
-    image: "redis:alpine"
+  game-service:
+    build:
+      context: .
+      dockerfile: ./gameServer/Dockerfile
+      target: development
     ports:
-      - "6379:6379"
+      - "3002:3002"
+      - "3003:3003"
+      # Port for debugger
+      - "9230:9230"
+    environment:
+      # Required for tsx hot module reloading - https://github.com/privatenumber/tsx/issues/266
+      - CHOKIDAR_USEPOLLING=true
+      - DOCKER_HOST=true
+    volumes:
+      - ./gameServer:/app/gameServer
+    networks:
+      - app-network
   webapp:
     build:
       context: .
@@ -35,9 +50,14 @@ services:
     volumes:
       - ./src:/app/src
     depends_on:
-      - express
+      - lobby-service
+      - game-service
     networks:
       - app-network
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
 networks:
   app-network:
     driver: bridge
