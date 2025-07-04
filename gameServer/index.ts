@@ -1,7 +1,6 @@
 import express from "express";
 import { Server } from "socket.io";
 import cors from "cors";
-import http from "http";
 import https from "https";
 import { SecureContextOptions } from "tls";
 import fs from "fs";
@@ -18,7 +17,6 @@ import {
 const configSettings =
   process.env.NODE_ENV === "production" ? config.prodConfig : config.devConfig;
 
-const httpPort = configSettings.httpPort;
 const httpsPort = configSettings.httpsPort;
 const allowedOrigins = configSettings.allowedOrigins;
 
@@ -45,11 +43,8 @@ app.use(
   }),
 );
 
-https.createServer(options, app).listen(httpsPort, () => {
+const server = https.createServer(options, app).listen(httpsPort, () => {
   console.log(`GameServer HTTPS is listening on ${httpsPort}`);
-});
-const server = http.createServer(app).listen(httpPort, () => {
-  console.log(`GameServer HTTP is listening on ${httpPort}`);
 });
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {

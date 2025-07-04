@@ -7,6 +7,11 @@ RUN npm install
 EXPOSE 3002 3003 9230
 
 COPY . .
+
+# In dev environments, we could go through the process of imitating a CA and adding that to our computer, configuring DNS entries for a cert
+# But the following environment variable is simpler for local development. Just don't do this in production
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+
 CMD ["npm", "run", "gameService:watch"]
 
 # Production
@@ -18,6 +23,5 @@ RUN npm install
 EXPOSE 3002 3003
 
 COPY . .
-RUN npm run build-client
-RUN npm run build-server
+RUN npm run build-game
 CMD ["node", "dist/gameService/server/index.js"]

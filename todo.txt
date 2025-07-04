@@ -38,9 +38,27 @@ Priority:
   - Add server disconnect
 - (better) Error boundary
 
+Scalability Notes:
+- 2 servers
+  - Lobby
+    - Stateless, uses Redis
+    - Serves Javascript
+  - Game
+    - Stateful
+    - Handles game logic
+- 1 Redis db
+- Next Steps:
+  - Nginx + Kube
+    - Add nginx ingress
+    - Launch multiple Lobby Server Nodes and configure nginx load balancing
+    - Migrate to kubernetes with Kind
+  - Scale Game Server
+    - Keep track of all active game servers in Lobby Server
+    - When creating a game, choose a game server and store its index in redis
+    - When joining a game, reference the index of the server and tell the client to connect to the specific index
+  - AWS EKS deployment
+
 Refactor TODOs:
-- Split out lobby and game server into two separate servers
-- Create separate docker file for frontend and two backend servers
 - Add argument for docker compose to attach debugger
 - Potentially lift game logic into new model
 - Lift weather out of pokemon manager model

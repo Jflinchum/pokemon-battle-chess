@@ -8,20 +8,20 @@ export interface InternalConfig {
 
 export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
   devConfig: {
-    keyLocation: "private-key.pem",
-    certLocation: "certificate.pem",
+    keyLocation: "nginx/private-key.key",
+    certLocation: "nginx/certificate.crt",
     allowedOrigins: ["https://localhost:5173"],
     gameServiceUrl: process.env.DOCKER_HOST
-      ? "http://game-service:3002"
+      ? "https://game-service:3003"
       : "http://localhost:3002",
     httpsPort: 3001,
   },
 
   prodConfig: {
-    keyLocation: "private-key.pem",
-    certLocation: "certificate.pem",
+    keyLocation: "nginx/private-key.key",
+    certLocation: "nginx/certificate.crt",
     allowedOrigins: [],
-    gameServiceUrl: "https://game-service:3002",
+    gameServiceUrl: "https://game-service:3003",
     httpsPort: 3001,
   },
 };
