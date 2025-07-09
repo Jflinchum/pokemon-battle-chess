@@ -24,15 +24,15 @@ export default defineConfig({
     proxy: {
       "/lobby-service": {
         target: process.env.DOCKER_HOST
-          ? "https://lobby-service:3001"
+          ? "https://lobby-server-service:3001"
           : "https://localhost:3001",
         changeOrigin: process.env.DOCKER_HOST ? false : true,
         secure: false,
       },
       "/game-service": {
         target: process.env.DOCKER_HOST
-          ? "https://game-service:3002"
-          : "https://localhost:3002",
+          ? "https://game-server-service:3003"
+          : "https://localhost:3003",
         changeOrigin: process.env.DOCKER_HOST ? false : true,
         secure: false,
       },

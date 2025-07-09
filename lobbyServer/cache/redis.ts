@@ -1,4 +1,5 @@
 import { createClient, SCHEMA_FIELD_TYPE, SearchReply } from "redis";
+import { getConfig } from "../config.js";
 
 /**
  *
@@ -6,7 +7,7 @@ import { createClient, SCHEMA_FIELD_TYPE, SearchReply } from "redis";
  * room:{roomId} -> { roomCode, hostName, hostId, isOngoing }
  */
 
-const redisClient = createClient({ url: "redis://host.docker.internal:6379" });
+const redisClient = createClient({ url: getConfig().redisUrl });
 
 const connectAndIndexRedis = async () => {
   redisClient.on("error", (err) => console.log("Redis Client Error", err));

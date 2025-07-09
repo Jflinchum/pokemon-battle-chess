@@ -5,7 +5,7 @@ import https from "https";
 import { SecureContextOptions } from "tls";
 import fs from "fs";
 import GameRoomManager from "./models/GameRoomManager.js";
-import { config } from "./config.js";
+import { getConfig } from "./config.js";
 import { registerSocketEvents } from "./socket/socketEvents.js";
 import { registerRoutes } from "./controllers/index.js";
 import { registerSocketIoAdmin } from "./socket/socketIoAdmin.js";
@@ -14,8 +14,7 @@ import {
   ServerToClientEvents,
 } from "../shared/types/Socket.js";
 
-const configSettings =
-  process.env.NODE_ENV === "production" ? config.prodConfig : config.devConfig;
+const configSettings = getConfig();
 
 const httpsPort = configSettings.httpsPort;
 const allowedOrigins = configSettings.allowedOrigins;

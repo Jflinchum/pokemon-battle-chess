@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nginx
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: nginx
+    spec:
+      restartPolicy: Always
+      volumes:
+        - name: nginx-conf
+          configMap:
+            items:
+              - key: nginx.conf
+                path: default.conf
+            name: nginx-conf
+        - name: nginx-secret
+          secret:
+            secretName: nginx-tls
+      containers:
+        - image: nginx:alpine
+          name: nginx
+          ports:
+            - containerPort: 443
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/default.conf
+              name: nginx-conf
+              subPath: default.conf
+            - mountPath: /etc/nginx/ssl
+              name: nginx-secret

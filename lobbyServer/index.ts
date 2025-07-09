@@ -4,11 +4,10 @@ import cors from "cors";
 import https from "https";
 import { SecureContextOptions } from "tls";
 import fs from "fs";
-import { config } from "./config.js";
+import { getConfig } from "./config.js";
 import { registerRoutes } from "./controllers/index.js";
 
-const configSettings =
-  process.env.NODE_ENV === "production" ? config.prodConfig : config.devConfig;
+const configSettings = getConfig();
 
 const httpsPort = configSettings.httpsPort;
 const allowedOrigins = configSettings.allowedOrigins;

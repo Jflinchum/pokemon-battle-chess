@@ -77,48 +77,56 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
       }
     }
 
-    const gameServerResp = await fetch(
-      `${config.gameServiceUrl}/game-service/create-room`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    try {
+      const gameServerResp = await fetch(
+        `${config.gameServiceUrl}/game-service/create-room`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            playerId,
+            playerName,
+            password,
+            avatarId,
+            playerSecret,
+          }),
         },
-        body: JSON.stringify({
-          playerId,
-          playerName,
+      );
+
+      const gameServerRespBody = await gameServerResp.json();
+      if (gameServerResp.status === 200) {
+        const cacheCreateRoomPromise = createRoom(
+          gameServerRespBody.data.roomId,
           password,
-          avatarId,
-          playerSecret,
-        }),
-      },
-    );
+          playerName,
+          playerId,
+        );
+        const cacheAddPlayerPromise = addPlayerIdToRoom(
+          gameServerRespBody.data.roomId,
+          playerId,
+        );
 
-    const gameServerRespBody = await gameServerResp.json();
-    if (gameServerResp.status === 200) {
-      const cacheCreateRoomPromise = createRoom(
-        gameServerRespBody.data.roomId,
-        password,
-        playerName,
-        playerId,
-      );
-      const cacheAddPlayerPromise = addPlayerIdToRoom(
-        gameServerRespBody.data.roomId,
-        playerId,
-      );
-
-      try {
-        await Promise.all([cacheCreateRoomPromise, cacheAddPlayerPromise]);
-      } catch {
-        res.status(500).send({
+        try {
+          await Promise.all([cacheCreateRoomPromise, cacheAddPlayerPromise]);
+        } catch {
+          res.status(500).send({
+            data: { roomId: gameServerRespBody.data.roomId },
+          });
+        }
+        res.status(200).send({
           data: { roomId: gameServerRespBody.data.roomId },
         });
+      } else {
+        res.status(gameServerResp.status).send();
       }
-      res.status(200).send({
-        data: { roomId: gameServerRespBody.data.roomId },
-      });
-    } else {
-      res.status(gameServerResp.status).send();
+    } catch (err) {
+      console.log(
+        "Failed to request from game service: " + (err as unknown as Error),
+      );
+      console.log(config.gameServiceUrl);
+      res.status(500).send();
     }
   });
 

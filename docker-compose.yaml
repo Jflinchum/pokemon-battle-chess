@@ -1,5 +1,5 @@
 services:
-  lobby-service:
+  lobby-server-service:
     build:
       context: .
       dockerfile: ./lobbyServer/Dockerfile
@@ -15,10 +15,10 @@ services:
     volumes:
       - ./lobbyServer:/app/lobbyServer
     depends_on:
-      - game-service
+      - game-server-service
     networks:
       - app-network
-  game-service:
+  game-server-service:
     build:
       context: .
       dockerfile: ./gameServer/Dockerfile
@@ -50,8 +50,8 @@ services:
     volumes:
       - ./src:/app/src
     depends_on:
-      - lobby-service
-      - game-service
+      - lobby-server-service
+      - game-server-service
     networks:
       - app-network
   redis:
@@ -59,18 +59,16 @@ services:
     ports:
       - "6379:6379"
   nginx:
-    image: "nginx"
+    image: "nginx:alpine"
     ports:
       - "8080:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx/lobby_proxy.conf:/etc/nginx/lobby_proxy.conf
-      - ./nginx/game_proxy.conf:/etc/nginx/game_proxy.conf
-      - ./nginx/certificate.crt:/etc/nginx/certificate.crt
-      - ./nginx/private-key.key:/etc/nginx/private-key.key
+      - ./nginx/certificate.crt:/etc/nginx/ssl/tls.crt
+      - ./nginx/private-key.key:/etc/nginx/ssl/tls.key
     depends_on:
-      - lobby-service
-      - game-service
+      - lobby-server-service
+      - game-server-service
     networks:
       - app-network
 networks:
