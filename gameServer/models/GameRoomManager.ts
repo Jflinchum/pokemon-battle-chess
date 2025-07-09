@@ -108,7 +108,7 @@ export default class GameRoomManager {
       );
     }
 
-    room.leaveRoom(player?.playerId);
+    room.leaveRoom(player.playerId);
 
     if (!room.hasPlayers()) {
       this.removeRoom(room.roomId);

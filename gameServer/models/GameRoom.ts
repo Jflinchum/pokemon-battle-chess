@@ -28,7 +28,7 @@ import { GameOptions } from "../../shared/types/GameOptions.js";
 import GameTimer from "./GameTimer.js";
 import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes.js";
 import { Player } from "../../shared/types/Player.js";
-import { setRoomToOngoing } from "../cache/redis.js";
+import { removePlayerIdFromRoom, setRoomToOngoing } from "../cache/redis.js";
 
 export default class GameRoom {
   public roomId: string;
@@ -140,7 +140,7 @@ export default class GameRoom {
     }
   }
 
-  public leaveRoom(playerId?: string) {
+  public leaveRoom(playerId: string) {
     if (this.player1?.playerId === playerId) {
       this.player1 = null;
     }
@@ -153,6 +153,7 @@ export default class GameRoom {
     this.playerList = this.playerList.filter(
       (player) => playerId !== player.playerId,
     );
+    removePlayerIdFromRoom(this.roomId, playerId);
   }
 
   public hasPlayers() {
