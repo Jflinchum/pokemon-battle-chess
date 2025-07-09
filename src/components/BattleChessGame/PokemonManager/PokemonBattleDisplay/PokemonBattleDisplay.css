@@ -16,11 +16,8 @@
   margin: auto;
 
   @media (min-width: 1000px) {
-    margin: initial;
-  }
-
-  @media (min-height: 800px) and (min-width: 1000px) {
     width: 100%;
+    margin: initial;
   }
 }
 
