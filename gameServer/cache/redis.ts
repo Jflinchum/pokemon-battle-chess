@@ -33,12 +33,16 @@ export const removePlayerIdFromRoom = async (
 ): Promise<void> => {
   const roomHostId = await redisClient.hGet(`room:${roomId}`, "hostId");
   if (roomHostId === playerId) {
-    await redisClient
-      .multi()
-      .del(`roomPlayerSet:${roomId}`)
-      .del(`room:${roomId}`)
-      .exec();
+    await removeRoom(roomId);
   } else {
     await redisClient.sRem(`roomPlayerSet:${roomId}`, playerId);
   }
+};
+
+export const removeRoom = async (roomId: string) => {
+  await redisClient
+    .multi()
+    .del(`roomPlayerSet:${roomId}`)
+    .del(`room:${roomId}`)
+    .exec();
 };

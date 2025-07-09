@@ -185,6 +185,12 @@ export const getRoomListDetails = async (
     return Promise.resolve(null);
   }
 
+  const exists = await redisClient.exists(`room:${roomId}`);
+
+  if (!exists) {
+    return Promise.resolve(null);
+  }
+
   const [hostName, hasRoomCode, isOngoing, playerCount] = await redisClient
     .multi()
     .hGet(`room:${roomId}`, "hostName")
@@ -192,6 +198,7 @@ export const getRoomListDetails = async (
     .hGet(`room:${roomId}`, "isOngoing")
     .sCard(`roomPlayerSet:${roomId}`)
     .exec();
+
   return Promise.resolve({
     roomId,
     hostName: hostName as unknown as string,

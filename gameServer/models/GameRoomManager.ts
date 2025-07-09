@@ -6,6 +6,7 @@ import {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../../shared/types/Socket.js";
+import { removeRoom } from "../cache/redis.js";
 
 interface GameRoomList {
   [roomId: string]: GameRoom;
@@ -49,6 +50,7 @@ export default class GameRoomManager {
     console.log(`Cleaning up room ${roomId}`);
     this.io.to(roomId).emit("roomClosed");
     delete this.currentRooms[roomId];
+    removeRoom(roomId);
   }
 
   public getAllRooms(): GameRoom["roomId"][] {
