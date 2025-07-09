@@ -11,6 +11,7 @@ import "./PlayerInGameDisplay.css";
 
 interface PlayerInGameDisplayProps {
   player?: Player;
+  connectionIssues?: boolean;
   takenChessPieces: PokemonPiece[];
   timer?: TimerType["white"] | TimerType["black"];
   className?: string;
@@ -18,6 +19,7 @@ interface PlayerInGameDisplayProps {
 
 const PlayerInGameDisplay = ({
   player,
+  connectionIssues,
   takenChessPieces,
   timer,
   className = "",
@@ -33,7 +35,7 @@ const PlayerInGameDisplay = ({
         src={Sprites.getAvatar(player.avatarId || 1)}
       />
       <div className="nameContainer">
-        {player.transient ? (
+        {connectionIssues ? (
           <FontAwesomeIcon
             icon={faPlugCircleXmark}
             className="nameIcon"

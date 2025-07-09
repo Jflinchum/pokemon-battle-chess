@@ -49,6 +49,8 @@ function BattleChessManager({
   );
 
   const matchLogIndex = useRef(0);
+  const topPlayer = color === "w" ? blackPlayer : whitePlayer;
+  const bottomPlayer = color === "w" ? whitePlayer : blackPlayer;
 
   /**
    * Rendering the three different states of the game
@@ -61,7 +63,12 @@ function BattleChessManager({
       <GameManagerActions />
       <div className="battleChessContainer">
         <PlayerInGameDisplay
-          player={color === "w" ? blackPlayer : whitePlayer}
+          player={topPlayer}
+          connectionIssues={
+            gameState.players.find(
+              (player) => player.playerId === topPlayer?.playerId,
+            )?.transient
+          }
           takenChessPieces={pokemonManager.getTakenChessPieces(
             gameState.gameSettings.color === "w" ? "w" : "b",
           )}
@@ -77,7 +84,12 @@ function BattleChessManager({
           draftMode={gameState.gameSettings.options.format === "draft"}
         />
         <PlayerInGameDisplay
-          player={color === "w" ? whitePlayer : blackPlayer}
+          player={bottomPlayer}
+          connectionIssues={
+            gameState.players.find(
+              (player) => player.playerId === bottomPlayer?.playerId,
+            )?.transient
+          }
           takenChessPieces={pokemonManager.getTakenChessPieces(
             gameState.gameSettings.color === "w" ? "b" : "w",
           )}
