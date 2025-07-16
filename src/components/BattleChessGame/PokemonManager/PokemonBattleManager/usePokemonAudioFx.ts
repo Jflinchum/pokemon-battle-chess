@@ -19,6 +19,13 @@ import activateItemPokemon from "../../../../assets/pokemonAssets/audio/fx/item-
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 import { BattleArgsKWArgsTypes, BattleArgsKWArgType } from "@pkmn/protocol";
 
+const getPokemonCryUrlPath = (baseSpecies: string) => {
+  const mapping: Record<string, string> = {
+    "kommo-o": "kommoo",
+  };
+  return mapping[baseSpecies] || baseSpecies;
+};
+
 const fetchPokemonCryUrl = (pokemon?: string) => {
   if (!pokemon) {
     return;
@@ -28,7 +35,7 @@ const fetchPokemonCryUrl = (pokemon?: string) => {
     return;
   }
 
-  return `https://play.pokemonshowdown.com/audio/cries/${dexPokemon.baseSpecies.toLowerCase().replace(" ", "")}.mp3`;
+  return `https://play.pokemonshowdown.com/audio/cries/${getPokemonCryUrlPath(dexPokemon.baseSpecies.toLowerCase().replace(" ", ""))}.mp3`;
 };
 
 export const usePokemonAudioFx = ({
@@ -191,8 +198,10 @@ export const usePokemonAudioFx = ({
           playAudio(audioEffects.faintEffect);
           break;
         case "-boost":
-          audioEffects.statDecreaseEffect.pause();
-          playAudio(audioEffects.statIncreaseEffect);
+          if (previousArgs?.[0] !== "-boost") {
+            audioEffects.statDecreaseEffect.pause();
+            playAudio(audioEffects.statIncreaseEffect);
+          }
           break;
         case "-setboost":
           if (parseInt(args[3]) > 0) {
@@ -204,8 +213,10 @@ export const usePokemonAudioFx = ({
           }
           break;
         case "-unboost":
-          audioEffects.statIncreaseEffect.pause();
-          playAudio(audioEffects.statDecreaseEffect);
+          if (previousArgs?.[0] !== "-unboost") {
+            audioEffects.statIncreaseEffect.pause();
+            playAudio(audioEffects.statDecreaseEffect);
+          }
           break;
         case "switch":
           if (args[1].slice(0, 2) === "p1") {
@@ -250,7 +261,7 @@ export const usePokemonAudioFx = ({
         case "-enditem":
           if ((kwArgs as unknown as BattleArgsKWArgsTypes).eat) {
             playAudio(audioEffects.eatBerry);
-          } else {
+          } else if (!(kwArgs as unknown as BattleArgsKWArgsTypes).from) {
             playAudio(audioEffects.activateItem);
           }
           break;
