@@ -47,7 +47,15 @@ Scalability Notes:
     - Stateful
       - Attempt to make it stateless
         - Disconnects/cleanup
+          - Immediately set timestamp of disconnect in redis player cache 
+          - Immediately set timeout to clean up user if they've been disconnected for N minutes
+          - NEW scheduler server to periodically clean up leftover users if timeout is lost between server restarts
+            - Uses timestamps from player disconnect to see if they've been disconnected for longer than N minutes
+            - Will need to create new index in redis
         - Match making
+          - NEW scheduler server to periodically check redis for players looking to match make
+          - Eventually can introduce better match making logic (latency/region), but immediate thought is just a simple queue
+          - Will need to keep Scalability in mind when creating queue (add different data such as region, not just a player id queue)
     - Handles game logic
 - 1 Redis db
 - Next Steps:

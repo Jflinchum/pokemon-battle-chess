@@ -375,7 +375,10 @@ export default class GameRoom {
       return;
     }
 
-    if (this.pokemonGameManager.draftPieces.length > 0) {
+    if (
+      this.pokemonGameManager.draftPieces.length > 0 &&
+      this.chessManager.moveNumber() === 1
+    ) {
       try {
         if (timerExpired.white) {
           return await this.randomDraftPick("w");
