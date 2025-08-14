@@ -45,6 +45,9 @@ Scalability Notes:
     - Serves Javascript
   - Game
     - Stateful
+      - Attempt to make it stateless
+        - Disconnects/cleanup
+        - Match making
     - Handles game logic
 - 1 Redis db
 - Next Steps:
@@ -53,10 +56,7 @@ Scalability Notes:
     - Launch multiple Lobby Server Nodes and configure nginx load balancing
     - Migrate to kubernetes with Kind
   - Scale Game Server
-    - Keep track of all active game servers in Lobby Server
-    - When creating a game, choose a game server and store its index in redis
-    - When joining a game, reference the index of the server and tell the client to connect to the specific index
-  - AWS EKS deployment
+  - AWS EKS deployment or GCP GKE
 
 Refactor TODOs:
 - Add argument for docker compose to attach debugger
@@ -76,6 +76,7 @@ Issues:
   - If pokemon move's damage isn't clear (Grass Knot), then type effectiveness does not render
   - Likely more. Will need to keep an eye out
 - Wrong music playing after skipping to current turn when catching up
+- Skipping ahead to catch up while the client is about to start a battle locks the client in a state where they're always loading
 - Pokemon sprites occasionally disappearing
   - Caching issue? Clearing cache and refreshing fixes it, and it doesn't happen on all clients
 - On reconnect, server should check if the game is on going and tell the client the room is closed if it isn't

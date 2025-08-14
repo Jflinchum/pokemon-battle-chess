@@ -4,8 +4,8 @@ import Button from "../../../common/Button/Button";
 import "./PokemonDraftSelect.css";
 
 interface PokemonDraftSelectProps {
-  draftablePokemon: PokemonSet[];
-  bannedPokemon: PokemonSet[];
+  draftablePokemon: { set: PokemonSet; index: number }[];
+  bannedPokemon: { set: PokemonSet; index: number }[];
   onPokemonSelect: (index: number) => void;
   selectedDraftablePokemon?: number | null;
 }
@@ -18,43 +18,43 @@ const PokemonDraftSelect = ({
 }: PokemonDraftSelectProps) => {
   return (
     <ul className="pokemonDraftSelectContainer">
-      {draftablePokemon.map((pokemon, index) => (
-        <li key={index}>
+      {draftablePokemon.map((pokemon) => (
+        <li key={pokemon.index}>
           <Button
-            highlighted={selectedDraftablePokemon === index}
+            highlighted={selectedDraftablePokemon === pokemon.index}
             className="pokemonDraftOption"
             onClick={() => {
-              onPokemonSelect(index);
+              onPokemonSelect(pokemon.index);
             }}
           >
             <div
               draggable
-              onDragStart={() => onPokemonSelect(index)}
+              onDragStart={() => onPokemonSelect(pokemon.index)}
               className="pokemonDraftSprite"
             >
               <PokemonSprite
-                pokemonIdentifier={pokemon.species}
-                gender={pokemon.gender as GenderName}
-                shiny={pokemon.shiny}
+                pokemonIdentifier={pokemon.set.species}
+                gender={pokemon.set.gender as GenderName}
+                shiny={pokemon.set.shiny}
               />
             </div>
           </Button>
         </li>
       ))}
-      {bannedPokemon.map((pokemon, index) => (
-        <li key={index}>
+      {bannedPokemon.map((pokemon) => (
+        <li key={pokemon.index}>
           <button
             disabled
             className={"bannedDraft"}
             onClick={() => {
-              onPokemonSelect(index);
+              onPokemonSelect(pokemon.index);
             }}
           >
             <PokemonSprite
               className="pokemonDraftSprite"
-              pokemonIdentifier={pokemon.species}
-              gender={pokemon.gender as GenderName}
-              shiny={pokemon.shiny}
+              pokemonIdentifier={pokemon.set.species}
+              gender={pokemon.set.gender as GenderName}
+              shiny={pokemon.set.shiny}
             />
           </button>
         </li>

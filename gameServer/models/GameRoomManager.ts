@@ -1,12 +1,33 @@
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import GameRoom from "./GameRoom.js";
 import User from "./User.js";
-import { GameOptions } from "../../shared/types/GameOptions.js";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../../shared/types/Socket.js";
-import { removeRoom } from "../cache/redis.js";
+import {
+  createRoom,
+  movePlayerToActive,
+  deleteRoom,
+  doesRoomExist,
+  fetchRoomCode,
+  fetchPlayerSecret,
+  fetchUser,
+  fetchAllUsersInRoom,
+  fetchHostPlayerId,
+  fetchPlayer1Id,
+  fetchPlayer2Id,
+  fetchWhitePlayerId,
+  fetchBlackPlayerId,
+  fetchGameOptions,
+  fetchGame,
+  fetchPlayerSpectating,
+  setPlayerSpectating,
+  setGameRoomOptions,
+} from "../cache/redis.js";
+import { Player } from "../../shared/types/Player.js";
+import { Color } from "chess.js";
+import { GameOptions } from "../../shared/types/GameOptions.js";
 
 interface GameRoomList {
   [roomId: string]: GameRoom;
@@ -29,9 +50,9 @@ export default class GameRoomManager {
 
     this.randomBattleMatchQueue = [];
     this.draftBattleMatchQueue = [];
-    setInterval(() => {
-      this.processAllQueues();
-    }, 10 * 1000);
+    // setInterval(() => {
+    //   this.processAllQueues();
+    // }, 10 * 1000);
   }
 
   public getRoom(roomId?: string): GameRoom | undefined {
@@ -41,59 +62,216 @@ export default class GameRoomManager {
     return this.currentRooms[roomId];
   }
 
-  public addRoom(roomId: string, room: GameRoom) {
+  public async getCachedRoom(roomId?: string): Promise<GameRoom | null> {
+    if (!roomId) {
+      return null;
+    }
+    return await fetchGame(roomId);
+  }
+
+  public async getUser(playerId?: string): Promise<User | null> {
+    if (!playerId) {
+      return null;
+    }
+    return await fetchUser(playerId);
+  }
+
+  public async getRoomOptions(roomId: string): Promise<GameOptions> {
+    const gameRoomOptions = await fetchGameOptions(roomId);
+    if (gameRoomOptions) {
+      return gameRoomOptions;
+    }
+    console.log("Defaulting game room options");
+
+    return {
+      format: "random",
+      offenseAdvantage: {
+        atk: 0,
+        def: 0,
+        spa: 0,
+        spd: 1,
+        spe: 0,
+        accuracy: 0,
+        evasion: 0,
+      },
+      weatherWars: false,
+      timersEnabled: true,
+      banTimerDuration: 30,
+      chessTimerDuration: 15,
+      chessTimerIncrement: 5,
+      pokemonTimerIncrement: 1,
+    };
+  }
+
+  public async getPublicPlayerList(roomId: string): Promise<Player[]> {
+    const [
+      users,
+      player1Id,
+      player2Id,
+      hostPlayerId,
+      whitePlayerId,
+      blackPlayerId,
+    ] = await Promise.all([
+      fetchAllUsersInRoom(roomId),
+      fetchPlayer1Id(roomId),
+      fetchPlayer2Id(roomId),
+      fetchHostPlayerId(roomId),
+      fetchWhitePlayerId(roomId),
+      fetchBlackPlayerId(roomId),
+    ]);
+
+    return users.map((user) =>
+      this.convertUserToPlayer({
+        user,
+        isHost: user.playerId === hostPlayerId,
+        isPlayer1: user.playerId === player1Id,
+        isPlayer2: user.playerId === player2Id,
+        color:
+          user.playerId === whitePlayerId
+            ? "w"
+            : user.playerId === blackPlayerId
+              ? "b"
+              : null,
+        isTransient: user.transient,
+        isSpectator: user.playerId !== player1Id && user.playerId !== player2Id,
+      }),
+    );
+  }
+
+  private convertUserToPlayer = ({
+    user,
+    isHost,
+    isPlayer1,
+    isPlayer2,
+    isSpectator,
+    isTransient,
+    color,
+  }: {
+    user: User;
+    isHost: boolean;
+    isPlayer1: boolean;
+    isPlayer2: boolean;
+    isSpectator: boolean;
+    isTransient: boolean;
+    color: Color | null;
+  }): Player => {
+    return {
+      playerName: user.playerName,
+      playerId: user.playerId,
+      avatarId: user.avatarId,
+      transient: isTransient,
+      viewingResults: user.viewingResults,
+      isHost,
+      isPlayer1,
+      isPlayer2,
+      color,
+      isSpectator,
+    };
+  };
+
+  public async cachedRoomExists(roomId: string) {
+    return await doesRoomExist(roomId);
+  }
+
+  public async togglePlayerSpectating({
+    roomId,
+    playerId,
+  }: {
+    roomId: string;
+    playerId: string;
+  }) {
+    const isSpectating = await fetchPlayerSpectating(playerId);
+    return await setPlayerSpectating(roomId, playerId, !isSpectating);
+  }
+
+  public async verifyPlayerConnection(
+    {
+      roomId,
+      playerId,
+      secretId,
+    }: { roomId?: string; playerId?: string; secretId?: string },
+    altOptions?: { roomCode?: string },
+  ): Promise<boolean> {
+    if (!roomId || !playerId || !secretId) {
+      console.log(`${playerId} mismatch for ${roomId}`);
+      return false;
+    }
+
+    const cachedRoomExist = await doesRoomExist(roomId);
+    if (cachedRoomExist === 0) {
+      console.log(`${roomId} does not exist`);
+      return false;
+    }
+
+    if (altOptions) {
+      const roomCode = await fetchRoomCode(roomId);
+      if (altOptions.roomCode !== roomCode) {
+        console.log(`${playerId} invalid password for ${roomId}`);
+        return false;
+      }
+    }
+
+    const playerSecret = await fetchPlayerSecret(playerId);
+    if (playerSecret !== secretId) {
+      console.log(`${playerId} invalid player secret`);
+      return false;
+    }
+
+    return true;
+  }
+
+  public async addRoom(roomId: string, room: GameRoom) {
     console.log(`Creating room ${roomId}`);
-    return (this.currentRooms[roomId] = room);
+    return createRoom(roomId, room);
   }
 
   public removeRoom(roomId: string) {
     console.log(`Cleaning up room ${roomId}`);
     this.io.to(roomId).emit("roomClosed");
-    delete this.currentRooms[roomId];
-    removeRoom(roomId);
+    deleteRoom(roomId);
   }
 
-  public getAllRooms(): GameRoom["roomId"][] {
-    return Object.keys(this.currentRooms);
-  }
-
-  public getGameFromUserSocket(socket: Socket): GameRoom | null {
-    let gameRoom: GameRoom | null = null;
-    for (const room in this.currentRooms) {
-      if (this.currentRooms[room].getPlayer(socket)) {
-        gameRoom = this.currentRooms[room];
-        break;
-      }
+  public async playerCreatedRoomId(
+    playerId: string,
+  ): Promise<string | undefined> {
+    const player = await fetchUser(playerId);
+    const gameRoomExists = await doesRoomExist(player?.connectedRoom);
+    if (gameRoomExists) {
+      return player!.connectedRoom || undefined;
     }
-    return gameRoom;
+    return;
   }
 
-  public getPlayer(playerId: string) {
-    let player: User | null = null;
-    let gameRoom: GameRoom | null = null;
-    for (const room in this.currentRooms) {
-      if (this.currentRooms[room].getPlayer(playerId)) {
-        player = this.currentRooms[room].getPlayer(playerId);
-        gameRoom = this.currentRooms[room];
-        break;
-      }
-    }
-    return { player, room: gameRoom };
+  public async playerJoinRoom(roomId: string, user: User) {
+    await movePlayerToActive(roomId, user.playerId);
   }
 
-  public playerLeaveRoom(roomId: string, playerId?: string) {
-    const room = this.getRoom(roomId);
-    const player = room?.getPlayer(playerId);
-    if (!room || !player) {
+  public async isPlayerActive(roomId: string, playerId: string) {
+    const [player1Id, player2Id] = await Promise.all([
+      fetchPlayer1Id(roomId),
+      fetchPlayer2Id(roomId),
+    ]);
+
+    return player1Id === playerId || player2Id === playerId;
+  }
+
+  public async setRoomOptions(roomId: string, options: GameOptions) {
+    await setGameRoomOptions(roomId, options);
+  }
+
+  public async playerLeaveRoom(roomId: string, playerId?: string) {
+    const room = await this.getCachedRoom(roomId);
+    const player = await this.getUser(playerId);
+    if (!room || !player || !playerId) {
       return;
     }
 
-    const isActivePlayer = room.getActivePlayer(player?.playerId);
+    const isActivePlayer = await this.isPlayerActive(roomId, playerId);
 
-    if (playerId && room.transientPlayerList[playerId]) {
-      clearTimeout(room.transientPlayerList[playerId]);
-      delete room.transientPlayerList[playerId];
-    }
+    // if (playerId && room.transientPlayerList[playerId]) {
+    //   clearTimeout(room.transientPlayerList[playerId]);
+    //   delete room.transientPlayerList[playerId];
+    // }
 
     if (room.hostPlayer?.playerId === playerId) {
       this.io.to(room.roomId).emit("endGameFromDisconnect", {
@@ -112,101 +290,96 @@ export default class GameRoomManager {
 
     room.leaveRoom(player.playerId);
 
-    if (!room.hasPlayers()) {
-      this.removeRoom(room.roomId);
-    } else {
-      this.io
-        .to(room.roomId)
-        .emit("connectedPlayers", room.getPublicPlayerList());
-    }
+    this.io
+      .to(room.roomId)
+      .emit("connectedPlayers", await this.getPublicPlayerList(roomId));
   }
 
-  public addPlayerToQueue(user: User, queue: "random" | "draft") {
-    if (queue === "random") {
-      this.randomBattleMatchQueue.push(user);
-    } else if (queue === "draft") {
-      this.draftBattleMatchQueue.push(user);
-    }
-  }
+  //   public addPlayerToQueue(user: User, queue: "random" | "draft") {
+  //     if (queue === "random") {
+  //       this.randomBattleMatchQueue.push(user);
+  //     } else if (queue === "draft") {
+  //       this.draftBattleMatchQueue.push(user);
+  //     }
+  //   }
 
-  public removePlayerFromQueue(socket: Socket, queue?: "random" | "draft") {
-    if (queue || queue === "random") {
-      this.randomBattleMatchQueue = this.randomBattleMatchQueue.filter(
-        (user) => user.socket?.id !== socket.id,
-      );
-    }
-    if (queue || queue === "draft") {
-      this.draftBattleMatchQueue = this.draftBattleMatchQueue.filter(
-        (user) => user.socket?.id !== socket.id,
-      );
-    }
-  }
+  //   public removePlayerFromQueue(socket: Socket, queue?: "random" | "draft") {
+  //     if (queue || queue === "random") {
+  //       this.randomBattleMatchQueue = this.randomBattleMatchQueue.filter(
+  //         (user) => user.socket?.id !== socket.id,
+  //       );
+  //     }
+  //     if (queue || queue === "draft") {
+  //       this.draftBattleMatchQueue = this.draftBattleMatchQueue.filter(
+  //         (user) => user.socket?.id !== socket.id,
+  //       );
+  //     }
+  //   }
 
-  private processAllQueues() {
-    this.randomBattleMatchQueue = this.randomBattleMatchQueue.filter(
-      (user) => user.socket?.connected === true,
-    );
-    this.draftBattleMatchQueue = this.draftBattleMatchQueue.filter(
-      (user) => user.socket?.connected === true,
-    );
-    const gameOptions = {
-      offenseAdvantage: {
-        atk: 0,
-        def: 0,
-        spa: 0,
-        spd: 1,
-        spe: 0,
-        accuracy: 0,
-        evasion: 0,
-      },
-      weatherWars: true,
-      timersEnabled: true,
-      banTimerDuration: 30,
-      chessTimerDuration: 15,
-      chessTimerIncrement: 5,
-      pokemonTimerIncrement: 1,
-    };
+  //   private processAllQueues() {
+  //     this.randomBattleMatchQueue = this.randomBattleMatchQueue.filter(
+  //       (user) => user.socket?.connected === true,
+  //     );
+  //     this.draftBattleMatchQueue = this.draftBattleMatchQueue.filter(
+  //       (user) => user.socket?.connected === true,
+  //     );
+  //     const gameOptions = {
+  //       offenseAdvantage: {
+  //         atk: 0,
+  //         def: 0,
+  //         spa: 0,
+  //         spd: 1,
+  //         spe: 0,
+  //         accuracy: 0,
+  //         evasion: 0,
+  //       },
+  //       weatherWars: true,
+  //       timersEnabled: true,
+  //       banTimerDuration: 30,
+  //       chessTimerDuration: 15,
+  //       chessTimerIncrement: 5,
+  //       pokemonTimerIncrement: 1,
+  //     };
 
-    this.randomBattleMatchQueue = this.createGamesForQueue(
-      this.randomBattleMatchQueue,
-      {
-        format: "random",
-        ...gameOptions,
-      },
-    );
+  //     this.randomBattleMatchQueue = this.createGamesForQueue(
+  //       this.randomBattleMatchQueue,
+  //       {
+  //         format: "random",
+  //         ...gameOptions,
+  //       },
+  //     );
 
-    this.draftBattleMatchQueue = this.createGamesForQueue(
-      this.draftBattleMatchQueue,
-      {
-        format: "draft",
-        ...gameOptions,
-      },
-    );
-  }
+  //     this.draftBattleMatchQueue = this.createGamesForQueue(
+  //       this.draftBattleMatchQueue,
+  //       {
+  //         format: "draft",
+  //         ...gameOptions,
+  //       },
+  //     );
+  //   }
 
-  private createGamesForQueue(queue: User[], gameOptions: GameOptions) {
-    const remainingQueue: User[] = [];
-    for (let i = 0; i < queue.length - 1; i += 2) {
-      const newRoomId = crypto.randomUUID();
+  //   private createGamesForQueue(queue: User[], gameOptions: GameOptions) {
+  //     const remainingQueue: User[] = [];
+  //     for (let i = 0; i < queue.length - 1; i += 2) {
+  //       const newRoomId = crypto.randomUUID();
 
-      this.currentRooms[newRoomId] = new GameRoom(
-        newRoomId,
-        null,
-        "",
-        this,
-        true,
-      );
-      this.currentRooms[newRoomId].joinRoom(queue[i]);
-      this.currentRooms[newRoomId].joinRoom(queue[i + 1]);
-      this.currentRooms[newRoomId].setOptions(gameOptions);
-      queue[i].socket?.emit("foundMatch", { roomId: newRoomId });
-      queue[i + 1].socket?.emit("foundMatch", { roomId: newRoomId });
-      this.currentRooms[newRoomId].startGame();
-    }
+  //       this.currentRooms[newRoomId] = new GameRoom(
+  //         newRoomId,
+  //         null,
+  //         "",
+  //         this,
+  //       );
+  //       this.playerJoinRoom(newRoomId, queue[i]);
+  //       this.playerJoinRoom(newRoomId, queue[i + 1]);
+  //       this.currentRooms[newRoomId].setOptions(gameOptions);
+  //       queue[i].socket?.emit("foundMatch", { roomId: newRoomId });
+  //       queue[i + 1].socket?.emit("foundMatch", { roomId: newRoomId });
+  //       this.currentRooms[newRoomId].startGame();
+  //     }
 
-    if (queue.length % 2 !== 0) {
-      remainingQueue.push(queue[queue.length - 1]);
-    }
-    return remainingQueue;
-  }
+  //     if (queue.length % 2 !== 0) {
+  //       remainingQueue.push(queue[queue.length - 1]);
+  //     }
+  //     return remainingQueue;
+  //   }
 }

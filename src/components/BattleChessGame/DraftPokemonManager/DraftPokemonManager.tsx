@@ -70,11 +70,15 @@ const DraftPokemonManager = ({
           selectedSquare={selectedSquare}
         />
         <PokemonChessDetailsCard
-          squareModifier={pokemonManager.getWeatherFromSquare(selectedSquare)}
+          squareModifier={pokemonManager.getModifiersFromSquare(selectedSquare)}
           pokemon={
             pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn ||
             (draftPokemonSelected !== null
-              ? pokemonManager.draftPieces[draftPokemonSelected]
+              ? pokemonManager.draftPieces[
+                  pokemonManager.draftPieces.findIndex(
+                    ({ index }) => index === draftPokemonSelected,
+                  )
+                ]?.set
               : null)
           }
         />

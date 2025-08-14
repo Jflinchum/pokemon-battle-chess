@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import GameRoom from "../models/GameRoom.js";
 import GameRoomManager from "../models/GameRoomManager.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
+import { doesRoomExist } from "../cache/redis.js";
 
 interface APIResponse<Data> {
   data?: Data;
@@ -51,21 +52,16 @@ export const registerRoutes = (
     }
 
     // Player already owns a room
-    const { room } = gameRoomManager.getPlayer(playerId);
-    if (room) {
-      gameRoomManager.removeRoom(room.roomId);
+    const roomId = await gameRoomManager.playerCreatedRoomId(playerId);
+    if (roomId) {
+      gameRoomManager.removeRoom(roomId);
     }
     const newRoomId = crypto.randomUUID();
 
-    const host = new User(playerName, playerId, avatarId || "1", secret);
-    const gameRoom = new GameRoom(
-      newRoomId,
-      host,
-      password,
-      gameRoomManager,
-      false,
-    );
-    gameRoomManager.addRoom(newRoomId, gameRoom);
+    const user = new User(playerName, playerId, avatarId, secret);
+    const gameRoom = new GameRoom(newRoomId, password);
+    await gameRoomManager.addRoom(newRoomId, gameRoom);
+    await gameRoomManager.playerJoinRoom(newRoomId, user);
 
     res.status(200).send({
       data: { roomId: newRoomId },
@@ -94,15 +90,14 @@ export const registerRoutes = (
     const roomId = req.body.roomId;
     const playerId = req.body.playerId;
     const playerName = req.body.playerName;
-    const password = req.body.password;
     const avatarId = req.body.avatarId;
     const playerSecret = req.body.playerSecret;
-    const room = gameRoomManager.getRoom(roomId);
+    const roomExists = await doesRoomExist(roomId);
 
     if (!roomId || !playerId || !playerName) {
       res.status(400).send({ message: "Missing parameters" });
       return;
-    } else if (!room) {
+    } else if (!roomExists) {
       res.status(400).send({ message: "Room is no longer available" });
       return;
     } else if (isStringProfane(playerName)) {
@@ -110,23 +105,13 @@ export const registerRoutes = (
       return;
     }
 
-    if (room.password !== password) {
-      res.status(401).send({ message: "Invalid password" });
-      return;
-    }
-
-    if (!room) {
-      res.status(400).send({ message: "Room is no longer available" });
-      return;
-    }
-    const existingPlayer = room.getPlayer(playerId);
-    if (existingPlayer) {
-      if (room.transientPlayerList[playerId]) {
-        clearTimeout(room.transientPlayerList[playerId]);
-      }
-      existingPlayer.setViewingResults(false);
+    const existingPlayer = await gameRoomManager.getUser(playerId);
+    if (existingPlayer?.transient) {
+      // clearTimeout(room.transientPlayerList[playerId]);
+      await existingPlayer.setViewingResults(false);
     } else {
-      room?.joinRoom(
+      await gameRoomManager.playerJoinRoom(
+        roomId,
         new User(playerName, playerId, avatarId || "1", playerSecret),
       );
     }
@@ -143,8 +128,7 @@ export const registerRoutes = (
   >("/game-service/leave-room", async (req, res) => {
     const roomId = req.body.roomId;
     const playerId = req.body.playerId;
-    const room = gameRoomManager.getRoom(roomId);
-    if (!roomId || !playerId || !room) {
+    if (!roomId || !playerId) {
       res.status(204).send();
       return;
     }

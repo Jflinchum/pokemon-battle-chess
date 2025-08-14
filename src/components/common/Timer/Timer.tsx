@@ -7,12 +7,16 @@ interface TimerProps {
   timerExpiration: number;
   paused: boolean;
   hasStarted: boolean;
-  startingTime: number;
   className?: string;
 }
 
 const getTimeLeftInMilliSeconds = (expiration: number) => {
-  return Math.floor(expiration - new Date().getTime()) + 1;
+  return expiration - new Date().getTime();
+};
+
+const getTimeLeftRoundedUpToNearestSecond = (expiration: number) => {
+  const timeLeft = expiration - new Date().getTime();
+  return timeLeft + (1000 - (timeLeft % 1000));
 };
 
 const formatMillisecondsToTime = (milliseconds: number) => {
@@ -31,11 +35,12 @@ const Timer = ({
   timerExpiration,
   paused,
   hasStarted,
-  startingTime,
   className = "",
 }: TimerProps) => {
   const [time, setTime] = useState<number>(
-    hasStarted ? getTimeLeftInMilliSeconds(timerExpiration) : startingTime,
+    hasStarted
+      ? getTimeLeftInMilliSeconds(timerExpiration)
+      : getTimeLeftRoundedUpToNearestSecond(timerExpiration),
   );
   const [timeInterval, setTimeInterval] = useState<number>(
     getTimeLeftInMilliSeconds(timerExpiration) < 60 * 1000 ? 10 : 1000,
@@ -68,10 +73,10 @@ const Timer = ({
   useEffect(() => {
     const timeLeft = hasStarted
       ? getTimeLeftInMilliSeconds(timerExpiration)
-      : startingTime;
+      : getTimeLeftRoundedUpToNearestSecond(timerExpiration);
     setTime(timeLeft);
     setTimeInterval(timeLeft < 60 * 1000 ? 10 : 1000);
-  }, [timerExpiration, hasStarted, startingTime]);
+  }, [timerExpiration, hasStarted]);
 
   return (
     <span className={`timer ${paused ? "paused" : ""} ${className}`}>

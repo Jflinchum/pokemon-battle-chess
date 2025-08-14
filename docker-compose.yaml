@@ -14,6 +14,7 @@ services:
       - DOCKER_HOST=true
     volumes:
       - ./lobbyServer:/app/lobbyServer
+      - ./shared:/app/shared
     depends_on:
       - game-server-service
     networks:
@@ -34,6 +35,7 @@ services:
       - DOCKER_HOST=true
     volumes:
       - ./gameServer:/app/gameServer
+      - ./shared:/app/shared
     networks:
       - app-network
   webapp:
@@ -49,6 +51,7 @@ services:
       - DOCKER_HOST=true
     volumes:
       - ./src:/app/src
+      - ./shared:/app/shared
     depends_on:
       - lobby-server-service
       - game-server-service

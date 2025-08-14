@@ -17,8 +17,8 @@ export const useSocketRequests = () => {
   );
 
   const requestChessMove = useCallback(
-    (san: string) => {
-      socket.emit("requestChessMove", { sanMove: san, ...commonClientArgs });
+    (sanMove: string) => {
+      socket.emit("requestChessMove", { sanMove, ...commonClientArgs });
     },
     [commonClientArgs],
   );
@@ -53,6 +53,10 @@ export const useSocketRequests = () => {
     },
     [commonClientArgs],
   );
+
+  const requestValidateTimers = useCallback(() => {
+    socket.emit("requestValidateTimers", { ...commonClientArgs });
+  }, [commonClientArgs]);
 
   const requestSetViewingResults = useCallback(
     (viewingResults: boolean) => {
@@ -123,6 +127,7 @@ export const useSocketRequests = () => {
     requestDraftPokemon,
     requestBanPokemon,
     requestPokemonMove,
+    requestValidateTimers,
     requestSetViewingResults,
     requestReturnEveryoneToRoom,
     requestStartGame,

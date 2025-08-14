@@ -193,8 +193,8 @@ const ChessManager = ({
         <PokemonChessDetailsCard
           chessMoveHistory={chessMoveHistory}
           squareModifier={
-            pokemonManager.getWeatherFromSquare(hoveredSquare) ||
-            pokemonManager.getWeatherFromSquare(selectedSquare)
+            pokemonManager.getModifiersFromSquare(hoveredSquare) ||
+            pokemonManager.getModifiersFromSquare(selectedSquare)
           }
           pokemon={
             pokemonManager.getPokemonFromSquare(hoveredSquare)?.pkmn ||

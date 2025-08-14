@@ -1,5 +1,4 @@
-import { Socket } from "socket.io";
-import { Chess, Color, Square } from "chess.js";
+import { Chess, Color, Move, Piece, Square } from "chess.js";
 import {
   Dex as SimDex,
   BattleStreams,
@@ -7,14 +6,15 @@ import {
   PRNGSeed,
   Battle,
 } from "@pkmn/sim";
-import { BoostID, PokemonSet } from "@pkmn/data";
+import { BoostID } from "@pkmn/data";
 import { PRNG } from "@pkmn/sim";
 import { Protocol } from "@pkmn/protocol";
 import { ObjectReadWriteStream } from "@pkmn/streams";
 import User from "./User.js";
-import GameRoomManager from "./GameRoomManager.js";
 import {
+  ChessBoardSquare,
   PokemonBattleChessManager,
+  PokemonPiece,
   SquareModifier,
   TerrainNames,
   WeatherNames,
@@ -23,30 +23,79 @@ import {
   EndGameReason,
   MatchHistory,
   MatchLog,
+  Timer,
 } from "../../shared/types/Game.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import GameTimer from "./GameTimer.js";
 import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes.js";
 import { Player } from "../../shared/types/Player.js";
-import { removePlayerIdFromRoom, setRoomToOngoing } from "../cache/redis.js";
+import {
+  clearPokemonBanList,
+  clearPokemonMoveHistory,
+  getBlackMatchHistory,
+  getBlackPlayerPokemonMove,
+  getBlackTimerExpiration,
+  getBlackTimerPaused,
+  getBlackTimeSinceLastMove,
+  getPokemonBanList,
+  getPokemonBattleSeed,
+  getPokemonBattleStakes,
+  getPokemonMoveHistory,
+  getRoomBoard,
+  getRoomPokemonIndices,
+  getRoomSquareModifiers,
+  getRoomSquareModifierTarget,
+  getWhiteMatchHistory,
+  getWhitePlayerPokemonMove,
+  getWhiteTimerExpiration,
+  getWhiteTimerPaused,
+  getWhiteTimeSinceLastMove,
+  initializeGameStart,
+  pushBlackMatchHistory,
+  pushMatchHistory,
+  pushPokemonBanList,
+  pushPokemonMoveHistory,
+  pushWhiteMatchHistory,
+  releaseLockForRoom,
+  removePlayerIdFromRoom,
+  resetMatchHistory,
+  setBlackPlayerPokemonMove,
+  setBlackTimerExpiration,
+  setBlackTimerPaused,
+  setBlackTimeSinceLastMove,
+  setChessBoard,
+  setGameRoomSeed,
+  setGeneratedPokemonIndices,
+  setLockForRoom,
+  setPlayersViewingResults,
+  setPokemonBattleSeed,
+  setPokemonBattleStakes,
+  setRoomSquareModifiers,
+  setRoomSquareModifierTarget,
+  setRoomTimers,
+  setRoomToOngoing,
+  setWhitePlayerPokemonMove,
+  setWhiteTimerExpiration,
+  setWhiteTimerPaused,
+  setWhiteTimeSinceLastMove,
+} from "../cache/redis.js";
+import {
+  packSquareModifierIntoBitField,
+  unpackSquareModifierFromBitField,
+} from "../cache/squareModifierBitField.js";
 
 export default class GameRoom {
   public roomId: string;
-  public roomSeed: PRNGSeed;
-  private secretSeed: PRNGSeed;
-  private secretPRNG: PRNG;
-  public isQuickPlay: boolean;
+  public publicSeed: PRNGSeed;
   public password: string;
   public hostPlayer: User | null = null;
   public player1: User | null = null;
   public player2: User | null = null;
-  public playerList: User[];
+  public playerList?: string[];
   public transientPlayerList: Record<User["playerId"], NodeJS.Timeout> = {};
-  // Store list of spectators
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
 
-  private gameRoomManager: GameRoomManager;
   public whitePlayer: User | null;
   public blackPlayer: User | null;
   private currentTurnWhite: boolean = true;
@@ -65,36 +114,35 @@ export default class GameRoom {
   public blackMatchHistory: MatchHistory = [];
   public gameTimer: GameTimer | null;
 
+  private currentPokemonBattleStakes: { san: string; color: Color } | null =
+    null;
   private squareModifierTarget: number;
 
   constructor(
     roomId: string,
-    hostPlayer: User | null,
     password: string,
-    gameRoomManager: GameRoomManager,
-    isQuickPlay: boolean,
+    publicSeed?: PRNGSeed,
+    roomGameOptions?: GameOptions,
+    playerList?: string[],
+    hostPlayer?: User,
+    player1?: User,
+    player2?: User,
+    whitePlayer?: User,
+    blackPlayer?: User,
+    isOngoing?: boolean,
   ) {
     this.roomId = roomId;
-    this.hostPlayer = hostPlayer;
-    this.player1 = hostPlayer;
-    this.playerList = [];
-    if (hostPlayer) {
-      this.playerList.push(hostPlayer);
-    }
+    this.playerList = playerList;
 
-    this.isQuickPlay = isQuickPlay;
-    this.isOngoing = false;
+    this.isOngoing = isOngoing || false;
     this.password = password;
-    this.gameRoomManager = gameRoomManager;
-    this.roomSeed = PRNG.generateSeed();
-    this.secretSeed = PRNG.generateSeed();
-    this.secretPRNG = new PRNG(this.secretSeed);
+    this.publicSeed = publicSeed || PRNG.generateSeed();
 
     this.chessManager = new Chess();
     this.currentTurnWhite = true;
     this.whiteMatchHistory = [];
     this.blackMatchHistory = [];
-    this.roomGameOptions = {
+    this.roomGameOptions = roomGameOptions || {
       format: "random",
       offenseAdvantage: {
         atk: 0,
@@ -116,28 +164,19 @@ export default class GameRoom {
     this.squareModifierTarget = 15;
 
     this.pokemonGameManager = new PokemonBattleChessManager({
-      seed: this.roomSeed,
+      seed: this.publicSeed,
       format: this.roomGameOptions.format,
       weatherWars: this.roomGameOptions.weatherWars,
     });
-    this.whitePlayer = null;
-    this.blackPlayer = null;
+    this.player1 = player1 || null;
+    this.player2 = player2 || null;
+    this.hostPlayer = hostPlayer || null;
+    this.whitePlayer = whitePlayer || null;
+    this.blackPlayer = blackPlayer || null;
     this.whitePlayerPokemonMove = null;
     this.blackPlayerPokemonMove = null;
     this.currentPokemonBattleStream = null;
     this.currentPokemonBattle = null;
-  }
-
-  public joinRoom(player: User) {
-    if (this.player1 === null) {
-      this.player1 = player;
-    } else if (this.player2 === null) {
-      this.player2 = player;
-    }
-    const existingPlayer = this.getPlayer(player.playerId);
-    if (!existingPlayer) {
-      this.playerList.push(player);
-    }
   }
 
   public leaveRoom(playerId: string) {
@@ -150,18 +189,7 @@ export default class GameRoom {
     if (this.hostPlayer?.playerId === playerId) {
       this.hostPlayer = null;
     }
-    this.playerList = this.playerList.filter(
-      (player) => playerId !== player.playerId,
-    );
     removePlayerIdFromRoom(this.roomId, playerId);
-  }
-
-  public hasPlayers() {
-    return this.playerList.length > 0;
-  }
-
-  public getPlayers(): User[] {
-    return this.playerList;
   }
 
   private convertUserToPlayer(user: User): Player {
@@ -186,75 +214,19 @@ export default class GameRoom {
     };
   }
 
-  public getPublicPlayerList() {
-    return this.playerList.map((user) => this.convertUserToPlayer(user));
-  }
-
-  /**
-   * Client, host, or spectator
-   */
-  public getPlayer(playerIdOrSocket?: string | Socket): User | null {
-    return (
-      this.playerList.find((player) => {
-        if (playerIdOrSocket instanceof Socket) {
-          return player.socket?.id === playerIdOrSocket.id;
-        } else {
-          return player.playerId === playerIdOrSocket;
-        }
-      }) || null
-    );
-  }
-
-  /**
-   * Either the client or host. Does not get spectators
-   */
-  public getActivePlayer(playerIdOrSocket?: string | Socket): User | null {
-    if (typeof playerIdOrSocket === "string") {
-      if (this.player1?.playerId === playerIdOrSocket) {
-        return this.player1;
-      } else if (this.player2?.playerId === playerIdOrSocket) {
-        return this.player2;
-      }
-    } else if (playerIdOrSocket instanceof Socket) {
-      if (this.player1?.socket?.id === playerIdOrSocket.id) {
-        return this.player1;
-      } else if (this.player2?.socket?.id === playerIdOrSocket.id) {
-        return this.player2;
-      }
-    }
-
-    return null;
-  }
-
   public preparePlayerDisconnect(player: User) {
     const transientTimeout = setTimeout(() => {
       console.log(
         "Player disconnection exceeded timeout. Forcing them out of the room.",
       );
-      this.gameRoomManager.playerLeaveRoom(this.roomId, player.playerId);
+      // this.gameRoomManager.playerLeaveRoom(this.roomId, player.playerId);
     }, 1000 * 60);
     this.transientPlayerList[player.playerId] = transientTimeout;
   }
 
-  public toggleSpectating(player: User) {
-    if (player.playerId === this.player1?.playerId) {
-      this.player1 = null;
-    } else if (player.playerId === this.player2?.playerId) {
-      this.player2 = null;
-    } else {
-      if (!this.player1) {
-        this.player1 = player;
-      } else if (!this.player2) {
-        this.player2 = player;
-      }
-    }
-  }
-
   public getSpectators() {
-    return this.playerList.filter(
-      (player) =>
-        player.playerId !== this.player1?.playerId &&
-        player.playerId !== this.player2?.playerId,
+    return this.playerList?.filter(
+      (p) => p !== this.player1?.playerId && p !== this.player2?.playerId,
     );
   }
 
@@ -302,97 +274,130 @@ export default class GameRoom {
   ) {
     return {
       color,
-      seed: this.roomSeed,
+      seed: this.publicSeed,
       options: this.roomGameOptions,
       whitePlayer: this.convertUserToPlayer(whitePlayer),
       blackPlayer: this.convertUserToPlayer(blackPlayer),
-      isQuickPlay: this.isQuickPlay,
     };
   }
 
-  public startGame() {
+  public async initializeGame() {
     if (this.player1 && this.player2) {
-      this.resetRoomForRematch();
-      this.isOngoing = true;
-      setRoomToOngoing(this.roomId, true);
+      await this.resetRoomForRematch();
       const coinFlip = Math.random() > 0.5;
 
       const white = coinFlip ? this.player1 : this.player2;
       const black = coinFlip ? this.player2 : this.player1;
       this.whitePlayer = white;
       this.blackPlayer = black;
+      await initializeGameStart(this.roomId, white.playerId, black.playerId);
+      if (this.roomGameOptions.timersEnabled) {
+        await this.initializeTimers();
+      }
 
-      this.broadcastTimers();
-      this.whitePlayer.socket?.emit(
-        "startGame",
-        this.buildStartGameArgs("w", white, black),
-      );
-      this.getSpectators().forEach((spectator) =>
-        spectator.socket?.emit(
-          "startGame",
-          this.buildStartGameArgs("w", white, black),
-        ),
-      );
-      this.blackPlayer.socket?.emit(
-        "startGame",
-        this.buildStartGameArgs("b", white, black),
-      );
+      return {
+        whiteStartGame: this.buildStartGameArgs("w", white, black),
+        blackStartGame: this.buildStartGameArgs("b", white, black),
+        timers: this.gameTimer?.getTimers(false),
+      };
     }
+    throw new Error("Players not initialized");
   }
 
-  public verifyPlayer(playerId?: string, playerSecret?: string) {
-    if (!playerId || !playerSecret) return false;
-    const player = this.getPlayer(playerId);
-    if (!player) return false;
-
-    return player.playerSecret === playerSecret;
+  private async setGameState() {
+    return Promise.all([
+      this.setChessState(),
+      this.setPokemonManagerState(),
+      this.setPokemonBattleState(),
+      this.setTimerState(),
+    ]);
   }
 
-  private emitGameOutput = (data: MatchLog, user?: User | null) => {
-    if (user) {
-      user.socket?.timeout(10000).emit("gameOutput", data, (err: Error) => {
-        if (err) {
-          this.startHealthCheck(user);
-        }
-      });
+  private async setChessState() {
+    const chessFen = await getRoomBoard(this.roomId);
+    if (!chessFen) {
+      throw Error("Unable to retreive chess fen.");
+    }
+    this.chessManager = new Chess(chessFen, { skipValidation: true });
+    this.chessManager.board();
+    this.currentTurnWhite = this.chessManager.turn() === "w";
+  }
+
+  private async setPokemonManagerState() {
+    const pokemonPieceIndices = await getRoomPokemonIndices(this.roomId);
+    const pokemonBannedIndices = await getPokemonBanList(this.roomId);
+    const squareModifiers = (await getRoomSquareModifiers(this.roomId)).map(
+      unpackSquareModifierFromBitField,
+    );
+    this.squareModifierTarget =
+      (await getRoomSquareModifierTarget(this.roomId)) || 15;
+    this.pokemonGameManager = new PokemonBattleChessManager({
+      seed: this.publicSeed,
+      format: this.roomGameOptions.format,
+      weatherWars: this.roomGameOptions.weatherWars,
+      chessBoard: this.chessManager.board(),
+      pokemonPieceIndices,
+      pokemonBannedIndices,
+      squareModifiers,
+    });
+  }
+
+  private async setPokemonBattleState() {
+    this.currentPokemonBattleStakes = await getPokemonBattleStakes(this.roomId);
+    this.whitePlayerPokemonMove = await getWhitePlayerPokemonMove(this.roomId);
+    this.blackPlayerPokemonMove = await getBlackPlayerPokemonMove(this.roomId);
+  }
+
+  public async lockAndValidateTimer(): Promise<
+    { matchOutput: MatchLog[]; timer: Timer | undefined } | undefined
+  > {
+    const reservedLock = await setLockForRoom(this.roomId);
+
+    if (reservedLock) {
+      try {
+        await this.setGameState();
+
+        const timerValidation = await this.validateGameTimer();
+        return timerValidation;
+      } finally {
+        await releaseLockForRoom(reservedLock);
+      }
     } else {
-      this.playerList.forEach((user) =>
-        user.socket?.timeout(10000).emit("gameOutput", data, (err: Error) => {
-          if (err) {
-            this.startHealthCheck(user);
-          }
-        }),
-      );
+      return;
     }
-  };
+  }
 
-  private startHealthCheck(user: User) {
-    console.log(`Starting healthcheck for player ${user.playerId}`);
+  private async validateGameTimer(): Promise<
+    { matchOutput: MatchLog[]; timer: Timer | undefined } | undefined
+  > {
+    const timerExpired = this.gameTimer?.isTimeExpired();
+    if (!timerExpired?.white && !timerExpired?.black) {
+      return;
+    }
 
-    const healthCheck = () => {
-      // If the player has left or disconnected, stop the health check
-      if (this.transientPlayerList[user.playerId]) {
-        clearTimeout(timeout);
-        return;
-      }
-      if (!this.getPlayer(user.playerId)) {
-        clearTimeout(timeout);
-        return;
-      }
-
-      user.socket?.timeout(10000).emit("health", (err: Error) => {
-        if (!err) {
-          user.socket?.emit("startSync", {
-            history: this.getHistory(user.playerId),
-          });
-          clearTimeout(timeout);
-          return;
+    if (this.pokemonGameManager.draftPieces.length > 0) {
+      try {
+        if (timerExpired.white) {
+          return await this.randomDraftPick("w");
+        } else if (timerExpired.black) {
+          return await this.randomDraftPick("b");
         }
-      });
-    };
-
-    const timeout: NodeJS.Timeout = setInterval(healthCheck, 150000);
-    healthCheck();
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      if (timerExpired.white) {
+        return {
+          matchOutput: [this.endGameDueToTimeout("w")],
+          timer: this.gameTimer?.getTimers(),
+        };
+      } else if (timerExpired.black) {
+        return {
+          matchOutput: [this.endGameDueToTimeout("b")],
+          timer: this.gameTimer?.getTimers(),
+        };
+      }
+    }
   }
 
   public async validateAndEmitChessMove({
@@ -401,25 +406,55 @@ export default class GameRoom {
   }: {
     sanMove: string;
     playerId: string;
-  }) {
+  }): Promise<
+    | {
+        whiteStreamOutput: MatchLog[];
+        blackStreamOutput: MatchLog[];
+        timers?: Timer;
+      }
+    | undefined
+  > {
+    const whiteStreamOutput: MatchLog[] = [];
+    const blackStreamOutput: MatchLog[] = [];
+
+    try {
+      await this.setGameState();
+    } catch (err) {
+      console.log(err);
+      return;
+    }
     if (!this.whitePlayer || !this.blackPlayer || !this.isOngoing) {
+      console.log("State error");
       return;
     }
     if (this.currentTurnWhite && this.whitePlayer.playerId !== playerId) {
+      console.log("Player id does not match with white");
       return;
     } else if (
       !this.currentTurnWhite &&
       this.blackPlayer.playerId !== playerId
     ) {
+      console.log("Player id does not match with black");
       return;
     }
-    if (this.currentPokemonBattleStream) {
+    if (this.currentPokemonBattleStakes) {
+      console.log("Already pokemon stakes. No chess moves allowed");
       return;
     }
+    const timerValidationOutput = await this.validateGameTimer();
+    if (timerValidationOutput) {
+      return {
+        whiteStreamOutput: timerValidationOutput.matchOutput,
+        blackStreamOutput: timerValidationOutput.matchOutput,
+        timers: timerValidationOutput.timer,
+      };
+    }
+
     const chessMove = this.chessManager
       .moves({ verbose: true, continueOnCheck: true })
       .find((move) => move.san === sanMove);
     if (!chessMove) {
+      console.log("Could not find chess move");
       return;
     }
 
@@ -438,97 +473,75 @@ export default class GameRoom {
       const p2Pokemon = this.currentTurnWhite
         ? this.pokemonGameManager.getPokemonFromSquare(capturedPieceSquare)
         : this.pokemonGameManager.getPokemonFromSquare(chessMove.from);
+      const attemptedMove = { san: sanMove, color: chessMove.color };
 
-      const moveSucceeds = await this.createPokemonBattleStream({
-        p1Set: p1Pokemon!.pkmn,
-        p2Set: p2Pokemon!.pkmn,
-        attemptedMove: { san: sanMove, color: chessMove.color },
-        squareModifier: this.pokemonGameManager.squareModifiers.find(
-          (sqMod) => sqMod.square === capturedPieceSquare,
-        ),
-        battleSquare: capturedPieceSquare,
+      if (!p1Pokemon || !p2Pokemon) {
+        console.log("Could not find pokemon to battle.");
+        return;
+      }
+
+      const battleStartData: MatchLog = {
+        type: "pokemon",
+        data: {
+          event: "battleStart",
+          p1Pokemon: p1Pokemon.pkmn,
+          p2Pokemon: p2Pokemon.pkmn,
+          attemptedMove,
+        },
+      };
+      const battleSeed = new PRNG().getSeed();
+      await this.initiatePokemonBattle({
+        attemptedMove,
+        battleSeed,
       });
-
-      // Clear out the old battle stream
-      this.currentPokemonBattleStream = null;
-      this.currentPokemonBattle = null;
-
-      if (moveSucceeds) {
-        const lostPiece = this.chessManager.get(capturedPieceSquare);
-        this.pokemonGameManager.movePokemonToSquare(
-          chessMove.from,
-          chessMove.to,
-          chessMove.promotion,
-        );
-        this.chessManager.move(sanMove, { continueOnCheck: true });
-
-        const chessData: MatchLog = {
-          type: "chess",
-          data: {
-            color: this.currentTurnWhite ? "w" : "b",
-            san: sanMove,
-            failed: false,
-          },
-        };
-        this.pushHistory(chessData);
-        this.emitGameOutput(chessData);
-        if (lostPiece?.type === "k") {
-          // Game ender
-          this.endGame(this.currentTurnWhite ? "w" : "b", "KING_CAPTURED");
-          return;
-        }
+      whiteStreamOutput.push(battleStartData);
+      blackStreamOutput.push(battleStartData);
+      await this.pushHistory(battleStartData);
+      const squareModifier =
+        this.pokemonGameManager.getModifiersFromSquare(capturedPieceSquare);
+      const initialBattleOutput = await this.simulatePokemonBattle({
+        moveHistory: [],
+        p1Pokemon: p1Pokemon,
+        p2Pokemon: p2Pokemon,
+        battleSquare: capturedPieceSquare,
+        squareModifier: squareModifier,
+        seed: battleSeed,
+      });
+      if (initialBattleOutput) {
+        whiteStreamOutput.push(...initialBattleOutput.whiteStream);
+        blackStreamOutput.push(...initialBattleOutput.blackStream);
+        await this.pushWhiteHistory(initialBattleOutput.whiteStream);
+        await this.pushBlackHistory(initialBattleOutput.blackStream);
       } else {
-        const lostPiece = this.chessManager.get(chessMove.from);
-        this.pokemonGameManager.getPokemonFromSquare(chessMove.from)!.square =
-          null;
-        this.chessManager.remove(chessMove.from);
-        this.chessManager.forceAdvanceTurn();
-
-        const chessData: MatchLog = {
-          type: "chess",
-          data: {
-            color: this.currentTurnWhite ? "w" : "b",
-            san: sanMove,
-            failed: true,
-          },
-        };
-        this.pushHistory(chessData);
-        this.emitGameOutput(chessData);
-        if (lostPiece?.type === "k") {
-          // Game ender
-          this.endGame(this.currentTurnWhite ? "w" : "b", "KING_CAPTURED");
-          return;
-        }
+        console.log("No initial battle output");
+        return;
       }
     } else {
-      this.pokemonGameManager.movePokemonToSquare(
-        chessMove.from,
-        chessMove.to,
-        chessMove.promotion,
-      );
-      this.chessManager.move(sanMove, { continueOnCheck: true });
+      await this.moveChessPiece(chessMove);
       const chessData: MatchLog = {
         type: "chess",
         data: { color: this.currentTurnWhite ? "w" : "b", san: sanMove },
       };
-      this.pushHistory(chessData);
-      this.emitGameOutput(chessData);
+      await this.pushHistory(chessData);
+      whiteStreamOutput.push(chessData);
+      blackStreamOutput.push(chessData);
     }
 
-    this.gameTimer?.processChessMove(this.currentTurnWhite, () =>
-      this.endGameDueToTimeout(this.currentTurnWhite ? "b" : "w"),
-    );
-    this.broadcastTimers();
-
-    this.currentTurnWhite = !this.currentTurnWhite;
+    let timers: Timer | undefined;
+    if (this.roomGameOptions.timersEnabled) {
+      timers = await this.processRoomTimers(
+        chessMove.isCapture() || chessMove.isEnPassant()
+          ? "chessStartBattle"
+          : "chess",
+      );
+    }
 
     if (this.roomGameOptions.weatherWars && this.currentTurnWhite) {
       if (this.chessManager.moveNumber() % 10 === 0) {
-        this.squareModifierTarget = this.secretPRNG.random(10, 20);
+        await this.generateSquareModifierTarget();
       }
       const generatedSquares = this.pokemonGameManager.createNewSquareModifiers(
         this.squareModifierTarget,
-        this.secretPRNG,
       );
       if (generatedSquares && generatedSquares.length > 0) {
         const squareModifierData: MatchLog = {
@@ -541,23 +554,110 @@ export default class GameRoom {
             },
           },
         };
-        this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
-        this.emitGameOutput(squareModifierData);
+        await setRoomSquareModifiers(
+          this.roomId,
+          this.pokemonGameManager.squareModifiers.map(
+            packSquareModifierIntoBitField,
+          ),
+        );
+        await this.pushHistory(JSON.parse(JSON.stringify(squareModifierData)));
+        whiteStreamOutput.push(squareModifierData);
+        blackStreamOutput.push(squareModifierData);
       }
+    }
+
+    return { whiteStreamOutput, blackStreamOutput, timers };
+  }
+
+  private async processRoomTimers(
+    mode:
+      | "chess"
+      | "chessStartBattle"
+      | "pokemonMovesFinalized"
+      | "pokemonEndBattle"
+      | "pokemonUpdate"
+      | "pokemonBan"
+      | "pokemonDraft",
+  ) {
+    if (this.gameTimer) {
+      if (mode === "chess") {
+        this.gameTimer.processChessMove(this.currentTurnWhite);
+      } else if (mode === "chessStartBattle") {
+        this.gameTimer.processChessMove(this.currentTurnWhite, true);
+      } else if (mode === "pokemonMovesFinalized") {
+        this.gameTimer.processPokemonMove();
+      } else if (mode === "pokemonEndBattle") {
+        this.gameTimer.processPokemonMove(true, this.currentTurnWhite);
+      } else if (mode === "pokemonBan" || mode === "pokemonDraft") {
+        const whiteDraftOrBan =
+          this.pokemonGameManager.draftPieces.length % 2 === 0;
+        this.gameTimer.stopTimer(whiteDraftOrBan ? "b" : "w");
+
+        if (this.pokemonGameManager.chessPieces.length < 32) {
+          // Continue draft
+          this.gameTimer.initializeGameTimer({
+            timeDuration: this.roomGameOptions.banTimerDuration * 1000,
+          });
+          this.gameTimer.startTimer(whiteDraftOrBan ? "w" : "b");
+        } else {
+          // Start chess game + timers
+          this.gameTimer.initializeGameTimer({
+            timeDuration: this.roomGameOptions.chessTimerDuration * 60 * 1000,
+          });
+          this.gameTimer.startTimer("w");
+        }
+      }
+
+      await setRoomTimers(this.roomId, {
+        whitePlayerTimerExpiration: this.gameTimer.whitePlayerTimerExpiration,
+        whitePlayerTimeSinceLastMove: this.gameTimer.whitePlayerLastMoveTime,
+        whitePlayerTimerPaused: this.gameTimer.whitePlayerTimerPaused,
+        blackPlayerTimerExpiration: this.gameTimer.blackPlayerTimerExpiration,
+        blackPlayerTimeSinceLastMove: this.gameTimer.blackPlayerLastMoveTime,
+        blackPlayerTimerPaused: this.gameTimer.blackPlayerTimerPaused,
+      });
+      return this.gameTimer.getTimers(
+        !(mode === "pokemonBan" || mode === "pokemonDraft"),
+      );
     }
   }
 
-  private endGameDueToTimeout(color: Color) {
-    this.endGame(color === "w" ? "b" : "w", "TIMEOUT");
+  private async moveChessPiece(chessMove: Move) {
+    this.pokemonGameManager.movePokemonToSquare(
+      chessMove.from,
+      chessMove.to,
+      chessMove.promotion,
+    );
+    this.chessManager.move(chessMove.san, { continueOnCheck: true });
+    await setGeneratedPokemonIndices(
+      this.roomId,
+      this.pokemonGameManager.getPokemonIndexedBoardLocations(),
+    );
+    await setChessBoard(this.roomId, this.chessManager.fen());
   }
 
-  private randomDraftPick() {
+  private async failChessMoveFromLosingBattle(chessMove: Move) {
+    this.pokemonGameManager.getPokemonFromSquare(chessMove.from)!.square = null;
+    this.chessManager.remove(chessMove.from);
+    this.chessManager.forceAdvanceTurn();
+    await setGeneratedPokemonIndices(
+      this.roomId,
+      this.pokemonGameManager.getPokemonIndexedBoardLocations(),
+    );
+    await setChessBoard(this.roomId, this.chessManager.fen());
+  }
+
+  private endGameDueToTimeout(color: Color) {
+    return this.endGame(color === "w" ? "b" : "w", "TIMEOUT");
+  }
+
+  private async randomDraftPick(color: Color) {
     if (!this.whitePlayer || !this.blackPlayer) {
       return;
     }
     let possibleSquares: string[] = [];
     let playerId;
-    if (this.currentTurnWhite) {
+    if (color === "w") {
       playerId = this.whitePlayer.playerId;
       for (let i = 0; i < 16; i++) {
         possibleSquares.push(
@@ -580,221 +680,780 @@ export default class GameRoom {
     const randomSquareIndex = Math.floor(
       Math.random() * possibleSquares.length,
     );
-    const randomPokemonIndex = Math.floor(
-      Math.random() *
-        (38 -
-          this.pokemonGameManager.banPieces.length -
-          this.pokemonGameManager.chessPieces.length),
-    );
+    const randomPokemonIndex =
+      this.pokemonGameManager.draftPieces[
+        Math.floor(Math.random() * this.pokemonGameManager.draftPieces.length)
+      ].index;
 
     if (this.pokemonGameManager.banPieces.length < 6) {
-      this.validateAndEmitPokemonBan({
-        draftPokemonIndex: randomPokemonIndex,
-        playerId,
-      });
+      return await this.banPokemon(playerId, randomPokemonIndex);
     } else {
-      this.validateAndEmitPokemonDraft({
-        square: possibleSquares[randomSquareIndex] as Square,
-        draftPokemonIndex: randomPokemonIndex,
+      const chessSquare = possibleSquares[randomSquareIndex] as Square;
+      const chessPiece = this.chessManager.get(chessSquare)!;
+      return await this.draftPokemon(
+        possibleSquares[randomSquareIndex] as Square,
+        chessPiece,
         playerId,
-      });
+        randomPokemonIndex,
+      );
     }
   }
 
-  public endGame(color: Color | "", reason: EndGameReason) {
+  public endGame(color: Color | "", reason: EndGameReason): MatchLog {
     const gameData: MatchLog = {
       type: "generic",
       data: { event: "gameEnd", color, reason },
     };
-    this.pushHistory(gameData);
-    this.emitGameOutput(gameData);
-    this.playerList.forEach((player) => {
-      player.setViewingResults(true);
-    });
-    this.broadcastAll("connectedPlayers", this.getPublicPlayerList());
-    this.gameTimer?.stopTimers();
-    this.broadcastTimers();
-    this.isOngoing = false;
     setRoomToOngoing(this.roomId, false);
-    this.resetRoomForRematch();
+    setPlayersViewingResults(this.playerList || [], true);
+    return gameData;
   }
 
-  public resetRoomForRematch() {
-    this.roomSeed = PRNG.generateSeed();
-    this.secretSeed = PRNG.generateSeed();
-    this.secretPRNG = new PRNG(this.secretSeed);
+  private async generatePublicSeed() {
+    this.publicSeed = PRNG.generateSeed();
+    return await setGameRoomSeed(this.roomId, this.publicSeed);
+  }
 
+  private async resetChessBoard() {
     this.chessManager = new Chess();
-    this.currentTurnWhite = true;
-    this.whiteMatchHistory = [];
-    this.blackMatchHistory = [];
+    return await setChessBoard(this.roomId, this.chessManager.fen());
+  }
+
+  private async generateSquareModifierTarget() {
+    this.squareModifierTarget = new PRNG().random(10, 20);
+    return await setRoomSquareModifierTarget(
+      this.roomId,
+      this.squareModifierTarget,
+    );
+  }
+
+  private async initiatePokemonBattle({
+    attemptedMove,
+    battleSeed,
+  }: {
+    attemptedMove: { san: string; color: Color };
+    battleSeed: string;
+  }) {
+    return await Promise.all([
+      setPokemonBattleStakes(this.roomId, attemptedMove),
+      setPokemonBattleSeed(this.roomId, battleSeed),
+    ]);
+  }
+
+  public async resetRoomForRematch() {
+    await this.generatePublicSeed();
+
+    await this.resetChessBoard();
+    await resetMatchHistory(this.roomId);
 
     this.pokemonGameManager = new PokemonBattleChessManager({
-      seed: this.roomSeed,
+      seed: this.publicSeed,
       format: this.roomGameOptions.format,
       weatherWars: this.roomGameOptions.weatherWars,
     });
-    this.whitePlayerPokemonMove = null;
-    this.blackPlayerPokemonMove = null;
+    await setGeneratedPokemonIndices(
+      this.roomId,
+      this.pokemonGameManager.getPokemonIndexedBoardLocations(),
+    );
+    await setRoomSquareModifiers(
+      this.roomId,
+      this.pokemonGameManager.squareModifiers.map(
+        packSquareModifierIntoBitField,
+      ),
+    );
+
+    await setWhitePlayerPokemonMove(this.roomId, null);
+    await setBlackPlayerPokemonMove(this.roomId, null);
+    await setPokemonBattleStakes(this.roomId);
+    await setPokemonBattleSeed(this.roomId);
+    await clearPokemonMoveHistory(this.roomId);
+    await clearPokemonBanList(this.roomId);
     this.currentPokemonBattleStream = null;
     this.currentPokemonBattle = null;
 
     /**
      * Timers
      */
-    if (this.gameTimer) {
-      this.gameTimer.clearTimeouts();
-    }
-    const timerDuration =
-      this.roomGameOptions.format === "random"
-        ? this.roomGameOptions.chessTimerDuration * 60 * 1000
-        : this.roomGameOptions.banTimerDuration * 1000;
-    const callback =
-      this.roomGameOptions.format === "random"
-        ? () => this.endGameDueToTimeout("w")
-        : () => this.randomDraftPick();
-
-    this.gameTimer = new GameTimer(
-      this.roomGameOptions.chessTimerIncrement,
-      this.roomGameOptions.pokemonTimerIncrement,
-      this.roomGameOptions.timersEnabled,
-    );
-    this.gameTimer.initializeGameTimer(timerDuration);
-    this.gameTimer.startTimer(callback, "w");
+    await setWhiteTimerExpiration(this.roomId);
+    await setWhiteTimeSinceLastMove(this.roomId);
+    await setBlackTimerExpiration(this.roomId);
+    await setBlackTimeSinceLastMove(this.roomId);
 
     /**
      * Weather Wars init
      */
     if (this.roomGameOptions.weatherWars) {
-      this.squareModifierTarget = this.secretPRNG.random(10, 20);
+      await this.generateSquareModifierTarget();
     }
   }
 
-  public validateAndEmitPokemonMove({
+  public async validateAndEmitPokemonMove({
     pokemonMove,
     playerId,
   }: {
     pokemonMove: string;
     playerId: string;
-  }) {
-    if (!this.whitePlayer || !this.blackPlayer || !this.isOngoing) {
+  }): Promise<
+    | {
+        whiteStreamOutput: MatchLog[];
+        blackStreamOutput: MatchLog[];
+        timers?: Timer;
+      }
+    | undefined
+  > {
+    const whiteStreamOutput: MatchLog[] = [];
+    const blackStreamOutput: MatchLog[] = [];
+    try {
+      await this.setGameState();
+    } catch (err) {
+      console.log(err);
       return;
     }
+    if (
+      !this.whitePlayer ||
+      !this.blackPlayer ||
+      !this.isOngoing ||
+      !this.currentPokemonBattleStakes
+    ) {
+      console.log("Players or stakes are not set");
+      return;
+    }
+
+    const timerValidationOutput = await this.validateGameTimer();
+    if (timerValidationOutput) {
+      return {
+        whiteStreamOutput: timerValidationOutput.matchOutput,
+        blackStreamOutput: timerValidationOutput.matchOutput,
+        timers: timerValidationOutput.timer,
+      };
+    }
+
     const isUndo = pokemonMove === "undo";
-    const isForfeit = pokemonMove === "forfeit";
     if (playerId === this.whitePlayer.playerId) {
       if (isUndo) {
-        this.whitePlayerPokemonMove = null;
+        console.log("Clearing white move");
+        await this.setPlayerPokemonMove("w", null);
         if (this.roomGameOptions.timersEnabled) {
-          this.gameTimer?.startTimer(() => this.endGameDueToTimeout("w"), "w");
+          this.gameTimer?.startTimer("w");
         }
-      } else if (isForfeit && this.currentPokemonBattleStream) {
-        this.currentPokemonBattle?.add(
-          "message",
-          `${playerId} has forefeitted`,
-        );
-        // Custom forfeit command to reduce hp to 0 on client
-        this.currentPokemonBattle?.add("-forfeit", "p1");
-        this.currentPokemonBattle?.sendUpdates();
-        this.currentPokemonBattleStream.omniscient.write(">forcelose p1");
       } else {
-        this.whitePlayerPokemonMove = pokemonMove;
-        this.gameTimer?.pauseTimer("w");
+        console.log("Setting white player move");
+        await this.setPlayerPokemonMove("w", pokemonMove);
+        if (this.roomGameOptions.timersEnabled) {
+          this.gameTimer?.stopTimer("w");
+        }
       }
     } else if (playerId === this.blackPlayer.playerId) {
       if (isUndo) {
-        this.blackPlayerPokemonMove = null;
+        console.log("Clearing black move");
+        await this.setPlayerPokemonMove("b", null);
         if (this.roomGameOptions.timersEnabled) {
-          this.gameTimer?.startTimer(() => this.endGameDueToTimeout("b"), "b");
+          this.gameTimer?.startTimer("b");
         }
-      } else if (isForfeit && this.currentPokemonBattleStream) {
-        this.currentPokemonBattle?.add(
-          "message",
-          `${playerId} has forefeitted`,
-        );
-        // Custom forfeit command to reduce hp to 0 on client
-        this.currentPokemonBattle?.add("-forfeit", "p2");
-        this.currentPokemonBattle?.sendUpdates();
-        this.currentPokemonBattleStream.omniscient.write(">forcelose p2");
       } else {
-        this.blackPlayerPokemonMove = pokemonMove;
-        this.gameTimer?.pauseTimer("b");
+        console.log("Setting black player move");
+        await this.setPlayerPokemonMove("b", pokemonMove);
+        if (this.roomGameOptions.timersEnabled) {
+          this.gameTimer?.stopTimer("b");
+        }
       }
     }
 
-    if (this.whitePlayerPokemonMove && this.blackPlayerPokemonMove) {
-      this.currentPokemonBattleStream?.p1.write(
-        `move ${this.whitePlayerPokemonMove}`,
-      );
-      this.currentPokemonBattleStream?.p2.write(
-        `move ${this.blackPlayerPokemonMove}`,
-      );
-      this.whitePlayerPokemonMove = null;
-      this.blackPlayerPokemonMove = null;
-      this.gameTimer?.processPokemonMove((color: Color) =>
-        this.endGameDueToTimeout(color),
-      );
+    if (
+      (this.whitePlayerPokemonMove && this.blackPlayerPokemonMove) ||
+      this.whitePlayerPokemonMove === "forfeit" ||
+      this.blackPlayerPokemonMove === "forfeit"
+    ) {
+      try {
+        const { whiteStream, blackStream, omniscientStream } =
+          (await this.getPokemonMatchOutput(
+            this.whitePlayerPokemonMove || undefined,
+            this.blackPlayerPokemonMove || undefined,
+          )) || { whiteStream: [], blackStream: [], omniscientStream: [] };
+        whiteStreamOutput.push(...whiteStream);
+        whiteStreamOutput.push(...omniscientStream);
+        blackStreamOutput.push(...blackStream);
+        blackStreamOutput.push(...omniscientStream);
+
+        const matchVictory = !!omniscientStream.find(
+          (log) => log.type === "pokemon" && log.data.event === "victory",
+        );
+        if (matchVictory) {
+          await this.processRoomTimers("pokemonEndBattle");
+        } else {
+          await this.processRoomTimers("pokemonMovesFinalized");
+        }
+      } catch (err) {
+        console.log(err);
+        return;
+      }
+    } else {
+      console.log("Both player moves are not set");
+      await this.processRoomTimers("pokemonUpdate");
     }
 
-    if (this.roomGameOptions.timersEnabled) {
-      this.broadcastTimers();
-    }
+    this.pushWhiteHistory(whiteStreamOutput);
+    this.pushBlackHistory(blackStreamOutput);
+
+    return {
+      whiteStreamOutput,
+      blackStreamOutput,
+      timers: this.roomGameOptions.timersEnabled
+        ? this.gameTimer?.getTimers()
+        : undefined,
+    };
   }
 
-  public validateAndEmitPokemonBan({
+  private setPlayerPokemonMove = async (color: Color, move: string | null) => {
+    if (color === "w") {
+      this.whitePlayerPokemonMove = move;
+      await setWhitePlayerPokemonMove(this.roomId, move);
+    }
+    if (color === "b") {
+      this.blackPlayerPokemonMove = move;
+      await setBlackPlayerPokemonMove(this.roomId, move);
+    }
+  };
+
+  private getPokemonMatchOutput = async (
+    whitePokemonMove?: string,
+    blackPokemonMove?: string,
+  ) => {
+    if (!this.currentPokemonBattleStakes) {
+      throw new Error("Battle stakes not initialized");
+    }
+    const chessMove = this.chessManager
+      .moves({ verbose: true, continueOnCheck: true })
+      .find((move) => move.san === this.currentPokemonBattleStakes!.san);
+    if (!chessMove) {
+      console.log("Could not find chess move for pokemon battle stakes");
+      return;
+    }
+    let capturedPieceSquare: Square;
+    if (chessMove.isEnPassant()) {
+      capturedPieceSquare =
+        `${chessMove.to[0] + (parseInt(chessMove.to[1]) + (chessMove.color === "w" ? -1 : 1))}` as Square;
+    } else {
+      capturedPieceSquare = chessMove.to;
+    }
+
+    const p1Pokemon = this.currentTurnWhite
+      ? this.pokemonGameManager.getPokemonFromSquare(chessMove.from)
+      : this.pokemonGameManager.getPokemonFromSquare(capturedPieceSquare);
+    const p2Pokemon = this.currentTurnWhite
+      ? this.pokemonGameManager.getPokemonFromSquare(capturedPieceSquare)
+      : this.pokemonGameManager.getPokemonFromSquare(chessMove.from);
+
+    const moveHistory = await getPokemonMoveHistory(this.roomId);
+    const battleSeed =
+      ((await getPokemonBattleSeed(this.roomId)) as PRNGSeed) ||
+      new PRNG().getSeed();
+
+    if (!p1Pokemon || !p2Pokemon) {
+      console.log("Could not find pokemon for pokemon battle");
+      return;
+    }
+
+    const squareModifier =
+      this.pokemonGameManager.getModifiersFromSquare(capturedPieceSquare);
+
+    const matchOutput = await this.simulatePokemonBattle({
+      p1PokemonMove: whitePokemonMove,
+      p2PokemonMove: blackPokemonMove,
+      p1Pokemon,
+      p2Pokemon,
+      moveHistory,
+      battleSquare: capturedPieceSquare,
+      squareModifier,
+      seed: battleSeed,
+    });
+
+    if (
+      matchOutput?.omniscientStream.find(
+        (log) => log.type === "pokemon" && log.data.event === "victory",
+      )
+    ) {
+      await Promise.all([
+        setPokemonBattleStakes(this.roomId),
+        setPokemonBattleSeed(this.roomId),
+        clearPokemonMoveHistory(this.roomId),
+        this.setPlayerPokemonMove("w", null),
+        this.setPlayerPokemonMove("b", null),
+      ]);
+    } else {
+      await Promise.all([
+        pushPokemonMoveHistory(
+          this.roomId,
+          `>p1 move ${whitePokemonMove}`,
+          `>p2 move ${blackPokemonMove}`,
+        ),
+        this.setPlayerPokemonMove("w", null),
+        this.setPlayerPokemonMove("b", null),
+      ]);
+    }
+    return matchOutput;
+  };
+
+  private async simulatePokemonBattle({
+    p1PokemonMove,
+    p2PokemonMove,
+    p1Pokemon,
+    p2Pokemon,
+    moveHistory,
+    battleSquare,
+    squareModifier,
+    seed,
+  }: {
+    p1PokemonMove?: string;
+    p2PokemonMove?: string;
+    p1Pokemon: PokemonPiece;
+    p2Pokemon: PokemonPiece;
+    moveHistory: string[];
+    battleSquare: Square;
+    squareModifier?: SquareModifier;
+    seed: PRNGSeed;
+  }): Promise<
+    | {
+        whiteStream: MatchLog[];
+        blackStream: MatchLog[];
+        omniscientStream: MatchLog[];
+      }
+    | undefined
+  > {
+    const simulationTerminator = "POKEMON_GAMBIT_END_OF_SIMULATION_TERMINATOR";
+    if (!this.whitePlayer || !this.blackPlayer) {
+      return;
+    }
+    const p1Spec = {
+      name: this.whitePlayer.playerId,
+      team: Teams.pack([p1Pokemon.pkmn]),
+    };
+    const p2Spec = {
+      name: this.blackPlayer.playerId,
+      team: Teams.pack([p2Pokemon.pkmn]),
+    };
+
+    const offenseAdvantage = this.roomGameOptions.offenseAdvantage;
+    const advantageSide = this.currentTurnWhite ? "p1" : "p2";
+    const modifiers = squareModifier?.modifiers;
+    let addedModifiers = false;
+    let weatherChanges: WeatherId | "unset";
+    let terrainChanges: TerrainId | "unset";
+    let currentPokemonBattle: Battle | undefined = undefined;
+
+    const setCurrentPokemonBattle = (battle: Battle) => {
+      currentPokemonBattle = battle;
+    };
+
+    const pokemonBattleChessMod = SimDex.mod("pokemonbattlechess", {
+      Formats: [
+        {
+          name: "pbc",
+          mod: "gen9",
+          onBegin() {
+            setCurrentPokemonBattle(this);
+          },
+          onWeatherChange(target, _, sourceEffect) {
+            if (
+              sourceEffect.effectType === "Ability" ||
+              sourceEffect.effectType === "Move"
+            ) {
+              if (
+                target.battle.field.weather === "" ||
+                WeatherNames.includes(target.battle.field.weather as WeatherId)
+              ) {
+                weatherChanges =
+                  (target.battle.field.weather as WeatherId) || "unset";
+              }
+            }
+          },
+          onTerrainChange(target, _, sourceEffect) {
+            if (
+              sourceEffect.effectType === "Ability" ||
+              sourceEffect.effectType === "Move"
+            ) {
+              if (
+                target.battle.field.terrain === "" ||
+                TerrainNames.includes(target.battle.field.terrain as TerrainId)
+              ) {
+                terrainChanges =
+                  (target.battle.field.terrain as TerrainId) || "unset";
+              }
+            }
+          },
+          onSwitchIn(pokemon) {
+            if (pokemon.side.id === advantageSide) {
+              pokemon.boostBy(offenseAdvantage);
+              for (const stat in offenseAdvantage) {
+                if (offenseAdvantage[stat as BoostID]) {
+                  this.add(
+                    "message",
+                    `${pokemon.name} receives a stat boost from starting the battle!`,
+                  );
+                  this.add(
+                    "-boost",
+                    pokemon.fullname.replace(/(p[1-2])/g, "$1a"),
+                    stat,
+                    `${offenseAdvantage[stat as BoostID]}`,
+                  );
+                }
+              }
+            }
+            if (!addedModifiers) {
+              if (modifiers?.weather) {
+                this.field.setWeather(modifiers.weather.id, "debug");
+              }
+              if (modifiers?.terrain) {
+                this.field.setTerrain(modifiers.terrain.id, "debug");
+              }
+              addedModifiers = true;
+            }
+          },
+        },
+      ],
+    });
+    const battleStream = BattleStreams.getPlayerStreams(
+      new BattleStreams.BattleStream({}, pokemonBattleChessMod),
+    );
+    this.currentPokemonBattleStream = battleStream;
+    const spec = { formatid: "pbc", seed };
+    battleStream.omniscient.write(`>start ${JSON.stringify(spec)}`);
+    battleStream.omniscient.write(`>player p1 ${JSON.stringify(p1Spec)}`);
+    battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2Spec)}`);
+
+    for (let i = 0; i < moveHistory.length; i++) {
+      const player = moveHistory[i].substring(0, 3);
+      if (player === ">p1") {
+        battleStream.p1.write(moveHistory[i].substring(4));
+      } else if (player === ">p2") {
+        battleStream.p2.write(moveHistory[i].substring(4));
+      }
+    }
+
+    battleStream.p1.write(simulationTerminator);
+    battleStream.p2.write(simulationTerminator);
+
+    if (p1PokemonMove && p2PokemonMove) {
+      battleStream.p1.write(`move ${p1PokemonMove}`);
+      battleStream.p2.write(`move ${p2PokemonMove}`);
+    }
+    if (p1PokemonMove === "forfeit" && currentPokemonBattle) {
+      (currentPokemonBattle as unknown as Battle).add(
+        "message",
+        `${this.whitePlayer.playerId} has forefeitted`,
+      );
+      // Custom forfeit command to reduce hp to 0 on client
+      (currentPokemonBattle as unknown as Battle).add("-forfeit", "p1");
+      (currentPokemonBattle as unknown as Battle).sendUpdates();
+      battleStream.omniscient.write(">forcelose p1");
+    } else if (p2PokemonMove === "forfeit" && currentPokemonBattle) {
+      (currentPokemonBattle as unknown as Battle).add(
+        "message",
+        `${this.blackPlayer.playerId} has forefeitted`,
+      );
+      // Custom forfeit command to reduce hp to 0 on client
+      (currentPokemonBattle as unknown as Battle).add("-forfeit", "p2");
+      (currentPokemonBattle as unknown as Battle).sendUpdates();
+      battleStream.omniscient.write(">forcelose p2");
+    }
+    battleStream.p1.writeEnd();
+    battleStream.p2.writeEnd();
+    battleStream.omniscient.writeEnd();
+
+    const whiteBattleStreamHandler = async () => {
+      const whiteStreamOutput: MatchLog[] = [];
+      console.log("Beginning stream process");
+      for await (const chunk of battleStream.p1) {
+        console.log("white stream output", chunk);
+        if (chunk.includes(simulationTerminator)) {
+          if (p1PokemonMove || p2PokemonMove) {
+            whiteStreamOutput.length = 0;
+          }
+        } else {
+          const pokemonData: MatchLog = {
+            type: "pokemon",
+            data: { event: "streamOutput", chunk },
+          };
+          whiteStreamOutput.push(pokemonData);
+        }
+      }
+      return whiteStreamOutput;
+    };
+    const blackBattleStreamHandler = async () => {
+      const blackStreamOutput: MatchLog[] = [];
+      for await (const chunk of battleStream.p2) {
+        if (chunk.includes(simulationTerminator)) {
+          if (p1PokemonMove || p2PokemonMove) {
+            blackStreamOutput.length = 0;
+          }
+        } else {
+          const pokemonData: MatchLog = {
+            type: "pokemon",
+            data: { event: "streamOutput", chunk },
+          };
+          blackStreamOutput.push(pokemonData);
+        }
+      }
+      return blackStreamOutput;
+    };
+    const omniscientBattleStreamHandler = async () => {
+      const omniscientStreamOutput: MatchLog[] = [];
+      for await (const chunk of battleStream.omniscient) {
+        for (const { args } of Protocol.parse(chunk)) {
+          if (args[0] !== "win") {
+            continue;
+          }
+          // this.gameTimer?.stopTimers();
+
+          const weatherTerrainUpdates = this.updateWeatherAndTerrainAfterBattle(
+            battleSquare,
+            weatherChanges,
+            terrainChanges,
+          );
+          await setRoomSquareModifiers(
+            this.roomId,
+            this.pokemonGameManager.squareModifiers.map(
+              packSquareModifierIntoBitField,
+            ),
+          );
+
+          omniscientStreamOutput.push(...weatherTerrainUpdates);
+
+          const attackerWon =
+            (this.currentTurnWhite && args[1] === this.whitePlayer?.playerId) ||
+            (!this.currentTurnWhite && args[1] === this.blackPlayer?.playerId);
+
+          const victorOutput = this.updateVictorAfterBattle(attackerWon);
+          omniscientStreamOutput.push(...victorOutput);
+
+          const chessUpdates = await this.updateChessStakesAfterBattle(
+            battleSquare,
+            attackerWon,
+          );
+          omniscientStreamOutput.push(...chessUpdates);
+        }
+      }
+      return omniscientStreamOutput;
+    };
+    const [whiteStream, blackStream, omniscientStream] = await Promise.all([
+      whiteBattleStreamHandler(),
+      blackBattleStreamHandler(),
+      omniscientBattleStreamHandler(),
+    ]);
+    return {
+      whiteStream,
+      blackStream,
+      omniscientStream,
+    };
+  }
+
+  private updateVictorAfterBattle(attackerWon: boolean): MatchLog[] {
+    const victorOutput: MatchLog[] = [];
+    if (attackerWon) {
+      const data: MatchLog = {
+        type: "pokemon",
+        data: {
+          event: "victory",
+          color: this.currentTurnWhite ? "w" : "b",
+        },
+      };
+      victorOutput.push(data);
+    } else {
+      const data: MatchLog = {
+        type: "pokemon",
+        data: {
+          event: "victory",
+          color: this.currentTurnWhite ? "b" : "w",
+        },
+      };
+      victorOutput.push(data);
+    }
+    return victorOutput;
+  }
+
+  private async updateChessStakesAfterBattle(
+    battleSquare: Square,
+    attackerWon: boolean,
+  ): Promise<MatchLog[]> {
+    const chessOutput: MatchLog[] = [];
+    const chessMove = this.chessManager
+      .moves({ verbose: true, continueOnCheck: true })
+      .find((move) => move.san === this.currentPokemonBattleStakes?.san);
+
+    if (attackerWon && chessMove && this.currentPokemonBattleStakes) {
+      const lostPiece = this.chessManager.get(battleSquare);
+      await this.moveChessPiece(chessMove);
+      const chessData: MatchLog = {
+        type: "chess",
+        data: {
+          color: this.currentTurnWhite ? "w" : "b",
+          san: this.currentPokemonBattleStakes.san,
+          failed: false,
+        },
+      };
+      chessOutput.push(chessData);
+      if (lostPiece?.type === "k") {
+        chessOutput.push(
+          this.endGame(this.currentTurnWhite ? "w" : "b", "KING_CAPTURED"),
+        );
+      }
+    } else if (chessMove && this.currentPokemonBattleStakes) {
+      const lostPiece = this.chessManager.get(chessMove.from);
+      await this.failChessMoveFromLosingBattle(chessMove);
+      const chessData: MatchLog = {
+        type: "chess",
+        data: {
+          color: this.currentTurnWhite ? "w" : "b",
+          san: this.currentPokemonBattleStakes.san,
+          failed: true,
+        },
+      };
+      chessOutput.push(chessData);
+      if (lostPiece?.type === "k") {
+        chessOutput.push(
+          this.endGame(this.currentTurnWhite ? "w" : "b", "KING_CAPTURED"),
+        );
+      }
+    }
+
+    return chessOutput;
+  }
+
+  private updateWeatherAndTerrainAfterBattle(
+    battleSquare: Square,
+    weatherChanges: WeatherId | "unset",
+    terrainChanges: TerrainId | "unset",
+  ): MatchLog[] {
+    const weatherTerrainOutput: MatchLog[] = [];
+    this.pokemonGameManager.tickSquareModifiers(battleSquare);
+
+    if (
+      (weatherChanges !== undefined || terrainChanges !== undefined) &&
+      this.roomGameOptions.weatherWars
+    ) {
+      this.pokemonGameManager.updateSquareWeather(battleSquare, weatherChanges);
+      this.pokemonGameManager.updateSquareTerrain(battleSquare, terrainChanges);
+    }
+    const squareMod =
+      this.pokemonGameManager.getModifiersFromSquare(battleSquare);
+    if (
+      squareMod &&
+      (squareMod.modifiers.weather || squareMod.modifiers.terrain)
+    ) {
+      const squareModifierData: MatchLog = {
+        type: "weather",
+        data: {
+          event: "weatherChange",
+          modifier: {
+            type: "modify",
+            squareModifiers: [squareMod],
+          },
+        },
+      };
+      weatherTerrainOutput.push(JSON.parse(JSON.stringify(squareModifierData)));
+    } else {
+      const squareModifierData: MatchLog = {
+        type: "weather",
+        data: {
+          event: "weatherChange",
+          modifier: {
+            type: "remove",
+            squares: [battleSquare],
+          },
+        },
+      };
+      weatherTerrainOutput.push(JSON.parse(JSON.stringify(squareModifierData)));
+    }
+    return weatherTerrainOutput;
+  }
+
+  public async validateAndEmitPokemonBan({
     draftPokemonIndex,
     playerId,
   }: {
     draftPokemonIndex: number;
     playerId: string;
-  }) {
-    if (!this.whitePlayer || !this.blackPlayer) {
+  }): Promise<
+    { matchOutput: MatchLog[]; timer: Timer | undefined } | undefined
+  > {
+    try {
+      await this.setGameState();
+    } catch (err) {
+      console.log("Error setting state:", (err as unknown as Error).message);
+    }
+    if (
+      !this.whitePlayer ||
+      !this.blackPlayer ||
+      !this.pokemonGameManager.draftPieces.length ||
+      this.chessManager.moveNumber() > 1
+    ) {
+      console.log("Incorrect state for pokemon ban");
       return;
     }
-    if (playerId === this.whitePlayer.playerId) {
-      this.pokemonGameManager.banDraftPiece(draftPokemonIndex);
-      const matchLog: MatchLog = {
-        type: "ban",
-        data: { index: draftPokemonIndex, color: "w" },
-      };
-      this.pushHistory(matchLog);
-      this.emitGameOutput(matchLog);
-    } else if (playerId === this.blackPlayer.playerId) {
-      this.pokemonGameManager.banDraftPiece(draftPokemonIndex);
-      const matchLog: MatchLog = {
-        type: "ban",
-        data: { index: draftPokemonIndex, color: "b" },
-      };
-      this.pushHistory(matchLog);
-      this.emitGameOutput(matchLog);
+
+    const timerValidationOutput = await this.validateGameTimer();
+    if (timerValidationOutput) {
+      return timerValidationOutput;
     }
 
-    if (this.roomGameOptions.timersEnabled) {
-      this.gameTimer?.stopTimer(this.currentTurnWhite ? "w" : "b");
-
-      if (this.pokemonGameManager.chessPieces.length < 32) {
-        // Continue draft
-        this.gameTimer?.initializeGameTimer(
-          this.roomGameOptions.banTimerDuration * 1000,
-        );
-        this.gameTimer?.startTimer(
-          () => this.randomDraftPick(),
-          this.currentTurnWhite ? "b" : "w",
-        );
-        this.broadcastTimers();
-      } else {
-        // Start chess game + timers
-        this.gameTimer?.initializeGameTimer(
-          this.roomGameOptions.chessTimerDuration * 60 * 1000,
-        );
-        this.gameTimer?.startTimer(() => this.endGameDueToTimeout("w"), "w");
-        this.broadcastTimers();
-      }
-    }
-    this.currentTurnWhite = !this.currentTurnWhite;
+    return this.banPokemon(playerId, draftPokemonIndex);
   }
 
-  public validateAndEmitPokemonDraft({
+  private async banPokemon(playerId: string, banPokemonIndex: number) {
+    const banOutput: MatchLog[] = [];
+    if (
+      this.pokemonGameManager.banPieces.find(
+        (p) => p.index === banPokemonIndex,
+      ) ||
+      this.pokemonGameManager.chessPieces.find(
+        (p) => p.index === banPokemonIndex,
+      )
+    ) {
+      throw Error(
+        "Can not ban a pokemon that has already been banned or drafted",
+      );
+    }
+
+    if (
+      playerId === this.whitePlayer?.playerId &&
+      this.pokemonGameManager.draftPieces.length % 2 === 0
+    ) {
+      await this.updateBanState(banPokemonIndex);
+      const matchLog: MatchLog = {
+        type: "ban",
+        data: { index: banPokemonIndex, color: "w" },
+      };
+      await this.pushHistory(matchLog);
+      banOutput.push(matchLog);
+    } else if (
+      playerId === this.blackPlayer?.playerId &&
+      this.pokemonGameManager.draftPieces.length % 2 === 1
+    ) {
+      await this.updateBanState(banPokemonIndex);
+      const matchLog: MatchLog = {
+        type: "ban",
+        data: { index: banPokemonIndex, color: "b" },
+      };
+      await this.pushHistory(matchLog);
+      banOutput.push(matchLog);
+    } else {
+      return;
+    }
+
+    let timer: Timer | undefined;
+    if (this.roomGameOptions.timersEnabled) {
+      timer = await this.processRoomTimers("pokemonBan");
+    }
+
+    return { matchOutput: banOutput, timer };
+  }
+
+  private async updateBanState(draftPokemonIndex: number) {
+    await pushPokemonBanList(this.roomId, draftPokemonIndex);
+    this.pokemonGameManager.banDraftPiece(draftPokemonIndex);
+  }
+
+  public async validateAndEmitPokemonDraft({
     square,
     draftPokemonIndex,
     playerId,
@@ -802,350 +1461,223 @@ export default class GameRoom {
     square?: Square;
     draftPokemonIndex: number;
     playerId: string;
-  }) {
-    const chessSquare = square ? this.chessManager.get(square) : null;
+  }): Promise<
+    { matchOutput: MatchLog[]; timer: Timer | undefined } | undefined
+  > {
+    const chessPiece = square ? this.chessManager.get(square) : null;
+    try {
+      await this.setGameState();
+    } catch (err) {
+      console.log("Error setting state:", (err as unknown as Error).message);
+    }
     if (
       !square ||
-      !chessSquare ||
+      !chessPiece ||
       !this.whitePlayer ||
       !this.blackPlayer ||
-      !this.isOngoing
+      !this.isOngoing ||
+      !this.pokemonGameManager.draftPieces.length ||
+      this.chessManager.moveNumber() > 1
     ) {
+      console.log("Incorrect state for pokemon ban");
       return;
     }
-    if (playerId === this.whitePlayer.playerId) {
-      this.pokemonGameManager.assignPokemonToSquare(
-        draftPokemonIndex,
-        square,
-        chessSquare!.type,
-        "w",
+
+    const timerValidationOutput = await this.validateGameTimer();
+    if (timerValidationOutput) {
+      return timerValidationOutput;
+    }
+
+    return this.draftPokemon(square, chessPiece, playerId, draftPokemonIndex);
+  }
+
+  private async draftPokemon(
+    square: Square,
+    chessPiece: Piece,
+    playerId: string,
+    draftPokemonIndex: number,
+  ) {
+    const draftOutput: MatchLog[] = [];
+    const chessPieceSquare = {
+      square,
+      type: chessPiece.type,
+      color: chessPiece.color,
+    };
+    if (
+      this.pokemonGameManager.chessPieces.find(
+        (p) => p.index === draftPokemonIndex,
+      ) ||
+      this.pokemonGameManager.banPieces.find(
+        (p) => p.index === draftPokemonIndex,
+      )
+    ) {
+      throw Error(
+        "Can not draft a pokemon that has already been drafted or banned.",
       );
+    }
+
+    if (
+      playerId === this.whitePlayer?.playerId &&
+      this.pokemonGameManager.draftPieces.length % 2 === 0
+    ) {
+      await this.updateDraftState(draftPokemonIndex, chessPieceSquare, "w");
       const matchLog: MatchLog = {
         type: "draft",
         data: { square, index: draftPokemonIndex, color: "w" },
       };
-      this.pushHistory(matchLog);
-      this.emitGameOutput(matchLog);
-    } else if (playerId === this.blackPlayer.playerId) {
-      this.pokemonGameManager.assignPokemonToSquare(
-        draftPokemonIndex,
-        square,
-        chessSquare!.type,
-        "b",
-      );
+      await this.pushHistory(matchLog);
+      draftOutput.push(matchLog);
+    } else if (
+      playerId === this.blackPlayer?.playerId &&
+      this.pokemonGameManager.draftPieces.length % 2 === 1
+    ) {
+      await this.updateDraftState(draftPokemonIndex, chessPieceSquare, "b");
       const matchLog: MatchLog = {
         type: "draft",
         data: { square, index: draftPokemonIndex, color: "b" },
       };
-      this.pushHistory(matchLog);
-      this.emitGameOutput(matchLog);
+      await this.pushHistory(matchLog);
+      draftOutput.push(matchLog);
+    } else {
+      return;
     }
 
+    let timer: Timer | undefined;
     if (this.roomGameOptions.timersEnabled) {
-      this.gameTimer?.stopTimer(this.currentTurnWhite ? "w" : "b");
-
-      if (this.pokemonGameManager.chessPieces.length < 32) {
-        // Continue draft
-        this.gameTimer?.initializeGameTimer(
-          this.roomGameOptions.banTimerDuration * 1000,
-        );
-        this.gameTimer?.startTimer(
-          () => this.randomDraftPick(),
-          this.currentTurnWhite ? "b" : "w",
-        );
-        this.broadcastTimers();
-      } else {
-        // Start chess game + timers
-        this.gameTimer?.initializeGameTimer(
-          this.roomGameOptions.chessTimerDuration * 60 * 1000,
-        );
-        this.gameTimer?.startTimer(() => this.endGameDueToTimeout("w"), "w");
-        this.broadcastTimers();
-      }
+      timer = await this.processRoomTimers("pokemonDraft");
     }
-    this.currentTurnWhite = !this.currentTurnWhite;
+    return { matchOutput: draftOutput, timer };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private broadcastAll(event: string, ...args: any) {
-    if (this.whitePlayer) {
-      this.whitePlayer.socket?.emit(event, ...args);
-    }
-    if (this.blackPlayer) {
-      this.blackPlayer.socket?.emit(event, ...args);
-    }
-    this.getSpectators().forEach((spectator) =>
-      spectator.socket?.emit(event, ...args),
+  private async updateDraftState(
+    index: number,
+    chessSquare: Exclude<ChessBoardSquare, null>,
+    color: Color,
+  ) {
+    this.pokemonGameManager.assignPokemonToSquare(
+      index,
+      chessSquare.square,
+      chessSquare.type,
+      color,
+    );
+    await setGeneratedPokemonIndices(
+      this.roomId,
+      this.pokemonGameManager.getPokemonIndexedBoardLocations(),
     );
   }
 
-  private pushHistory(log: MatchLog) {
+  private async pushWhiteHistory(log: MatchLog | MatchLog[]) {
+    if (Array.isArray(log)) {
+      if (log.length > 0) {
+        this.whiteMatchHistory.push(...log);
+        return await pushWhiteMatchHistory(
+          this.roomId,
+          ...log.map((l) => JSON.stringify(l)),
+        );
+      }
+    } else {
+      this.whiteMatchHistory.push(log);
+      return await pushWhiteMatchHistory(this.roomId, JSON.stringify(log));
+    }
+  }
+
+  private async pushBlackHistory(log: MatchLog | MatchLog[]) {
+    if (Array.isArray(log)) {
+      if (log.length > 0) {
+        this.blackMatchHistory.push(...log);
+        return await pushBlackMatchHistory(
+          this.roomId,
+          ...log.map((l) => JSON.stringify(l)),
+        );
+      }
+    } else {
+      this.blackMatchHistory.push(log);
+      return await pushBlackMatchHistory(this.roomId, JSON.stringify(log));
+    }
+  }
+
+  private async pushHistory(log: MatchLog) {
     this.whiteMatchHistory.push(log);
     this.blackMatchHistory.push(log);
+    return await pushMatchHistory(this.roomId, log);
   }
 
-  public getHistory(playerId: string) {
+  public async getHistory(playerId: string): Promise<MatchLog[]> {
     if (playerId === this.blackPlayer?.playerId) {
-      return this.blackMatchHistory;
-    } else {
-      return this.whiteMatchHistory;
-    }
-  }
-
-  public broadcastTimers() {
-    if (this.roomGameOptions.timersEnabled) {
-      this.broadcastAll("currentTimers", this.gameTimer?.getTimers());
-    }
-  }
-
-  private async createPokemonBattleStream({
-    p1Set,
-    p2Set,
-    attemptedMove,
-    squareModifier,
-    battleSquare,
-  }: {
-    p1Set: PokemonSet;
-    p2Set: PokemonSet;
-    attemptedMove: { san: string; color: Color };
-    squareModifier?: SquareModifier;
-    battleSquare: Square;
-  }) {
-    if (!this.whitePlayer || !this.blackPlayer) {
-      return;
-    }
-    const p1Spec = {
-      name: this.whitePlayer.playerId,
-      team: Teams.pack([p1Set]),
-    };
-    const p2Spec = {
-      name: this.blackPlayer.playerId,
-      team: Teams.pack([p2Set]),
-    };
-    const battleStartData: MatchLog = {
-      type: "pokemon",
-      data: {
-        event: "battleStart",
-        p1Pokemon: p1Set,
-        p2Pokemon: p2Set,
-        attemptedMove,
-      },
-    };
-    this.emitGameOutput(battleStartData);
-    this.pushHistory(battleStartData);
-
-    this.gameTimer?.startTimer(() => this.endGameDueToTimeout("w"), "w");
-    this.gameTimer?.startTimer(() => this.endGameDueToTimeout("b"), "b");
-    this.broadcastTimers();
-
-    const setCurrentPokemonBattle = (battle: Battle) => {
-      this.currentPokemonBattle = battle;
-    };
-
-    return new Promise((resolve) => {
-      const offenseAdvantage = this.roomGameOptions.offenseAdvantage;
-      const advantageSide = this.currentTurnWhite ? "p1" : "p2";
-      const modifiers = squareModifier?.modifiers;
-      let addedModifiers = false;
-      let weatherChanges: WeatherId | "unset";
-      let terrainChanges: TerrainId | "unset";
-
-      const pokemonBattleChessMod = SimDex.mod("pokemonbattlechess", {
-        Formats: [
-          {
-            name: "pbc",
-            mod: "gen9",
-            onBegin() {
-              setCurrentPokemonBattle(this);
-            },
-            onWeatherChange(target, _, sourceEffect) {
-              if (
-                sourceEffect.effectType === "Ability" ||
-                sourceEffect.effectType === "Move"
-              ) {
-                if (
-                  target.battle.field.weather === "" ||
-                  WeatherNames.includes(
-                    target.battle.field.weather as WeatherId,
-                  )
-                ) {
-                  weatherChanges =
-                    (target.battle.field.weather as WeatherId) || "unset";
-                }
-              }
-            },
-            onTerrainChange(target, _, sourceEffect) {
-              if (
-                sourceEffect.effectType === "Ability" ||
-                sourceEffect.effectType === "Move"
-              ) {
-                if (
-                  target.battle.field.terrain === "" ||
-                  TerrainNames.includes(
-                    target.battle.field.terrain as TerrainId,
-                  )
-                ) {
-                  terrainChanges =
-                    (target.battle.field.terrain as TerrainId) || "unset";
-                }
-              }
-            },
-            onSwitchIn(pokemon) {
-              if (pokemon.side.id === advantageSide) {
-                pokemon.boostBy(offenseAdvantage);
-                for (const stat in offenseAdvantage) {
-                  if (offenseAdvantage[stat as BoostID]) {
-                    this.add(
-                      "message",
-                      `${pokemon.name} receives a stat boost from starting the battle!`,
-                    );
-                    this.add(
-                      "-boost",
-                      pokemon.fullname.replace(/(p[1-2])/g, "$1a"),
-                      stat,
-                      `${offenseAdvantage[stat as BoostID]}`,
-                    );
-                  }
-                }
-              }
-              if (!addedModifiers) {
-                if (modifiers?.weather) {
-                  this.field.setWeather(modifiers.weather.id, "debug");
-                }
-                if (modifiers?.terrain) {
-                  this.field.setTerrain(modifiers.terrain.id, "debug");
-                }
-                addedModifiers = true;
-              }
-            },
-          },
-        ],
-      });
-      const battleStream = BattleStreams.getPlayerStreams(
-        new BattleStreams.BattleStream({}, pokemonBattleChessMod),
+      return (await getBlackMatchHistory(this.roomId)).map((log) =>
+        JSON.parse(log),
       );
-      this.currentPokemonBattleStream = battleStream;
-      const spec = { formatid: "pbc" };
-      battleStream.omniscient.write(`>start ${JSON.stringify(spec)}`);
-      battleStream.omniscient.write(`>player p1 ${JSON.stringify(p1Spec)}`);
-      battleStream.omniscient.write(`>player p2 ${JSON.stringify(p2Spec)}`);
-      const whiteBattleStreamHandler = async () => {
-        for await (const chunk of battleStream.p1) {
-          const pokemonData: MatchLog = {
-            type: "pokemon",
-            data: { event: "streamOutput", chunk },
-          };
-          this.whiteMatchHistory.push(pokemonData);
-          this.emitGameOutput(pokemonData, this.whitePlayer);
-          this.getSpectators().forEach((spectator) =>
-            this.emitGameOutput(pokemonData, spectator),
-          );
-        }
-      };
-      const blackBattleStreamHandler = async () => {
-        for await (const chunk of battleStream.p2) {
-          const pokemonData: MatchLog = {
-            type: "pokemon",
-            data: { event: "streamOutput", chunk },
-          };
-          this.blackMatchHistory.push(pokemonData);
-          this.emitGameOutput(pokemonData, this.blackPlayer);
-        }
-      };
-      const omniscientBattleStreamHandler = async () => {
-        for await (const chunk of battleStream.omniscient) {
-          for (const { args } of Protocol.parse(chunk)) {
-            if (args[0] === "win") {
-              this.gameTimer?.stopTimers();
-              this.pokemonGameManager.tickSquareModifiers(battleSquare);
+    } else {
+      return (await getWhiteMatchHistory(this.roomId)).map((log) =>
+        JSON.parse(log),
+      );
+    }
+  }
 
-              if (
-                (weatherChanges !== undefined ||
-                  terrainChanges !== undefined) &&
-                this.roomGameOptions.weatherWars
-              ) {
-                this.pokemonGameManager.updateSquareWeather(
-                  battleSquare,
-                  weatherChanges,
-                );
-                this.pokemonGameManager.updateSquareTerrain(
-                  battleSquare,
-                  terrainChanges,
-                );
-              }
-              const squareMod =
-                this.pokemonGameManager.getWeatherFromSquare(battleSquare);
-              if (
-                squareMod &&
-                (squareMod.modifiers.weather || squareMod.modifiers.terrain)
-              ) {
-                const squareModifierData: MatchLog = {
-                  type: "weather",
-                  data: {
-                    event: "weatherChange",
-                    modifier: {
-                      type: "modify",
-                      squareModifiers: [squareMod],
-                    },
-                  },
-                };
-                this.pushHistory(
-                  JSON.parse(JSON.stringify(squareModifierData)),
-                );
-                this.emitGameOutput(squareModifierData);
-              } else {
-                const squareModifierData: MatchLog = {
-                  type: "weather",
-                  data: {
-                    event: "weatherChange",
-                    modifier: {
-                      type: "remove",
-                      squares: [battleSquare],
-                    },
-                  },
-                };
-                this.pushHistory(
-                  JSON.parse(JSON.stringify(squareModifierData)),
-                );
-                this.emitGameOutput(squareModifierData);
-              }
+  public async setTimerState() {
+    if (this.roomGameOptions.timersEnabled) {
+      this.gameTimer = new GameTimer(
+        this.roomGameOptions.chessTimerIncrement,
+        this.roomGameOptions.pokemonTimerIncrement,
+      );
 
-              if (
-                (this.currentTurnWhite &&
-                  args[1] === this.whitePlayer?.playerId) ||
-                (!this.currentTurnWhite &&
-                  args[1] === this.blackPlayer?.playerId)
-              ) {
-                const data: MatchLog = {
-                  type: "pokemon",
-                  data: {
-                    event: "victory",
-                    color: this.currentTurnWhite ? "w" : "b",
-                  },
-                };
-                this.pushHistory(data);
-                this.emitGameOutput(data);
-                return resolve(true);
-              }
-              const data: MatchLog = {
-                type: "pokemon",
-                data: {
-                  event: "victory",
-                  color: this.currentTurnWhite ? "b" : "w",
-                },
-              };
-              this.pushHistory(data);
-              this.emitGameOutput(data);
-              return resolve(false);
-            }
-          }
-        }
-      };
-      whiteBattleStreamHandler();
-      blackBattleStreamHandler();
-      omniscientBattleStreamHandler();
+      const whitePlayerTimerExpiration = parseInt(
+        (await getWhiteTimerExpiration(this.roomId)) || "",
+      );
+      const whitePlayerTimeSinceLastMove = parseInt(
+        (await getWhiteTimeSinceLastMove(this.roomId)) || "",
+      );
+      const whitePlayerTimerPaused = await getWhiteTimerPaused(this.roomId);
+      const blackPlayerTimerExpiration = parseInt(
+        (await getBlackTimerExpiration(this.roomId)) || "",
+      );
+      const blackPlayerTimeSinceLastMove = parseInt(
+        (await getBlackTimeSinceLastMove(this.roomId)) || "",
+      );
+      const blackPlayerTimerPaused = await getBlackTimerPaused(this.roomId);
 
-      return battleStream;
+      this.gameTimer.initializeGameTimer({
+        whitePlayerTimerExpiration,
+        whitePlayerTimeSinceLastMove,
+        whitePlayerTimerPaused,
+        blackPlayerTimerExpiration,
+        blackPlayerTimeSinceLastMove,
+        blackPlayerTimerPaused,
+      });
+    }
+  }
+
+  private async initializeTimers() {
+    const timeDuration =
+      this.roomGameOptions.format === "random"
+        ? this.roomGameOptions.chessTimerDuration * 60 * 1000
+        : this.roomGameOptions.banTimerDuration * 1000;
+
+    this.gameTimer = new GameTimer(
+      this.roomGameOptions.chessTimerIncrement,
+      this.roomGameOptions.pokemonTimerIncrement,
+    );
+    this.gameTimer.initializeGameTimer({
+      timeDuration,
     });
+
+    await setWhiteTimerExpiration(
+      this.roomId,
+      `${this.gameTimer.whitePlayerTimerExpiration}`,
+    );
+    await setWhiteTimeSinceLastMove(
+      this.roomId,
+      `${this.gameTimer.whitePlayerLastMoveTime}`,
+    );
+    await setWhiteTimerPaused(this.roomId, false);
+    await setBlackTimerExpiration(
+      this.roomId,
+      `${this.gameTimer.blackPlayerTimerExpiration}`,
+    );
+    await setBlackTimeSinceLastMove(
+      this.roomId,
+      `${this.gameTimer.blackPlayerLastMoveTime}`,
+    );
+    await setBlackTimerPaused(this.roomId, true);
   }
 }

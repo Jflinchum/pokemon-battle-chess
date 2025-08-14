@@ -6,7 +6,6 @@ import TakenChessPieces from "../../ChessManager/TakenChessPieces/TakenChessPiec
 import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessManager";
 import { Timer as TimerType } from "../../../../../shared/types/Game.js";
 import Timer from "../../../common/Timer/Timer";
-import { useGameState } from "../../../../context/GameState/GameStateContext";
 import "./PlayerInGameDisplay.css";
 
 interface PlayerInGameDisplayProps {
@@ -24,7 +23,6 @@ const PlayerInGameDisplay = ({
   timer,
   className = "",
 }: PlayerInGameDisplayProps) => {
-  const { gameState } = useGameState();
   if (!player) {
     return null;
   }
@@ -50,9 +48,6 @@ const PlayerInGameDisplay = ({
           timerExpiration={timer.timerExpiration}
           paused={timer.pause}
           hasStarted={timer.hasStarted}
-          startingTime={
-            gameState.gameSettings.options.chessTimerDuration * 60 * 1000
-          }
           className="playerTimer"
         />
       )}

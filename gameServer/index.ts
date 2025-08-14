@@ -4,6 +4,8 @@ import cors from "cors";
 import https from "https";
 import { SecureContextOptions } from "tls";
 import fs from "fs";
+import { createAdapter } from "@socket.io/redis-streams-adapter";
+import { Redis } from "ioredis";
 import GameRoomManager from "./models/GameRoomManager.js";
 import { getConfig } from "./config.js";
 import { registerSocketEvents } from "./socket/socketEvents.js";
@@ -46,7 +48,10 @@ const server = https.createServer(options, app).listen(httpsPort, () => {
   console.log(`GameServer HTTPS is listening on ${httpsPort}`);
 });
 
+const redisClient = new Redis(getConfig().redisUrl);
+
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
+  adapter: createAdapter(redisClient),
   cors: {
     origin: [...allowedOrigins, "https://admin.socket.io"],
     credentials: true,

@@ -64,6 +64,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     }
 
     const roomIds = await getRoomIdFromHostId(playerId);
+    console.log("Owned rooms", roomIds);
 
     // Player already owns a room
     if (roomIds) {
@@ -105,6 +106,9 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         );
         const cacheAddPlayerPromise = addPlayerIdToRoom(
           gameServerRespBody.data.roomId,
+          playerName,
+          avatarId,
+          playerSecret,
           playerId,
         );
 
@@ -157,7 +161,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     const playerSecret = req.body.playerSecret;
     const doesRoomExist = await roomExists(roomId);
 
-    if (!roomId || !playerId || !playerName) {
+    if (!roomId || !playerId || !playerName || !playerSecret) {
       res.status(400).send({ message: "Missing parameters" });
       return;
     } else if (!doesRoomExist) {
@@ -183,7 +187,6 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         },
         body: JSON.stringify({
           roomId,
-          password,
           playerId,
           playerName,
           avatarId,
@@ -194,7 +197,13 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
 
     if (gameServerResp.status === 200) {
       try {
-        await addPlayerIdToRoom(roomId, playerId);
+        await addPlayerIdToRoom(
+          roomId,
+          playerName,
+          avatarId || "1",
+          playerSecret,
+          playerId,
+        );
       } catch (err) {
         console.log(err);
         res.status(500).send();

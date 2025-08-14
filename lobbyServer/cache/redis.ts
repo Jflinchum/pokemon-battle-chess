@@ -1,4 +1,4 @@
-import { createClient, SCHEMA_FIELD_TYPE, SearchReply } from "redis";
+import { Redis } from "ioredis";
 import { getConfig } from "../config.js";
 
 /**
@@ -7,32 +7,36 @@ import { getConfig } from "../config.js";
  * room:{roomId} -> { roomCode, hostName, hostId, isOngoing }
  */
 
-const redisClient = createClient({ url: getConfig().redisUrl });
+const redisClient = new Redis(getConfig().redisUrl, { lazyConnect: true });
 
 const connectAndIndexRedis = async () => {
-  redisClient.on("error", (err) => console.log("Redis Client Error", err));
+  redisClient.on("error", (err) => {
+    console.log("Redis Client Error", err);
+    redisClient.disconnect();
+  });
   await redisClient.connect();
   await createRedisIndex();
 };
 
 const createRedisIndex = async () => {
-  const indexList = await redisClient.ft._list();
-  if (indexList.includes("hash-idx:rooms")) {
+  const indexList = await redisClient.call("FT._LIST");
+  if (Array.isArray(indexList) && indexList.includes("hash-idx:rooms")) {
     return;
   }
 
-  redisClient.ft.create(
+  redisClient.call(
+    "FT.CREATE",
     "hash-idx:rooms",
-    {
-      hostName: SCHEMA_FIELD_TYPE.TEXT,
-      hostId: SCHEMA_FIELD_TYPE.TEXT,
-      roomCode: SCHEMA_FIELD_TYPE.TEXT,
-      isOngoing: SCHEMA_FIELD_TYPE.NUMERIC,
-    },
-    {
-      ON: "HASH",
-      PREFIX: "room",
-    },
+    "ON",
+    "HASH",
+    "PREFIX",
+    "1",
+    "room:", // TODO confirm this works
+    "SCHEMA",
+    "hostName",
+    "TEXT",
+    "hostId",
+    "TEXT",
   );
 };
 
@@ -45,48 +49,66 @@ export const setKey = async (
   key: string,
   value: string,
 ): Promise<void> => {
-  await redisClient.hSet(hash, key, value);
+  await redisClient.hset(hash, key, value);
 };
 
 export const getValue = async (
   hash: string,
   key: string,
 ): Promise<string | null> => {
-  return redisClient.hGet(hash, key);
+  return redisClient.hget(hash, key);
 };
 
 export const addPlayerIdToRoom = async (
   roomId: string,
+  playerName: string,
+  avatarId: string,
+  secret: string,
   playerId: string,
 ): Promise<void> => {
-  await redisClient.sAdd(`roomPlayerSet:${roomId}`, playerId);
+  await redisClient
+    .multi()
+    .sadd(`roomPlayerSet:${roomId}`, playerId)
+    .hset(`player:${playerId}`, {
+      playerName,
+      avatarId,
+      secret,
+      viewingResults: 0,
+    })
+    .exec();
 };
 
 export const isPlayerIdInRoom = async (
   roomId: string,
   playerId: string,
 ): Promise<number> => {
-  return redisClient.sIsMember(`roomPlayerSet:${roomId}`, playerId);
+  return redisClient.sismember(`roomPlayerSet:${roomId}`, playerId);
 };
 
 export const removePlayerIdFromRoom = async (
   roomId: string,
   playerId: string,
 ): Promise<void> => {
-  const roomHostId = await redisClient.hGet(`room:${roomId}`, "hostId");
+  const roomHostId = await redisClient.hget(`room:${roomId}`, "hostId");
   if (roomHostId === playerId) {
     await redisClient
       .multi()
       .del(`roomPlayerSet:${roomId}`)
       .del(`room:${roomId}`)
+      .del(`roomWhiteMatchHistory:${roomId}`)
+      .del(`roomBlackMatchHistory:${roomId}`)
+      .del(`roomPokemonBoard:${roomId}`)
+      .del(`roomPokemonMoveHistory:${roomId}`)
+      .del(`roomPokemonBan:${roomId}`)
+      .del(`player:${playerId}`)
       .exec();
   } else {
-    await redisClient.sRem(`roomPlayerSet:${roomId}`, playerId);
+    await redisClient.srem(`roomPlayerSet:${roomId}`, playerId);
   }
 };
 
 export const getRoomSize = async (roomId: string): Promise<number> => {
-  return redisClient.sCard(`roomPlayerSet:${roomId}`);
+  return redisClient.scard(`roomPlayerSet:${roomId}`);
 };
 
 export const createRoom = async (
@@ -97,13 +119,13 @@ export const createRoom = async (
 ) => {
   await redisClient
     .multi()
-    .hSet(`room:${roomId}`, {
+    .hset(`room:${roomId}`, {
       roomCode,
       hostName: host,
       hostId,
       isOngoing: 0,
     })
-    .sAdd(`roomPlayerSet:${roomId}`, hostId)
+    .sadd(`roomPlayerSet:${roomId}`, hostId)
     .exec();
 };
 
@@ -117,7 +139,7 @@ export const roomExists = async (roomId?: string): Promise<number> => {
 export const getRoomPasscode = async (
   roomId: string,
 ): Promise<string | null> => {
-  return redisClient.hGet(`room:${roomId}`, "roomCode");
+  return redisClient.hget(`room:${roomId}`, "roomCode");
 };
 
 export const getRoomFromName = async (
@@ -133,43 +155,68 @@ export const getRoomFromName = async (
   }[]
 > => {
   try {
-    const results = await redisClient.ft.search(
+    const response = await redisClient.call(
+      "FT.SEARCH",
       "hash-idx:rooms",
       `${searchTerm ? `@hostName:${searchTerm}` : "*"}`,
-      { LIMIT: { from: (page - 1) * limit, size: limit } },
+      "LIMIT",
+      (page - 1) * limit,
+      limit,
     );
-    if ((results as SearchReply)?.total) {
-      return (results as SearchReply).documents.map(({ id, value }) => ({
-        hostName: (value.hostName as string) || "",
-        hasPassword: !!value.roomCode,
-        isOngoing: value.isOngoing === "1",
-        roomId: id.replace("room:", ""),
-      }));
+
+    if (!Array.isArray(response) || !response[0]) {
+      return [];
     }
+
+    const results = [];
+
+    for (let i = 1; i < response.length; i += 2) {
+      const value: Record<string, string> = {};
+      for (let j = 0; j < response[i + 1].length; j += 2) {
+        const key = response[i + 1][j] as string;
+        value[key] = response[i + 1][j + 1];
+      }
+      results.push({ id: response[i], value });
+    }
+
+    return results.map(({ id, value }) => ({
+      hostName: (value.hostName as string) || "",
+      hasPassword: !!value.roomCode,
+      isOngoing: value.isOngoing === "1",
+      roomId: id.replace("room:", ""),
+    }));
   } catch (err) {
     console.log(err);
     return [];
   }
-
-  return [];
 };
 
 export const getRoomIdFromHostId = async (hostId: string) => {
   try {
-    const results = await redisClient.ft.search(
+    const response = await redisClient.call(
+      "FT.SEARCH",
       "hash-idx:rooms",
-      `@hostId:"${hostId}"`,
+      `@hostId:${hostId}`,
     );
-    if ((results as SearchReply)?.total >= 1) {
-      return (results as SearchReply).documents.map(({ id }) =>
-        id.replace("room:", ""),
-      );
+
+    if (!Array.isArray(response) || !response[0]) {
+      return;
     }
+
+    const results = [];
+
+    for (let i = 1; i < response.length; i += 2) {
+      const value: Record<string, string> = {};
+      for (let j = 0; j < response[i + 1].length; j += 2) {
+        const key = response[i + 1][j] as string;
+        value[key] = response[i + 1][j + 1];
+      }
+      results.push({ id: response[i], value });
+    }
+    return results.map(({ id }) => id.replace("room:", ""));
   } catch {
     return;
   }
-
-  return;
 };
 
 export const getRoomListDetails = async (
@@ -191,13 +238,21 @@ export const getRoomListDetails = async (
     return Promise.resolve(null);
   }
 
-  const [hostName, hasRoomCode, isOngoing, playerCount] = await redisClient
+  const response = await redisClient
     .multi()
-    .hGet(`room:${roomId}`, "hostName")
-    .hGet(`room:${roomId}`, "roomCode")
-    .hGet(`room:${roomId}`, "isOngoing")
-    .sCard(`roomPlayerSet:${roomId}`)
+    .hget(`room:${roomId}`, "hostName")
+    .hget(`room:${roomId}`, "roomCode")
+    .hget(`room:${roomId}`, "isOngoing")
+    .scard(`roomPlayerSet:${roomId}`)
     .exec();
+
+  if (!response) {
+    return Promise.resolve(null);
+  }
+
+  const [hostName, hasRoomCode, isOngoing, playerCount] = response.map(
+    ([, result]) => result,
+  );
 
   return Promise.resolve({
     roomId,
@@ -213,5 +268,5 @@ export const getHostNameFromRoomId = async (roomId?: string | null) => {
     return Promise.resolve(null);
   }
 
-  return await redisClient.hGet(`room:${roomId}`, "hostName");
+  return await redisClient.hget(`room:${roomId}`, "hostName");
 };

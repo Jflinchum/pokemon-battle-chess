@@ -22,6 +22,7 @@ export interface ClientToServerEvents {
   requestChessMove: (args: RequestChessMoveArgs) => void;
   requestDraftPokemon: (args: RequestDraftPokemonArgs) => void;
   requestPokemonMove: (args: RequestPokemonMoveArgs, cb: () => void) => void;
+  requestValidateTimers: (args: CommonClientArgs) => void;
   setViewingResults: (args: SetViewingResultsArgs) => void;
   requestEndGameAsHost: (args: CommonClientArgs) => void;
   requestStartGame: (args: CommonClientArgs) => void;
