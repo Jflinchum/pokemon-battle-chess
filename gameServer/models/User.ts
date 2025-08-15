@@ -37,8 +37,4 @@ export default class User {
   public setRoom(id: string) {
     this.connectedRoom = id;
   }
-
-  public setTransient(t: boolean) {
-    this.transient = t;
-  }
 }

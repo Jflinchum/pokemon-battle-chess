@@ -24,6 +24,8 @@ import {
   fetchPlayerSpectating,
   setPlayerSpectating,
   setGameRoomOptions,
+  removePlayerIdFromRoom,
+  setUserAsTransient,
 } from "../cache/redis.js";
 import { Player } from "../../shared/types/Player.js";
 import { Color } from "chess.js";
@@ -38,6 +40,8 @@ export default class GameRoomManager {
 
   public randomBattleMatchQueue: User[];
   public draftBattleMatchQueue: User[];
+
+  public transientPlayerList: Record<User["playerId"], NodeJS.Timeout> = {};
 
   private io: Server;
 
@@ -261,38 +265,58 @@ export default class GameRoomManager {
 
   public async playerLeaveRoom(roomId: string, playerId?: string) {
     const room = await this.getCachedRoom(roomId);
-    const player = await this.getUser(playerId);
-    if (!room || !player || !playerId) {
+    if (!room || !playerId) {
       return;
     }
 
     const isActivePlayer = await this.isPlayerActive(roomId, playerId);
 
-    // if (playerId && room.transientPlayerList[playerId]) {
-    //   clearTimeout(room.transientPlayerList[playerId]);
-    //   delete room.transientPlayerList[playerId];
-    // }
-
     if (room.hostPlayer?.playerId === playerId) {
       this.io.to(room.roomId).emit("endGameFromDisconnect", {
-        name: player?.playerName,
+        name: room.hostPlayer.playerName,
         isHost: true,
       });
       this.removeRoom(room.roomId);
       return;
     }
     if (room.isOngoing && isActivePlayer) {
-      room.endGame(
-        room.whitePlayer?.playerId === playerId ? "b" : "w",
-        "PLAYER_DISCONNECTED",
-      );
+      this.io
+        .to(room.roomId)
+        .emit(
+          "gameOutput",
+          room.endGame(
+            room.whitePlayer?.playerId === playerId ? "b" : "w",
+            "PLAYER_DISCONNECTED",
+          ),
+          () => {},
+        );
     }
 
-    room.leaveRoom(player.playerId);
+    await removePlayerIdFromRoom(roomId, playerId);
 
     this.io
       .to(room.roomId)
       .emit("connectedPlayers", await this.getPublicPlayerList(roomId));
+  }
+
+  public async clearPlayerTransientState(playerId: string) {
+    if (this.transientPlayerList[playerId]) {
+      clearTimeout(this.transientPlayerList[playerId]);
+      delete this.transientPlayerList[playerId];
+    }
+
+    await setUserAsTransient(playerId, 0);
+  }
+
+  public async preparePlayerDisconnect(roomId: string, playerId: string) {
+    const transientTimeout = setTimeout(() => {
+      console.log(
+        "Player disconnection exceeded timeout. Forcing them out of the room.",
+      );
+      this.playerLeaveRoom(roomId, playerId);
+    }, 1000 * 60);
+    this.transientPlayerList[playerId] = transientTimeout;
+    await setUserAsTransient(playerId, new Date().getTime());
   }
 
   //   public addPlayerToQueue(user: User, queue: "random" | "draft") {

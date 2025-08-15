@@ -6,11 +6,9 @@ import {
   createRoom,
   getRoomListDetails,
   getRoomPasscode,
-  removePlayerIdFromRoom,
   roomExists,
   getRoomFromName,
   getRoomSize,
-  getRoomIdFromHostId,
 } from "../cache/redis.js";
 import { InternalConfig } from "../config.js";
 
@@ -61,21 +59,6 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     if (isStringProfane(playerName)) {
       res.status(400).send({ message: "Name does not pass profanity filter." });
       return;
-    }
-
-    const roomIds = await getRoomIdFromHostId(playerId);
-    console.log("Owned rooms", roomIds);
-
-    // Player already owns a room
-    if (roomIds) {
-      try {
-        await Promise.all(
-          roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId)),
-        );
-      } catch (err) {
-        console.log(err);
-        // attempt to continue with creating the new room, anyways
-      }
     }
 
     try {
@@ -239,7 +222,6 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
           playerId,
         }),
       });
-      removePlayerIdFromRoom(roomId, playerId);
 
       res.status(200).send();
     },

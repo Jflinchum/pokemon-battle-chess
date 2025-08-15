@@ -85,28 +85,6 @@ export const isPlayerIdInRoom = async (
   return redisClient.sismember(`roomPlayerSet:${roomId}`, playerId);
 };
 
-export const removePlayerIdFromRoom = async (
-  roomId: string,
-  playerId: string,
-): Promise<void> => {
-  const roomHostId = await redisClient.hget(`room:${roomId}`, "hostId");
-  if (roomHostId === playerId) {
-    await redisClient
-      .multi()
-      .del(`roomPlayerSet:${roomId}`)
-      .del(`room:${roomId}`)
-      .del(`roomWhiteMatchHistory:${roomId}`)
-      .del(`roomBlackMatchHistory:${roomId}`)
-      .del(`roomPokemonBoard:${roomId}`)
-      .del(`roomPokemonMoveHistory:${roomId}`)
-      .del(`roomPokemonBan:${roomId}`)
-      .del(`player:${playerId}`)
-      .exec();
-  } else {
-    await redisClient.srem(`roomPlayerSet:${roomId}`, playerId);
-  }
-};
-
 export const getRoomSize = async (roomId: string): Promise<number> => {
   return redisClient.scard(`roomPlayerSet:${roomId}`);
 };
@@ -188,34 +166,6 @@ export const getRoomFromName = async (
   } catch (err) {
     console.log(err);
     return [];
-  }
-};
-
-export const getRoomIdFromHostId = async (hostId: string) => {
-  try {
-    const response = await redisClient.call(
-      "FT.SEARCH",
-      "hash-idx:rooms",
-      `@hostId:${hostId}`,
-    );
-
-    if (!Array.isArray(response) || !response[0]) {
-      return;
-    }
-
-    const results = [];
-
-    for (let i = 1; i < response.length; i += 2) {
-      const value: Record<string, string> = {};
-      for (let j = 0; j < response[i + 1].length; j += 2) {
-        const key = response[i + 1][j] as string;
-        value[key] = response[i + 1][j + 1];
-      }
-      results.push({ id: response[i], value });
-    }
-    return results.map(({ id }) => id.replace("room:", ""));
-  } catch {
-    return;
   }
 };
 

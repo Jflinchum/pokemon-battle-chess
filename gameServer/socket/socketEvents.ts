@@ -23,9 +23,13 @@ export const registerSocketEvents = (
       const room = await gameRoomManager.getCachedRoom(
         player?.connectedRoom ?? undefined,
       );
+
       if (room && player) {
         console.log(`Preparing player for disconnect. ${player.playerId}`);
-        room.preparePlayerDisconnect(player);
+        await gameRoomManager.preparePlayerDisconnect(
+          room.roomId,
+          player.playerId,
+        );
         io.to(room.roomId).emit(
           "connectedPlayers",
           await gameRoomManager.getPublicPlayerList(room.roomId),
@@ -64,13 +68,8 @@ export const registerSocketEvents = (
       player = user;
       player.setRoom(roomId);
 
-      /**
-       * TODO - Move logic into room manager
-       */
-      // if (room.transientPlayerList[playerId]) {
-      //   clearTimeout(room.transientPlayerList[playerId]);
-      //   delete room.transientPlayerList[playerId];
-      // }
+      gameRoomManager.clearPlayerTransientState(playerId);
+
       socket.join([roomId, playerId]);
       const connectedPlayers =
         await gameRoomManager.getPublicPlayerList(roomId);
@@ -336,8 +335,11 @@ export const registerSocketEvents = (
       ) {
         return;
       }
+
       player = await gameRoomManager.getUser(playerId);
+      player?.setRoom(roomId);
       socket.join([roomId, playerId]);
+
       if (room.isOngoing) {
         // if (room.transientPlayerList[playerId]) {
         //   clearTimeout(room.transientPlayerList[playerId]);

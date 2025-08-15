@@ -101,7 +101,7 @@ export const fetchUser = async (
       playerId,
       avatarId as unknown as string,
       secret as unknown as string,
-      (transient as unknown as string) === "1",
+      (transient as unknown as string) !== "0",
       (viewingResults as unknown as string) === "1",
       (spectating as unknown as string) === "1",
     );
@@ -189,14 +189,57 @@ export const removePlayerIdFromRoom = async (
 
 export const deleteRoom = async (roomId: string) => {
   const playerIdList = await redisClient.smembers(`roomPlayerSet:${roomId}`);
-  await redisClient
-    .multi()
-    .del(`roomPlayerSet:${roomId}`)
-    .del(`room:${roomId}`)
-    .del(`roomWhiteMatchHistory:${roomId}`)
-    .del(`roomBlackMatchHistory:${roomId}`)
-    .del(playerIdList.map((id) => `player:${id}`))
-    .exec();
+
+  return Promise.all([
+    ...playerIdList.map((id) => redisClient.del(`player:${id}`)),
+    redisClient
+      .multi()
+      .del(`roomPlayerSet:${roomId}`)
+      .del(`room:${roomId}`)
+      .del(`roomWhiteMatchHistory:${roomId}`)
+      .del(`roomBlackMatchHistory:${roomId}`)
+      .del(`roomPokemonBoard:${roomId}`)
+      .del(`roomPokemonMoveHistory:${roomId}`)
+      .del(`roomPokemonBan:${roomId}`)
+      .exec(),
+  ]);
+};
+
+export const setUserAsTransient = async (
+  playerId: string,
+  transientTimestamp: number,
+) => {
+  return await redisClient.hset(`player:${playerId}`, {
+    transient: transientTimestamp,
+  });
+};
+
+export const getRoomIdFromHostId = async (hostId: string) => {
+  try {
+    const response = await redisClient.call(
+      "FT.SEARCH",
+      "hash-idx:rooms",
+      `@hostId:${hostId}`,
+    );
+
+    if (!Array.isArray(response) || !response[0]) {
+      return;
+    }
+
+    const results = [];
+
+    for (let i = 1; i < response.length; i += 2) {
+      const value: Record<string, string> = {};
+      for (let j = 0; j < response[i + 1].length; j += 2) {
+        const key = response[i + 1][j] as string;
+        value[key] = response[i + 1][j + 1];
+      }
+      results.push({ id: response[i], value });
+    }
+    return results.map(({ id }) => id.replace("room:", ""));
+  } catch {
+    return;
+  }
 };
 
 export const createRoom = async (roomId: string, room: GameRoom) => {

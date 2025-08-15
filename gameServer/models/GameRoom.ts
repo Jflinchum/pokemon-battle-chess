@@ -57,7 +57,6 @@ import {
   pushPokemonMoveHistory,
   pushWhiteMatchHistory,
   releaseLockForRoom,
-  removePlayerIdFromRoom,
   resetMatchHistory,
   setBlackPlayerPokemonMove,
   setBlackTimerExpiration,
@@ -92,7 +91,6 @@ export default class GameRoom {
   public player1: User | null = null;
   public player2: User | null = null;
   public playerList?: string[];
-  public transientPlayerList: Record<User["playerId"], NodeJS.Timeout> = {};
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
 
@@ -179,25 +177,12 @@ export default class GameRoom {
     this.currentPokemonBattle = null;
   }
 
-  public leaveRoom(playerId: string) {
-    if (this.player1?.playerId === playerId) {
-      this.player1 = null;
-    }
-    if (this.player2?.playerId === playerId) {
-      this.player2 = null;
-    }
-    if (this.hostPlayer?.playerId === playerId) {
-      this.hostPlayer = null;
-    }
-    removePlayerIdFromRoom(this.roomId, playerId);
-  }
-
   private convertUserToPlayer(user: User): Player {
     return {
       playerName: user.playerName,
       playerId: user.playerId,
       avatarId: user.avatarId,
-      transient: !!this.transientPlayerList[user.playerId],
+      transient: false,
       viewingResults: user.viewingResults,
       isHost: user.playerId === this.hostPlayer?.playerId,
       isPlayer1: user.playerId === this.player1?.playerId,
@@ -212,16 +197,6 @@ export default class GameRoom {
         user.playerId !== this.player1?.playerId &&
         user.playerId !== this.player2?.playerId,
     };
-  }
-
-  public preparePlayerDisconnect(player: User) {
-    const transientTimeout = setTimeout(() => {
-      console.log(
-        "Player disconnection exceeded timeout. Forcing them out of the room.",
-      );
-      // this.gameRoomManager.playerLeaveRoom(this.roomId, player.playerId);
-    }, 1000 * 60);
-    this.transientPlayerList[player.playerId] = transientTimeout;
   }
 
   public getSpectators() {
@@ -707,6 +682,7 @@ export default class GameRoom {
       type: "generic",
       data: { event: "gameEnd", color, reason },
     };
+    this.pushHistory(gameData);
     setRoomToOngoing(this.roomId, false);
     setPlayersViewingResults(this.playerList || [], true);
     return gameData;

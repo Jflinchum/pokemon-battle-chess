@@ -46,9 +46,8 @@ Scalability Notes:
   - Game
     - Stateful
       - Attempt to make it stateless
+        - Ack functions for game output and resync if fail ack
         - Disconnects/cleanup
-          - Immediately set timestamp of disconnect in redis player cache 
-          - Immediately set timeout to clean up user if they've been disconnected for N minutes
           - NEW scheduler server to periodically clean up leftover users if timeout is lost between server restarts
             - Uses timestamps from player disconnect to see if they've been disconnected for longer than N minutes
             - Will need to create new index in redis

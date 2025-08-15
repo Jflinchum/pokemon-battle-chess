@@ -3,7 +3,11 @@ import User from "../models/User.js";
 import GameRoom from "../models/GameRoom.js";
 import GameRoomManager from "../models/GameRoomManager.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
-import { doesRoomExist } from "../cache/redis.js";
+import {
+  doesRoomExist,
+  getRoomIdFromHostId,
+  removePlayerIdFromRoom,
+} from "../cache/redis.js";
 
 interface APIResponse<Data> {
   data?: Data;
@@ -52,10 +56,20 @@ export const registerRoutes = (
     }
 
     // Player already owns a room
-    const roomId = await gameRoomManager.playerCreatedRoomId(playerId);
-    if (roomId) {
-      gameRoomManager.removeRoom(roomId);
+    const roomIds = await getRoomIdFromHostId(playerId);
+
+    // Player already owns a room
+    if (roomIds) {
+      try {
+        await Promise.all(
+          roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId)),
+        );
+      } catch (err) {
+        console.log(err);
+        // attempt to continue with creating the new room, anyways
+      }
     }
+
     const newRoomId = crypto.randomUUID();
 
     const user = new User(playerName, playerId, avatarId, secret);
