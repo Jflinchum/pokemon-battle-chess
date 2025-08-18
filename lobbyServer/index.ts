@@ -6,6 +6,7 @@ import { SecureContextOptions } from "tls";
 import fs from "fs";
 import { getConfig } from "./config.js";
 import { registerRoutes } from "./controllers/index.js";
+import { registerScheduler } from "./scheduler.js";
 
 const configSettings = getConfig();
 
@@ -43,3 +44,4 @@ app.use(express.json());
 app.use(express.static(path.join(path.resolve(), "./dist")));
 
 registerRoutes(app, configSettings);
+registerScheduler(configSettings);

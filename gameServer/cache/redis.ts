@@ -35,7 +35,7 @@ import { Lock, Redlock } from "@sesamecare-oss/redlock";
  * roomPokemonBoard:{roomId} -> (number | null)[]
  * roomPokemonBan:${roomId} -> number[]
  * roomSquareModifiers:${roomId} -> number[]
- * player:{playerId} -> { playerName, avatarId, secret, viewingResults, spectating }
+ * player:{playerId} -> { playerName, roomId, avatarId, secret, transient, viewingResults, spectating }
  * roomLock:{roomId}
  */
 
@@ -95,15 +95,20 @@ export const fetchUser = async (
   const [playerName, avatarId, secret, transient, viewingResults, spectating] =
     response.map(([, result]) => result);
 
+  const isTransient = typeof transient === "string" && transient !== "0";
+  const isViewingResults =
+    typeof viewingResults === "string" && viewingResults === "1";
+  const isSpectating = typeof spectating === "string" && spectating === "1";
+
   if (playerName && avatarId && secret) {
     return new User(
       playerName as unknown as string,
       playerId,
       avatarId as unknown as string,
       secret as unknown as string,
-      (transient as unknown as string) !== "0",
-      (viewingResults as unknown as string) === "1",
-      (spectating as unknown as string) === "1",
+      isTransient,
+      isViewingResults,
+      isSpectating,
     );
   }
   return null;
@@ -183,7 +188,10 @@ export const removePlayerIdFromRoom = async (
   if (roomHostId === playerId) {
     await deleteRoom(roomId);
   } else {
-    await redisClient.srem(`roomPlayerSet:${roomId}`, playerId);
+    await Promise.all([
+      redisClient.srem(`roomPlayerSet:${roomId}`, playerId),
+      redisClient.del(`player:${playerId}`),
+    ]);
   }
 };
 

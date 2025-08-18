@@ -4,7 +4,31 @@ import { getConfig } from "../config.js";
 /**
  *
  * roomPlayerSet:{roomId} -> playerId[]
- * room:{roomId} -> { roomCode, hostName, hostId, isOngoing }
+ * room:{roomId} -> {
+ *    roomCode,
+ *    publicSeed,
+ *    hostName,
+ *    hostId,
+ *    isOngoing,
+ *    player1Id,
+ *    player2Id,
+ *    whitePlayerId,
+ *    blackPlayerId,
+ *    chessBoard,
+ *    squareModifierTarget,
+ *    format,
+ *    atkBuff...,
+ *    whitePlayerPokemonMove,
+ *    blackPlayerPokemonMove,
+ * }
+ * roomPokemonMoveHistory:{roomId} string[]
+ * roomWhiteMatchHistory:{roomId} -> MatchLog[]
+ * roomBlackMatchHistory:{roomId} -> MatchLog[]
+ * roomPokemonBoard:{roomId} -> (number | null)[]
+ * roomPokemonBan:${roomId} -> number[]
+ * roomSquareModifiers:${roomId} -> number[]
+ * player:{playerId} -> { playerName, avatarId, roomId, secret, transient, viewingResults, spectating }
+ * roomLock:{roomId}
  */
 
 const redisClient = new Redis(getConfig().redisUrl, { lazyConnect: true });
@@ -20,24 +44,39 @@ const connectAndIndexRedis = async () => {
 
 const createRedisIndex = async () => {
   const indexList = await redisClient.call("FT._LIST");
-  if (Array.isArray(indexList) && indexList.includes("hash-idx:rooms")) {
-    return;
+  if (!Array.isArray(indexList) || !indexList.includes("hash-idx:rooms")) {
+    redisClient.call(
+      "FT.CREATE",
+      "hash-idx:rooms",
+      "ON",
+      "HASH",
+      "PREFIX",
+      "1",
+      "room:", // TODO confirm this works
+      "SCHEMA",
+      "hostName",
+      "TEXT",
+      "hostId",
+      "TEXT",
+    );
   }
 
-  redisClient.call(
-    "FT.CREATE",
-    "hash-idx:rooms",
-    "ON",
-    "HASH",
-    "PREFIX",
-    "1",
-    "room:", // TODO confirm this works
-    "SCHEMA",
-    "hostName",
-    "TEXT",
-    "hostId",
-    "TEXT",
-  );
+  if (!Array.isArray(indexList) || !indexList.includes("hash-idx:players")) {
+    redisClient.call(
+      "FT.CREATE",
+      "hash-idx:players",
+      "ON",
+      "HASH",
+      "PREFIX",
+      "1",
+      "player:", // TODO confirm this works
+      "SCHEMA",
+      "playerName",
+      "TEXT",
+      "transient",
+      "NUMERIC",
+    );
+  }
 };
 
 (async () => {
@@ -74,6 +113,7 @@ export const addPlayerIdToRoom = async (
       avatarId,
       secret,
       viewingResults: 0,
+      roomId,
     })
     .exec();
 };
@@ -219,4 +259,40 @@ export const getHostNameFromRoomId = async (roomId?: string | null) => {
   }
 
   return await redisClient.hget(`room:${roomId}`, "hostName");
+};
+
+export const getDisconnectedUsers = async (): Promise<
+  { playerId: string; roomId: string }[]
+> => {
+  const IDLE_TIME_UNTIL_DISCONNECT = 1000 * 60 * 3;
+  try {
+    const response = await redisClient.call(
+      "FT.SEARCH",
+      "hash-idx:players",
+      `@transient:[1 ${new Date().getTime() + IDLE_TIME_UNTIL_DISCONNECT}]`,
+    );
+
+    if (!Array.isArray(response) || !response[0]) {
+      return [];
+    }
+
+    const results = [];
+
+    for (let i = 1; i < response.length; i += 2) {
+      const value: Record<string, string> = {};
+      for (let j = 0; j < response[i + 1].length; j += 2) {
+        const key = response[i + 1][j] as string;
+        value[key] = response[i + 1][j + 1];
+      }
+      results.push({
+        playerId: response[i].replace("player:", ""),
+        roomId: value.roomId,
+      });
+    }
+
+    return results;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
 };

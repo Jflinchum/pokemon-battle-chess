@@ -147,7 +147,7 @@ export const registerRoutes = (
       return;
     }
 
-    gameRoomManager.playerLeaveRoom(roomId, req.body.playerId);
+    gameRoomManager.playerLeaveRoom(roomId, playerId);
 
     res.status(200).send();
   });

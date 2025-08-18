@@ -43,26 +43,23 @@ Scalability Notes:
   - Lobby
     - Stateless, uses Redis
     - Serves Javascript
+    - Handles room queries and fronts initial http requests
   - Game
-    - Stateful
-      - Attempt to make it stateless
-        - Ack functions for game output and resync if fail ack
-        - Disconnects/cleanup
-          - NEW scheduler server to periodically clean up leftover users if timeout is lost between server restarts
-            - Uses timestamps from player disconnect to see if they've been disconnected for longer than N minutes
-            - Will need to create new index in redis
-        - Match making
-          - NEW scheduler server to periodically check redis for players looking to match make
-          - Eventually can introduce better match making logic (latency/region), but immediate thought is just a simple queue
-          - Will need to keep Scalability in mind when creating queue (add different data such as region, not just a player id queue)
+    - Stateless, uses Redis
     - Handles game logic
+    - Creates websocket server for players to join
 - 1 Redis db
 - Next Steps:
   - Nginx + Kube
-    - Add nginx ingress
-    - Launch multiple Lobby Server Nodes and configure nginx load balancing
-    - Migrate to kubernetes with Kind
-  - Scale Game Server
+    - Learn Helm and set up nginx ingress and redis in cluster
+    - Launch multiple Lobby/Game Server Nodes and configure nginx load balancing
+    - Attempt to make game lobby stateless
+      - Ack functions for game output and resync if fail ack
+      - Match making
+        - Game server checks redis to see if any players in queue
+          - If there is a player, dequeue them and matchmake them
+          - If there is not a player, enqueue the player
+        - Eventually can introduce better match making logic (latency/region), but immediate thought is just a simple queue
   - AWS EKS deployment or GCP GKE
 
 Refactor TODOs:
@@ -76,7 +73,7 @@ Refactor TODOs:
 
 Issues:
 - Some pokemon can generate with only status moves (full support) (meowstic)
-- Draft picking timer does not reset exactly to max time. It goes a little above or below it
+- After drafting, all pokemon sprites are invisible on chess pieces until a piece is moved
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
   - Revelation Dance
