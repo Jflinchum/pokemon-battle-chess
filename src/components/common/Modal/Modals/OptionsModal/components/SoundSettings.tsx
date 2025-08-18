@@ -4,13 +4,13 @@ import {
   VolumePreference,
   useUserState,
 } from "../../../../../../context/UserState/UserStateContext";
-import movePieceMP3 from "../../../../../../assets/chessAssets/audio/movePiece.mp3";
+import movePieceFX from "../../../../../../assets/chessAssets/audio/movePiece.ogg";
 import damageEffectivePokemon from "../../../../../../assets/pokemonAssets/audio/fx/damage-effective.wav";
 
 export const SoundSettings = () => {
   const { userState, dispatch } = useUserState();
   const movePieceAudio = useMemo(() => {
-    const movePieceAudio = new Audio(movePieceMP3);
+    const movePieceAudio = new Audio(movePieceFX);
     return movePieceAudio;
   }, []);
 

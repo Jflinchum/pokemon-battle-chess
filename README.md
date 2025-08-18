@@ -12,6 +12,6 @@ A mixture between Pokemon and Chess! Each chess piece gets assigned a Pokemon, w
 
 ## Credits
 
-Chess Piece Assets - https://www.chess.com
+Chess Assets - Cburnett https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
 Chess Engine - https://github.com/jhlywa/chess.js
 Pokemon Engine - https://github.com/pkmn/ps
