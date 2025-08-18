@@ -6,7 +6,7 @@ const DISCONNECTED_USER_INTERVAL = 1000 * 60 * 3;
 export const registerScheduler = (config: InternalConfig) => {
   const setUpDisconnectedUserCleanUpInterval = () => {
     setInterval(async () => {
-      console.log("Running clean up job for disconnected users.");
+      console.log("Running clean up job.");
       const disconnectedUsers = await getDisconnectedUsers();
 
       disconnectedUsers.forEach(async (user) => {

@@ -341,10 +341,7 @@ export const registerSocketEvents = (
       socket.join([roomId, playerId]);
 
       if (room.isOngoing) {
-        // if (room.transientPlayerList[playerId]) {
-        //   clearTimeout(room.transientPlayerList[playerId]);
-        //   delete room.transientPlayerList[playerId];
-        // }
+        gameRoomManager.clearPlayerTransientState(playerId);
         socket.emit("startSync", { history: await room.getHistory(playerId) });
         if (room.roomGameOptions.timersEnabled) {
           await room.setTimerState();
