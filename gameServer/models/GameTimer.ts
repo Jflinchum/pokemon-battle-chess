@@ -107,16 +107,16 @@ export default class GameTimer {
         timerExpiration:
           this.whitePlayerTimerExpiration +
           (new Date().getTime() - this.whitePlayerLastMoveTime) *
-            (this.whitePlayerTimerPaused ? 0 : 1),
-        pause: !this.whitePlayerTimerPaused,
+            (this.whitePlayerTimerPaused ? 1 : 0),
+        pause: this.whitePlayerTimerPaused,
         hasStarted: true,
       },
       black: {
         timerExpiration:
           this.blackPlayerTimerExpiration +
           (new Date().getTime() - this.blackPlayerLastMoveTime) *
-            (this.blackPlayerTimerPaused ? 0 : 1),
-        pause: !this.blackPlayerTimerPaused,
+            (this.blackPlayerTimerPaused ? 1 : 0),
+        pause: this.blackPlayerTimerPaused,
         hasStarted: true,
       },
     };

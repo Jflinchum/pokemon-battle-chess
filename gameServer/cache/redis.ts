@@ -268,6 +268,8 @@ export const createRoom = async (roomId: string, room: GameRoom) => {
     chessTimerDuration: 15,
     chessTimerIncrement: 5,
     pokemonTimerIncrement: 5,
+    whitePlayerTimerPaused: 0,
+    blackPlayerTimerPaused: 1,
   });
 };
 

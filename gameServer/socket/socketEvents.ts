@@ -82,12 +82,16 @@ export const registerSocketEvents = (
 
       if (room.isOngoing && room.whitePlayer && room.blackPlayer) {
         socket.emit("startSync", { history: await room.getHistory(playerId) });
-        // if (room.roomGameOptions.timersEnabled && room.gameTimer) {
-        //   socket.emit(
-        //     "currentTimers",
-        //     room.gameTimer.getTimersWithLastMoveShift(),
-        //   );
-        // }
+
+        if (room.roomGameOptions.timersEnabled) {
+          await room.setTimerState();
+          if (room.gameTimer) {
+            socket.emit(
+              "currentTimers",
+              room.gameTimer.getTimersWithLastMoveShift(),
+            );
+          }
+        }
         socket.emit(
           "startGame",
           room.blackPlayer?.playerId === playerId
@@ -240,9 +244,6 @@ export const registerSocketEvents = (
           "connectedPlayers",
           await gameRoomManager.getPublicPlayerList(roomId),
         );
-
-        // this.gameTimer?.stopTimers();
-        // this.broadcastTimers();
       },
     );
 
@@ -589,12 +590,12 @@ export const registerSocketEvents = (
           io.to(playerId).emit("startSync", {
             history: await room.getHistory(playerId),
           });
-          // if (room.roomGameOptions.timersEnabled && room.gameTimer) {
-          //   socket.emit(
-          //     "currentTimers",
-          //     room.gameTimer.getTimersWithLastMoveShift(),
-          //   );
-          // }
+          if (room.roomGameOptions.timersEnabled && room.gameTimer) {
+            socket.emit(
+              "currentTimers",
+              room.gameTimer.getTimersWithLastMoveShift(),
+            );
+          }
           socket.emit(
             "startGame",
             room.buildStartGameArgs("w", room.whitePlayer, room.blackPlayer),
