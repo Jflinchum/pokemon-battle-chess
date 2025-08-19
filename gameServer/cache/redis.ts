@@ -35,6 +35,8 @@ import { Lock, Redlock } from "@sesamecare-oss/redlock";
  * roomPokemonBoard:{roomId} -> (number | null)[]
  * roomPokemonBan:${roomId} -> number[]
  * roomSquareModifiers:${roomId} -> number[]
+ * randomMatchmakingQueue - playerId[]
+ * draftMatchmakingQueue - playerId[]
  * player:{playerId} -> { playerName, roomId, avatarId, secret, transient, viewingResults, spectating }
  * roomLock:{roomId}
  */
@@ -130,6 +132,7 @@ export const fetchGame = async (
     .hget(`room:${roomId}`, "whitePlayerId")
     .hget(`room:${roomId}`, "blackPlayerId")
     .hget(`room:${roomId}`, "isOngoing")
+    .hget(`room:${roomId}`, "isQuickPlay")
     .smembers(`roomPlayerSet:${roomId}`)
     .exec();
   if (!response) {
@@ -144,6 +147,7 @@ export const fetchGame = async (
     whitePlayerId,
     blackPlayerId,
     isOngoing,
+    isQuickPlay,
     playerList,
   ] = response.map(([, result]) => result);
   const roomOptions = (await fetchGameOptions(roomId)) ?? undefined;
@@ -169,6 +173,7 @@ export const fetchGame = async (
     whitePlayer,
     blackPlayer,
     (isOngoing as unknown as string) === "1",
+    (isQuickPlay as unknown as string) === "1",
   );
 };
 
@@ -193,6 +198,20 @@ export const removePlayerIdFromRoom = async (
       redisClient.del(`player:${playerId}`),
     ]);
   }
+};
+
+export const addPlayerToCache = async (user: User) => {
+  return redisClient.hset(`player:${user.playerId}`, {
+    playerName: user.playerName,
+    avatarId: user.avatarId,
+    secret: user.playerSecret,
+    viewingResults: 0,
+    roomId: user.connectedRoom,
+  });
+};
+
+export const deletePlayerFromCache = async (playerId: string) => {
+  return await redisClient.del(`player:${playerId}`);
 };
 
 export const deleteRoom = async (roomId: string) => {
@@ -220,6 +239,10 @@ export const setUserAsTransient = async (
   return await redisClient.hset(`player:${playerId}`, {
     transient: transientTimestamp,
   });
+};
+
+export const getUserTransient = async (playerId: string) => {
+  return await redisClient.hget(`player:${playerId}`, "transient");
 };
 
 export const getRoomIdFromHostId = async (hostId: string) => {
@@ -250,27 +273,40 @@ export const getRoomIdFromHostId = async (hostId: string) => {
   }
 };
 
-export const createRoom = async (roomId: string, room: GameRoom) => {
+export const createRoom = async (
+  roomId: string,
+  room: GameRoom,
+  isQuickPlay?: boolean,
+) => {
   await redisClient.hset(`room:${roomId}`, {
     publicSeed: room.publicSeed,
-    isOngoing: 0,
-    format: "random",
-    atkBuff: 0,
-    defBuff: 0,
-    spaBuff: 0,
-    spdBuff: 1,
-    speBuff: 0,
-    accuracyBuff: 0,
-    evasionBuff: 0,
-    weatherWars: 0,
-    timersEnabled: 1,
-    banTimerDuration: 30,
-    chessTimerDuration: 15,
-    chessTimerIncrement: 5,
-    pokemonTimerIncrement: 5,
+    roomCode: room.password,
+    isOngoing: isQuickPlay ? 1 : 0,
+    format: room.roomGameOptions.format,
+    atkBuff: room.roomGameOptions.offenseAdvantage.atk,
+    defBuff: room.roomGameOptions.offenseAdvantage.def,
+    spaBuff: room.roomGameOptions.offenseAdvantage.spa,
+    spdBuff: room.roomGameOptions.offenseAdvantage.spd,
+    speBuff: room.roomGameOptions.offenseAdvantage.spe,
+    accuracyBuff: room.roomGameOptions.offenseAdvantage.accuracy,
+    evasionBuff: room.roomGameOptions.offenseAdvantage.evasion,
+    weatherWars: room.roomGameOptions.weatherWars ? 1 : 0,
+    timersEnabled: room.roomGameOptions.timersEnabled ? 1 : 0,
+    banTimerDuration: room.roomGameOptions.banTimerDuration,
+    chessTimerDuration: room.roomGameOptions.chessTimerDuration,
+    chessTimerIncrement: room.roomGameOptions.chessTimerIncrement,
+    pokemonTimerIncrement: room.roomGameOptions.pokemonTimerIncrement,
     whitePlayerTimerPaused: 0,
     blackPlayerTimerPaused: 1,
+    isQuickPlay: isQuickPlay ? 1 : 0,
   });
+};
+
+export const addPlayerIdToRoomPlayerSet = async (
+  roomId: string,
+  playerId: string,
+): Promise<void> => {
+  await redisClient.sadd(`roomPlayerSet:${roomId}`, playerId);
 };
 
 export const movePlayerToActive = async (roomId: string, playerId: string) => {
@@ -287,10 +323,18 @@ export const movePlayerToActive = async (roomId: string, playerId: string) => {
   const [player1, player2] = response.map(([, result]) => result);
 
   if (!player1) {
-    await redisClient.hset(`room:${roomId}`, "player1Id", playerId);
+    return setPlayerAsPlayer1(roomId, playerId);
   } else if (!player2) {
-    await redisClient.hset(`room:${roomId}`, "player2Id", playerId);
+    return setPlayerAsPlayer2(roomId, playerId);
   }
+};
+
+export const setPlayerAsPlayer1 = async (roomId: string, playerId: string) => {
+  return await redisClient.hset(`room:${roomId}`, "player1Id", playerId);
+};
+
+export const setPlayerAsPlayer2 = async (roomId: string, playerId: string) => {
+  return await redisClient.hset(`room:${roomId}`, "player2Id", playerId);
 };
 
 export const movePlayerToInactive = async (
@@ -897,4 +941,46 @@ export const setLockForRoom = async (roomId: string, expireTime?: number) => {
 
 export const releaseLockForRoom = async (lock: Lock) => {
   return lock.release();
+};
+
+export const pushPlayerToRandomQueue = async (user: User) => {
+  return await redisClient
+    .multi()
+    .rpush("randomMatchmakingQueue", user.playerId)
+    .hset(`player:${user.playerId}`, {
+      playerName: user.playerName,
+      avatarId: user.avatarId,
+      secret: user.playerSecret,
+      viewingResults: 0,
+    })
+    .exec();
+};
+
+export const getFirstPlayerInRandomQueue = async () => {
+  return await redisClient.lpop("randomMatchmakingQueue");
+};
+
+export const removePlayerFromRandomQueue = async (playerId: string) => {
+  return await redisClient.lrem("randomMatchmakingQueue", 0, playerId);
+};
+
+export const pushPlayerToDraftQueue = async (user: User) => {
+  return await redisClient
+    .multi()
+    .rpush("draftMatchmakingQueue", user.playerId)
+    .hset(`player:${user.playerId}`, {
+      playerName: user.playerName,
+      avatarId: user.avatarId,
+      secret: user.playerSecret,
+      viewingResults: 0,
+    })
+    .exec();
+};
+
+export const getFirstPlayerInDraftQueue = async () => {
+  return await redisClient.lpop("draftMatchmakingQueue");
+};
+
+export const removePlayerFromDraftQueue = async (playerId: string) => {
+  return await redisClient.lrem("draftMatchmakingQueue", 0, playerId);
 };

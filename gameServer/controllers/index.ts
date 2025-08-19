@@ -3,11 +3,7 @@ import User from "../models/User.js";
 import GameRoom from "../models/GameRoom.js";
 import GameRoomManager from "../models/GameRoomManager.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
-import {
-  doesRoomExist,
-  getRoomIdFromHostId,
-  removePlayerIdFromRoom,
-} from "../cache/redis.js";
+import { doesRoomExist } from "../cache/redis.js";
 
 interface APIResponse<Data> {
   data?: Data;
@@ -35,15 +31,11 @@ export const registerRoutes = (
       playerName: User["playerName"];
       playerId: User["playerId"];
       password: string;
-      avatarId: User["avatarId"];
-      playerSecret: User["playerSecret"];
     }
   >("/game-service/create-room", async (req, res) => {
     const playerName = req.body.playerName;
     const playerId = req.body.playerId;
     const password = req.body.password;
-    const avatarId = req.body.avatarId;
-    const secret = req.body.playerSecret;
 
     if (!playerName || !playerId) {
       res.status(400).send();
@@ -55,30 +47,14 @@ export const registerRoutes = (
       return;
     }
 
-    // Player already owns a room
-    const roomIds = await getRoomIdFromHostId(playerId);
-
-    // Player already owns a room
-    if (roomIds) {
-      try {
-        await Promise.all(
-          roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId)),
-        );
-      } catch (err) {
-        console.log(err);
-        // attempt to continue with creating the new room, anyways
-      }
-    }
-
-    const newRoomId = crypto.randomUUID();
-
-    const user = new User(playerName, playerId, avatarId, secret);
-    const gameRoom = new GameRoom(newRoomId, password);
-    await gameRoomManager.addRoom(newRoomId, gameRoom);
-    await gameRoomManager.playerJoinRoom(newRoomId, user);
+    const { roomId } = await gameRoomManager.createAndCacheNewRoom(
+      playerId,
+      password,
+    );
+    await gameRoomManager.playerJoinRoom(roomId, playerId);
 
     res.status(200).send({
-      data: { roomId: newRoomId },
+      data: { roomId },
     });
   });
 
@@ -96,16 +72,11 @@ export const registerRoutes = (
       roomId?: GameRoom["roomId"];
       playerId?: User["playerId"];
       playerName?: User["playerName"];
-      playerSecret: User["playerSecret"];
-      password?: GameRoom["password"];
-      avatarId?: User["avatarId"];
     }
   >("/game-service/join-room", async (req, res) => {
     const roomId = req.body.roomId;
     const playerId = req.body.playerId;
     const playerName = req.body.playerName;
-    const avatarId = req.body.avatarId;
-    const playerSecret = req.body.playerSecret;
     const roomExists = await doesRoomExist(roomId);
 
     if (!roomId || !playerId || !playerName) {
@@ -121,13 +92,10 @@ export const registerRoutes = (
 
     const existingPlayer = await gameRoomManager.getUser(playerId);
     if (existingPlayer?.transient) {
-      // clearTimeout(room.transientPlayerList[playerId]);
+      gameRoomManager.clearPlayerTransientState(playerId);
       await existingPlayer.setViewingResults(false);
     } else {
-      await gameRoomManager.playerJoinRoom(
-        roomId,
-        new User(playerName, playerId, avatarId || "1", playerSecret),
-      );
+      await gameRoomManager.playerJoinRoom(roomId, playerId);
     }
     res.status(200).send({ data: { roomId: roomId } });
   });

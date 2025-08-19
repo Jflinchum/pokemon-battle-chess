@@ -6,7 +6,7 @@ import {
   ServerToClientEvents,
 } from "../../shared/types/Socket.js";
 import {
-  createRoom,
+  createRoom as createRoomInCache,
   movePlayerToActive,
   deleteRoom,
   doesRoomExist,
@@ -26,6 +26,17 @@ import {
   setGameRoomOptions,
   removePlayerIdFromRoom,
   setUserAsTransient,
+  pushPlayerToRandomQueue,
+  pushPlayerToDraftQueue,
+  removePlayerFromRandomQueue,
+  removePlayerFromDraftQueue,
+  getFirstPlayerInRandomQueue,
+  getFirstPlayerInDraftQueue,
+  getRoomIdFromHostId,
+  setPlayerAsPlayer1,
+  setPlayerAsPlayer2,
+  deletePlayerFromCache,
+  getUserTransient,
 } from "../cache/redis.js";
 import { Player } from "../../shared/types/Player.js";
 import { Color } from "chess.js";
@@ -54,16 +65,6 @@ export default class GameRoomManager {
 
     this.randomBattleMatchQueue = [];
     this.draftBattleMatchQueue = [];
-    // setInterval(() => {
-    //   this.processAllQueues();
-    // }, 10 * 1000);
-  }
-
-  public getRoom(roomId?: string): GameRoom | undefined {
-    if (!roomId) {
-      return;
-    }
-    return this.currentRooms[roomId];
   }
 
   public async getCachedRoom(roomId?: string): Promise<GameRoom | null> {
@@ -215,8 +216,8 @@ export default class GameRoomManager {
       }
     }
 
-    const playerSecret = await fetchPlayerSecret(playerId);
-    if (playerSecret !== secretId) {
+    const cachedPlayerSecret = await fetchPlayerSecret(playerId);
+    if (cachedPlayerSecret !== secretId) {
       console.log(`${playerId} invalid player secret`);
       return false;
     }
@@ -224,9 +225,55 @@ export default class GameRoomManager {
     return true;
   }
 
-  public async addRoom(roomId: string, room: GameRoom) {
-    console.log(`Creating room ${roomId}`);
-    return createRoom(roomId, room);
+  public async createAndCacheNewRoom(
+    playerId: string,
+    password: string,
+    matchMaking?: "random" | "draft",
+  ) {
+    // Player already owns a room
+    const roomIds = await getRoomIdFromHostId(playerId);
+
+    // Player already owns a room
+    if (roomIds) {
+      try {
+        await Promise.all(
+          roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId)),
+        );
+      } catch (err) {
+        console.log(err);
+        // attempt to continue with creating the new room, anyways
+      }
+    }
+
+    const newRoomId = crypto.randomUUID();
+
+    let gameOptions;
+
+    if (matchMaking) {
+      gameOptions = {
+        format: matchMaking,
+        offenseAdvantage: {
+          atk: 0,
+          def: 0,
+          spa: 0,
+          spd: 1,
+          spe: 0,
+          accuracy: 0,
+          evasion: 0,
+        },
+        weatherWars: true,
+        timersEnabled: true,
+        banTimerDuration: 30,
+        chessTimerDuration: 15,
+        chessTimerIncrement: 5,
+        pokemonTimerIncrement: 1,
+      };
+    }
+
+    const gameRoom = new GameRoom(newRoomId, password, undefined, gameOptions);
+    console.log(`Creating room ${newRoomId}`);
+    await createRoomInCache(newRoomId, gameRoom, !!matchMaking);
+    return gameRoom;
   }
 
   public removeRoom(roomId: string) {
@@ -246,8 +293,16 @@ export default class GameRoomManager {
     return;
   }
 
-  public async playerJoinRoom(roomId: string, user: User) {
-    await movePlayerToActive(roomId, user.playerId);
+  public async playerJoinRoom(roomId: string, playerId: string) {
+    await movePlayerToActive(roomId, playerId);
+  }
+
+  public async player1JoinRoom(roomId: string, playerId: string) {
+    await setPlayerAsPlayer1(roomId, playerId);
+  }
+
+  public async player2JoinRoom(roomId: string, playerId: string) {
+    await setPlayerAsPlayer2(roomId, playerId);
   }
 
   public async isPlayerActive(roomId: string, playerId: string) {
@@ -308,102 +363,50 @@ export default class GameRoomManager {
     await setUserAsTransient(playerId, 0);
   }
 
-  public async preparePlayerDisconnect(roomId: string, playerId: string) {
-    const transientTimeout = setTimeout(() => {
-      console.log(
-        "Player disconnection exceeded timeout. Forcing them out of the room.",
-      );
-      this.playerLeaveRoom(roomId, playerId);
+  public async preparePlayerDisconnect(playerId: string, roomId?: string) {
+    const transientTimeout = setTimeout(async () => {
+      const stillTransient = await getUserTransient(playerId);
+
+      if (stillTransient && stillTransient !== "0") {
+        if (roomId) {
+          console.log(
+            "Player disconnection exceeded timeout. Forcing them out of the room.",
+          );
+          this.playerLeaveRoom(roomId, playerId);
+        } else {
+          deletePlayerFromCache(playerId);
+        }
+      }
     }, 1000 * 60);
     this.transientPlayerList[playerId] = transientTimeout;
     await setUserAsTransient(playerId, new Date().getTime());
   }
 
-  //   public addPlayerToQueue(user: User, queue: "random" | "draft") {
-  //     if (queue === "random") {
-  //       this.randomBattleMatchQueue.push(user);
-  //     } else if (queue === "draft") {
-  //       this.draftBattleMatchQueue.push(user);
-  //     }
-  //   }
+  public async addPlayerToQueue(user: User, queue: "random" | "draft") {
+    if (queue === "random") {
+      return await pushPlayerToRandomQueue(user);
+    } else if (queue === "draft") {
+      return await pushPlayerToDraftQueue(user);
+    }
+  }
 
-  //   public removePlayerFromQueue(socket: Socket, queue?: "random" | "draft") {
-  //     if (queue || queue === "random") {
-  //       this.randomBattleMatchQueue = this.randomBattleMatchQueue.filter(
-  //         (user) => user.socket?.id !== socket.id,
-  //       );
-  //     }
-  //     if (queue || queue === "draft") {
-  //       this.draftBattleMatchQueue = this.draftBattleMatchQueue.filter(
-  //         (user) => user.socket?.id !== socket.id,
-  //       );
-  //     }
-  //   }
+  public async getPlayerFromQueue(queue: "random" | "draft") {
+    if (queue === "random") {
+      return await getFirstPlayerInRandomQueue();
+    } else if (queue === "draft") {
+      return await getFirstPlayerInDraftQueue();
+    }
+  }
 
-  //   private processAllQueues() {
-  //     this.randomBattleMatchQueue = this.randomBattleMatchQueue.filter(
-  //       (user) => user.socket?.connected === true,
-  //     );
-  //     this.draftBattleMatchQueue = this.draftBattleMatchQueue.filter(
-  //       (user) => user.socket?.connected === true,
-  //     );
-  //     const gameOptions = {
-  //       offenseAdvantage: {
-  //         atk: 0,
-  //         def: 0,
-  //         spa: 0,
-  //         spd: 1,
-  //         spe: 0,
-  //         accuracy: 0,
-  //         evasion: 0,
-  //       },
-  //       weatherWars: true,
-  //       timersEnabled: true,
-  //       banTimerDuration: 30,
-  //       chessTimerDuration: 15,
-  //       chessTimerIncrement: 5,
-  //       pokemonTimerIncrement: 1,
-  //     };
-
-  //     this.randomBattleMatchQueue = this.createGamesForQueue(
-  //       this.randomBattleMatchQueue,
-  //       {
-  //         format: "random",
-  //         ...gameOptions,
-  //       },
-  //     );
-
-  //     this.draftBattleMatchQueue = this.createGamesForQueue(
-  //       this.draftBattleMatchQueue,
-  //       {
-  //         format: "draft",
-  //         ...gameOptions,
-  //       },
-  //     );
-  //   }
-
-  //   private createGamesForQueue(queue: User[], gameOptions: GameOptions) {
-  //     const remainingQueue: User[] = [];
-  //     for (let i = 0; i < queue.length - 1; i += 2) {
-  //       const newRoomId = crypto.randomUUID();
-
-  //       this.currentRooms[newRoomId] = new GameRoom(
-  //         newRoomId,
-  //         null,
-  //         "",
-  //         this,
-  //       );
-  //       this.playerJoinRoom(newRoomId, queue[i]);
-  //       this.playerJoinRoom(newRoomId, queue[i + 1]);
-  //       this.currentRooms[newRoomId].setOptions(gameOptions);
-  //       queue[i].socket?.emit("foundMatch", { roomId: newRoomId });
-  //       queue[i + 1].socket?.emit("foundMatch", { roomId: newRoomId });
-  //       this.currentRooms[newRoomId].startGame();
-  //     }
-
-  //     if (queue.length % 2 !== 0) {
-  //       remainingQueue.push(queue[queue.length - 1]);
-  //     }
-  //     return remainingQueue;
-  //   }
+  public async removePlayerFromQueue(
+    playerId: string,
+    queue?: "random" | "draft",
+  ) {
+    if (!queue || queue === "random") {
+      return await removePlayerFromRandomQueue(playerId);
+    }
+    if (!queue || queue === "draft") {
+      return await removePlayerFromDraftQueue(playerId);
+    }
+  }
 }

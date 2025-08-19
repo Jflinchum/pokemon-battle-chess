@@ -72,6 +72,7 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
+- If the king initiates the battle and loses, the game thinks that loser won
 - Some pokemon can generate with only status moves (full support) (meowstic)
 - After drafting, all pokemon sprites are invisible on chess pieces until a piece is moved
 - Some pokemon moves do not show type effectiveness correctly

@@ -4,9 +4,16 @@ import {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../../shared/types/Socket.js";
-import { cleanString } from "../../shared/util/profanityFilter.js";
+import {
+  cleanString,
+  isStringProfane,
+} from "../../shared/util/profanityFilter.js";
 import User from "../models/User.js";
-import { setPlayerViewingResults } from "../cache/redis.js";
+import {
+  addPlayerIdToRoomPlayerSet,
+  addPlayerToCache,
+  setPlayerViewingResults,
+} from "../cache/redis.js";
 import { MatchLog, Timer } from "../../shared/types/Game.js";
 
 export const registerSocketEvents = (
@@ -36,17 +43,88 @@ export const registerSocketEvents = (
         );
       }
 
-      // gameRoomManager.removePlayerFromQueue(socket);
+      if (player) {
+        gameRoomManager.removePlayerFromQueue(player.playerId);
+      }
+
+      player = null;
     });
 
-    // socket.on(
-    //   "matchSearch",
-    //   ({ playerName, playerId, secretId, avatarId, matchQueue }) => {
-    //     const user = new User(playerName, playerId, avatarId || "1", secretId);
-    //     user.assignSocket(socket);
-    //     gameRoomManager.addPlayerToQueue(user, matchQueue);
-    //   },
-    // );
+    socket.on(
+      "matchSearch",
+      async ({ playerName, playerId, secretId, avatarId, matchQueue }) => {
+        if (
+          !playerId ||
+          !secretId ||
+          !playerName ||
+          isStringProfane(playerName) ||
+          !matchQueue
+        ) {
+          console.log("Incorrect parameters for quick play");
+          return;
+        }
+        const user = new User(playerName, playerId, avatarId || "1", secretId);
+        player = user;
+        socket.join(playerId);
+
+        await addPlayerToCache(user);
+
+        const nextUserInQueue =
+          await gameRoomManager.getPlayerFromQueue(matchQueue);
+
+        if (!nextUserInQueue) {
+          console.log("No players in queue. Adding player to queue.");
+          gameRoomManager.addPlayerToQueue(user, matchQueue);
+        } else if (nextUserInQueue !== playerId) {
+          console.log("Found players in queue. Attempting to create room");
+
+          const room = await gameRoomManager.createAndCacheNewRoom(
+            playerId,
+            "",
+            matchQueue,
+          );
+
+          await Promise.all([
+            gameRoomManager.removePlayerFromQueue(user.playerId, matchQueue),
+            gameRoomManager.removePlayerFromQueue(nextUserInQueue, matchQueue),
+            gameRoomManager.player1JoinRoom(room.roomId, user.playerId),
+            gameRoomManager.player2JoinRoom(room.roomId, nextUserInQueue),
+            addPlayerIdToRoomPlayerSet(room.roomId, user.playerId),
+            addPlayerIdToRoomPlayerSet(room.roomId, nextUserInQueue),
+          ]);
+
+          io.to([user.playerId, nextUserInQueue]).emit("foundMatch", {
+            roomId: room.roomId,
+          });
+
+          const cachedRoom = await gameRoomManager.getCachedRoom(room.roomId);
+
+          if (!cachedRoom) {
+            throw Error("Could not initiate match - Cached room not found.");
+          }
+
+          const { whiteStartGame, blackStartGame, timers } =
+            await cachedRoom.initializeGame();
+
+          io.to(whiteStartGame.whitePlayer.playerId).emit(
+            "startGame",
+            whiteStartGame,
+          );
+          io.to(blackStartGame.blackPlayer.playerId).emit(
+            "startGame",
+            blackStartGame,
+          );
+          io.to(room.roomId).emit(
+            "connectedPlayers",
+            await gameRoomManager.getPublicPlayerList(room.roomId),
+          );
+
+          if (timers) {
+            io.to(room.roomId).emit("currentTimers", timers);
+          }
+        }
+      },
+    );
 
     socket.on("joinRoom", async ({ roomId, playerId, roomCode, secretId }) => {
       console.log(`${playerId} requested to join room ${roomId}`);
@@ -85,6 +163,7 @@ export const registerSocketEvents = (
 
         if (room.roomGameOptions.timersEnabled) {
           await room.setTimerState();
+
           if (room.gameTimer) {
             socket.emit(
               "currentTimers",

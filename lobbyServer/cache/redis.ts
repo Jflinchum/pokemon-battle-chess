@@ -52,12 +52,14 @@ const createRedisIndex = async () => {
       "HASH",
       "PREFIX",
       "1",
-      "room:", // TODO confirm this works
+      "room:",
       "SCHEMA",
       "hostName",
       "TEXT",
       "hostId",
       "TEXT",
+      "isQuickPlay",
+      "NUMERIC",
     );
   }
 
@@ -69,7 +71,7 @@ const createRedisIndex = async () => {
       "HASH",
       "PREFIX",
       "1",
-      "player:", // TODO confirm this works
+      "player:",
       "SCHEMA",
       "playerName",
       "TEXT",
@@ -176,7 +178,7 @@ export const getRoomFromName = async (
     const response = await redisClient.call(
       "FT.SEARCH",
       "hash-idx:rooms",
-      `${searchTerm ? `@hostName:${searchTerm}` : "*"}`,
+      `${searchTerm ? `@hostName:%${searchTerm}% @isQuickPlay:[0 0]` : "@isQuickPlay:[0 0]"}`,
       "LIMIT",
       (page - 1) * limit,
       limit,

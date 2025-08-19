@@ -93,6 +93,7 @@ export default class GameRoom {
   public playerList?: string[];
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
+  public isQuickPlay: boolean;
 
   public whitePlayer: User | null;
   public blackPlayer: User | null;
@@ -128,11 +129,13 @@ export default class GameRoom {
     whitePlayer?: User,
     blackPlayer?: User,
     isOngoing?: boolean,
+    isQuickPlay?: boolean,
   ) {
     this.roomId = roomId;
     this.playerList = playerList;
 
     this.isOngoing = isOngoing || false;
+    this.isQuickPlay = isQuickPlay || false;
     this.password = password;
     this.publicSeed = publicSeed || PRNG.generateSeed();
 
@@ -253,6 +256,7 @@ export default class GameRoom {
       options: this.roomGameOptions,
       whitePlayer: this.convertUserToPlayer(whitePlayer),
       blackPlayer: this.convertUserToPlayer(blackPlayer),
+      isQuickPlay: this.isQuickPlay,
     };
   }
 
