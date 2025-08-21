@@ -41,6 +41,7 @@ import {
 import { Player } from "../../shared/types/Player.js";
 import { Color } from "chess.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
+import { DEFAULT_GAME_OPTIONS } from "../constants/gameConstants.js";
 
 interface GameRoomList {
   [roomId: string]: GameRoom;
@@ -237,7 +238,7 @@ export default class GameRoomManager {
     if (roomIds) {
       try {
         await Promise.all(
-          roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId)),
+          roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId, 0)),
         );
       } catch (err) {
         console.log(err);
@@ -250,24 +251,7 @@ export default class GameRoomManager {
     let gameOptions;
 
     if (matchMaking) {
-      gameOptions = {
-        format: matchMaking,
-        offenseAdvantage: {
-          atk: 0,
-          def: 0,
-          spa: 0,
-          spd: 1,
-          spe: 0,
-          accuracy: 0,
-          evasion: 0,
-        },
-        weatherWars: true,
-        timersEnabled: true,
-        banTimerDuration: 30,
-        chessTimerDuration: 15,
-        chessTimerIncrement: 5,
-        pokemonTimerIncrement: 1,
-      };
+      gameOptions = DEFAULT_GAME_OPTIONS;
     }
 
     const gameRoom = new GameRoom(newRoomId, password, undefined, gameOptions);
@@ -311,7 +295,14 @@ export default class GameRoomManager {
       fetchPlayer2Id(roomId),
     ]);
 
-    return player1Id === playerId || player2Id === playerId;
+    if (player1Id === playerId) {
+      return 1;
+    }
+
+    if (player2Id === playerId) {
+      return 2;
+    }
+    return 0;
   }
 
   public async setRoomOptions(roomId: string, options: GameOptions) {
@@ -324,7 +315,7 @@ export default class GameRoomManager {
       return;
     }
 
-    const isActivePlayer = await this.isPlayerActive(roomId, playerId);
+    const activePlayerSlot = await this.isPlayerActive(roomId, playerId);
 
     if (room.hostPlayer?.playerId === playerId) {
       this.io.to(room.roomId).emit("endGameFromDisconnect", {
@@ -334,7 +325,7 @@ export default class GameRoomManager {
       this.removeRoom(room.roomId);
       return;
     }
-    if (room.isOngoing && isActivePlayer) {
+    if (room.isOngoing && activePlayerSlot) {
       this.io
         .to(room.roomId)
         .emit(
@@ -347,7 +338,7 @@ export default class GameRoomManager {
         );
     }
 
-    await removePlayerIdFromRoom(roomId, playerId);
+    await removePlayerIdFromRoom(roomId, playerId, activePlayerSlot);
 
     this.io
       .to(room.roomId)

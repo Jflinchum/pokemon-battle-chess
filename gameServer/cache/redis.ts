@@ -188,14 +188,21 @@ export const setRoomToOngoing = async (roomId: string, isOngoing: boolean) => {
 export const removePlayerIdFromRoom = async (
   roomId: string,
   playerId: string,
+  activePlayerSlot: 0 | 1 | 2,
 ): Promise<void> => {
   const roomHostId = await redisClient.hget(`room:${roomId}`, "hostId");
+
   if (roomHostId === playerId) {
     await deleteRoom(roomId);
   } else {
+    const activePlayerSlotPromise = activePlayerSlot
+      ? redisClient.hdel(`room:${roomId}`, `player${activePlayerSlot}Id`)
+      : Promise.resolve();
+
     await Promise.all([
       redisClient.srem(`roomPlayerSet:${roomId}`, playerId),
       redisClient.del(`player:${playerId}`),
+      activePlayerSlotPromise,
     ]);
   }
 };

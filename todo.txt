@@ -27,6 +27,7 @@ Add "copy code" button in lobby if room code is available
 Credits modal
 Changelog at bottom of main menu
 Dev tool to fetch seed in case of encountering bug or issue
+Introduce better match making logic (latency/region) and scheduled matchmaking timer to process that queue
 
 Priority:
 - Better logging
@@ -59,7 +60,6 @@ Scalability Notes:
         - Game server checks redis to see if any players in queue
           - If there is a player, dequeue them and matchmake them
           - If there is not a player, enqueue the player
-        - Eventually can introduce better match making logic (latency/region), but immediate thought is just a simple queue
   - AWS EKS deployment or GCP GKE
 
 Refactor TODOs:
@@ -72,7 +72,6 @@ Refactor TODOs:
 - Move logic in controller/index into GameRoom
 
 Issues:
-- If the king initiates the battle and loses, the game thinks that loser won
 - Some pokemon can generate with only status moves (full support) (meowstic)
 - After drafting, all pokemon sprites are invisible on chess pieces until a piece is moved
 - Some pokemon moves do not show type effectiveness correctly
