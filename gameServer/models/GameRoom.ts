@@ -82,6 +82,16 @@ import {
   packSquareModifierIntoBitField,
   unpackSquareModifierFromBitField,
 } from "../cache/squareModifierBitField.js";
+import {
+  CHESS_MOVES_UNTIL_NEW_SQUARE_MODIFIER_TARGET,
+  DEFAULT_GAME_OPTIONS,
+  POKE_SIMULATOR_TERMINATOR,
+} from "../constants/gameConstants.js";
+import {
+  SQUARE_MODIFIER_TARGET,
+  LOW_SQUARE_MODIFIER_TARGET,
+  HIGH_SQUARE_MODIFIER_TARGET,
+} from "../../shared/constants/gameConstants.js";
 
 export default class GameRoom {
   public roomId: string;
@@ -143,26 +153,9 @@ export default class GameRoom {
     this.currentTurnWhite = true;
     this.whiteMatchHistory = [];
     this.blackMatchHistory = [];
-    this.roomGameOptions = roomGameOptions || {
-      format: "random",
-      offenseAdvantage: {
-        atk: 0,
-        def: 0,
-        spa: 0,
-        spd: 1,
-        spe: 0,
-        accuracy: 0,
-        evasion: 0,
-      },
-      weatherWars: false,
-      timersEnabled: true,
-      banTimerDuration: 30,
-      chessTimerDuration: 15,
-      chessTimerIncrement: 5,
-      pokemonTimerIncrement: 1,
-    };
+    this.roomGameOptions = roomGameOptions || DEFAULT_GAME_OPTIONS;
     this.gameTimer = null;
-    this.squareModifierTarget = 15;
+    this.squareModifierTarget = SQUARE_MODIFIER_TARGET;
 
     this.pokemonGameManager = new PokemonBattleChessManager({
       seed: this.publicSeed,
@@ -211,37 +204,32 @@ export default class GameRoom {
   public setOptions(options: GameOptions) {
     this.roomGameOptions = {
       format: typeof options.format === "string" ? options.format : "random",
-      offenseAdvantage: options.offenseAdvantage || {
-        atk: 0,
-        def: 0,
-        spa: 0,
-        spd: 1,
-        spe: 0,
-        accuracy: 0,
-        evasion: 0,
-      },
+      offenseAdvantage:
+        options.offenseAdvantage || DEFAULT_GAME_OPTIONS.offenseAdvantage,
       weatherWars:
-        typeof options.weatherWars === "boolean" ? options.weatherWars : false,
+        typeof options.weatherWars === "boolean"
+          ? options.weatherWars
+          : DEFAULT_GAME_OPTIONS.weatherWars,
       timersEnabled:
         typeof options.timersEnabled === "boolean"
           ? options.timersEnabled
-          : true,
+          : DEFAULT_GAME_OPTIONS.timersEnabled,
       banTimerDuration:
         typeof options.banTimerDuration === "number"
           ? options.banTimerDuration
-          : 30,
+          : DEFAULT_GAME_OPTIONS.banTimerDuration,
       chessTimerDuration:
         typeof options.chessTimerDuration === "number"
           ? options.chessTimerDuration
-          : 15,
+          : DEFAULT_GAME_OPTIONS.chessTimerDuration,
       chessTimerIncrement:
         typeof options.chessTimerIncrement === "number"
           ? options.chessTimerIncrement
-          : 5,
+          : DEFAULT_GAME_OPTIONS.chessTimerIncrement,
       pokemonTimerIncrement:
         typeof options.pokemonTimerIncrement === "number"
           ? options.pokemonTimerIncrement
-          : 1,
+          : DEFAULT_GAME_OPTIONS.pokemonTimerIncrement,
     };
   }
 
@@ -309,7 +297,8 @@ export default class GameRoom {
       unpackSquareModifierFromBitField,
     );
     this.squareModifierTarget =
-      (await getRoomSquareModifierTarget(this.roomId)) || 15;
+      (await getRoomSquareModifierTarget(this.roomId)) ||
+      SQUARE_MODIFIER_TARGET;
     this.pokemonGameManager = new PokemonBattleChessManager({
       seed: this.publicSeed,
       format: this.roomGameOptions.format,
@@ -519,7 +508,11 @@ export default class GameRoom {
     }
 
     if (this.roomGameOptions.weatherWars && this.currentTurnWhite) {
-      if (this.chessManager.moveNumber() % 10 === 0) {
+      if (
+        this.chessManager.moveNumber() %
+          CHESS_MOVES_UNTIL_NEW_SQUARE_MODIFIER_TARGET ===
+        0
+      ) {
         await this.generateSquareModifierTarget();
       }
       const generatedSquares = this.pokemonGameManager.createNewSquareModifiers(
@@ -703,7 +696,10 @@ export default class GameRoom {
   }
 
   private async generateSquareModifierTarget() {
-    this.squareModifierTarget = new PRNG().random(10, 20);
+    this.squareModifierTarget = new PRNG().random(
+      LOW_SQUARE_MODIFIER_TARGET,
+      HIGH_SQUARE_MODIFIER_TARGET,
+    );
     return await setRoomSquareModifierTarget(
       this.roomId,
       this.squareModifierTarget,
@@ -1003,7 +999,6 @@ export default class GameRoom {
       }
     | undefined
   > {
-    const simulationTerminator = "POKEMON_GAMBIT_END_OF_SIMULATION_TERMINATOR";
     if (!this.whitePlayer || !this.blackPlayer) {
       return;
     }
@@ -1113,8 +1108,8 @@ export default class GameRoom {
       }
     }
 
-    battleStream.p1.write(simulationTerminator);
-    battleStream.p2.write(simulationTerminator);
+    battleStream.p1.write(POKE_SIMULATOR_TERMINATOR);
+    battleStream.p2.write(POKE_SIMULATOR_TERMINATOR);
 
     if (p1PokemonMove && p2PokemonMove) {
       battleStream.p1.write(`move ${p1PokemonMove}`);
@@ -1148,7 +1143,7 @@ export default class GameRoom {
       console.log("Beginning stream process");
       for await (const chunk of battleStream.p1) {
         console.log("white stream output", chunk);
-        if (chunk.includes(simulationTerminator)) {
+        if (chunk.includes(POKE_SIMULATOR_TERMINATOR)) {
           if (p1PokemonMove || p2PokemonMove) {
             whiteStreamOutput.length = 0;
           }
@@ -1165,7 +1160,7 @@ export default class GameRoom {
     const blackBattleStreamHandler = async () => {
       const blackStreamOutput: MatchLog[] = [];
       for await (const chunk of battleStream.p2) {
-        if (chunk.includes(simulationTerminator)) {
+        if (chunk.includes(POKE_SIMULATOR_TERMINATOR)) {
           if (p1PokemonMove || p2PokemonMove) {
             blackStreamOutput.length = 0;
           }
@@ -1186,7 +1181,6 @@ export default class GameRoom {
           if (args[0] !== "win") {
             continue;
           }
-          // this.gameTimer?.stopTimers();
 
           const weatherTerrainUpdates = this.updateWeatherAndTerrainAfterBattle(
             battleSquare,

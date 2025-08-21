@@ -6,6 +6,14 @@ import { PokeSimRandomGen } from "./PokeSimRandomGen.js";
 import { WeatherId, TerrainId } from "../types/PokemonTypes.js";
 import { getWeightedRandom } from "../util/getWeightedRandom.js";
 import { getSquareIndexIn1DArray } from "../util/chessSquareIndex.js";
+import {
+  HIGH_SQUARE_MODIFIER_DURATION,
+  HIGH_SQUARE_MODIFIER_TARGET,
+  LOW_SQUARE_MODIFIER_DURATION,
+  LOW_SQUARE_MODIFIER_TARGET,
+  SQUARE_MOD_X_DISTANCE_PROBABILITIES,
+  SQUARE_MOD_Y_DISTANCE_PROBABILITY,
+} from "../constants/gameConstants.js";
 
 export const WeatherNames: WeatherId[] = [
   "sandstorm",
@@ -293,7 +301,10 @@ export class PokemonBattleChessManager {
    * Initially populated via public room seed and then appended to with a secret internal seed as the game progresses
    */
   public populateSquareModifiers() {
-    const maxSquare = this.prng.random(10, 20);
+    const maxSquare = this.prng.random(
+      LOW_SQUARE_MODIFIER_TARGET,
+      HIGH_SQUARE_MODIFIER_TARGET,
+    );
     this.generateSquareModifiers(maxSquare);
   }
 
@@ -304,26 +315,16 @@ export class PokemonBattleChessManager {
    */
   private generateSquareModifiers(numSquares: number) {
     const generatedSquares: SquareModifier[] = [];
-    const xDistanceProbabilities = [
-      { value: 0.5, weight: 0.4 },
-      { value: 1.5, weight: 0.3 },
-      { value: 2.5, weight: 0.2 },
-      { value: 3.5, weight: 0.1 },
-    ];
-    const yDistanceProbabilities = [
-      { value: 0.5, weight: 0.6 },
-      { value: 1.5, weight: 0.4 },
-    ];
     let i = 0;
     while (i < numSquares) {
       const x =
         3.5 +
         (this.prng.random() < 0.5 ? 1 : -1) *
-          getWeightedRandom(xDistanceProbabilities, this.prng);
+          getWeightedRandom(SQUARE_MOD_X_DISTANCE_PROBABILITIES, this.prng);
       const y =
         3.5 +
         (this.prng.random() < 0.5 ? 1 : -1) *
-          getWeightedRandom(yDistanceProbabilities, this.prng);
+          getWeightedRandom(SQUARE_MOD_Y_DISTANCE_PROBABILITY, this.prng);
       const square = SQUARES[y * 8 + x];
       const currentSquareWeather = this.getModifiersFromSquare(square);
 
@@ -349,12 +350,18 @@ export class PokemonBattleChessManager {
         if (currentSquareWeather.modifiers.terrain) {
           currentSquareWeather.modifiers.weather = {
             id: this.prng.sample(WeatherNames),
-            duration: this.prng.random(2, 5),
+            duration: this.prng.random(
+              LOW_SQUARE_MODIFIER_DURATION,
+              HIGH_SQUARE_MODIFIER_DURATION,
+            ),
           };
         } else {
           currentSquareWeather.modifiers.terrain = {
             id: this.prng.sample(TerrainNames),
-            duration: this.prng.random(2, 5),
+            duration: this.prng.random(
+              LOW_SQUARE_MODIFIER_DURATION,
+              HIGH_SQUARE_MODIFIER_DURATION,
+            ),
           };
         }
         generatedSquares.push(currentSquareWeather);
@@ -367,7 +374,10 @@ export class PokemonBattleChessManager {
             modifiers: {
               terrain: {
                 id: this.prng.sample(TerrainNames),
-                duration: this.prng.random(2, 5),
+                duration: this.prng.random(
+                  LOW_SQUARE_MODIFIER_DURATION,
+                  HIGH_SQUARE_MODIFIER_DURATION,
+                ),
               },
             },
           };
@@ -377,7 +387,10 @@ export class PokemonBattleChessManager {
             modifiers: {
               weather: {
                 id: this.prng.sample(WeatherNames),
-                duration: this.prng.random(2, 5),
+                duration: this.prng.random(
+                  LOW_SQUARE_MODIFIER_DURATION,
+                  HIGH_SQUARE_MODIFIER_DURATION,
+                ),
               },
             },
           };
