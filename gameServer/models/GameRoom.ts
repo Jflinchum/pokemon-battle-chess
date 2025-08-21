@@ -1288,7 +1288,7 @@ export default class GameRoom {
       chessOutput.push(chessData);
       if (lostPiece?.type === "k") {
         chessOutput.push(
-          this.endGame(this.currentTurnWhite ? "w" : "b", "KING_CAPTURED"),
+          this.endGame(this.currentTurnWhite ? "b" : "w", "KING_CAPTURED"),
         );
       }
     }
