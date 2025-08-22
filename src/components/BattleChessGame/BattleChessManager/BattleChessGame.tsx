@@ -145,8 +145,13 @@ export const BattleChessGame = ({
       );
       setDraftTurnPick((curr) => (curr === "w" ? "b" : "w"));
       setIsDrafting(!!pokemonManager.draftPieces.length);
+
+      if (!pokemonManager.draftPieces.length) {
+        // Once we're done draft picking, reset all simulator state and merge the pokemon manager into the board
+        resetSimulators();
+      }
     },
-    [chessManager, pokemonManager],
+    [chessManager, pokemonManager, resetSimulators],
   );
 
   const resetMatchHistory = useCallback(() => {

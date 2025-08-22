@@ -64,6 +64,7 @@ Scalability Notes:
 
 Refactor TODOs:
 - Add argument for docker compose to attach debugger
+- Add error handling within socket requests
 - Potentially lift game logic into new model
 - Lift weather out of pokemon manager model
 - Put API request and response types in shared folder
@@ -73,7 +74,6 @@ Refactor TODOs:
 
 Issues:
 - Some pokemon can generate with only status moves (full support) (meowstic)
-- After drafting, all pokemon sprites are invisible on chess pieces until a piece is moved
 - Some pokemon moves do not show type effectiveness correctly
   - Judgement with Arceus
   - Revelation Dance
