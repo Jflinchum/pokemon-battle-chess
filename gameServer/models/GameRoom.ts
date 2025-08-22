@@ -100,7 +100,7 @@ export default class GameRoom {
   public hostPlayer: User | null = null;
   public player1: User | null = null;
   public player2: User | null = null;
-  public playerList?: string[];
+  public playerIdList?: string[];
   public roomGameOptions: GameOptions;
   public isOngoing: boolean;
   public isQuickPlay: boolean;
@@ -142,7 +142,7 @@ export default class GameRoom {
     isQuickPlay?: boolean,
   ) {
     this.roomId = roomId;
-    this.playerList = playerList;
+    this.playerIdList = playerList;
 
     this.isOngoing = isOngoing || false;
     this.isQuickPlay = isQuickPlay || false;
@@ -196,7 +196,7 @@ export default class GameRoom {
   }
 
   public getSpectators() {
-    return this.playerList?.filter(
+    return this.playerIdList?.filter(
       (p) => p !== this.player1?.playerId && p !== this.player2?.playerId,
     );
   }
@@ -681,7 +681,7 @@ export default class GameRoom {
     };
     this.pushHistory(gameData);
     setRoomToOngoing(this.roomId, false);
-    setPlayersViewingResults(this.playerList || [], true);
+    setPlayersViewingResults(this.playerIdList || [], true);
     return gameData;
   }
 

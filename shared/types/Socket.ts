@@ -6,7 +6,7 @@ import { MatchLog, Timer } from "./Game.js";
 export interface ServerToClientEvents {
   connectedPlayers: (players: Player[]) => void;
   changeGameOptions: (options: GameOptions) => void;
-  startSync: (args: { history: MatchLog[] }) => void;
+  startSync: (args: { history: MatchLog[] }, cb: () => void) => void;
   currentTimers: (timer: Timer) => void;
   startGame: (args: GameSettings, isSync?: boolean) => void;
   chatMessage: (args: { playerName: string; message: string }) => void;

@@ -15,11 +15,40 @@ import {
   setPlayerViewingResults,
 } from "../cache/redis.js";
 import { MatchLog, Timer } from "../../shared/types/Game.js";
+import GameRoom from "../models/GameRoom.js";
 
 export const registerSocketEvents = (
   io: Server<ClientToServerEvents, ServerToClientEvents>,
   gameRoomManager: GameRoomManager,
 ) => {
+  const resync = async (
+    room: GameRoom,
+    playerId?: string | null,
+    depth?: number,
+  ) => {
+    if (!playerId) {
+      return;
+    }
+
+    if ((depth || 0) >= 5) {
+      return;
+    }
+
+    io.to(playerId)
+      .timeout(5000)
+      .emit(
+        "startSync",
+        {
+          history: await room.getHistory(playerId),
+        },
+        (err) => {
+          if (err) {
+            resync(room, playerId, (depth || 0) + 1);
+          }
+        },
+      );
+  };
+
   io.on("connection", (socket) => {
     console.log("New User Connection");
     let player: User | null = null;
@@ -159,7 +188,17 @@ export const registerSocketEvents = (
       console.log(`Player ${playerId} joined room ${roomId}`);
 
       if (room.isOngoing && room.whitePlayer && room.blackPlayer) {
-        socket.emit("startSync", { history: await room.getHistory(playerId) });
+        socket
+          .timeout(5000)
+          .emit(
+            "startSync",
+            { history: await room.getHistory(playerId) },
+            (err) => {
+              if (err) {
+                resync(room, playerId);
+              }
+            },
+          );
 
         if (room.roomGameOptions.timersEnabled) {
           await room.setTimerState();
@@ -422,7 +461,17 @@ export const registerSocketEvents = (
 
       if (room.isOngoing) {
         gameRoomManager.clearPlayerTransientState(playerId);
-        socket.emit("startSync", { history: await room.getHistory(playerId) });
+        socket
+          .timeout(5000)
+          .emit(
+            "startSync",
+            { history: await room.getHistory(playerId) },
+            (err) => {
+              if (err) {
+                resync(room, playerId);
+              }
+            },
+          );
         if (room.roomGameOptions.timersEnabled) {
           await room.setTimerState();
 
@@ -474,25 +523,35 @@ export const registerSocketEvents = (
         if (whiteStreamOutput.length) {
           whiteStreamOutput.forEach((matchLog) => {
             if (room.whitePlayer?.playerId) {
-              io.to(room.whitePlayer.playerId).emit(
-                "gameOutput",
-                matchLog,
-                () => {},
-              );
+              io.to(room.whitePlayer.playerId)
+                .timeout(5000)
+                .emit("gameOutput", matchLog, (err) => {
+                  if (err) {
+                    resync(room, room.whitePlayer?.playerId);
+                  }
+                });
             }
             room.getSpectators()?.forEach((playerId) => {
-              io.to(playerId).emit("gameOutput", matchLog, () => {});
+              io.to(playerId)
+                .timeout(5000)
+                .emit("gameOutput", matchLog, (err) => {
+                  if (err) {
+                    resync(room, room.whitePlayer?.playerId);
+                  }
+                });
             });
           });
         }
         if (blackStreamOutput.length) {
           blackStreamOutput.forEach((matchLog) => {
             if (room.blackPlayer?.playerId) {
-              io.to(room.blackPlayer.playerId).emit(
-                "gameOutput",
-                matchLog,
-                () => {},
-              );
+              io.to(room.blackPlayer.playerId)
+                .timeout(5000)
+                .emit("gameOutput", matchLog, (err) => {
+                  if (err) {
+                    resync(room, room.whitePlayer?.playerId);
+                  }
+                });
             }
           });
         }
@@ -540,25 +599,35 @@ export const registerSocketEvents = (
         if (whiteStreamOutput.length) {
           whiteStreamOutput.forEach((matchLog) => {
             if (room.whitePlayer?.playerId) {
-              io.to(room.whitePlayer.playerId).emit(
-                "gameOutput",
-                matchLog,
-                () => {},
-              );
+              io.to(room.whitePlayer.playerId)
+                .timeout(5000)
+                .emit("gameOutput", matchLog, (err) => {
+                  if (err) {
+                    resync(room, room.whitePlayer?.playerId);
+                  }
+                });
             }
             room.getSpectators()?.forEach((playerId) => {
-              io.to(playerId).emit("gameOutput", matchLog, () => {});
+              io.to(playerId)
+                .timeout(5000)
+                .emit("gameOutput", matchLog, (err) => {
+                  if (err) {
+                    resync(room, room.whitePlayer?.playerId);
+                  }
+                });
             });
           });
         }
         if (blackStreamOutput.length) {
           blackStreamOutput.forEach((matchLog) => {
             if (room.blackPlayer?.playerId) {
-              io.to(room.blackPlayer.playerId).emit(
-                "gameOutput",
-                matchLog,
-                () => {},
-              );
+              io.to(room.blackPlayer.playerId)
+                .timeout(5000)
+                .emit("gameOutput", matchLog, (err) => {
+                  if (err) {
+                    resync(room, room.whitePlayer?.playerId);
+                  }
+                });
             }
           });
         }
@@ -627,7 +696,13 @@ export const registerSocketEvents = (
 
         if (matchOutput) {
           matchOutput.forEach((log) => {
-            io.to(roomId).emit("gameOutput", log, () => {});
+            io.to(roomId)
+              .timeout(5000)
+              .emit("gameOutput", log, (err) => {
+                if (err) {
+                  resync(room, room.whitePlayer?.playerId);
+                }
+              });
           });
         }
 
@@ -666,9 +741,19 @@ export const registerSocketEvents = (
          * If a new match has already started after the player has returned to the room, sync them up to the current turn
          */
         if (room.isOngoing && room.whitePlayer && room.blackPlayer) {
-          io.to(playerId).emit("startSync", {
-            history: await room.getHistory(playerId),
-          });
+          io.to(playerId)
+            .timeout(5000)
+            .emit(
+              "startSync",
+              {
+                history: await room.getHistory(playerId),
+              },
+              (err) => {
+                if (err) {
+                  resync(room, playerId);
+                }
+              },
+            );
           if (room.roomGameOptions.timersEnabled && room.gameTimer) {
             socket.emit(
               "currentTimers",
@@ -733,7 +818,13 @@ export const registerSocketEvents = (
         if (output) {
           if (output.matchOutput) {
             output.matchOutput.forEach((log) => {
-              io.to(roomId).emit("gameOutput", log, () => {});
+              io.to(roomId)
+                .timeout(5000)
+                .emit("gameOutput", log, (err) => {
+                  if (err) {
+                    resync(room, room.whitePlayer?.playerId);
+                  }
+                });
             });
           }
 
