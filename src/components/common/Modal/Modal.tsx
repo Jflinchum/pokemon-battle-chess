@@ -15,6 +15,7 @@ import CustomizeModal from "./Modals/CustomizeModal/CustomizeModal";
 import GenericModal from "./Modals/GenericModal/GenericModal";
 import QuickMatchModal from "./Modals/QuickMatchModal/QuickMatchModal";
 import "./Modal.css";
+import CreditsModal from "./Modals/CreditsModal/CreditsModal";
 
 const renderModal = (currentModal: ModalName) => {
   switch (currentModal) {
@@ -34,6 +35,8 @@ const renderModal = (currentModal: ModalName) => {
       return <EndGameModal />;
     case "CUSTOMIZE":
       return <CustomizeModal />;
+    case "CREDITS":
+      return <CreditsModal />;
     case "GENERIC":
       return <GenericModal />;
     default:

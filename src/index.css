@@ -20,6 +20,8 @@
   --button-outline: rgb(100, 100, 200);
   --dark-translucent-bg: rgba(70, 70, 70, 0.8);
   --translucent-bg: rgba(255, 255, 255, 0.15);
+  --hyperlink-dark-mode: rgb(150, 195, 255);
+  --hyperlink-visited-dark-mode: rgb(195, 140, 250);
 
   --chess-square-white: var(--gray-1);
   --chess-square-black: var(--gray-3);
@@ -84,4 +86,11 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+}
+
+a {
+  color: var(--hyperlink-dark-mode);
+  &:visited {
+    color: var(--hyperlink-visited-dark-mode);
+  }
 }

@@ -1,0 +1,22 @@
+.creditsModalContainer {
+  text-align: center;
+  min-width: 30vw;
+}
+
+.creditsModalTitle {
+  margin-top: 0;
+}
+
+.creditsModalBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.creditsGithubButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  gap: 8px;
+  margin: auto;
+}

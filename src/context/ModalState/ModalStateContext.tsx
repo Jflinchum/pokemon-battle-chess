@@ -12,6 +12,7 @@ export type ModalName =
   | "CUSTOMIZE"
   | "GENERIC"
   | "QUICK_MATCH"
+  | "CREDITS"
   | "";
 
 export interface RoomCodeModalProps {
@@ -65,6 +66,10 @@ type ModalStateAction =
   | {
       type: "OPEN_END_GAME_MODAL";
       payload: { required?: boolean; modalProps?: EndGameModalProps };
+    }
+  | {
+      type: "OPEN_CREDITS_MODAL";
+      payload: { required?: boolean };
     }
   | { type: "CLOSE_MODAL"; payload?: object };
 
@@ -141,6 +146,12 @@ export const modalStateReducer = (
       return {
         ...modalState,
         currentModal: "CUSTOMIZE",
+        required: action.payload.required,
+      };
+    case "OPEN_CREDITS_MODAL":
+      return {
+        ...modalState,
+        currentModal: "CREDITS",
         required: action.payload.required,
       };
     case "CLOSE_MODAL":

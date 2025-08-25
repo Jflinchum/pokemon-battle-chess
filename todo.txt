@@ -54,13 +54,11 @@ Scalability Notes:
   - Nginx + Kube
     - Learn Helm and set up nginx ingress and redis in cluster
     - Launch multiple Lobby/Game Server Nodes and configure nginx load balancing
-    - Attempt to make game lobby stateless
-      - Ack functions for game output and resync if fail ack
-      - Match making
-        - Game server checks redis to see if any players in queue
-          - If there is a player, dequeue them and matchmake them
-          - If there is not a player, enqueue the player
-  - AWS EKS deployment or GCP GKE
+  - Set up CI within Github on push to a production branch to:
+    - Build and publish docker images
+    - Pull docker image within GKE and deploy  
+  - GCE GKE
+
 
 Refactor TODOs:
 - Add argument for docker compose to attach debugger
