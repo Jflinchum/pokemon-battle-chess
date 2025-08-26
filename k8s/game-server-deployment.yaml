@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: game-server-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       name: game-server

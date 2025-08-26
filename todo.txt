@@ -24,7 +24,6 @@ Battle conclusion animation? Needs to be a little short and skippable for bullet
 Add Pokedex on left nav to look up full descriptions?
 Lazy loading and preloading
 Add "copy code" button in lobby if room code is available
-Credits modal
 Changelog at bottom of main menu
 Dev tool to fetch seed in case of encountering bug or issue
 Introduce better match making logic (latency/region) and scheduled matchmaking timer to process that queue
