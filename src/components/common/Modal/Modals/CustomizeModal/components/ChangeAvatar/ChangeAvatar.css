@@ -23,3 +23,11 @@
     background-color: var(--gray-7);
   }
 }
+
+.avatarSelected {
+  background-color: var(--green-5);
+
+  &:hover {
+    background-color: var(--green-7);
+  }
+}

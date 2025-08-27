@@ -4,7 +4,7 @@ import { useUserState } from "../../../../../../../context/UserState/UserStateCo
 import "./ChangeAvatar.css";
 
 export const ChangeAvatar = () => {
-  const { dispatch } = useUserState();
+  const { userState, dispatch } = useUserState();
 
   const handleAvatarSelect = (id: string) => {
     dispatch({ type: "SET_AVATAR", payload: `${id}` });
@@ -14,7 +14,7 @@ export const ChangeAvatar = () => {
     <div className="avatarChangeBody">
       {Object.keys(avatarIdMapping).map((id) => (
         <button
-          className="avatarButton"
+          className={`avatarButton ${userState.avatarId === id ? "avatarSelected" : ""}`}
           key={id}
           onClick={() => handleAvatarSelect(id)}
         >
