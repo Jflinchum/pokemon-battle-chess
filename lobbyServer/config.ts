@@ -15,22 +15,21 @@ export const getConfig = () => {
 
 export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
   devConfig: {
-    keyLocation: "nginx/private-key.key",
-    certLocation: "nginx/certificate.crt",
+    keyLocation: "nginx/tls.key",
+    certLocation: "nginx/tls.crt",
     allowedOrigins: ["https://localhost:5173"],
     gameServiceUrl: process.env.DOCKER_HOST
-      ? "https://game-server-service:3003"
+      ? "http://game-server-service:3003"
       : "http://localhost:3003",
     redisUrl: "redis://host.docker.internal:6379",
     httpsPort: 3001,
   },
 
   prodConfig: {
-    keyLocation: "nginx/private-key.key",
-    certLocation: "nginx/certificate.crt",
+    keyLocation: "nginx/tls.key",
+    certLocation: "nginx/tls.crt",
     allowedOrigins: [],
-    gameServiceUrl:
-      "https://game-server-service.default.svc.cluster.local:3003",
+    gameServiceUrl: "http://game-server-service:3003",
     redisUrl: "redis://redis-service.default.svc.cluster.local:6379",
     httpsPort: 3001,
   },

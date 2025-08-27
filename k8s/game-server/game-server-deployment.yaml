@@ -16,8 +16,15 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: jonflinchum/pokemon-gambit-game-server:latest
+        - image: jonflinchum/pokemon-gambit-game-server:v0.0.1
+          imagePullPolicy: Always
           name: game-server
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              memory: "1024Mi"
           ports:
             - containerPort: 3003
               protocol: TCP

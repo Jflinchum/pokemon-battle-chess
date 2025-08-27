@@ -14,10 +14,24 @@ spec:
       labels:
         name: lobby-server
     spec:
+      restartPolicy: Always
+      volumes:
+        - name: nginx-secret
+          secret:
+            secretName: nginx-tls
       containers:
-        - image: jonflinchum/pokemon-gambit-lobby-server:latest
+        - image: jonflinchum/pokemon-gambit-lobby-server:v0.0.1
+          imagePullPolicy: Always
           name: lobby-server
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              memory: "1024Mi"
           ports:
             - containerPort: 3001
               protocol: TCP
-      restartPolicy: Always
+          volumeMounts:
+            - mountPath: /app/nginx
+              name: nginx-secret
