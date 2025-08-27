@@ -17,7 +17,14 @@ import statusSleepPokemon from "../../../../assets/pokemonAssets/audio/fx/status
 import eatBerryPokemon from "../../../../assets/pokemonAssets/audio/fx/berry-eat.mp3";
 import activateItemPokemon from "../../../../assets/pokemonAssets/audio/fx/item-activate.mp3";
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
-import { BattleArgsKWArgsTypes } from "@pkmn/protocol";
+import { BattleArgsKWArgsTypes, BattleArgsKWArgType } from "@pkmn/protocol";
+
+const getPokemonCryUrlPath = (baseSpecies: string) => {
+  const mapping: Record<string, string> = {
+    "kommo-o": "kommoo",
+  };
+  return mapping[baseSpecies] || baseSpecies;
+};
 
 const fetchPokemonCryUrl = (pokemon?: string) => {
   if (!pokemon) {
@@ -28,7 +35,7 @@ const fetchPokemonCryUrl = (pokemon?: string) => {
     return;
   }
 
-  return `https://play.pokemonshowdown.com/audio/cries/${dexPokemon.baseSpecies.toLowerCase().replace(" ", "")}.mp3`;
+  return `https://play.pokemonshowdown.com/audio/cries/${getPokemonCryUrlPath(dexPokemon.baseSpecies.toLowerCase().replace(" ", ""))}.mp3`;
 };
 
 export const usePokemonAudioFx = ({
@@ -91,7 +98,11 @@ export const usePokemonAudioFx = ({
       eatBerry,
       activateItem,
     };
-  }, []);
+  }, [
+    p1PokemonSpecies,
+    p2PokemonSpecies,
+    userState.volumePreference.pokemonBattleVolume,
+  ]);
 
   useEffect(() => {
     audioEffects.damageEffective.volume =
@@ -124,7 +135,24 @@ export const usePokemonAudioFx = ({
       userState.volumePreference.pokemonBattleVolume;
     audioEffects.activateItem.volume =
       userState.volumePreference.pokemonBattleVolume;
-  }, [userState.volumePreference.pokemonBattleVolume]);
+  }, [
+    audioEffects.activateItem,
+    audioEffects.damageEffective,
+    audioEffects.damageNotEffective,
+    audioEffects.damageSuperEffective,
+    audioEffects.eatBerry,
+    audioEffects.faintEffect,
+    audioEffects.healEffect,
+    audioEffects.statDecreaseEffect,
+    audioEffects.statIncreaseEffect,
+    audioEffects.statusBurn,
+    audioEffects.statusConfuse,
+    audioEffects.statusFrozen,
+    audioEffects.statusPara,
+    audioEffects.statusPoison,
+    audioEffects.statusSleep,
+    userState.volumePreference.pokemonBattleVolume,
+  ]);
 
   const playAudio = (audio?: HTMLAudioElement) => {
     if (!audio) {
@@ -136,7 +164,7 @@ export const usePokemonAudioFx = ({
 
   const playAudioEffect = useCallback(
     (
-      { args, kwArgs }: { args: CustomArgTypes; kwArgs: BattleArgsKWArgsTypes },
+      { args, kwArgs }: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType },
       { args: previousArgs }: { args: CustomArgTypes | undefined },
     ) => {
       switch (args[0]) {
@@ -170,8 +198,10 @@ export const usePokemonAudioFx = ({
           playAudio(audioEffects.faintEffect);
           break;
         case "-boost":
-          audioEffects.statDecreaseEffect.pause();
-          playAudio(audioEffects.statIncreaseEffect);
+          if (previousArgs?.[0] !== "-boost") {
+            audioEffects.statDecreaseEffect.pause();
+            playAudio(audioEffects.statIncreaseEffect);
+          }
           break;
         case "-setboost":
           if (parseInt(args[3]) > 0) {
@@ -183,8 +213,10 @@ export const usePokemonAudioFx = ({
           }
           break;
         case "-unboost":
-          audioEffects.statIncreaseEffect.pause();
-          playAudio(audioEffects.statDecreaseEffect);
+          if (previousArgs?.[0] !== "-unboost") {
+            audioEffects.statIncreaseEffect.pause();
+            playAudio(audioEffects.statDecreaseEffect);
+          }
           break;
         case "switch":
           if (args[1].slice(0, 2) === "p1") {
@@ -227,9 +259,9 @@ export const usePokemonAudioFx = ({
           }
           break;
         case "-enditem":
-          if (kwArgs.eat) {
+          if ((kwArgs as unknown as BattleArgsKWArgsTypes).eat) {
             playAudio(audioEffects.eatBerry);
-          } else {
+          } else if (!(kwArgs as unknown as BattleArgsKWArgsTypes).from) {
             playAudio(audioEffects.activateItem);
           }
           break;

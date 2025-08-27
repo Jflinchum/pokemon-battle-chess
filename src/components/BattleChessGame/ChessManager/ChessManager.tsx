@@ -8,7 +8,7 @@ import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromot
 import { getVerboseChessMove } from "./util";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useDebounce } from "../../../utils";
-import { ChessData } from "../../../../shared/types/game";
+import { ChessData } from "../../../../shared/types/Game";
 import { Arrow, ArrowController } from "./ArrowController/ArrowController";
 import "./ChessManager.css";
 
@@ -193,8 +193,8 @@ const ChessManager = ({
         <PokemonChessDetailsCard
           chessMoveHistory={chessMoveHistory}
           squareModifier={
-            pokemonManager.getWeatherFromSquare(hoveredSquare) ||
-            pokemonManager.getWeatherFromSquare(selectedSquare)
+            pokemonManager.getModifiersFromSquare(hoveredSquare) ||
+            pokemonManager.getModifiersFromSquare(selectedSquare)
           }
           pokemon={
             pokemonManager.getPokemonFromSquare(hoveredSquare)?.pkmn ||

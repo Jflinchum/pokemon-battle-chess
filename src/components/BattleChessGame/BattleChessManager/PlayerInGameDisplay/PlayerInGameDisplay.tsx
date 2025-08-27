@@ -4,13 +4,13 @@ import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { Player } from "../../../../../shared/types/Player";
 import TakenChessPieces from "../../ChessManager/TakenChessPieces/TakenChessPieces";
 import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessManager";
-import { Timer as TimerType } from "../../../../../shared/types/game";
+import { Timer as TimerType } from "../../../../../shared/types/Game.js";
 import Timer from "../../../common/Timer/Timer";
-import { useGameState } from "../../../../context/GameState/GameStateContext";
 import "./PlayerInGameDisplay.css";
 
 interface PlayerInGameDisplayProps {
   player?: Player;
+  connectionIssues?: boolean;
   takenChessPieces: PokemonPiece[];
   timer?: TimerType["white"] | TimerType["black"];
   className?: string;
@@ -18,11 +18,11 @@ interface PlayerInGameDisplayProps {
 
 const PlayerInGameDisplay = ({
   player,
+  connectionIssues,
   takenChessPieces,
   timer,
   className = "",
 }: PlayerInGameDisplayProps) => {
-  const { gameState } = useGameState();
   if (!player) {
     return null;
   }
@@ -33,7 +33,7 @@ const PlayerInGameDisplay = ({
         src={Sprites.getAvatar(player.avatarId || 1)}
       />
       <div className="nameContainer">
-        {player.transient ? (
+        {connectionIssues ? (
           <FontAwesomeIcon
             icon={faPlugCircleXmark}
             className="nameIcon"
@@ -48,9 +48,6 @@ const PlayerInGameDisplay = ({
           timerExpiration={timer.timerExpiration}
           paused={timer.pause}
           hasStarted={timer.hasStarted}
-          startingTime={
-            gameState.gameSettings.options.chessTimerDuration * 60 * 1000
-          }
           className="playerTimer"
         />
       )}

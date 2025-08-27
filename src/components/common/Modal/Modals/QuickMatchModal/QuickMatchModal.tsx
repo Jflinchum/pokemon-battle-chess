@@ -56,8 +56,9 @@ const QuickMatchModal = () => {
   ]);
 
   useEffect(() => {
-    socket.on("foundMatch", ({ roomId }) => {
+    socket.on("foundMatch", async ({ roomId }) => {
       setSearching(false);
+
       userStateDispatch({
         type: "JOIN_ROOM",
         payload: { roomId, roomCode: "" },

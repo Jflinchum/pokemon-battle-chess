@@ -27,8 +27,8 @@ import { useGameState } from "../../../context/GameState/GameStateContext";
 import { CurrentBattle } from "./BattleChessManager";
 import { useSocketRequests } from "../../../util/useSocketRequests";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
-import movePieceMP3 from "../../../assets/chessAssets/audio/movePiece.mp3";
-import capturePieceMP3 from "../../../assets/chessAssets/audio/capturePiece.mp3";
+import movePieceFX from "../../../assets/chessAssets/audio/movePiece.ogg";
+import capturePieceFX from "../../../assets/chessAssets/audio/capturePiece.ogg";
 import Spinner from "../../common/Spinner/Spinner";
 import ChessManager from "../ChessManager/ChessManager";
 import PokemonBattleManager from "../PokemonManager/PokemonBattleManager/PokemonBattleManager";
@@ -36,7 +36,7 @@ import {
   ChessData,
   EndGameReason,
   MatchHistory,
-} from "../../../../shared/types/game";
+} from "../../../../shared/types/Game.js";
 import DraftPokemonManager from "../DraftPokemonManager/DraftPokemonManager";
 import { usePremoves } from "./usePremove";
 
@@ -86,8 +86,8 @@ export const BattleChessGame = ({
   const battleTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const { movePieceAudio, capturePieceAudio } = useMemo(() => {
-    const movePieceAudio = new Audio(movePieceMP3);
-    const capturePieceAudio = new Audio(capturePieceMP3);
+    const movePieceAudio = new Audio(movePieceFX);
+    const capturePieceAudio = new Audio(capturePieceFX);
     movePieceAudio.volume = userState.volumePreference.pieceVolume;
     capturePieceAudio.volume = userState.volumePreference.pieceVolume;
     return {
@@ -145,8 +145,13 @@ export const BattleChessGame = ({
       );
       setDraftTurnPick((curr) => (curr === "w" ? "b" : "w"));
       setIsDrafting(!!pokemonManager.draftPieces.length);
+
+      if (!pokemonManager.draftPieces.length) {
+        // Once we're done draft picking, reset all simulator state and merge the pokemon manager into the board
+        resetSimulators();
+      }
     },
-    [chessManager, pokemonManager],
+    [chessManager, pokemonManager, resetSimulators],
   );
 
   const resetMatchHistory = useCallback(() => {

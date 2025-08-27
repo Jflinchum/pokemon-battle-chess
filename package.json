@@ -4,14 +4,23 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "server": "tsx ./server/index.ts",
-    "server:debug": "tsx --inspect-brk ./server/index.ts",
-    "build": "tsc -b && vite build",
+    "client": "vite",
+    "client:docker": "vite --host=0.0.0.0",
+    "lobbyService": "tsx ./lobbyServer/index.ts",
+    "lobbyService:debug": "tsx --inspect-brk ./lobbyServer/index.ts",
+    "lobbyService:watch": "tsx watch ./lobbyServer/index.ts",
+    "lobbyService:docker:debug": "tsx watch --inspect-brk --inspect-port=0.0.0.0:9229 ./lobbyServer/index.ts",
+    "gameService": "tsx ./gameServer/index.ts",
+    "gameService:debug": "tsx --inspect-brk ./gameServer/index.ts",
+    "gameService:watch": "tsx watch ./gameServer/index.ts",
+    "gameService:docker:debug": "tsx watch --inspect-brk --inspect-port=0.0.0.0:9230 ./gameServer/index.ts",
+    "build-client": "tsc -b src && vite build",
+    "build-lobby": "tsc -b lobbyServer",
+    "build-game": "tsc -b gameServer",
     "lint": "eslint .",
     "preview": "vite preview",
     "postinstall": "patch-package",
-    "prepare": "husky"
+    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production'){ process.exit(1)} \" || husky"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
@@ -30,12 +39,18 @@
     "@pkmn/protocol": "^0.6.32",
     "@pkmn/randoms": "^0.9.32",
     "@pkmn/view": "^0.6.32",
+    "@sesamecare-oss/redlock": "^1.4.0",
     "@socket.io/admin-ui": "^0.5.1",
+    "@socket.io/redis-streams-adapter": "^0.2.2",
+    "@types/express": "^5.0.1",
     "@types/node": "^22.13.13",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
     "bcryptjs": "^3.0.2",
-    "chess.js": "^1.2.0",
+    "chess.js": "1.2.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "ioredis": "^5.6.1",
     "obscenity": "^0.4.3",
     "patch-package": "^8.0.0",
     "react": "^19.0.0",
@@ -44,13 +59,11 @@
     "react-tooltip": "^5.28.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "socketio": "^1.0.0"
+    "socketio": "^1.0.0",
+    "typescript": "~5.7.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@types/express": "^5.0.1",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^10.1.5",
@@ -61,7 +74,6 @@
     "lint-staged": "^16.1.0",
     "prettier": "3.5.3",
     "tsx": "^4.19.3",
-    "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"
   }

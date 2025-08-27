@@ -14,7 +14,7 @@ export interface Room {
   hostName: string;
   hasPassword: boolean;
   playerCount: number;
-  matchInProgress: boolean;
+  isOngoing: boolean;
 }
 
 interface RoomListProps {

@@ -6,7 +6,7 @@ import {
 import { useUserState } from "../../../../../context/UserState/UserStateContext";
 import { useGameState } from "../../../../../context/GameState/GameStateContext";
 import Button from "../../../Button/Button";
-import { EndGameReason } from "../../../../../../shared/types/game";
+import { EndGameReason } from "../../../../../../shared/types/Game";
 import "./EndGameModal.css";
 import { useMemo } from "react";
 import { useSocketRequests } from "../../../../../util/useSocketRequests";
@@ -30,11 +30,7 @@ const getEndGameTitle = (
   }
 };
 
-const getEndgameSubtitle = (
-  reason: EndGameReason,
-  loseName: string,
-  disconnectName?: string,
-) => {
+const getEndgameSubtitle = (reason: EndGameReason, loseName: string) => {
   switch (reason) {
     case "KING_CAPTURED":
       return `${loseName} had their King captured!`;
@@ -43,7 +39,7 @@ const getEndgameSubtitle = (
     case "HOST_DISCONNECTED":
       return `Game ended because the host has left the game.`;
     case "PLAYER_DISCONNECTED":
-      return `${disconnectName} left the game.`;
+      return `${loseName} left the game.`;
     case "HOST_ENDED_GAME":
       return "The host has ended the game.";
   }
@@ -56,11 +52,7 @@ const EndGameModal = () => {
   const { requestSetViewingResults } = useSocketRequests();
 
   const currentColor = gameState.gameSettings?.color;
-  const {
-    victor,
-    reason,
-    name: disconnectName,
-  } = modalState.modalProps as EndGameModalProps;
+  const { victor, reason } = modalState.modalProps as EndGameModalProps;
 
   const handleBackToMenu = () => {
     userStateDispatch({ type: "LEAVE_ROOM" });
@@ -103,7 +95,7 @@ const EndGameModal = () => {
           reason,
         )}
       </h2>
-      <h4>{getEndgameSubtitle(reason, loseName, disconnectName)}</h4>
+      <h4>{getEndgameSubtitle(reason, loseName)}</h4>
       {reason !== "HOST_DISCONNECTED" && (
         <div className="endGamePlayerList">
           <div className="endGamePlayer">

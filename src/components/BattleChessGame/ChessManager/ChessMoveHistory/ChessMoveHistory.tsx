@@ -1,4 +1,4 @@
-import { ChessData } from "../../../../../shared/types/game";
+import { ChessData } from "../../../../../shared/types/Game.js";
 import "./ChessMoveHistory.css";
 import { useEffect, useRef } from "react";
 

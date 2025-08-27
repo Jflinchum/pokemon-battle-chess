@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
 import { useGameState } from "../../context/GameState/GameStateContext";
@@ -7,7 +7,7 @@ import { useModalState } from "../../context/ModalState/ModalStateContext";
 import { socket } from "../../socket";
 import Room from "./Room/Room";
 import ChatToggle from "./Chat/ChatToggle/ChatToggle";
-import { MatchHistory, Timer } from "../../../shared/types/game";
+import { MatchHistory, Timer } from "../../../shared/types/Game";
 import { Player } from "../../../shared/types/Player";
 import { useMusicPlayer } from "../../util/useMusicPlayer";
 import { useSocketRequests } from "../../util/useSocketRequests";
@@ -19,7 +19,11 @@ const RoomManager = () => {
   const { dispatch: dispatchModalState } = useModalState();
   const [matchHistory, setMatchHistory] = useState<MatchHistory>();
   const [timers, setTimers] = useState<Timer>();
-  const { requestJoinGame, requestSync } = useSocketRequests();
+  const timerIds = useRef<{ white?: NodeJS.Timeout; black?: NodeJS.Timeout }>(
+    {},
+  );
+  const { requestJoinGame, requestSync, requestValidateTimers } =
+    useSocketRequests();
 
   const { stopSongs } = useMusicPlayer();
 
@@ -35,6 +39,26 @@ const RoomManager = () => {
   }, [requestJoinGame]);
 
   useEffect(() => {
+    const setTimerValidationTimeouts = (timers: Timer) => {
+      if (!timers.white.pause) {
+        clearTimeout(timerIds.current.white);
+        timerIds.current.white = setTimeout(() => {
+          requestValidateTimers();
+        }, timers.white.timerExpiration - new Date().getTime());
+      } else {
+        clearTimeout(timerIds.current.white);
+      }
+
+      if (!timers.black.pause) {
+        clearTimeout(timerIds.current.black);
+        timerIds.current.black = setTimeout(() => {
+          requestValidateTimers();
+        }, timers.black.timerExpiration - new Date().getTime());
+      } else {
+        clearTimeout(timerIds.current.black);
+      }
+    };
+
     if (!socket.connected) {
       socket.connect();
     }
@@ -91,6 +115,7 @@ const RoomManager = () => {
 
     socket.on("currentTimers", (timer: Timer) => {
       setTimers(timer);
+      setTimerValidationTimeouts(timer);
     });
 
     socket.on("startGame", (settings, isSyncing) => {
@@ -150,6 +175,7 @@ const RoomManager = () => {
     dispatchUserState,
     userState.id,
     requestSync,
+    requestValidateTimers,
   ]);
 
   return (

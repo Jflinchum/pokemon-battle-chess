@@ -2,9 +2,18 @@ import { PieceSymbol, Color, Square, SQUARES } from "chess.js";
 import { PokemonSet } from "@pkmn/data";
 import { PRNG, PRNGSeed } from "@pkmn/sim";
 import { Dex } from "@pkmn/dex";
-import { PokeSimRandomGen } from "./PokeSimRandomGen";
-import { WeatherId, TerrainId } from "../types/PokemonTypes";
-import { getWeightedRandom } from "../util/getWeightedRandom";
+import { PokeSimRandomGen } from "./PokeSimRandomGen.js";
+import { WeatherId, TerrainId } from "../types/PokemonTypes.js";
+import { getWeightedRandom } from "../util/getWeightedRandom.js";
+import { getSquareIndexIn1DArray } from "../util/chessSquareIndex.js";
+import {
+  HIGH_SQUARE_MODIFIER_DURATION,
+  HIGH_SQUARE_MODIFIER_TARGET,
+  LOW_SQUARE_MODIFIER_DURATION,
+  LOW_SQUARE_MODIFIER_TARGET,
+  SQUARE_MOD_X_DISTANCE_PROBABILITIES,
+  SQUARE_MOD_Y_DISTANCE_PROBABILITY,
+} from "../constants/gameConstants.js";
 
 export const WeatherNames: WeatherId[] = [
   "sandstorm",
@@ -29,6 +38,7 @@ export type ChessBoardSquare = {
 } | null;
 
 export interface PokemonPiece {
+  index: number;
   type: PieceSymbol;
   square: Square | null;
   pkmn: PokemonSet;
@@ -58,8 +68,8 @@ export class PokemonBattleChessManager {
   public chessPieces: PokemonPiece[] = [];
   public seed?: PRNGSeed;
   public prng: PRNG;
-  public draftPieces: PokemonSet[] = [];
-  public banPieces: PokemonSet[] = [];
+  public draftPieces: { set: PokemonSet; index: number }[] = [];
+  public banPieces: { set: PokemonSet; index: number }[] = [];
   public squareModifiers: SquareModifier[] = [];
 
   private pokeSimRandomGen: PokeSimRandomGen;
@@ -71,12 +81,18 @@ export class PokemonBattleChessManager {
     format,
     weatherWars,
     chessPieces,
+    chessBoard,
+    pokemonPieceIndices,
+    pokemonBannedIndices,
     squareModifiers,
   }: {
     seed?: PRNGSeed;
     format?: FormatID;
     weatherWars?: boolean;
     chessPieces?: PokemonPiece[];
+    chessBoard?: ChessBoardSquare[][];
+    pokemonPieceIndices?: number[];
+    pokemonBannedIndices?: number[];
     squareModifiers?: SquareModifier[];
   }) {
     this.prng = new PRNG(seed);
@@ -89,9 +105,13 @@ export class PokemonBattleChessManager {
       this.chessPieces = chessPieces;
     } else {
       if (format === "random") {
-        this.populateBoardWithRandomTeams();
+        this.populateBoardWithRandomTeams(chessBoard, pokemonPieceIndices);
       } else if (format === "draft") {
-        this.populateDraftWithRandomTeams();
+        this.populateDraftWithRandomTeams(
+          chessBoard,
+          pokemonPieceIndices,
+          pokemonBannedIndices,
+        );
       }
     }
 
@@ -121,7 +141,10 @@ export class PokemonBattleChessManager {
     }
   }
 
-  public populateBoardWithRandomTeams() {
+  public populateBoardWithRandomTeams(
+    cachedChessBoard?: ChessBoardSquare[][],
+    cachedChessPieceIndices?: number[],
+  ) {
     const bChessPieceArray = [
       "r",
       "n",
@@ -145,32 +168,132 @@ export class PokemonBattleChessManager {
       "r",
     ];
     for (let i = 0; i < 16; i++) {
-      this.chessPieces.push({
-        type: bChessPieceArray[i],
-        square:
-          `${String.fromCharCode(97 + Math.floor(i % 8))}${8 - Math.floor(i / 8)}` as Square,
-        pkmn: this.pokeSimRandomGen.buildRandomPokemon(
-          this.getFilter(bChessPieceArray[i]),
-        ),
-        color: "b",
-      });
+      if (cachedChessBoard && cachedChessPieceIndices) {
+        const square =
+          this.getChessPieceFromCachedBoardAndIndices(
+            i,
+            cachedChessBoard,
+            cachedChessPieceIndices,
+          )?.square || null;
+        this.chessPieces.push({
+          index: i,
+          type: bChessPieceArray[i],
+          square,
+          pkmn: this.pokeSimRandomGen.buildRandomPokemon(
+            this.getFilter(bChessPieceArray[i]),
+          ),
+          color: "b",
+        });
+      } else {
+        this.chessPieces.push({
+          index: i,
+          type: bChessPieceArray[i],
+          square:
+            `${String.fromCharCode(97 + Math.floor(i % 8))}${8 - Math.floor(i / 8)}` as Square,
+          pkmn: this.pokeSimRandomGen.buildRandomPokemon(
+            this.getFilter(bChessPieceArray[i]),
+          ),
+          color: "b",
+        });
+      }
     }
     for (let i = 0; i < 16; i++) {
-      this.chessPieces.push({
-        type: wChessPieceArray[i],
-        square:
-          `${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}` as Square,
-        pkmn: this.pokeSimRandomGen.buildRandomPokemon(
-          this.getFilter(wChessPieceArray[i]),
-        ),
-        color: "w",
-      });
+      if (cachedChessBoard && cachedChessPieceIndices) {
+        const square =
+          this.getChessPieceFromCachedBoardAndIndices(
+            i + 16,
+            cachedChessBoard,
+            cachedChessPieceIndices,
+          )?.square || null;
+        this.chessPieces.push({
+          index: i + 16,
+          type: wChessPieceArray[i],
+          square,
+          pkmn: this.pokeSimRandomGen.buildRandomPokemon(
+            this.getFilter(wChessPieceArray[i]),
+          ),
+          color: "w",
+        });
+      } else {
+        this.chessPieces.push({
+          index: i + 16,
+          type: wChessPieceArray[i],
+          square:
+            `${String.fromCharCode(97 + Math.floor(i % 8))}${2 - Math.floor(i / 8)}` as Square,
+          pkmn: this.pokeSimRandomGen.buildRandomPokemon(
+            this.getFilter(wChessPieceArray[i]),
+          ),
+          color: "w",
+        });
+      }
     }
   }
 
-  public populateDraftWithRandomTeams() {
-    for (let i = 0; i < 38; i++) {
-      this.draftPieces.push(this.pokeSimRandomGen.buildRandomPokemon());
+  public populateDraftWithRandomTeams(
+    cachedChessBoard?: ChessBoardSquare[][],
+    cachedChessPieceIndices?: number[],
+    cachedBannedPokemonPieces?: number[],
+  ) {
+    if (
+      cachedChessBoard &&
+      cachedChessPieceIndices &&
+      cachedBannedPokemonPieces
+    ) {
+      for (let i = 0; i < 38; i++) {
+        const cachedChessSquare = this.getChessPieceFromCachedBoardAndIndices(
+          i,
+          cachedChessBoard,
+          cachedChessPieceIndices,
+        );
+        if (cachedChessSquare) {
+          this.chessPieces.push({
+            index: i,
+            type: cachedChessSquare.type,
+            square: cachedChessSquare.square,
+            pkmn: this.pokeSimRandomGen.buildRandomPokemon(),
+            color: cachedChessSquare.color,
+          });
+        } else {
+          if (cachedBannedPokemonPieces.includes(i)) {
+            this.banPieces.push({
+              set: this.pokeSimRandomGen.buildRandomPokemon(),
+              index: i,
+            });
+          } else {
+            this.draftPieces.push({
+              set: this.pokeSimRandomGen.buildRandomPokemon(),
+              index: i,
+            });
+          }
+        }
+      }
+    } else {
+      for (let i = 0; i < 38; i++) {
+        this.draftPieces.push({
+          set: this.pokeSimRandomGen.buildRandomPokemon(),
+          index: i,
+        });
+      }
+    }
+  }
+
+  private getChessPieceFromCachedBoardAndIndices(
+    currentIndex: number,
+    cachedChessBoard?: ChessBoardSquare[][],
+    cachedChessPieceIndices?: number[],
+  ) {
+    if (!cachedChessBoard || !cachedChessPieceIndices) {
+      return;
+    }
+    const chessBoardIndex = cachedChessPieceIndices.findIndex(
+      (i) => i === currentIndex,
+    );
+    if (chessBoardIndex >= 0) {
+      return cachedChessBoard[Math.floor(chessBoardIndex / 8)][
+        chessBoardIndex % 8
+      ];
+    } else {
+      return null;
     }
   }
 
@@ -178,7 +301,10 @@ export class PokemonBattleChessManager {
    * Initially populated via public room seed and then appended to with a secret internal seed as the game progresses
    */
   public populateSquareModifiers() {
-    const maxSquare = this.prng.random(10, 20);
+    const maxSquare = this.prng.random(
+      LOW_SQUARE_MODIFIER_TARGET,
+      HIGH_SQUARE_MODIFIER_TARGET,
+    );
     this.generateSquareModifiers(maxSquare);
   }
 
@@ -189,28 +315,18 @@ export class PokemonBattleChessManager {
    */
   private generateSquareModifiers(numSquares: number) {
     const generatedSquares: SquareModifier[] = [];
-    const xDistanceProbabilities = [
-      { value: 0.5, weight: 0.4 },
-      { value: 1.5, weight: 0.3 },
-      { value: 2.5, weight: 0.2 },
-      { value: 3.5, weight: 0.1 },
-    ];
-    const yDistanceProbabilities = [
-      { value: 0.5, weight: 0.6 },
-      { value: 1.5, weight: 0.4 },
-    ];
     let i = 0;
     while (i < numSquares) {
       const x =
         3.5 +
         (this.prng.random() < 0.5 ? 1 : -1) *
-          getWeightedRandom(xDistanceProbabilities, this.prng);
+          getWeightedRandom(SQUARE_MOD_X_DISTANCE_PROBABILITIES, this.prng);
       const y =
         3.5 +
         (this.prng.random() < 0.5 ? 1 : -1) *
-          getWeightedRandom(yDistanceProbabilities, this.prng);
+          getWeightedRandom(SQUARE_MOD_Y_DISTANCE_PROBABILITY, this.prng);
       const square = SQUARES[y * 8 + x];
-      const currentSquareWeather = this.getWeatherFromSquare(square);
+      const currentSquareWeather = this.getModifiersFromSquare(square);
 
       /**
        * If we detect weather on the square already, we need to push the new modifier onto it instead of adding a duplicate square onto the array
@@ -234,12 +350,18 @@ export class PokemonBattleChessManager {
         if (currentSquareWeather.modifiers.terrain) {
           currentSquareWeather.modifiers.weather = {
             id: this.prng.sample(WeatherNames),
-            duration: this.prng.random(2, 5),
+            duration: this.prng.random(
+              LOW_SQUARE_MODIFIER_DURATION,
+              HIGH_SQUARE_MODIFIER_DURATION,
+            ),
           };
         } else {
           currentSquareWeather.modifiers.terrain = {
             id: this.prng.sample(TerrainNames),
-            duration: this.prng.random(2, 5),
+            duration: this.prng.random(
+              LOW_SQUARE_MODIFIER_DURATION,
+              HIGH_SQUARE_MODIFIER_DURATION,
+            ),
           };
         }
         generatedSquares.push(currentSquareWeather);
@@ -252,7 +374,10 @@ export class PokemonBattleChessManager {
             modifiers: {
               terrain: {
                 id: this.prng.sample(TerrainNames),
-                duration: this.prng.random(2, 5),
+                duration: this.prng.random(
+                  LOW_SQUARE_MODIFIER_DURATION,
+                  HIGH_SQUARE_MODIFIER_DURATION,
+                ),
               },
             },
           };
@@ -262,7 +387,10 @@ export class PokemonBattleChessManager {
             modifiers: {
               weather: {
                 id: this.prng.sample(WeatherNames),
-                duration: this.prng.random(2, 5),
+                duration: this.prng.random(
+                  LOW_SQUARE_MODIFIER_DURATION,
+                  HIGH_SQUARE_MODIFIER_DURATION,
+                ),
               },
             },
           };
@@ -296,7 +424,7 @@ export class PokemonBattleChessManager {
       }
     }
 
-    this.squareModifiers.filter(
+    this.squareModifiers = this.squareModifiers.filter(
       (squareMod) => squareMod.modifiers.terrain || squareMod.modifiers.weather,
     );
   }
@@ -326,7 +454,7 @@ export class PokemonBattleChessManager {
 
   public updateSquareWeather(square: Square, weather?: WeatherId | "unset") {
     if (weather === undefined) return;
-    const squareMod = this.getWeatherFromSquare(square);
+    const squareMod = this.getModifiersFromSquare(square);
 
     if (weather === "unset") {
       if (squareMod?.modifiers.terrain) {
@@ -356,7 +484,7 @@ export class PokemonBattleChessManager {
 
   public updateSquareTerrain(square: Square, terrain?: TerrainId | "unset") {
     if (terrain === undefined) return;
-    const squareMod = this.getWeatherFromSquare(square);
+    const squareMod = this.getModifiersFromSquare(square);
     if (terrain === "unset") {
       if (squareMod?.modifiers.weather) {
         delete squareMod.modifiers.terrain;
@@ -383,20 +511,19 @@ export class PokemonBattleChessManager {
     }
   }
 
-  public createNewSquareModifiers(target: number, secretPrng: PRNG) {
+  public createNewSquareModifiers(target: number) {
+    const prng = new PRNG();
     if (target <= this.squareModifiers.length) {
       return;
     }
-    const shouldGenerateNewSquare = !secretPrng.randomChance(
+    const shouldGenerateNewSquare = !prng.randomChance(
       1,
       target - this.squareModifiers.length,
     );
     if (!shouldGenerateNewSquare) {
       return;
     }
-    const numSquares = secretPrng.random(
-      target - this.squareModifiers.length + 1,
-    );
+    const numSquares = prng.random(target - this.squareModifiers.length + 1);
     return this.generateSquareModifiers(numSquares);
   }
 
@@ -423,7 +550,7 @@ export class PokemonBattleChessManager {
     );
   }
 
-  public getWeatherFromSquare(
+  public getModifiersFromSquare(
     square?: Square | null,
     squareModifiers?: SquareModifier[],
   ) {
@@ -431,6 +558,17 @@ export class PokemonBattleChessManager {
       return squareModifiers.find((modifier) => modifier.square === square);
     }
     return this.squareModifiers.find((modifier) => modifier.square === square);
+  }
+
+  public getPokemonIndexedBoardLocations(): number[] {
+    const boardArray = new Array(64).fill(-1);
+    this.chessPieces.forEach((piece) => {
+      if (piece.square) {
+        const boardArrayIndex = getSquareIndexIn1DArray(piece.square);
+        boardArray[boardArrayIndex] = piece.index;
+      }
+    });
+    return boardArray;
   }
 
   private getFilter(type: PieceSymbol) {
@@ -469,25 +607,30 @@ export class PokemonBattleChessManager {
   }
 
   public assignPokemonToSquare(
-    index: number | null,
+    index: number,
     square: Square,
     type: PieceSymbol,
     color: Color,
   ) {
-    if (index !== null) {
-      this.chessPieces.push({
-        type,
-        square,
-        color,
-        pkmn: this.draftPieces.splice(index, 1)[0],
-      });
-    }
+    this.chessPieces.push({
+      index,
+      type,
+      square,
+      color,
+      pkmn: this.draftPieces.splice(
+        this.draftPieces.findIndex((piece) => piece.index === index),
+        1,
+      )[0].set,
+    });
   }
 
-  public banDraftPiece(index: number | null) {
-    if (index !== null) {
-      this.banPieces.push(this.draftPieces.splice(index, 1)[0]);
-    }
+  public banDraftPiece(index: number) {
+    this.banPieces.push(
+      this.draftPieces.splice(
+        this.draftPieces.findIndex((piece) => piece.index === index),
+        1,
+      )[0],
+    );
   }
 
   public getChessPieces = () => this.chessPieces;

@@ -19,7 +19,7 @@ const RoomListItem = ({ room, onClick }: RoomListItem) => {
               <FontAwesomeIcon icon={faLock} />
             </span>
           )}
-          {room.matchInProgress && (
+          {room.isOngoing && (
             <span title="Game In Progress">
               <FontAwesomeIcon icon={faEllipsis} />
             </span>

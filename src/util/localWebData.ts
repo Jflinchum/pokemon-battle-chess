@@ -91,15 +91,38 @@ export const setAnimationSpeedPreference = (
   );
 };
 
+const validateVolumePreference = (
+  volumePrefString?: string | null,
+): VolumePreference | null => {
+  let volumePref;
+  try {
+    volumePref = volumePrefString ? JSON.parse(volumePrefString) : null;
+  } catch {
+    return null;
+  }
+  if (
+    volumePref !== null &&
+    typeof volumePref === "object" &&
+    typeof volumePref.pieceVolume === "number" &&
+    typeof volumePref.pokemonBattleVolume === "number" &&
+    typeof volumePref.musicVolume === "number"
+  ) {
+    return volumePref;
+  }
+  return null;
+};
+
 export const getVolumePreference = () => {
   const defaultVolumePreferences: VolumePreference = {
     pieceVolume: 0.25,
     pokemonBattleVolume: 0.25,
     musicVolume: 0.25,
   };
-  const volumePreference = localStorage.getItem("volumePreference");
+  const volumePreference = validateVolumePreference(
+    localStorage.getItem("volumePreference"),
+  );
   return (
-    volumePreference ? JSON.parse(volumePreference) : defaultVolumePreferences
+    volumePreference ? volumePreference : defaultVolumePreferences
   ) as VolumePreference;
 };
 

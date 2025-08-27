@@ -1,0 +1,79 @@
+services:
+  lobby-server-service:
+    build:
+      context: .
+      dockerfile: ./lobbyServer/Dockerfile
+      target: development
+    ports:
+      - "3001:3001"
+      # Port for debugger
+      - "9229:9229"
+    environment:
+      # Required for tsx hot module reloading - https://github.com/privatenumber/tsx/issues/266
+      - CHOKIDAR_USEPOLLING=true
+      - DOCKER_HOST=true
+    volumes:
+      - ./lobbyServer:/app/lobbyServer
+      - ./shared:/app/shared
+    depends_on:
+      - game-server-service
+    networks:
+      - app-network
+  game-server-service:
+    build:
+      context: .
+      dockerfile: ./gameServer/Dockerfile
+      target: development
+    ports:
+      - "3002:3002"
+      - "3003:3003"
+      # Port for debugger
+      - "9230:9230"
+    environment:
+      # Required for tsx hot module reloading - https://github.com/privatenumber/tsx/issues/266
+      - CHOKIDAR_USEPOLLING=true
+      - DOCKER_HOST=true
+    volumes:
+      - ./gameServer:/app/gameServer
+      - ./shared:/app/shared
+    networks:
+      - app-network
+  webapp:
+    build:
+      context: .
+      dockerfile: ./src/Dockerfile
+      target: development
+    ports:
+      - "5173:5173"
+    environment:
+      # Required for tsx hot module reloading - https://github.com/privatenumber/tsx/issues/266
+      - CHOKIDAR_USEPOLLING=true
+      - DOCKER_HOST=true
+    volumes:
+      - ./src:/app/src
+      - ./shared:/app/shared
+    depends_on:
+      - lobby-server-service
+      - game-server-service
+    networks:
+      - app-network
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+  nginx:
+    image: "nginx:alpine"
+    ports:
+      - "8080:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/tls.crt:/etc/nginx/ssl/tls.crt
+      - ./nginx/tls.key:/etc/nginx/ssl/tls.key
+    depends_on:
+      - lobby-server-service
+      - game-server-service
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge

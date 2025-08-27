@@ -1,12 +1,12 @@
 import { Square } from "chess.js";
-import { GameOptions, GameSettings } from "./GameOptions";
-import { Player } from "./Player";
-import { MatchLog, Timer } from "./game";
+import { GameOptions, GameSettings } from "./GameOptions.js";
+import { Player } from "./Player.js";
+import { MatchLog, Timer } from "./Game.js";
 
 export interface ServerToClientEvents {
   connectedPlayers: (players: Player[]) => void;
   changeGameOptions: (options: GameOptions) => void;
-  startSync: (args: { history: MatchLog[] }) => void;
+  startSync: (args: { history: MatchLog[] }, cb: () => void) => void;
   currentTimers: (timer: Timer) => void;
   startGame: (args: GameSettings, isSync?: boolean) => void;
   chatMessage: (args: { playerName: string; message: string }) => void;
@@ -22,6 +22,7 @@ export interface ClientToServerEvents {
   requestChessMove: (args: RequestChessMoveArgs) => void;
   requestDraftPokemon: (args: RequestDraftPokemonArgs) => void;
   requestPokemonMove: (args: RequestPokemonMoveArgs, cb: () => void) => void;
+  requestValidateTimers: (args: CommonClientArgs) => void;
   setViewingResults: (args: SetViewingResultsArgs) => void;
   requestEndGameAsHost: (args: CommonClientArgs) => void;
   requestStartGame: (args: CommonClientArgs) => void;

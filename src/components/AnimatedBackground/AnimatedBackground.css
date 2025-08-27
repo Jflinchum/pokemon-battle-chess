@@ -36,6 +36,8 @@
   display: inline-block;
   min-width: 5vw;
   min-height: 5vw;
+  max-width: 10vw;
+  max-height: 10vw;
   background-size: contain;
 }
 

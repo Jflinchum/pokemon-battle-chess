@@ -2,7 +2,7 @@ import { Chess } from "chess.js";
 import { PokemonSet } from "@pkmn/data";
 import { PokemonBattleChessManager } from "../../../../../../../shared/models/PokemonBattleChessManager";
 import { BattleChessGame } from "../../../../../BattleChessGame/BattleChessManager/BattleChessGame";
-import { MatchHistory } from "../../../../../../../shared/types/game";
+import { MatchHistory } from "../../../../../../../shared/types/Game";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export const HowToPlayScreen2 = () => {

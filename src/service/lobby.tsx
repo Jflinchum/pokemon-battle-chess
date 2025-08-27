@@ -7,7 +7,7 @@ export const createNewRoom = async (
   avatarId: string,
   secretId: string,
 ) => {
-  const response = await fetch("/api/createRoom", {
+  const response = await fetch("/lobby-service/create-room", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -24,8 +24,8 @@ export const createNewRoom = async (
 };
 
 export const leaveRoom = async (roomId: string, playerId: string) => {
-  fetch("/api/leaveRoom", {
-    method: "POST",
+  fetch("/lobby-service/leave-room", {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
@@ -45,8 +45,8 @@ export const joinRoom = async (
   avatarId: string,
   secretId: string,
 ) => {
-  const response = await fetch("/api/joinRoom", {
-    method: "POST",
+  const response = await fetch("/lobby-service/join-room", {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
@@ -69,7 +69,7 @@ export const getAvailableRooms = async (
   searchTerm = "",
 ) => {
   const response = await fetch(
-    `/api/getRooms?page=${page}&limit=${limit}${searchTerm.length ? `&searchTerm=${searchTerm}` : ""}`,
+    `/lobby-service/get-rooms?page=${page}&limit=${limit}${searchTerm.length ? `&searchTerm=${searchTerm}` : ""}`,
     {
       method: "GET",
       headers: {
@@ -85,7 +85,7 @@ export const getRoom = async (
   { roomId }: { roomId: string },
   fetchOptions: RequestInit = {},
 ) => {
-  const response = await fetch(`/api/getRoom?roomId=${roomId}`, {
+  const response = await fetch(`/lobby-service/get-room?roomId=${roomId}`, {
     method: "GET",
     headers: {
       "Cache-Control": "no-cache",

@@ -76,6 +76,10 @@ const PokemonBattleManager = ({
       perspective === "p1" ? p2PokemonSet["species"] : p1PokemonSet["species"],
   });
 
+  const [processedBattleLog, setProcessedBattleLog] = useState<
+    { args: CustomArgTypes; kwArgs: KWArgType }[]
+  >([]);
+
   useEffect(() => {
     let catchUpTimer:
       | { start: () => Promise<void>; stop: () => void }
@@ -120,6 +124,12 @@ const PokemonBattleManager = ({
         setTerrainState(getTerrainStateFromBattle(battle));
         setMoves(getPokemonMoveChoicesFromBattle(battle));
         currentPokemonMoveHistoryIndex.current++;
+        setProcessedBattleLog(
+          currentPokemonMoveHistory.slice(
+            0,
+            currentPokemonMoveHistoryIndex.current,
+          ),
+        );
 
         if (!gameState.isSkippingAhead) {
           playAudioEffect({ args, kwArgs }, { args: previousArgs });
@@ -147,16 +157,14 @@ const PokemonBattleManager = ({
     gameState.isSkippingAhead,
     onBattleEnd,
     userState.animationSpeedPreference,
+    playAudioEffect,
   ]);
 
   return (
     <PokemonBattleDisplay
       demoMode={demoMode}
       prng={prng}
-      fullBattleLog={currentPokemonMoveHistory.slice(
-        0,
-        currentPokemonMoveHistoryIndex.current,
-      )}
+      fullBattleLog={processedBattleLog}
       moves={moves}
       logFormatter={formatter}
       weatherState={weatherState}

@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCertificate,
   faChessKing,
   faCog,
   faDoorOpen,
@@ -49,6 +50,10 @@ const MenuOptions = () => {
 
   const handleOptionsClick = () => {
     dispatch({ type: "OPEN_OPTIONS_MODAL", payload: {} });
+  };
+
+  const handleCreditsClick = () => {
+    dispatch({ type: "OPEN_CREDITS_MODAL", payload: {} });
   };
 
   const handleUploadReplay = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,6 +133,13 @@ const MenuOptions = () => {
         >
           <FontAwesomeIcon icon={faCog} />
           <span>Options</span>
+        </NavOptionButton>
+        <NavOptionButton
+          className="menuOptionButtonContainer"
+          onClick={handleCreditsClick}
+        >
+          <FontAwesomeIcon icon={faCertificate} />
+          <span>Credits</span>
         </NavOptionButton>
       </div>
       <input

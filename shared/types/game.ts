@@ -1,6 +1,6 @@
 import { PokemonSet } from "@pkmn/data";
 import { Color, Square } from "chess.js";
-import { SquareModifier } from "../models/PokemonBattleChessManager";
+import { SquareModifier } from "../models/PokemonBattleChessManager.js";
 
 export type MatchHistory = MatchLog[];
 export type MatchLog =

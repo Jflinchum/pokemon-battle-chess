@@ -5,7 +5,7 @@ import {
 } from "../shared/types/Socket";
 
 const url =
-  process.env.NODE_ENV === "production" ? undefined : "http://localhost:3000";
+  process.env.NODE_ENV === "production" ? undefined : "https://localhost:8080";
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   url,
