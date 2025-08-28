@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: lobby-server-deployment
 spec:
-  replicas: 2
+  replicas: 3
   maxUnavailable: 1
   selector:
     matchLabels:
