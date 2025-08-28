@@ -95,8 +95,8 @@ jobs:
           chmod u+x ./kustomize
 
       # Deploy the Docker Game Server image to the GKE cluster
-      - name: Deploy
-        working-directory: k8s/game-server
+      - name: Deploy Game Server
+        working-directory: ./k8s/game-server
         run: |-
           ${{ github.workspace }}/kustomize edit set image $DOCKER_REPO/$GAME_SERVER_IMAGE:latest:TAG=$DOCKER_REPO/$GAME_SERVER_IMAGE:$GITHUB_SHA
           ${{ github.workspace }}/kustomize build . | kubectl apply -f -
@@ -104,8 +104,8 @@ jobs:
           kubectl get services -o wide
 
       # Deploy the Docker Lobby Server image to the GKE cluster
-      - name: Deploy
-        working-directory: k8s/lobby-server
+      - name: Deploy Lobby Server
+        working-directory: ./k8s/lobby-server
         run: |-
           ${{ github.workspace }}/kustomize edit set image $DOCKER_REPO/$LOBBY_SERVER_IMAGE:latest:TAG=$DOCKER_REPO/$LOBBY_SERVER_IMAGE:$GITHUB_SHA
           ${{ github.workspace }}/kustomize build . | kubectl apply -f -
