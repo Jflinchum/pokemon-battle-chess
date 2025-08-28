@@ -5,7 +5,7 @@ A mixture between Pokemon and Chess! Each chess piece gets assigned a Pokemon, w
 ## How to Run
 
 - Before running this project, you'll want to set up some localhost certs for running https locally.
-  - Place the certificate under `nginx/certificate.crt` and the private key under `nginx/private-key.key`
+  - Place the certificate under `nginx/tls.crt` and the private key under `nginx/tls.key`
 - Install Docker
 - Run docker compose build
 - Run docker compose up
@@ -13,5 +13,7 @@ A mixture between Pokemon and Chess! Each chess piece gets assigned a Pokemon, w
 ## Credits
 
 Chess Assets - Cburnett https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
+
 Chess Engine - https://github.com/jhlywa/chess.js
+
 Pokemon Engine - https://github.com/pkmn/ps
