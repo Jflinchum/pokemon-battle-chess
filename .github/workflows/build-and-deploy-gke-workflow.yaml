@@ -15,7 +15,7 @@ on:
       - gke-release
 
 env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  PROJECT_ID: ${{ vars.GKE_PROJECT }}
   GKE_CLUSTER: autopilot-cluster-1
   GKE_ZONE: us-central1
   GAME_SERVER_DEPLOYMENT: k8s/game-server
