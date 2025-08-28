@@ -1,9 +1,9 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: lobby-server-deployment
+  name: lobby-server-pdb
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: lobby-server
+      name: lobby-server
