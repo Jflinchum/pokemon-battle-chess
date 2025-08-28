@@ -20,7 +20,7 @@ spec:
           secret:
             secretName: nginx-tls
       containers:
-        - image: jonflinchum/pokemon-gambit-lobby-server:v0.0.1
+        - image: jonflinchum/pokemon-gambit-lobby-server:latest
           imagePullPolicy: Always
           name: lobby-server
           resources:

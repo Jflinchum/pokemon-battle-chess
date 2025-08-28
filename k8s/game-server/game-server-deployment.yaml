@@ -16,7 +16,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: jonflinchum/pokemon-gambit-game-server:v0.0.1
+        - image: jonflinchum/pokemon-gambit-game-server:latest
           imagePullPolicy: Always
           name: game-server
           resources:
