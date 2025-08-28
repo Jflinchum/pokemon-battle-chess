@@ -4,6 +4,7 @@ metadata:
   name: game-server-deployment
 spec:
   replicas: 2
+  maxUnavailable: 1
   selector:
     matchLabels:
       name: game-server
