@@ -9,6 +9,8 @@ spec:
       name: lobby-server
   strategy:
     type: Recreate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
