@@ -9,8 +9,8 @@ const CreditsModal = () => {
       <h2 className="creditsModalTitle">Credits</h2>
       <div className="creditsModalBody">
         <p>
-          Pokemon Gambit is a non profit, open source, project. All rights to
-          The Pokémon Company®
+          Pokemon Gambit is a non profit, open source project. All rights to The
+          Pokémon Company®
         </p>
         <p>
           Created and developed by{" "}
