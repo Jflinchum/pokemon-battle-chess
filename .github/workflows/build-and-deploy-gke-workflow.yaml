@@ -99,6 +99,7 @@ jobs:
         run: |-
           cd ./k8s/game-server
           ${{ github.workspace }}/kustomize edit set image $DOCKER_REPO/$GAME_SERVER_IMAGE:latest:TAG=$DOCKER_REPO/$GAME_SERVER_IMAGE:$GITHUB_SHA
+          ${{ github.workspace }}/kustomize build .
           ${{ github.workspace }}/kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/$GAME_SERVER_DEPLOYMENT
           kubectl get services -o wide
@@ -108,6 +109,7 @@ jobs:
         run: |-
           cd ./k8s/lobby-server
           ${{ github.workspace }}/kustomize edit set image $DOCKER_REPO/$LOBBY_SERVER_IMAGE:latest:TAG=$DOCKER_REPO/$LOBBY_SERVER_IMAGE:$GITHUB_SHA
+          ${{ github.workspace }}/kustomize build .
           ${{ github.workspace }}/kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/$LOBBY_SERVER_DEPLOYMENT
           kubectl get services -o wide
