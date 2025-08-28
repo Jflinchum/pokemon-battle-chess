@@ -3,6 +3,7 @@ FROM node:lts-alpine AS development
 WORKDIR /app
 
 COPY package*.json ./
+COPY patches ./patches
 RUN npm install
 EXPOSE 3002 3003 9230
 
@@ -20,6 +21,7 @@ FROM node:lts-alpine AS production
 WORKDIR /app
 
 COPY package*.json ./
+COPY patches ./patches
 RUN npm install
 EXPOSE 3002 3003
 
