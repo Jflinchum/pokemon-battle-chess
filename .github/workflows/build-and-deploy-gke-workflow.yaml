@@ -18,8 +18,8 @@ env:
   PROJECT_ID: ${{ vars.GKE_PROJECT }}
   GKE_CLUSTER: autopilot-cluster-1
   GKE_ZONE: us-central1
-  GAME_SERVER_DEPLOYMENT: k8s/game-server
-  LOBBY_SERVER_DEPLOYMENT: k8s/lobby-server
+  GAME_SERVER_DEPLOYMENT: game-server-deployment
+  LOBBY_SERVER_DEPLOYMENT: lobby-server-deployment
 
   DOCKER_REPO: jonflinchum
   GAME_SERVER_IMAGE: pokemon-gambit-game-server
