@@ -18,7 +18,10 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: autopilot-cluster-1
   GKE_ZONE: us-central1
-  DEPLOYMENT_NAME: pokemon-gambit-deployment
+  GAME_SERVER_DEPLOYMENT: k8s/game-server
+  LOBBY_SERVER_DEPLOYMENT: k8s/lobby-server
+
+  DOCKER_REPO: jonflinchum
   GAME_SERVER_IMAGE: pokemon-gambit-game-server
   LOBBY_SERVER_IMAGE: pokemon-gambit-lobby-server
 
@@ -49,21 +52,25 @@ jobs:
           location: ${{ env.GKE_ZONE }}
           credentials: ${{ secrets.GKE_SA_KEY }}
 
-      # Build the Docker game server image
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build Game Server
         run: |-
           docker build \
-            --tag "gcr.io/$PROJECT_ID/$GAME_SERVER_IMAGE:$GITHUB_SHA" \
+            --tag "$DOCKER_REPO/$GAME_SERVER_IMAGE:$GITHUB_SHA" \
             --build-arg GITHUB_SHA="$GITHUB_SHA" \
             --build-arg GITHUB_REF="$GITHUB_REF" \
             . \
             -f ./gameServer/Dockerfile
 
-      # Build the Docker lobby server image
       - name: Build Lobby Server
         run: |-
           docker build \
-            --tag "gcr.io/$PROJECT_ID/$LOBBY_SERVER_IMAGE:$GITHUB_SHA" \
+            --tag "$DOCKER_REPO/$LOBBY_SERVER_IMAGE:$GITHUB_SHA" \
             --build-arg GITHUB_SHA="$GITHUB_SHA" \
             --build-arg GITHUB_REF="$GITHUB_REF" \
             . \
@@ -72,11 +79,11 @@ jobs:
       # Push the Docker image to Google Container Registry
       - name: Publish Game Server
         run: |-
-          docker push "gcr.io/$PROJECT_ID/$GAME_SERVER_IMAGE:$GITHUB_SHA"
+          docker push "$DOCKER_REPO/$GAME_SERVER_IMAGE:$GITHUB_SHA"
 
       - name: Publish Lobby Server
         run: |-
-          docker push "gcr.io/$PROJECT_ID/$LOBBY_SERVER_IMAGE:$GITHUB_SHA"
+          docker push "$DOCKER_REPO/$LOBBY_SERVER_IMAGE:$GITHUB_SHA"
 
       # Set up kustomize
       - name: Set up Kustomize
@@ -84,10 +91,20 @@ jobs:
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
 
-      # Deploy the Docker image to the GKE cluster
+      # Deploy the Docker Game Server image to the GKE cluster
       - name: Deploy
+        working-directory: k8s/game-server
         run: |-
-          ./kustomize edit set image gcr.io/PROJECT_ID/IMAGE:TAG=gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
-          ./kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment/$DEPLOYMENT_NAME
+          ${{ github.workspace }}/kustomize edit set image $DOCKER_REPO/$GAME_SERVER_IMAGE:latest:TAG=$DOCKER_REPO/$GAME_SERVER_IMAGE:$GITHUB_SHA
+          ${{ github.workspace }}/kustomize build . | kubectl apply -f -
+          kubectl rollout status $GAME_SERVER_DEPLOYMENT
+          kubectl get services -o wide
+
+      # Deploy the Docker Lobby Server image to the GKE cluster
+      - name: Deploy
+        working-directory: k8s/lobby-server
+        run: |-
+          ${{ github.workspace }}/kustomize edit set image $DOCKER_REPO/$LOBBY_SERVER_IMAGE:latest:TAG=$DOCKER_REPO/$LOBBY_SERVER_IMAGE:$GITHUB_SHA
+          ${{ github.workspace }}/kustomize build . | kubectl apply -f -
+          kubectl rollout status $LOBBY_SERVER_DEPLOYMENT
           kubectl get services -o wide
