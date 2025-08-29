@@ -13,7 +13,7 @@ export const DEFAULT_GAME_OPTIONS: GameOptions = {
     accuracy: 0,
     evasion: 0,
   },
-  weatherWars: false,
+  weatherWars: true,
   timersEnabled: true,
   banTimerDuration: 30,
   chessTimerDuration: 15,
