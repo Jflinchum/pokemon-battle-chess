@@ -2,12 +2,13 @@
 FROM node:lts-alpine AS development
 WORKDIR /app
 
-COPY package*.json ./
-COPY patches ./patches
+COPY ./package*.json ./
+COPY ./patches ./patches
 RUN npm install
 EXPOSE 3002 3003 9230
 
-COPY . .
+COPY ./gameServer ./gameServer
+COPY ./shared ./shared
 
 # In dev environments, we could go through the process of imitating a CA and adding that to our computer, configuring DNS entries for a cert
 # But the following environment variable is simpler for local development. Just don't do this in production
@@ -20,12 +21,13 @@ CMD ["npm", "run", "gameService:watch"]
 FROM node:lts-alpine AS production
 WORKDIR /app
 
-COPY package*.json ./
-COPY patches ./patches
+COPY ./package*.json ./
+COPY ./patches ./patches
 RUN npm install
 EXPOSE 3002 3003
 
-COPY . .
+COPY ./gameServer ./gameServer
+COPY ./shared ./shared
 ENV NODE_ENV=production
 RUN npm run build-game
 CMD ["node", "dist/gameService/gameServer/index.js"]
