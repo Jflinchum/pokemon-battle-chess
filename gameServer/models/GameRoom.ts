@@ -29,6 +29,7 @@ import { GameOptions } from "../../shared/types/GameOptions.js";
 import GameTimer from "./GameTimer.js";
 import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes.js";
 import { Player } from "../../shared/types/Player.js";
+import { getCastledRookSquare } from "../../shared/util/getCastledRookSquare.js";
 import {
   clearPokemonBanList,
   clearPokemonMoveHistory,
@@ -603,6 +604,15 @@ export default class GameRoom {
       chessMove.to,
       chessMove.promotion,
     );
+    if (chessMove.isKingsideCastle() || chessMove.isQueensideCastle()) {
+      const { to: toCastledRookSquare, from: fromCastledRookSquare } =
+        getCastledRookSquare(chessMove.color, chessMove.isKingsideCastle());
+      this.pokemonGameManager.movePokemonToSquare(
+        fromCastledRookSquare,
+        toCastledRookSquare,
+      );
+    }
+    // if castle, move rook piece within pokemon game manager
     this.chessManager.move(chessMove.san, { continueOnCheck: true });
     await setGeneratedPokemonIndices(
       this.roomId,

@@ -1,4 +1,4 @@
-import { Chess, Color, PieceSymbol, Square } from "chess.js";
+import { Chess, PieceSymbol, Square } from "chess.js";
 import { ChessBoardSquare, PokemonChessBoardSquare } from "./types";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 
@@ -24,16 +24,6 @@ export const getSquareFromIndices = (
 
 export const getNumberFromSquareLetter = (letter: string): number => {
   return letter.charCodeAt(0) - 97;
-};
-
-export const getCastledRookSquare = (
-  color: Color,
-  isKingsideCastle: boolean,
-): { from: Square; to: Square } => {
-  return {
-    from: `${isKingsideCastle ? "h" : "a"}${color === "w" ? "1" : "8"}`,
-    to: `${isKingsideCastle ? "f" : "d"}${color === "w" ? "1" : "8"}`,
-  };
 };
 
 export const getVerboseChessMove = (

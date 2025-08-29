@@ -16,10 +16,10 @@ import {
   SquareModifier,
 } from "../../../../shared/models/PokemonBattleChessManager";
 import {
-  getCastledRookSquare,
   getVerboseSanChessMove,
   mergeBoardAndPokemonState,
 } from "../ChessManager/util";
+import { getCastledRookSquare } from "../../../../shared/util/getCastledRookSquare";
 import useBattleHistory from "./useBattleHistory";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
