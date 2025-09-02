@@ -1,7 +1,7 @@
 import { Color, PieceSymbol, Square } from "chess.js";
-import { PokemonChessBoardSquare } from "../types";
 import { getSquareColor } from "../util";
 import ChessSquare from "./ChessSquare/ChessSquare";
+import { PokemonChessBoardSquare } from "../../../../types/chess/PokemonChessBoardSquare";
 import "./ChessBoard.css";
 
 interface ChessBoardProps {

@@ -12,7 +12,6 @@ import { Protocol } from "@pkmn/protocol";
 import { ObjectReadWriteStream } from "@pkmn/streams";
 import User from "./User.js";
 import {
-  ChessBoardSquare,
   PokemonBattleChessManager,
   PokemonPiece,
   SquareModifier,
@@ -25,6 +24,7 @@ import {
   MatchLog,
   Timer,
 } from "../../shared/types/Game.js";
+import { ChessBoardSquare } from "../../shared/types/ChessBoardSquare.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import GameTimer from "./GameTimer.js";
 import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes.js";

@@ -4,6 +4,7 @@ import { PRNG, PRNGSeed } from "@pkmn/sim";
 import { Dex } from "@pkmn/dex";
 import { PokeSimRandomGen } from "./PokeSimRandomGen.js";
 import { WeatherId, TerrainId } from "../types/PokemonTypes.js";
+import { ChessBoardSquare } from "../types/ChessBoardSquare.js";
 import { getWeightedRandom } from "../util/getWeightedRandom.js";
 import { getSquareIndexIn1DArray } from "../util/chessSquareIndex.js";
 import {
@@ -30,12 +31,6 @@ export const TerrainNames: TerrainId[] = [
 ];
 
 export type FormatID = "random" | "draft";
-
-export type ChessBoardSquare = {
-  square: Square;
-  type: PieceSymbol;
-  color: Color;
-} | null;
 
 export interface PokemonPiece {
   index: number;

@@ -5,8 +5,8 @@ import PokemonDraftSelect from "./PokemonDraftSelect/PokemonDraftSelect";
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
-import { PokemonChessBoardSquare } from "../ChessManager/types";
 import Button from "../../common/Button/Button";
+import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
 import "./DraftPokemonManager.css";
 
 interface DraftPokemonManagerProps {

@@ -1,5 +1,6 @@
 import { Chess, PieceSymbol, Square } from "chess.js";
-import { ChessBoardSquare, PokemonChessBoardSquare } from "./types";
+import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
+import { ChessBoardSquare } from "../../../../shared/types/ChessBoardSquare";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 
 export const getSquareColor = (

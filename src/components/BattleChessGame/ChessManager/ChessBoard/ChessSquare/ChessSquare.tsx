@@ -1,6 +1,6 @@
-import { PokemonChessBoardSquare } from "../../types";
 import PokemonChessPieceSprite from "../PokemonChessPieceSprite/PokemonChessPieceSprite";
 import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
+import { PokemonChessBoardSquare } from "../../../../../types/chess/PokemonChessBoardSquare";
 import "./ChessSquare.css";
 
 interface ChessSquareProps {

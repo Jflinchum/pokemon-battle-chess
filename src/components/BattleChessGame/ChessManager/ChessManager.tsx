@@ -3,7 +3,7 @@ import { Chess, Square, Move, Color, PieceSymbol } from "chess.js";
 import ChessBoard from "./ChessBoard/ChessBoard";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
-import { MoveAttempt, PokemonChessBoardSquare } from "./types";
+import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
 import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromotionChoice";
 import { getVerboseChessMove } from "./util";
 import { useGameState } from "../../../context/GameState/GameStateContext";
@@ -11,6 +11,7 @@ import { useDebounce } from "../../../utils";
 import { ChessData } from "../../../../shared/types/Game";
 import { Arrow, ArrowController } from "./ArrowController/ArrowController";
 import "./ChessManager.css";
+import { MoveAttempt } from "../../../types/chess/MoveAttempt";
 
 interface ChessManagerProps {
   hide?: boolean;
