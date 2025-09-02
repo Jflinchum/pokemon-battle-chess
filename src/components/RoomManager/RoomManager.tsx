@@ -123,6 +123,11 @@ const RoomManager = () => {
     socket.on("startGame", (settings, isSyncing) => {
       if (!isSyncing) {
         setMatchHistory(undefined);
+      } else if (
+        settings.blackPlayer?.playerId === userState.id ||
+        settings.whitePlayer?.playerId === userState.id
+      ) {
+        dispatch({ type: "SET_SKIPPING_AHEAD", payload: true });
       }
       if (gameState.matchEnded && gameState.inGame) {
         /**
