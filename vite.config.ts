@@ -18,6 +18,7 @@ try {
 
 // https://vite.dev/config/
 export default defineConfig({
+  publicDir: "./src/public",
   plugins: [react()],
   server: {
     https: httpsOptions,
