@@ -63,10 +63,12 @@ const RoomManager = () => {
       socket.connect();
     }
 
-    socket.on("startSync", ({ history }: { history: MatchHistory }) => {
+    socket.on("startSync", ({ history }: { history: MatchHistory }, cb) => {
       console.log("starting sync");
       console.log(history);
       setMatchHistory(history);
+
+      cb();
     });
 
     socket.io.on("reconnect", () => {
