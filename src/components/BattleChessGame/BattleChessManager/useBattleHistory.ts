@@ -96,8 +96,6 @@ const useBattleHistory = ({
     }
   }, [gameState.matchEnded]);
 
-  const [catchingUp, setCatchingUp] = useState(false);
-
   useEffect(() => {
     if (matchHistory) {
       setCurrentMatchLog(matchHistory);
@@ -119,8 +117,11 @@ const useBattleHistory = ({
     // On mount, start attempting to sync to the current match
     const catchUpToCurrentState = async () => {
       while (matchLogIndex.current < matchLog.length) {
-        if (matchLogIndex.current < matchLog.length - 3 && !catchingUp) {
-          setCatchingUp(true);
+        if (
+          matchLogIndex.current < matchLog.length - 3 &&
+          !gameState.isCatchingUp
+        ) {
+          dispatch({ type: "SET_CATCHING_UP", payload: true });
         }
 
         const currentLog = matchLog[matchLogIndex.current];
@@ -131,7 +132,7 @@ const useBattleHistory = ({
          * in progress so that battle animations can continue playing out.
          * Current Battle gets reset from PokemonBattleManager
          */
-        if (currentBattle && currentLog.type === "chess") {
+        if (!skipToEndOfSync && currentBattle && currentLog.type === "chess") {
           break;
         }
 
@@ -220,7 +221,7 @@ const useBattleHistory = ({
       }
 
       if (matchLogIndex.current === matchLog.length) {
-        setCatchingUp(false);
+        dispatch({ type: "SET_CATCHING_UP", payload: false });
       }
     };
 
@@ -234,7 +235,6 @@ const useBattleHistory = ({
     skipToEndOfSync,
     matchLog,
     userState.animationSpeedPreference,
-    catchingUp,
     gameState.gameSettings.options.format,
     onBan,
     onDraft,
@@ -246,10 +246,11 @@ const useBattleHistory = ({
     onWeatherRemove,
     onWeatherChange,
     matchLogIndex,
+    dispatch,
+    gameState.isCatchingUp,
   ]);
 
   return {
-    catchingUp,
     currentMatchLog: matchLog.slice(0, matchLogIndex.current),
   };
 };

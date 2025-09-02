@@ -382,7 +382,7 @@ export const BattleChessGame = ({
     [modalStateDispatch, dispatch],
   );
 
-  const { catchingUp, currentMatchLog } = useBattleHistory({
+  const { currentMatchLog } = useBattleHistory({
     matchHistory,
     currentBattle,
     onBan,
@@ -398,12 +398,10 @@ export const BattleChessGame = ({
   });
 
   useEffect(() => {
-    dispatch({ type: "SET_CATCHING_UP", payload: catchingUp });
-
-    if (!catchingUp && gameState.isSkippingAhead) {
+    if (!gameState.isCatchingUp && gameState.isSkippingAhead) {
       dispatch({ type: "SET_SKIPPING_AHEAD", payload: false });
     }
-  }, [gameState.isSkippingAhead, catchingUp, dispatch]);
+  }, [gameState.isSkippingAhead, gameState.isCatchingUp, dispatch]);
 
   /**
    * Clear out the timeout for starting and ending a battle if we start skipping ahead.
@@ -434,7 +432,7 @@ export const BattleChessGame = ({
   const battleSquare = useMemo(() => {
     if (
       currentBattle &&
-      (!catchingUp || userState.animationSpeedPreference >= 1000) &&
+      (!gameState.isCatchingUp || userState.animationSpeedPreference >= 1000) &&
       !gameState.isSkippingAhead
     ) {
       if (!demoMode) {
@@ -460,9 +458,9 @@ export const BattleChessGame = ({
       }
     }
   }, [
-    catchingUp,
     chessManager,
     gameState.isSkippingAhead,
+    gameState.isCatchingUp,
     playRandomBattleSong,
     playRandomGlobalSong,
     userState.animationSpeedPreference,
