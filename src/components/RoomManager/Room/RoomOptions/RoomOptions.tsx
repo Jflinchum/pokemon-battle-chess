@@ -66,6 +66,7 @@ const getTimerIdFromTimerData = ({
 };
 
 const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
+  const [gameSeed, setGameSeed] = useState("");
   const [format, setFormat] = useState<FormatID>(gameOptions.format);
   const [offenseAdvantage, setOffenseAdvantage] = useState<BoostsTable>(
     gameOptions.offenseAdvantage,
@@ -93,6 +94,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
 
   useEffect(() => {
     onChange({
+      gameSeed,
       format,
       offenseAdvantage,
       weatherWars,
@@ -102,12 +104,34 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
       chessTimerIncrement: timerIdToTimerMapping[timerId].chessInc,
       pokemonTimerIncrement: timerIdToTimerMapping[timerId].pkmnInc,
     });
-  }, [format, offenseAdvantage, weatherWars, banTimer, timerId, onChange]);
+  }, [
+    format,
+    offenseAdvantage,
+    weatherWars,
+    banTimer,
+    timerId,
+    gameSeed,
+    onChange,
+  ]);
 
   return (
     <div className="roomOptionsContainer">
       <h3>Room Options</h3>
       <ul className="roomOptionsList">
+        {import.meta.env.DEV ? (
+          <li className="roomOption">
+            <div className="roomOptionLabel">
+              <label htmlFor="seed">Pokemon Generation Seed:</label>
+              <p>DEV ONLY - Sets the seed used for generating Pokemon.</p>
+            </div>
+            <input
+              value={gameSeed}
+              onChange={(e) => setGameSeed(e.target.value)}
+              name="seed"
+              disabled={!isHost}
+            />
+          </li>
+        ) : null}
         <li className="roomOption">
           <div className="roomOptionLabel">
             <label htmlFor="format">Pokemon Assignments:</label>

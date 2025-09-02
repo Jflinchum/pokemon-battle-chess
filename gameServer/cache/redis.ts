@@ -528,6 +528,8 @@ export const setGameRoomOptions = async (
   options: GameOptions,
 ) => {
   return await redisClient.hset(`room:${roomId}`, {
+    requestedSeed:
+      process.env.NODE_ENV === "production" ? "" : options.gameSeed,
     format: options.format,
     atkBuff: options.offenseAdvantage.atk,
     defBuff: options.offenseAdvantage.def,
@@ -549,6 +551,13 @@ export const setGameRoomSeed = async (roomId: string, seed: string) => {
   return await redisClient.hset(`room:${roomId}`, {
     publicSeed: seed,
   });
+};
+
+export const getRequestedGameSeed = async (roomId: string) => {
+  return (
+    ((await redisClient.hget(`room:${roomId}`, "requestedSeed")) as PRNGSeed) ||
+    ""
+  );
 };
 
 export const setRoomSquareModifierTarget = async (

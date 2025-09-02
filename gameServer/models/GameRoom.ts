@@ -42,6 +42,7 @@ import {
   getPokemonBattleSeed,
   getPokemonBattleStakes,
   getPokemonMoveHistory,
+  getRequestedGameSeed,
   getRoomBoard,
   getRoomPokemonIndices,
   getRoomSquareModifiers,
@@ -696,7 +697,12 @@ export default class GameRoom {
   }
 
   private async generatePublicSeed() {
-    this.publicSeed = PRNG.generateSeed();
+    if (process.env.NODE_ENV === "production") {
+      this.publicSeed = PRNG.generateSeed();
+    } else {
+      this.publicSeed =
+        (await getRequestedGameSeed(this.roomId)) || PRNG.generateSeed();
+    }
     return await setGameRoomSeed(this.roomId, this.publicSeed);
   }
 

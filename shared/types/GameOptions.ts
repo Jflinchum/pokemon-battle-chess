@@ -5,6 +5,7 @@ import { Player } from "./Player.js";
 type FormatID = "random" | "draft";
 
 export interface GameOptions {
+  gameSeed?: string;
   format: FormatID;
   offenseAdvantage: BoostsTable;
   weatherWars: boolean;
