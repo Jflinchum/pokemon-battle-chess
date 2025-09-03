@@ -14,10 +14,10 @@
     }
 
     &:nth-child(odd) {
-      background-color: grey;
+      background-color: var(--gray-3);
     }
     &:nth-child(even) {
-      background-color: darkcyan;
+      background-color: var(--gray-2);
     }
   }
 }
