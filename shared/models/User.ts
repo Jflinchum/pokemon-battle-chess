@@ -1,4 +1,4 @@
-import { setPlayerViewingResults } from "../cache/redis.js";
+import { setPlayerViewingResults } from "../../gameServer/cache/redis.js";
 
 export default class User {
   public playerName: string;

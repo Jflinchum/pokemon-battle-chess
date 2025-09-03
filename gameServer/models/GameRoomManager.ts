@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import GameRoom from "./GameRoom.js";
-import User from "./User.js";
+import User from "../../shared/models/User.js";
 import {
   ClientToServerEvents,
   ServerToClientEvents,

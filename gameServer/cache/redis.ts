@@ -2,7 +2,7 @@ import { Redis } from "ioredis";
 import { PRNGSeed } from "@pkmn/sim";
 import { getConfig } from "../config.js";
 import GameRoom from "../models/GameRoom.js";
-import User from "../models/User.js";
+import User from "../../shared/models/User.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import { FormatID } from "../../shared/models/PokemonBattleChessManager.js";
 import { MatchLog } from "../../shared/types/Game.js";
@@ -252,7 +252,9 @@ export const getUserTransient = async (playerId: string) => {
   return await redisClient.hget(`player:${playerId}`, "transient");
 };
 
-export const getRoomIdFromHostId = async (hostId: string) => {
+export const getRoomIdFromHostId = async (
+  hostId: string,
+): Promise<string[] | undefined> => {
   try {
     const response = await redisClient.call(
       "FT.SEARCH",
@@ -328,6 +330,10 @@ export const movePlayerToActive = async (roomId: string, playerId: string) => {
   }
 
   const [player1, player2] = response.map(([, result]) => result);
+
+  if (playerId === player1 || playerId === player2) {
+    return;
+  }
 
   if (!player1) {
     return setPlayerAsPlayer1(roomId, playerId);

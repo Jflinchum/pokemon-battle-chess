@@ -10,7 +10,7 @@ import { BoostID } from "@pkmn/data";
 import { PRNG } from "@pkmn/sim";
 import { Protocol } from "@pkmn/protocol";
 import { ObjectReadWriteStream } from "@pkmn/streams";
-import User from "./User.js";
+import User from "../../shared/models/User.js";
 import {
   PokemonBattleChessManager,
   PokemonPiece,

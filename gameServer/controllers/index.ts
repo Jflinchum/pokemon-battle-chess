@@ -1,5 +1,5 @@
 import { Express } from "express";
-import User from "../models/User.js";
+import User from "../../shared/models/User.js";
 import GameRoom from "../models/GameRoom.js";
 import GameRoomManager from "../models/GameRoomManager.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";

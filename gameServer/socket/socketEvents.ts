@@ -8,7 +8,7 @@ import {
   cleanString,
   isStringProfane,
 } from "../../shared/util/profanityFilter.js";
-import User from "../models/User.js";
+import User from "../../shared/models/User.js";
 import {
   addPlayerIdToRoomPlayerSet,
   addPlayerToCache,
