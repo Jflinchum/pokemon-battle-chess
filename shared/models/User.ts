@@ -1,5 +1,3 @@
-import { setPlayerViewingResults } from "../../gameServer/cache/redis.js";
-
 export default class User {
   public playerName: string;
   public playerId: string;
@@ -18,6 +16,7 @@ export default class User {
     transient?: boolean,
     viewingResults?: boolean,
     spectating?: boolean,
+    roomCode?: string,
   ) {
     this.playerName = name;
     this.playerId = id;
@@ -25,13 +24,8 @@ export default class User {
     this.viewingResults = viewingResults || false;
     this.transient = transient || false;
     this.playerSecret = secret;
-    this.connectedRoom = null;
+    this.connectedRoom = roomCode || null;
     this.spectating = spectating || false;
-  }
-
-  public async setViewingResults(v: boolean) {
-    this.viewingResults = v;
-    return await setPlayerViewingResults(this.playerId, v);
   }
 
   public setRoom(id: string) {

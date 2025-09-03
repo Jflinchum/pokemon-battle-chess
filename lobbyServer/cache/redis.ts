@@ -1,5 +1,6 @@
 import { Redis } from "ioredis";
 import { getConfig } from "../config.js";
+import User from "./../../shared/models/User.js";
 
 /**
  *
@@ -297,4 +298,56 @@ export const getDisconnectedUsers = async (): Promise<
     console.log(err);
     return [];
   }
+};
+
+export const fetchUser = async (
+  playerId: string | null,
+): Promise<User | null> => {
+  if (!playerId) {
+    return null;
+  }
+
+  const response = await redisClient
+    .multi()
+    .hget(`player:${playerId}`, "playerName")
+    .hget(`player:${playerId}`, "avatarId")
+    .hget(`player:${playerId}`, "secret")
+    .hget(`player:${playerId}`, "transient")
+    .hget(`player:${playerId}`, "viewingResults")
+    .hget(`player:${playerId}`, "spectating")
+    .hget(`player:${playerId}`, "roomId")
+    .exec();
+
+  if (!response) {
+    return null;
+  }
+  const [
+    playerName,
+    avatarId,
+    secret,
+    transient,
+    viewingResults,
+    spectating,
+    roomId,
+  ] = response.map(([, result]) => result);
+
+  const isTransient = typeof transient === "string" && transient !== "0";
+  const isViewingResults =
+    typeof viewingResults === "string" && viewingResults === "1";
+  const isSpectating = typeof spectating === "string" && spectating === "1";
+  const connectedRoom = typeof roomId === "string" ? roomId : undefined;
+
+  if (playerName && avatarId && secret) {
+    return new User(
+      playerName as unknown as string,
+      playerId,
+      avatarId as unknown as string,
+      secret as unknown as string,
+      isTransient,
+      isViewingResults,
+      isSpectating,
+      connectedRoom,
+    );
+  }
+  return null;
 };

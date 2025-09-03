@@ -9,6 +9,7 @@ import {
   roomExists,
   getRoomFromName,
   getRoomSize,
+  fetchUser,
 } from "../cache/redis.js";
 import { InternalConfig } from "../config.js";
 
@@ -159,6 +160,23 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     if (roomPasscode !== password) {
       res.status(401).send({ message: "Invalid password" });
       return;
+    }
+
+    const cachedUser = await fetchUser(playerId);
+    if (cachedUser?.connectedRoom && cachedUser?.connectedRoom !== roomId) {
+      console.log(
+        "User in a different room already. Kicking them out of their previous room",
+      );
+      await fetch(`${config.gameServiceUrl}/game-service/leave-room`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId: cachedUser.connectedRoom,
+          playerId,
+        }),
+      });
     }
 
     const gameServerResp = await fetch(

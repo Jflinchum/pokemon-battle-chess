@@ -260,10 +260,10 @@ export default class GameRoomManager {
     return gameRoom;
   }
 
-  public removeRoom(roomId: string) {
+  public async removeRoom(roomId: string) {
     console.log(`Cleaning up room ${roomId}`);
     this.io.to(roomId).emit("roomClosed");
-    deleteRoom(roomId);
+    await deleteRoom(roomId);
   }
 
   public async playerCreatedRoomId(
@@ -322,7 +322,7 @@ export default class GameRoomManager {
         name: room.hostPlayer.playerName,
         isHost: true,
       });
-      this.removeRoom(room.roomId);
+      await this.removeRoom(room.roomId);
       return;
     }
     if (room.isOngoing && activePlayerSlot) {

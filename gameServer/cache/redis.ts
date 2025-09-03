@@ -89,18 +89,27 @@ export const fetchUser = async (
     .hget(`player:${playerId}`, "transient")
     .hget(`player:${playerId}`, "viewingResults")
     .hget(`player:${playerId}`, "spectating")
+    .hget(`player:${playerId}`, "roomId")
     .exec();
 
   if (!response) {
     return null;
   }
-  const [playerName, avatarId, secret, transient, viewingResults, spectating] =
-    response.map(([, result]) => result);
+  const [
+    playerName,
+    avatarId,
+    secret,
+    transient,
+    viewingResults,
+    spectating,
+    roomId,
+  ] = response.map(([, result]) => result);
 
   const isTransient = typeof transient === "string" && transient !== "0";
   const isViewingResults =
     typeof viewingResults === "string" && viewingResults === "1";
   const isSpectating = typeof spectating === "string" && spectating === "1";
+  const connectedRoom = typeof roomId === "string" ? roomId : undefined;
 
   if (playerName && avatarId && secret) {
     return new User(
@@ -111,6 +120,7 @@ export const fetchUser = async (
       isTransient,
       isViewingResults,
       isSpectating,
+      connectedRoom,
     );
   }
   return null;

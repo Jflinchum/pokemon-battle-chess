@@ -3,7 +3,7 @@ import User from "../../shared/models/User.js";
 import GameRoom from "../models/GameRoom.js";
 import GameRoomManager from "../models/GameRoomManager.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
-import { doesRoomExist } from "../cache/redis.js";
+import { doesRoomExist, setPlayerViewingResults } from "../cache/redis.js";
 
 interface APIResponse<Data> {
   data?: Data;
@@ -93,7 +93,7 @@ export const registerRoutes = (
     const existingPlayer = await gameRoomManager.getUser(playerId);
     if (existingPlayer?.transient) {
       gameRoomManager.clearPlayerTransientState(playerId);
-      await existingPlayer.setViewingResults(false);
+      await setPlayerViewingResults(existingPlayer.playerId, false);
     } else {
       await gameRoomManager.playerJoinRoom(roomId, playerId);
     }
@@ -115,7 +115,7 @@ export const registerRoutes = (
       return;
     }
 
-    gameRoomManager.playerLeaveRoom(roomId, playerId);
+    await gameRoomManager.playerLeaveRoom(roomId, playerId);
 
     res.status(200).send();
   });
