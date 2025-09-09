@@ -122,6 +122,7 @@ const RoomManager = () => {
 
     socket.on("startGame", (settings, isSyncing) => {
       window.gameSeed = settings.seed;
+
       if (!isSyncing) {
         setMatchHistory(undefined);
       } else if (

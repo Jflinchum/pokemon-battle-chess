@@ -6,6 +6,8 @@ declare module "*.png";
 
 declare global {
   interface Window {
-    gameSeed: string;
+    gameSeed?: string;
   }
 }
+
+export {};
