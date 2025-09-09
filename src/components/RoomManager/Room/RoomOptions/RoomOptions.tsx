@@ -27,21 +27,13 @@ interface RoomOptionsProp {
 }
 
 const timerIdToTimerMapping: Record<
-  TimerId,
+  (typeof TimerId)[number],
   { chess: number; chessInc: number; pkmnInc: number }
 > = {
   "No Timer": { chess: 0, chessInc: 0, pkmnInc: 0 },
-  "30 + 20 + 10": { chess: 30, chessInc: 20, pkmnInc: 10 },
-  "30": { chess: 30, chessInc: 0, pkmnInc: 0 },
-  "15 + 10 + 5": { chess: 15, chessInc: 10, pkmnInc: 5 },
-  "10 + 5 + 1": { chess: 10, chessInc: 5, pkmnInc: 1 },
-  "10": { chess: 10, chessInc: 0, pkmnInc: 0 },
-  "5": { chess: 5, chessInc: 0, pkmnInc: 0 },
-  "3 + 2 + 1": { chess: 3, chessInc: 2, pkmnInc: 1 },
-  "3": { chess: 3, chessInc: 0, pkmnInc: 0 },
-  "2 + 1": { chess: 2, chessInc: 1, pkmnInc: 0 },
-  "1 + 1": { chess: 1, chessInc: 1, pkmnInc: 0 },
-  "1": { chess: 1, chessInc: 0, pkmnInc: 0 },
+  Long: { chess: 30, chessInc: 20, pkmnInc: 10 },
+  Normal: { chess: 15, chessInc: 10, pkmnInc: 5 },
+  Bullet: { chess: 2, chessInc: 1, pkmnInc: 0 },
 };
 
 const getTimerIdFromTimerData = ({
@@ -52,17 +44,20 @@ const getTimerIdFromTimerData = ({
   chess: number;
   chessInc: number;
   pkmnInc: number;
-}): TimerId => {
+}): (typeof TimerId)[number] => {
   const timer = Object.keys(timerIdToTimerMapping).find(
     (timerId) =>
-      timerIdToTimerMapping[timerId as TimerId].chess === chess &&
-      timerIdToTimerMapping[timerId as TimerId].chessInc === chessInc &&
-      timerIdToTimerMapping[timerId as TimerId].pkmnInc === pkmnInc,
+      timerIdToTimerMapping[timerId as (typeof TimerId)[number]].chess ===
+        chess &&
+      timerIdToTimerMapping[timerId as (typeof TimerId)[number]].chessInc ===
+        chessInc &&
+      timerIdToTimerMapping[timerId as (typeof TimerId)[number]].pkmnInc ===
+        pkmnInc,
   );
   if (!timer) {
     return "No Timer";
   }
-  return timer as TimerId;
+  return timer as (typeof TimerId)[number];
 };
 
 const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
@@ -90,7 +85,8 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
       gameOptions.pokemonTimerIncrement,
     ],
   );
-  const [timerId, setTimerId] = useState<TimerId>(currentTimerId);
+  const [timerId, setTimerId] =
+    useState<(typeof TimerId)[number]>(currentTimerId);
 
   useEffect(() => {
     onChange({
@@ -214,17 +210,14 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
           <div className="roomOptionLabel">
             <label htmlFor="gameTimer">Game Timer:</label>
             <p>
-              Timer countdowns in game. If players run out of time during the
+              Adds a timer to the game. If players run out of time during the
               draft/ban phase, a random pokemon will be chosen and randomly
-              assigned. If players run out of time in chess/pokemon, then they
-              will lose.
+              assigned. If players run out of time in the match, then they will
+              lose.
             </p>
             <p>
-              Time controls are in an "X + Y + Z" format. The first number is
-              the amount of total minutes in the match. The second number is the
-              amount of seconds a player gets when they move a chess piece. The
-              final third number is the amount of seconds a player gets when
-              they make a decision in a pokemon battle.
+              Long is 30 minutes. Normal is 15 minutes. Bullet is 2 minutes.
+              Each move you make in game will prolong your timer.
             </p>
           </div>
           <GameTimerOptions
