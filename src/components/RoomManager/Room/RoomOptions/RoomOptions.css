@@ -43,3 +43,9 @@ ul.roomOptionsList {
 .roomOptionBanTimer {
   margin: auto 0;
 }
+
+.roomOptionButtons {
+  margin-top: 8px;
+  margin-right: 8px;
+  width: 100px;
+}

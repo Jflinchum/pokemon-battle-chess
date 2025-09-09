@@ -4,6 +4,7 @@ import { FormatID } from "../../../../context/GameState/GameStateContext";
 import { GameOptions } from "../../../../../shared/types/GameOptions";
 import { GameTimerOptions, TimerId } from "./GameTimerOptions/GameTimerOptions";
 import "./RoomOptions.css";
+import Button from "../../../common/Button/Button";
 
 const advantageOptions: { stat: BoostID; label: string }[] = [
   { stat: "atk", label: "Attack" },
@@ -130,7 +131,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
         ) : null}
         <li className="roomOption">
           <div className="roomOptionLabel">
-            <label htmlFor="format">Pokemon Assignments:</label>
+            <label>Pokemon Assignments:</label>
             <p>
               Random will randomly assign a Pokemon to each chess piece and then
               start the match.
@@ -141,18 +142,18 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               Pokemon to their piece of choice.
             </p>
           </div>
-          <select
-            value={gameOptions.format}
-            onChange={(e) => setFormat(e.target.value as FormatID)}
-            name="format"
-            disabled={!isHost}
-          >
-            {formatOptions.map((format) => (
-              <option value={format.id} key={format.id}>
-                {format.label}
-              </option>
-            ))}
-          </select>
+
+          {formatOptions.map((formatOption) => (
+            <Button
+              key={formatOption.id}
+              disabled={!isHost}
+              highlighted={format === formatOption.id}
+              className="roomOptionButtons"
+              onClick={() => setFormat(formatOption.id)}
+            >
+              {formatOption.label}
+            </Button>
+          ))}
         </li>
         <li className="roomOption">
           <div className="roomOptionLabel">

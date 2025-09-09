@@ -23,7 +23,7 @@ export const GameTimerOptions = ({
           <Button
             disabled={disabled}
             highlighted={timerId === timer}
-            className="gameTimerButton"
+            className="roomOptionButtons"
             key={timer}
             onClick={() => handleSelectTimerId(timer)}
           >
