@@ -50,6 +50,8 @@
 
 .playerActions {
   margin-left: auto;
+  display: flex;
+  flex-wrap: nowrap;
 }
 
 .playerAction {

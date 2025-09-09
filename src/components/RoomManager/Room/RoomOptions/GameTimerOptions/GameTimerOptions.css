@@ -1,7 +1,6 @@
 .gameTimerContainer {
   display: flex;
   flex-wrap: wrap;
-  margin-left: 8px;
 }
 
 .gameTimerLabel {

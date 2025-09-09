@@ -42,7 +42,7 @@ const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
               <PlayerName className="playerListName" player={player} />
 
               {gameState.isHost && player.playerId !== userState.id && (
-                <span className="playerActions">
+                <div className="playerActions">
                   {(player.isPlayer1 || player.isPlayer2) &&
                     !gameState.inGame && (
                       <Button
@@ -62,7 +62,7 @@ const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
                   >
                     <FontAwesomeIcon icon={faX} />
                   </Button>
-                </span>
+                </div>
               )}
             </li>
           ))}
