@@ -16,6 +16,7 @@ import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
 import { timer } from "../../../../utils";
 import { usePokemonAudioFx } from "./usePokemonAudioFx";
+import { shouldDelayBeforeContinuing } from "../utils/shouldDelayBeforeContinuing";
 
 interface PokemonBattleManagerProps {
   prng: PRNG;
@@ -176,28 +177,6 @@ const PokemonBattleManager = ({
       perspective={perspective}
     />
   );
-};
-
-const shouldDelayBeforeContinuing = (logType: CustomArgTypes[0]) => {
-  const delayLogs: CustomArgTypes[0][] = [
-    "player",
-    "move",
-    "faint",
-    "switch",
-    "-damage",
-    "-heal",
-    "-forfeit",
-    "-boost",
-    "-unboost",
-    "-setboost",
-    "-weather",
-    "-activate",
-    "-enditem",
-  ];
-  if (delayLogs.includes(logType)) {
-    return true;
-  }
-  return false;
 };
 
 const getWeatherStateFromBattle = (battle: Battle) => {

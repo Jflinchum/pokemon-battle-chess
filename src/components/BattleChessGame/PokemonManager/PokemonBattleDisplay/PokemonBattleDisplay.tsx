@@ -78,6 +78,7 @@ const PokemonBattleDisplay = ({
         <PokemonBattleField
           prng={prng}
           battleHistory={fullBattleLog}
+          logFormatter={logFormatter}
           p1ActivePokemon={p1ActivePokemon}
           p2ActivePokemon={p2ActivePokemon}
           weatherState={weatherState}

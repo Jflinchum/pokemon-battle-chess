@@ -13,10 +13,14 @@ import {
 import { PokemonBattleConditions } from "./PokemonBattleCondition/PokemonBattleConditions";
 import { PokemonBattleBackground } from "./PokemonBattleBackground/PokemonBattleBackground";
 import "./PokemonBattleField.css";
+import { PokemonBattleText } from "./PokemonBattleText/PokemonBattleText";
+import { LogFormatter } from "@pkmn/view";
+import { useUserState } from "../../../../../context/UserState/UserStateContext";
 
 interface PokemonBattleFieldProps {
   prng: PRNG;
   battleHistory: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType }[];
+  logFormatter: LogFormatter;
   p1ActivePokemon: Pokemon | null;
   p2ActivePokemon: Pokemon | null;
   weatherState?: {
@@ -33,6 +37,8 @@ interface PokemonBattleFieldProps {
 
 const PokemonBattleField = ({
   prng,
+  battleHistory,
+  logFormatter,
   p1ActivePokemon,
   p2ActivePokemon,
   weatherState,
@@ -41,6 +47,7 @@ const PokemonBattleField = ({
   p2PokemonSet,
 }: PokemonBattleFieldProps) => {
   const [selectedSide, setSelectedSide] = useState<"p1" | "p2" | undefined>();
+  const { userState } = useUserState();
 
   const handlePokemonClick = (side: "p1" | "p2") => {
     setSelectedSide((curr) => (curr === side ? undefined : side));
@@ -74,6 +81,13 @@ const PokemonBattleField = ({
           shouldHide={selectedSide === "p1"}
         />
       )}
+
+      {userState.animationSpeedPreference >= 500 ? (
+        <PokemonBattleText
+          battleHistory={battleHistory}
+          logFormatter={logFormatter}
+        />
+      ) : null}
     </PokemonBattleBackground>
   );
 };

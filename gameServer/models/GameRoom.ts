@@ -1156,9 +1156,7 @@ export default class GameRoom {
 
     const whiteBattleStreamHandler = async () => {
       const whiteStreamOutput: MatchLog[] = [];
-      console.log("Beginning stream process");
       for await (const chunk of battleStream.p1) {
-        console.log("white stream output", chunk);
         if (chunk.includes(POKE_SIMULATOR_TERMINATOR)) {
           if (p1PokemonMove || p2PokemonMove) {
             whiteStreamOutput.length = 0;
