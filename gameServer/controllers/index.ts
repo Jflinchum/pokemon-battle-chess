@@ -52,6 +52,7 @@ export const registerRoutes = (
       password,
     );
     await gameRoomManager.playerJoinRoom(roomId, playerId);
+    gameRoomManager.clearPlayerTransientState(playerId);
 
     res.status(200).send({
       data: { roomId },

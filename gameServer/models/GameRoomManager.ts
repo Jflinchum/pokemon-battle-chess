@@ -36,12 +36,13 @@ import {
   setPlayerAsPlayer1,
   setPlayerAsPlayer2,
   deletePlayerFromCache,
-  getUserTransient,
+  getUserTransientStatus,
 } from "../cache/redis.js";
 import { Player } from "../../shared/types/Player.js";
 import { Color } from "chess.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import { DEFAULT_GAME_OPTIONS } from "../constants/gameConstants.js";
+import { transientDisconnectTime } from "../constants/userConstants.js";
 
 interface GameRoomList {
   [roomId: string]: GameRoom;
@@ -354,21 +355,24 @@ export default class GameRoomManager {
     await setUserAsTransient(playerId, 0);
   }
 
-  public async preparePlayerDisconnect(playerId: string, roomId?: string) {
+  public async preparePlayerDisconnect(playerId: string, roomId: string) {
     const transientTimeout = setTimeout(async () => {
-      const stillTransient = await getUserTransient(playerId);
+      const { transientTimestamp, currentRoomId } =
+        await getUserTransientStatus(playerId);
 
-      if (stillTransient && stillTransient !== "0") {
-        if (roomId) {
-          console.log(
-            "Player disconnection exceeded timeout. Forcing them out of the room.",
-          );
-          this.playerLeaveRoom(roomId, playerId);
+      if (transientTimestamp && transientTimestamp !== "0") {
+        if (currentRoomId) {
+          if (currentRoomId === roomId) {
+            console.log(
+              "Player disconnection exceeded timeout. Forcing them out of the room.",
+            );
+            this.playerLeaveRoom(roomId, playerId);
+          }
         } else {
           deletePlayerFromCache(playerId);
         }
       }
-    }, 1000 * 60);
+    }, transientDisconnectTime);
     this.transientPlayerList[playerId] = transientTimeout;
     await setUserAsTransient(playerId, new Date().getTime());
   }

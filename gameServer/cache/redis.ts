@@ -258,8 +258,28 @@ export const setUserAsTransient = async (
   });
 };
 
-export const getUserTransient = async (playerId: string) => {
-  return await redisClient.hget(`player:${playerId}`, "transient");
+export const getUserTransientStatus = async (
+  playerId: string,
+): Promise<{ transientTimestamp?: string; currentRoomId?: string }> => {
+  const response = await redisClient
+    .multi()
+    .hget(`player:${playerId}`, "transient")
+    .hget(`player:${playerId}`, `roomId`)
+    .exec();
+
+  if (!response) {
+    return {};
+  }
+
+  const [timestamp, roomId] = response.map(([, result]) => result);
+  const transientTimestamp =
+    typeof timestamp === "string" ? timestamp : undefined;
+  const currentRoomId = typeof roomId === "string" ? roomId : undefined;
+
+  return {
+    transientTimestamp,
+    currentRoomId,
+  };
 };
 
 export const getRoomIdFromHostId = async (
