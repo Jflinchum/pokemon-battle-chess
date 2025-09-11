@@ -23,4 +23,5 @@
 
 .creditsModalSubtext {
   font-size: 0.7em;
+  display: inline-block;
 }
