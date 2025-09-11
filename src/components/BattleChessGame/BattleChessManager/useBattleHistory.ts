@@ -76,7 +76,7 @@ const useBattleHistory = ({
   const { userState } = useUserState();
   const { gameState, dispatch } = useGameState();
 
-  const [matchLog, setCurrentMatchLog] = useState(matchHistory || []);
+  const [currentMatchLog, setCurrentMatchLog] = useState(matchHistory || []);
 
   useEffect(() => {
     socket.on("gameOutput", (log, ack) => {
@@ -96,6 +96,10 @@ const useBattleHistory = ({
     }
   }, [gameState.matchEnded]);
 
+  /**
+   * If we receive new match history from the server in an attempt to re-sync the user,
+   * then update our current state
+   */
   useEffect(() => {
     if (matchHistory) {
       setCurrentMatchLog(matchHistory);
@@ -103,8 +107,8 @@ const useBattleHistory = ({
   }, [matchHistory]);
 
   useEffect(() => {
-    dispatch({ type: "SET_MATCH_HISTORY", payload: matchLog });
-  }, [matchLog, dispatch]);
+    dispatch({ type: "SET_MATCH_HISTORY", payload: currentMatchLog });
+  }, [currentMatchLog, dispatch]);
 
   useEffect(() => {
     let catchUpTimer:
@@ -116,15 +120,15 @@ const useBattleHistory = ({
 
     // On mount, start attempting to sync to the current match
     const catchUpToCurrentState = async () => {
-      while (matchLogIndex.current < matchLog.length) {
+      while (matchLogIndex.current < currentMatchLog.length) {
         if (
-          matchLogIndex.current < matchLog.length - 3 &&
+          matchLogIndex.current < currentMatchLog.length - 3 &&
           !gameState.isCatchingUp
         ) {
           dispatch({ type: "SET_CATCHING_UP", payload: true });
         }
 
-        const currentLog = matchLog[matchLogIndex.current];
+        const currentLog = currentMatchLog[matchLogIndex.current];
         console.log(currentLog);
 
         /**
@@ -220,7 +224,7 @@ const useBattleHistory = ({
         }
       }
 
-      if (matchLogIndex.current === matchLog.length) {
+      if (matchLogIndex.current === currentMatchLog.length) {
         dispatch({ type: "SET_CATCHING_UP", payload: false });
       }
     };
@@ -233,7 +237,7 @@ const useBattleHistory = ({
   }, [
     currentBattle,
     skipToEndOfSync,
-    matchLog,
+    currentMatchLog,
     userState.animationSpeedPreference,
     gameState.gameSettings.options.format,
     onBan,
@@ -251,7 +255,7 @@ const useBattleHistory = ({
   ]);
 
   return {
-    currentMatchLog: matchLog.slice(0, matchLogIndex.current),
+    currentMatchLog: currentMatchLog.slice(0, matchLogIndex.current),
   };
 };
 
