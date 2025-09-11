@@ -115,6 +115,14 @@ const PokemonBattleManager = ({
           battle.add(args, kwArgs);
         }
 
+        if (args[0] === "win") {
+          if (!gameState.isSkippingAhead) {
+            catchUpTimer = timer(timeBetweenSteps * (skipToEndOfSync ? 0 : 1));
+            await catchUpTimer.start();
+          }
+          onBattleEnd();
+        }
+
         setP1ActivePokemon(
           perspective === "p1" ? battle.p1.active[0] : battle.p2.active[0],
         );
@@ -123,14 +131,13 @@ const PokemonBattleManager = ({
         );
         setWeatherState(getWeatherStateFromBattle(battle));
         setTerrainState(getTerrainStateFromBattle(battle));
-        setMoves(getPokemonMoveChoicesFromBattle(battle));
-        currentPokemonMoveHistoryIndex.current++;
         setProcessedBattleLog(
           currentPokemonMoveHistory.slice(
             0,
-            currentPokemonMoveHistoryIndex.current,
+            currentPokemonMoveHistoryIndex.current + 1,
           ),
         );
+        setMoves(getPokemonMoveChoicesFromBattle(battle));
 
         if (!gameState.isSkippingAhead) {
           playAudioEffect({ args, kwArgs }, { args: previousArgs });
@@ -139,10 +146,7 @@ const PokemonBattleManager = ({
             await catchUpTimer.start();
           }
         }
-
-        if (args[0] === "win") {
-          onBattleEnd();
-        }
+        currentPokemonMoveHistoryIndex.current++;
       }
     };
 

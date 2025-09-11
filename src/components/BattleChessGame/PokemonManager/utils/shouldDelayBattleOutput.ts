@@ -2,16 +2,18 @@ import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 
 export const shouldDelayBattleOutput = (logType: CustomArgTypes[0]) => {
   const delayLogs: CustomArgTypes[0][] = [
-    "player",
+    "start",
+    "win",
     "move",
     "faint",
     "switch",
     "cant",
+    "message",
+    "-miss",
     "-fail",
     "-curestatus",
     "-damage",
     "-heal",
-    "-forfeit",
     "-boost",
     "-unboost",
     "-setboost",

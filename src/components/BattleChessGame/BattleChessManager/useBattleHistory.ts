@@ -205,8 +205,6 @@ const useBattleHistory = ({
               case "victory":
                 onPokemonBattleEnd?.(currentLog.data.color);
                 matchLogIndex.current++;
-                catchUpTimer = timer(timeBetweenSteps);
-                await catchUpTimer.start();
                 break;
             }
             break;

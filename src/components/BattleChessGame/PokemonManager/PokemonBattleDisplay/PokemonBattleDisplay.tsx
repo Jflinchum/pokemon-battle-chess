@@ -142,7 +142,7 @@ const BattleMoveContainer = ({
   opponentPokemon,
 }: BattleMoveContainerProps) => {
   if (hideMoves) {
-    return <div></div>;
+    return <></>;
   } else if (moveChosen) {
     return (
       <div>
