@@ -16,7 +16,7 @@ import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
 import { timer } from "../../../../utils";
 import { usePokemonAudioFx } from "./usePokemonAudioFx";
-import { shouldDelayBeforeContinuing } from "../utils/shouldDelayBeforeContinuing";
+import { shouldDelayBattleOutput } from "../utils/shouldDelayBattleOutput";
 
 interface PokemonBattleManagerProps {
   prng: PRNG;
@@ -134,7 +134,7 @@ const PokemonBattleManager = ({
 
         if (!gameState.isSkippingAhead) {
           playAudioEffect({ args, kwArgs }, { args: previousArgs });
-          if (shouldDelayBeforeContinuing(args[0])) {
+          if (shouldDelayBattleOutput(args[0])) {
             catchUpTimer = timer(timeBetweenSteps * (skipToEndOfSync ? 0 : 1));
             await catchUpTimer.start();
           }

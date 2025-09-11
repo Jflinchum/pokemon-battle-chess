@@ -6,7 +6,7 @@ import { useDebounce } from "../../../../../../utils";
 import { LogFormatter } from "@pkmn/view";
 import StylizedText from "../../../../../common/StylizedText/StylizedText";
 import { useGameState } from "../../../../../../context/GameState/GameStateContext";
-import { shouldDelayBeforeContinuing } from "../../../utils/shouldDelayBeforeContinuing";
+import { shouldDelayBattleOutput } from "../../../utils/shouldDelayBattleOutput";
 
 interface PokemonBattleTextProps {
   battleHistory: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType }[];
@@ -26,7 +26,7 @@ export const PokemonBattleText = ({
 
   useEffect(() => {
     const latestLog = battleHistory[battleHistory.length - 1];
-    if (shouldDelayBeforeContinuing(latestLog?.args[0])) {
+    if (shouldDelayBattleOutput(latestLog?.args[0])) {
       let formattedText = logFormatter.formatText(
         latestLog.args as ArgType,
         latestLog.kwArgs,

@@ -1,6 +1,6 @@
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 
-export const shouldDelayBeforeContinuing = (logType: CustomArgTypes[0]) => {
+export const shouldDelayBattleOutput = (logType: CustomArgTypes[0]) => {
   const delayLogs: CustomArgTypes[0][] = [
     "player",
     "move",
