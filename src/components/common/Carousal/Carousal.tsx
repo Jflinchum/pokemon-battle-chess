@@ -31,6 +31,7 @@ export const Carousal = ({
       </div>
       <div className="carousalActions">
         <Button
+          className="carousalArrowButtons"
           color="primary"
           disabled={!wrapScreens && screenIndex === 0}
           onClick={() => {
@@ -60,6 +61,7 @@ export const Carousal = ({
           ))}
         </div>
         <Button
+          className="carousalArrowButtons"
           color="primary"
           disabled={!wrapScreens && screenIndex === screens.length - 1}
           onClick={() => {

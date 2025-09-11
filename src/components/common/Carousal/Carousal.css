@@ -38,6 +38,18 @@
     padding-top: 20px;
     display: flex;
     justify-content: center;
-    gap: 50px;
+    gap: 10px;
+
+    @media (min-width: 600px) {
+      gap: 50px;
+    }
+  }
+
+  .carousalArrowButtons {
+    width: 40px;
+
+    @media (min-width: 600px) {
+      width: 170px;
+    }
   }
 }
