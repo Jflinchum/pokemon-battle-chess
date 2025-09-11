@@ -110,7 +110,7 @@ const LobbyManager = () => {
                   className="paginationButton"
                   onClick={() =>
                     setCurrentPage((curr) =>
-                      curr + 1 >= totalPages ? curr : ++curr,
+                      curr >= totalPages ? curr : ++curr,
                     )
                   }
                 >

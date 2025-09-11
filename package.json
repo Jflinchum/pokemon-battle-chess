@@ -20,6 +20,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "postinstall": "patch-package",
+    "injectData": "node util/dev/dataInjection.js",
     "prepare": "node -e \"if (process.env.NODE_ENV !== 'production'){ process.exit(1)} \" || husky"
   },
   "lint-staged": {

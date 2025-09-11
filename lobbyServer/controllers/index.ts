@@ -276,7 +276,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     const roomDetails = await getRoomFromName(page, limit, searchTerm);
 
     const roomResponse = await Promise.all(
-      roomDetails.map(async (room) => {
+      roomDetails.rooms.map(async (room) => {
         const playerCount = await getRoomSize(room.roomId);
         return {
           ...room,
@@ -288,7 +288,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     res.status(200).send({
       data: {
         rooms: roomResponse,
-        pageCount: Math.floor(roomResponse.length / limit) + 1,
+        pageCount: Math.max(Math.ceil(roomDetails.roomCount / limit), 1),
       },
     });
   });

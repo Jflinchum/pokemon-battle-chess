@@ -167,14 +167,15 @@ export const getRoomFromName = async (
   page: number,
   limit: number,
   searchTerm: string,
-): Promise<
-  {
+): Promise<{
+  roomCount: number;
+  rooms: {
     roomId: string;
     hostName: string;
     hasPassword: boolean;
     isOngoing: boolean;
-  }[]
-> => {
+  }[];
+}> => {
   try {
     const response = await redisClient.call(
       "FT.SEARCH",
@@ -186,7 +187,7 @@ export const getRoomFromName = async (
     );
 
     if (!Array.isArray(response) || !response[0]) {
-      return [];
+      return { roomCount: 0, rooms: [] };
     }
 
     const results = [];
@@ -200,15 +201,21 @@ export const getRoomFromName = async (
       results.push({ id: response[i], value });
     }
 
-    return results.map(({ id, value }) => ({
-      hostName: (value.hostName as string) || "",
-      hasPassword: !!value.roomCode,
-      isOngoing: value.isOngoing === "1",
-      roomId: id.replace("room:", ""),
-    }));
+    return {
+      roomCount: response[0],
+      rooms: results.map(({ id, value }) => ({
+        hostName: (value.hostName as string) || "",
+        hasPassword: !!value.roomCode,
+        isOngoing: value.isOngoing === "1",
+        roomId: id.replace("room:", ""),
+      })),
+    };
   } catch (err) {
     console.log(err);
-    return [];
+    return {
+      roomCount: 0,
+      rooms: [],
+    };
   }
 };
 
