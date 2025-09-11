@@ -26,18 +26,12 @@
   }
 
   .carousalScreenSelectorActive {
-    border-bottom: 2px solid var(--green-4);
+    color: var(--green-4);
   }
 
   .carousalScreenSelectorItem:hover {
     cursor: pointer;
-
-    svg {
-      filter: drop-shadow(2px 2px var(--green-4))
-        drop-shadow(2px -2px var(--green-4))
-        drop-shadow(-2px -2px var(--green-4))
-        drop-shadow(-2px 2px var(--green-4));
-    }
+    border-bottom: 2px solid var(--green-4);
   }
 
   .carousalActions {
