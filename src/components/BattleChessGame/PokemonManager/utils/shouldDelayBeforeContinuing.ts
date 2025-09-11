@@ -18,6 +18,7 @@ export const shouldDelayBeforeContinuing = (logType: CustomArgTypes[0]) => {
     "-weather",
     "-activate",
     "-enditem",
+    "-immune",
   ];
   if (delayLogs.includes(logType)) {
     return true;
