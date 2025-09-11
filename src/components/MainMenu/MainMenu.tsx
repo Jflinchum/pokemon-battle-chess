@@ -15,6 +15,7 @@ import { getRoom } from "../../service/lobby";
 import { RejoinMessage } from "./RejoinMessage/RejoinMessage";
 import { joinRoom } from "../../service/lobby";
 import "./MainMenu.css";
+import { downloadReplay } from "../../util/downloadReplay";
 
 const MainMenu = () => {
   const { userState, dispatch: userStateDispatch } = useUserState();
@@ -106,7 +107,10 @@ const MainMenu = () => {
   }, [userState.currentRoomId, handleYesClick, handleNoClick]);
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      hasMatchHistory={!!gameState.matchHistory.length}
+      onMatchHistoryDownloadClick={(error) => downloadReplay(gameState, error)}
+    >
       <ToastContainer
         position="top-center"
         autoClose={5000}

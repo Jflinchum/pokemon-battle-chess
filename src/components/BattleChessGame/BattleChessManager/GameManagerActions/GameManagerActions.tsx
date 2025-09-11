@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCog,
@@ -12,7 +11,7 @@ import { useUserState } from "../../../../context/UserState/UserStateContext";
 import NavOptions from "../../../common/NavOptions/NavOptions";
 import { NavOptionButton } from "../../../common/NavOptions/NavOptionButton/NavOptionButton";
 import { useModalState } from "../../../../context/ModalState/ModalStateContext";
-import { downloadReplay } from "./downloadReplay";
+import { downloadReplay } from "../../../../util/downloadReplay";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./GameManagerActions.css";
 
@@ -22,11 +21,6 @@ const GameManagerActions = () => {
   const { dispatch: dispatchModalState } = useModalState();
   const { requestSetViewingResults, requestReturnEveryoneToRoom } =
     useSocketRequests();
-
-  const matchHistory = useMemo(
-    () => gameState.matchHistory,
-    [gameState.matchHistory],
-  );
 
   const handleLeaveRoom = () => {
     dispatch({ type: "LEAVE_ROOM" });
@@ -43,7 +37,7 @@ const GameManagerActions = () => {
   };
 
   const handleDownloadReplay = () => {
-    downloadReplay(gameState, matchHistory);
+    downloadReplay(gameState);
   };
 
   const handleReturnEveryoneToRoom = () => {
@@ -125,7 +119,7 @@ const GameManagerActions = () => {
           </span>
           <span className="gameManagerActionLabel">Options</span>
         </NavOptionButton>
-        {!gameState.isWatchingReplay && matchHistory && (
+        {!gameState.isWatchingReplay && gameState.matchHistory && (
           <NavOptionButton
             className="gameManagerAction"
             onClick={() => handleDownloadReplay()}

@@ -16,7 +16,7 @@ import { useUserState } from "../../../context/UserState/UserStateContext";
 import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
 import NavOptions from "../../common/NavOptions/NavOptions";
 import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
-import { ReplayData } from "../../BattleChessGame/BattleChessManager/GameManagerActions/downloadReplay";
+import { ReplayData } from "../../../util/downloadReplay";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { validateReplay } from "./validateReplay";
 import "./MenuOptions.css";

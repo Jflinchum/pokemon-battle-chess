@@ -1,4 +1,4 @@
-import { ReplayData } from "../../BattleChessGame/BattleChessManager/GameManagerActions/downloadReplay";
+import { ReplayData } from "../../../util/downloadReplay";
 
 export const validateReplay = (replayData: ReplayData) => {
   try {
