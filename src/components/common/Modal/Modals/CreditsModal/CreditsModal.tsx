@@ -17,6 +17,10 @@ const CreditsModal = () => {
           <a href="https://jflinchum.github.io/personal-webapp/">
             Jonathan Flinchum
           </a>
+          <span className="creditsModalSubtext">
+            If you're looking to hire a software engineer and like what you see,
+            consider reaching out!
+          </span>
         </p>
         <p>
           Huge thanks to Pokemon Showdown for their open source Pokemon Battle

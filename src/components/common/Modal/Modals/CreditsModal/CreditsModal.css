@@ -20,3 +20,7 @@
   gap: 8px;
   margin: auto;
 }
+
+.creditsModalSubtext {
+  font-size: 0.7em;
+}
