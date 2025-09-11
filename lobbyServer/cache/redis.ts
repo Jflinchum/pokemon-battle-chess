@@ -180,7 +180,7 @@ export const getRoomFromName = async (
     const response = await redisClient.call(
       "FT.SEARCH",
       "hash-idx:rooms",
-      `${searchTerm ? `@hostName:%${searchTerm}% @isQuickPlay:[0 0]` : "@isQuickPlay:[0 0]"}`,
+      `${searchTerm ? `@hostName:'*${searchTerm}*' @isQuickPlay:[0 0]` : "@isQuickPlay:[0 0]"}`,
       "LIMIT",
       (page - 1) * limit,
       limit,
