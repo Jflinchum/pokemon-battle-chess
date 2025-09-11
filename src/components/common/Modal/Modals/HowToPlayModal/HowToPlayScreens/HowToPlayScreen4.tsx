@@ -5,12 +5,13 @@ import { BattleChessGame } from "../../../../../BattleChessGame/BattleChessManag
 import { MatchHistory } from "../../../../../../../shared/types/Game";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-export const HowToPlayScreen2 = () => {
+export const HowToPlayScreen4 = () => {
   const pokemonManager = useMemo(
     () =>
       new PokemonBattleChessManager({
         seed: "1234,tutorial",
         format: "random",
+        weatherWars: true,
       }),
     [],
   );
@@ -24,13 +25,18 @@ export const HowToPlayScreen2 = () => {
     () => pokemonManager.getPokemonFromSquare("e7"),
     [pokemonManager],
   )!.pkmn;
-  const tauros = useMemo(
-    () => pokemonManager.getPokemonFromSquare("f7"),
+  const grimmsnarl = useMemo(
+    () => pokemonManager.getPokemonFromSquare("d7"),
+    [pokemonManager],
+  )!.pkmn;
+  const dewgong = useMemo(
+    () => pokemonManager.getPokemonFromSquare("e2"),
     [pokemonManager],
   )!.pkmn;
   const matchGenerator = useMemo(
-    () => getExampleMatchHistoryGenerator(ninetales, sawsbuck, tauros),
-    [ninetales, sawsbuck, tauros],
+    () =>
+      getExampleMatchHistoryGenerator(ninetales, sawsbuck, grimmsnarl, dewgong),
+    [ninetales, sawsbuck, grimmsnarl, dewgong],
   );
 
   const matchLogIndex = useRef(0);
@@ -54,7 +60,7 @@ export const HowToPlayScreen2 = () => {
       // document.removeEventListener("keydown", testKeypress);
       clearTimeout(exampleMoveTimeout);
     };
-  }, [ninetales, sawsbuck, matchGenerator]);
+  }, [matchGenerator]);
 
   useEffect(() => {
     if (currentMatchHistory.length === 0) {
@@ -66,12 +72,18 @@ export const HowToPlayScreen2 = () => {
 
   return (
     <>
-      <b>Taking a Piece</b>
+      <b>Weather Wars</b>
       <p>
-        Whenever you attempt to attack another Chess piece with your piece,{" "}
-        <b>you will first need to win a Pokemon battle!</b> If you win, you
-        successfully take the piece. However, if you lose,{" "}
-        <b>your Chess piece will be taken instead!</b>
+        One game mode within Pokemon Gambit is <b>"Weather Wars"</b>. In this
+        game mode, weather and terrain will appear throughout the chessboard
+        that will take affect when a battle starts on that chess square.
+      </p>
+      <p>
+        If a Pokemon has an ability or move that sets the weather or terrain,
+        the weather or terrain will{" "}
+        <b>stay on the board after the battle is over.</b> Weather and terrain
+        will only disappear from a square <b>after a set amount of battles</b>{" "}
+        on that square, or if another Pokemon overrides it.
       </p>
       <div className="gameDemoContainer">
         <BattleChessGame
@@ -90,16 +102,145 @@ export const HowToPlayScreen2 = () => {
 function* getExampleMatchHistoryGenerator(
   ninetales: PokemonSet<string>,
   sawsbuck: PokemonSet<string>,
-  tauros: PokemonSet<string>,
+  grimmsnarl: PokemonSet<string>,
+  dewgong: PokemonSet<string>,
 ): Generator<MatchHistory> {
   while (true) {
     const matchHistory: MatchHistory = [];
+    yield matchHistory;
+    matchHistory.push({
+      type: "weather",
+      data: {
+        event: "weatherChange",
+        modifier: {
+          type: "modify",
+          squareModifiers: [
+            {
+              square: "e5",
+              modifiers: { weather: { id: "sandstorm", duration: 3 } },
+            },
+          ],
+        },
+      },
+    });
     yield matchHistory;
     matchHistory.push({
       type: "chess",
       data: {
         color: "w",
         san: "d4",
+      },
+    });
+    yield matchHistory;
+    matchHistory.push({
+      type: "chess",
+      data: {
+        color: "b",
+        san: "d5",
+      },
+    });
+    yield matchHistory;
+    matchHistory.push({
+      type: "chess",
+      data: {
+        color: "w",
+        san: "e4",
+      },
+    });
+
+    yield matchHistory;
+    matchHistory.push(
+      {
+        type: "pokemon",
+        data: {
+          event: "battleStart",
+          p1Pokemon: dewgong,
+          p2Pokemon: grimmsnarl,
+          attemptedMove: {
+            color: "b",
+            san: "dxe4",
+          },
+        },
+      },
+      {
+        type: "pokemon",
+        data: {
+          event: "streamOutput",
+          chunk: "|t:|1747268665\n|gametype|singles",
+        },
+      },
+      {
+        type: "pokemon",
+        data: {
+          event: "streamOutput",
+          chunk: "|player|p1|Red||",
+        },
+      },
+      {
+        type: "pokemon",
+        data: {
+          event: "streamOutput",
+          chunk:
+            "|player|p2|Blue||\n|teamsize|p1|1\n|teamsize|p2|1\n|gen|9\n|tier|pbc\n|\n|t:|1747268665\n|start\n|switch|p1a: Dewgong|Dewgong, L85, F|278/278\n|switch|p2a: Grimmsnarl|Grimmsnarl, L88, M|100/100\n|message|Grimmsnarl receives a stat boost from starting the battle!\n|-boost|p2a: Grimmsnarl|spe|1\n|-fieldstart|move: Psychic Terrain\n|turn|1",
+        },
+      },
+    );
+    yield matchHistory;
+    yield matchHistory;
+    matchHistory.push({
+      type: "pokemon",
+      data: {
+        event: "streamOutput",
+        chunk:
+          "|\n|t:|1747268685\n\n|move|p2a: Grimmsnarl|Spirit Break|p1a: Dewgong|\n|-damage|p1a: Dewgong|104/278\n|move|p1a: Dewgong|Surf|p2a: Grimmsnarl|\n|-crit|p2a:Grimmsnarl|\n|-damage|p2a: Grimmsnarl|0 fnt\n|faint|p2a: Grimmsnarl\n",
+      },
+    });
+    yield matchHistory;
+    yield matchHistory;
+    matchHistory.push({
+      type: "pokemon",
+      data: {
+        event: "streamOutput",
+        chunk: "|\n|win|Red",
+      },
+    });
+    matchHistory.push({
+      type: "pokemon",
+      data: {
+        event: "victory",
+        color: "w",
+      },
+    });
+    matchHistory.push({
+      type: "weather",
+      data: {
+        event: "weatherChange",
+        modifier: {
+          type: "modify",
+          squareModifiers: [
+            {
+              square: "e4",
+              modifiers: { terrain: { id: "psychicterrain", duration: 3 } },
+            },
+          ],
+        },
+      },
+    });
+    matchHistory.push({
+      type: "chess",
+      data: {
+        color: "b",
+        san: "dxe4",
+        failed: true,
+      },
+    });
+
+    yield matchHistory;
+    matchHistory.push({
+      type: "chess",
+      data: {
+        color: "w",
+        san: "Bf4",
       },
     });
     yield matchHistory;
@@ -173,6 +314,21 @@ function* getExampleMatchHistoryGenerator(
       },
     });
     matchHistory.push({
+      type: "weather",
+      data: {
+        event: "weatherChange",
+        modifier: {
+          type: "modify",
+          squareModifiers: [
+            {
+              square: "e5",
+              modifiers: { weather: { id: "sunnyday", duration: 3 } },
+            },
+          ],
+        },
+      },
+    });
+    matchHistory.push({
       type: "chess",
       data: {
         color: "w",
@@ -180,89 +336,6 @@ function* getExampleMatchHistoryGenerator(
         failed: false,
       },
     });
-
-    yield matchHistory;
-
-    matchHistory.push({
-      type: "chess",
-      data: {
-        color: "b",
-        san: "f6",
-      },
-    });
-    yield matchHistory;
-    matchHistory.push(
-      {
-        type: "pokemon",
-        data: {
-          event: "battleStart",
-          p1Pokemon: ninetales,
-          p2Pokemon: tauros,
-          attemptedMove: {
-            color: "w",
-            san: "exf6",
-          },
-        },
-      },
-      {
-        type: "pokemon",
-        data: {
-          event: "streamOutput",
-          chunk: "|t:|1747268665\n|gametype|singles",
-        },
-      },
-      {
-        type: "pokemon",
-        data: {
-          event: "streamOutput",
-          chunk: "|player|p1|Red||",
-        },
-      },
-      {
-        type: "pokemon",
-        data: {
-          event: "streamOutput",
-          chunk:
-            "|player|p2|Blue||\n|teamsize|p1|1\n|teamsize|p2|1\n|gen|9\n|tier|pbc\n|\n|t:|1747268665\n|start\n|switch|p1a: Ninetales|Ninetales, L85, M|278/278\n|switch|p2a: Tauros|Tauros, L82, M|100/100\n|message|Ninetales receives a stat boost from starting the battle!\n|-boost|p1a: Ninetales|spe|1\n|-weather|Sunnyday\n|turn|1",
-        },
-      },
-    );
-    yield matchHistory;
-    yield matchHistory;
-    matchHistory.push({
-      type: "pokemon",
-      data: {
-        event: "streamOutput",
-        chunk:
-          "|\n|t:|1747268685\n|move|p1a: Ninetales|Fire Blast|p2a: Tauros|\n|-damage|p2a: Tauros|4/100\n|move|p2a: Tauros|Body Slam|p1a: Ninetales\n|-crit|p1a: Ninetales\n|-damage|p1a: Ninetales|0/278\n|faint|p1a: Ninetales\n",
-      },
-    });
-    yield matchHistory;
-    yield matchHistory;
-    matchHistory.push({
-      type: "pokemon",
-      data: {
-        event: "streamOutput",
-        chunk: "|\n|win|Blue",
-      },
-    });
-    matchHistory.push({
-      type: "pokemon",
-      data: {
-        event: "victory",
-        color: "b",
-      },
-    });
-
-    matchHistory.push({
-      type: "chess",
-      data: {
-        color: "w",
-        san: "exf6",
-        failed: true,
-      },
-    });
-
     yield matchHistory;
 
     matchHistory.push({

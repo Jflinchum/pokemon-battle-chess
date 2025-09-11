@@ -4,6 +4,7 @@ import { useGameState } from "../../../../../context/GameState/GameStateContext"
 import { HowToPlayScreen1 } from "./HowToPlayScreens/HowToPlayScreen1";
 import { HowToPlayScreen2 } from "./HowToPlayScreens/HowToPlayScreen2";
 import { HowToPlayScreen3 } from "./HowToPlayScreens/HowToPlayScreen3";
+import { HowToPlayScreen4 } from "./HowToPlayScreens/HowToPlayScreen4";
 import "./HowToPlayModal.css";
 
 const HowToPlayModal = () => {
@@ -29,6 +30,7 @@ const HowToPlayModal = () => {
           <HowToPlayScreen1 />,
           <HowToPlayScreen2 />,
           <HowToPlayScreen3 />,
+          <HowToPlayScreen4 />,
         ]}
       />
     </div>
