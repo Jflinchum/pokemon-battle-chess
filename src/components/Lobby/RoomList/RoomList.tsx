@@ -4,7 +4,6 @@ import RoomListItem from "./RoomListItem";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { joinRoom } from "../../../service/lobby";
-import ErrorMessage from "../../common/ErrorMessage/ErrorMessage";
 import { useDebounce } from "../../../utils";
 import Input from "../../common/Input/Input";
 import "./RoomList.css";
@@ -19,11 +18,10 @@ export interface Room {
 
 interface RoomListProps {
   availableRooms: Room[];
-  errorText?: string;
   onSearch: (searchTerm: string) => void;
 }
 
-const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
+const RoomList = ({ availableRooms, onSearch }: RoomListProps) => {
   const { dispatch, userState } = useUserState();
   const { dispatch: dispatchModalState } = useModalState();
   const [roomSearch, setRoomSearch] = useState("");
@@ -67,7 +65,6 @@ const RoomList = ({ availableRooms, errorText, onSearch }: RoomListProps) => {
 
   return (
     <div>
-      <ErrorMessage display="block">{errorText}</ErrorMessage>
       <div className="roomListTopActions">
         <span>Rooms:</span>
         <span className="roomSearchContainer">
