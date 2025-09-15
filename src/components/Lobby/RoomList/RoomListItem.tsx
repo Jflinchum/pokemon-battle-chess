@@ -1,6 +1,7 @@
 import { Room } from "./RoomList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis, faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import Tooltip from "../../common/Tooltip/Tooltip";
 import "./RoomListItem.css";
 
 interface RoomListItem {
@@ -15,18 +16,33 @@ const RoomListItem = ({ room, onClick }: RoomListItem) => {
         <span>{room.hostName}</span>
         <span className="roomListIconContainer">
           {room.hasPassword && (
-            <span title="Requires Passcode">
-              <FontAwesomeIcon icon={faLock} />
-            </span>
+            <>
+              <span data-tooltip-id="roomListPasscodeIcon">
+                <FontAwesomeIcon icon={faLock} />
+              </span>
+              <Tooltip anchorSelect={`[data-tooltip-id=roomListPasscodeIcon]`}>
+                {"Requires Passcode"}
+              </Tooltip>
+            </>
           )}
           {room.isOngoing && (
-            <span title="Game In Progress">
-              <FontAwesomeIcon icon={faEllipsis} />
-            </span>
+            <>
+              <span data-tooltip-id="roomListInProgressIcon">
+                <FontAwesomeIcon icon={faEllipsis} />
+              </span>
+              <Tooltip
+                anchorSelect={`[data-tooltip-id=roomListInProgressIcon]`}
+              >
+                {"Game In Progress"}
+              </Tooltip>
+            </>
           )}
-          <span title="Total Player Count">
+          <span data-tooltip-id="roomListPlayerCountIcon">
             <FontAwesomeIcon icon={faUser} /> {room.playerCount}
           </span>
+          <Tooltip anchorSelect={`[data-tooltip-id=roomListPlayerCountIcon]`}>
+            {"Total Player Count"}
+          </Tooltip>
         </span>
       </button>
     </li>

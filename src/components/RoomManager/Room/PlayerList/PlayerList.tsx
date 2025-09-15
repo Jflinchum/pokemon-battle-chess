@@ -8,6 +8,7 @@ import { useGameState } from "../../../../context/GameState/GameStateContext";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./PlayerList.css";
+import Tooltip from "../../../common/Tooltip/Tooltip";
 
 interface PlayerListProps extends React.HTMLAttributes<HTMLDivElement> {
   players: Player[];
@@ -45,23 +46,35 @@ const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
                 <div className="playerActions">
                   {(player.isPlayer1 || player.isPlayer2) &&
                     !gameState.inGame && (
-                      <Button
-                        className="playerAction"
-                        title="Move Player To Spectator"
-                        onClick={() =>
-                          handleMovePlayerToSpectator(player.playerId)
-                        }
-                      >
-                        <FontAwesomeIcon icon={faEye} />
-                      </Button>
+                      <>
+                        <Button
+                          data-tooltip-id="playerListMoveToSpectator"
+                          className="playerAction"
+                          onClick={() =>
+                            handleMovePlayerToSpectator(player.playerId)
+                          }
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </Button>
+                        <Tooltip
+                          anchorSelect={`[data-tooltip-id=playerListMoveToSpectator]`}
+                        >
+                          {"Move Player To Spectator"}
+                        </Tooltip>
+                      </>
                     )}
                   <Button
                     className="playerAction"
-                    title="Kick Player"
+                    data-tooltip-id="playerListKickPlayer"
                     onClick={() => handleKickClick(player.playerId)}
                   >
                     <FontAwesomeIcon icon={faX} />
                   </Button>
+                  <Tooltip
+                    anchorSelect={`[data-tooltip-id=playerListKickPlayer]`}
+                  >
+                    {"Kick Player"}
+                  </Tooltip>
                 </div>
               )}
             </li>

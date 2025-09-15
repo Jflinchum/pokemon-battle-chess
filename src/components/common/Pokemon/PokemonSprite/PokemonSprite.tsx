@@ -40,7 +40,8 @@ export const PokemonSprite = ({
   if (useDiv) {
     return (
       <div
-        title={pokemonIdentifier}
+        role="img"
+        aria-label={pokemonIdentifier}
         style={{
           backgroundImage: `url(${sprite})`,
           backgroundPosition: "center",
