@@ -8,6 +8,7 @@ import { FormatID } from "../../shared/models/PokemonBattleChessManager.js";
 import { MatchLog } from "../../shared/types/Game.js";
 import { Color } from "chess.js";
 import { Lock, Redlock } from "@sesamecare-oss/redlock";
+import { REDIS_KEY_EXPIRY } from "../../shared/constants/redisConstants.js";
 
 /**
  *
@@ -218,13 +219,17 @@ export const removePlayerIdFromRoom = async (
 };
 
 export const addPlayerToCache = async (user: User) => {
-  return redisClient.hset(`player:${user.playerId}`, {
-    playerName: user.playerName,
-    avatarId: user.avatarId,
-    secret: user.playerSecret,
-    viewingResults: 0,
-    roomId: user.connectedRoom,
-  });
+  return redisClient
+    .multi()
+    .hset(`player:${user.playerId}`, {
+      playerName: user.playerName,
+      avatarId: user.avatarId,
+      secret: user.playerSecret,
+      viewingResults: 0,
+      roomId: user.connectedRoom,
+    })
+    .expire(`player:${user.playerId}`, REDIS_KEY_EXPIRY)
+    .exec();
 };
 
 export const deletePlayerFromCache = async (playerId: string) => {
@@ -317,28 +322,32 @@ export const createRoom = async (
   room: GameRoom,
   isQuickPlay?: boolean,
 ) => {
-  await redisClient.hset(`room:${roomId}`, {
-    publicSeed: room.publicSeed,
-    roomCode: room.password,
-    isOngoing: isQuickPlay ? 1 : 0,
-    format: room.roomGameOptions.format,
-    atkBuff: room.roomGameOptions.offenseAdvantage.atk,
-    defBuff: room.roomGameOptions.offenseAdvantage.def,
-    spaBuff: room.roomGameOptions.offenseAdvantage.spa,
-    spdBuff: room.roomGameOptions.offenseAdvantage.spd,
-    speBuff: room.roomGameOptions.offenseAdvantage.spe,
-    accuracyBuff: room.roomGameOptions.offenseAdvantage.accuracy,
-    evasionBuff: room.roomGameOptions.offenseAdvantage.evasion,
-    weatherWars: room.roomGameOptions.weatherWars ? 1 : 0,
-    timersEnabled: room.roomGameOptions.timersEnabled ? 1 : 0,
-    banTimerDuration: room.roomGameOptions.banTimerDuration,
-    chessTimerDuration: room.roomGameOptions.chessTimerDuration,
-    chessTimerIncrement: room.roomGameOptions.chessTimerIncrement,
-    pokemonTimerIncrement: room.roomGameOptions.pokemonTimerIncrement,
-    whitePlayerTimerPaused: 0,
-    blackPlayerTimerPaused: 1,
-    isQuickPlay: isQuickPlay ? 1 : 0,
-  });
+  await redisClient
+    .multi()
+    .hset(`room:${roomId}`, {
+      publicSeed: room.publicSeed,
+      roomCode: room.password,
+      isOngoing: isQuickPlay ? 1 : 0,
+      format: room.roomGameOptions.format,
+      atkBuff: room.roomGameOptions.offenseAdvantage.atk,
+      defBuff: room.roomGameOptions.offenseAdvantage.def,
+      spaBuff: room.roomGameOptions.offenseAdvantage.spa,
+      spdBuff: room.roomGameOptions.offenseAdvantage.spd,
+      speBuff: room.roomGameOptions.offenseAdvantage.spe,
+      accuracyBuff: room.roomGameOptions.offenseAdvantage.accuracy,
+      evasionBuff: room.roomGameOptions.offenseAdvantage.evasion,
+      weatherWars: room.roomGameOptions.weatherWars ? 1 : 0,
+      timersEnabled: room.roomGameOptions.timersEnabled ? 1 : 0,
+      banTimerDuration: room.roomGameOptions.banTimerDuration,
+      chessTimerDuration: room.roomGameOptions.chessTimerDuration,
+      chessTimerIncrement: room.roomGameOptions.chessTimerIncrement,
+      pokemonTimerIncrement: room.roomGameOptions.pokemonTimerIncrement,
+      whitePlayerTimerPaused: 0,
+      blackPlayerTimerPaused: 1,
+      isQuickPlay: isQuickPlay ? 1 : 0,
+    })
+    .expire(`room:${roomId}`, REDIS_KEY_EXPIRY)
+    .exec();
 };
 
 export const addPlayerIdToRoomPlayerSet = async (
@@ -628,6 +637,7 @@ export const setRoomSquareModifiers = async (
     .multi()
     .del(`roomSquareModifiers:${roomId}`)
     .rpush(`roomSquareModifiers:${roomId}`, ...squareModifiers)
+    .expire(`roomSquareModifiers:${roomId}`, REDIS_KEY_EXPIRY)
     .exec();
 };
 
@@ -703,20 +713,22 @@ export const pushWhiteMatchHistory = async (
   roomId: string,
   ...matchLogString: string[]
 ) => {
-  return await redisClient.rpush(
-    `roomWhiteMatchHistory:${roomId}`,
-    ...matchLogString,
-  );
+  return await redisClient
+    .multi()
+    .rpush(`roomWhiteMatchHistory:${roomId}`, ...matchLogString)
+    .expire(`roomWhiteMatchHistory:${roomId}`, REDIS_KEY_EXPIRY)
+    .exec();
 };
 
 export const pushBlackMatchHistory = async (
   roomId: string,
   ...matchLogString: string[]
 ) => {
-  return await redisClient.rpush(
-    `roomBlackMatchHistory:${roomId}`,
-    ...matchLogString,
-  );
+  return await redisClient
+    .multi()
+    .rpush(`roomBlackMatchHistory:${roomId}`, ...matchLogString)
+    .expire(`roomBlackMatchHistory:${roomId}`, REDIS_KEY_EXPIRY)
+    .exec();
 };
 
 export const getWhiteMatchHistory = async (roomId: string) => {
@@ -747,6 +759,7 @@ export const setGeneratedPokemonIndices = async (
     .multi()
     .del(`roomPokemonBoard:${roomId}`)
     .rpush(`roomPokemonBoard:${roomId}`, ...boardIndices)
+    .expire(`roomPokemonBoard:${roomId}`, REDIS_KEY_EXPIRY)
     .exec();
 };
 
@@ -1005,6 +1018,7 @@ export const pushPlayerToRandomQueue = async (user: User) => {
       secret: user.playerSecret,
       viewingResults: 0,
     })
+    .expire(`player:${user.playerId}`, REDIS_KEY_EXPIRY)
     .exec();
 };
 
@@ -1026,6 +1040,7 @@ export const pushPlayerToDraftQueue = async (user: User) => {
       secret: user.playerSecret,
       viewingResults: 0,
     })
+    .expire(`player:${user.playerId}`, REDIS_KEY_EXPIRY)
     .exec();
 };
 

@@ -1,4 +1,5 @@
 import { Redis } from "ioredis";
+import { REDIS_KEY_EXPIRY } from "./../../shared/constants/redisConstants.js";
 import { getConfig } from "../config.js";
 import User from "./../../shared/models/User.js";
 
@@ -146,7 +147,9 @@ export const createRoom = async (
       hostId,
       isOngoing: 0,
     })
+    .expire(`room:${roomId}`, REDIS_KEY_EXPIRY)
     .sadd(`roomPlayerSet:${roomId}`, hostId)
+    .expire(`roomPlayerSet:${roomId}`, REDIS_KEY_EXPIRY)
     .exec();
 };
 
