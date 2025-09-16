@@ -11,6 +11,7 @@ COPY ./lobbyServer ./lobbyServer
 COPY ./shared ./shared
 COPY ./src ./src
 COPY ./index.html ./index.html
+COPY ./vite.config.ts ./vite.config.ts
 # Below is only needed for development, to serve self-signed TLS certs through Vite
 COPY ./nginx ./nginx
 
@@ -36,6 +37,7 @@ COPY ./lobbyServer ./lobbyServer
 COPY ./shared ./shared
 COPY ./src ./src
 COPY ./index.html ./index.html
+COPY ./vite.config.ts ./vite.config.ts
 RUN npm run build-client
 RUN npm run build-lobby
 CMD ["node", "dist/lobbyService/lobbyServer/index.js"]
