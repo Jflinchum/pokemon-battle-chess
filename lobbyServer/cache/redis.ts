@@ -1,7 +1,16 @@
 import { Redis } from "ioredis";
-import { REDIS_KEY_EXPIRY } from "./../../shared/constants/redisConstants.js";
+import {
+  PLAYER_KEY,
+  REDIS_KEY_EXPIRY,
+  ROOM_KEY,
+} from "./../../shared/constants/redisConstants.js";
 import { getConfig } from "../config.js";
 import User from "./../../shared/models/User.js";
+import {
+  getRoomKey,
+  getRoomPlayerSetKey,
+  getPlayerKey,
+} from "../../shared/cache/redis.js";
 
 /**
  *
@@ -111,8 +120,8 @@ export const addPlayerIdToRoom = async (
 ): Promise<void> => {
   await redisClient
     .multi()
-    .sadd(`roomPlayerSet:${roomId}`, playerId)
-    .hset(`player:${playerId}`, {
+    .sadd(getRoomPlayerSetKey(roomId), playerId)
+    .hset(getPlayerKey(playerId), {
       playerName,
       avatarId,
       secret,
@@ -126,11 +135,11 @@ export const isPlayerIdInRoom = async (
   roomId: string,
   playerId: string,
 ): Promise<number> => {
-  return redisClient.sismember(`roomPlayerSet:${roomId}`, playerId);
+  return redisClient.sismember(getRoomPlayerSetKey(roomId), playerId);
 };
 
 export const getRoomSize = async (roomId: string): Promise<number> => {
-  return redisClient.scard(`roomPlayerSet:${roomId}`);
+  return redisClient.scard(getRoomPlayerSetKey(roomId));
 };
 
 export const createRoom = async (
@@ -141,15 +150,15 @@ export const createRoom = async (
 ) => {
   await redisClient
     .multi()
-    .hset(`room:${roomId}`, {
+    .hset(getRoomKey(roomId), {
       roomCode,
       hostName: host,
       hostId,
       isOngoing: 0,
     })
-    .expire(`room:${roomId}`, REDIS_KEY_EXPIRY)
-    .sadd(`roomPlayerSet:${roomId}`, hostId)
-    .expire(`roomPlayerSet:${roomId}`, REDIS_KEY_EXPIRY)
+    .expire(getRoomKey(roomId), REDIS_KEY_EXPIRY)
+    .sadd(getRoomPlayerSetKey(roomId), hostId)
+    .expire(getRoomPlayerSetKey(roomId), REDIS_KEY_EXPIRY)
     .exec();
 };
 
@@ -157,13 +166,13 @@ export const roomExists = async (roomId?: string): Promise<number> => {
   if (!roomId) {
     return Promise.resolve(0);
   }
-  return redisClient.exists(`room:${roomId}`);
+  return redisClient.exists(getRoomKey(roomId));
 };
 
 export const getRoomPasscode = async (
   roomId: string,
 ): Promise<string | null> => {
-  return redisClient.hget(`room:${roomId}`, "roomCode");
+  return redisClient.hget(getRoomKey(roomId), "roomCode");
 };
 
 export const getRoomFromName = async (
@@ -210,7 +219,7 @@ export const getRoomFromName = async (
         hostName: (value.hostName as string) || "",
         hasPassword: !!value.roomCode,
         isOngoing: value.isOngoing === "1",
-        roomId: id.replace("room:", ""),
+        roomId: id.replace(`${ROOM_KEY}:`, ""),
       })),
     };
   } catch (err) {
@@ -235,7 +244,7 @@ export const getRoomListDetails = async (
     return Promise.resolve(null);
   }
 
-  const exists = await redisClient.exists(`room:${roomId}`);
+  const exists = await redisClient.exists(getRoomKey(roomId));
 
   if (!exists) {
     return Promise.resolve(null);
@@ -243,10 +252,10 @@ export const getRoomListDetails = async (
 
   const response = await redisClient
     .multi()
-    .hget(`room:${roomId}`, "hostName")
-    .hget(`room:${roomId}`, "roomCode")
-    .hget(`room:${roomId}`, "isOngoing")
-    .scard(`roomPlayerSet:${roomId}`)
+    .hget(getRoomKey(roomId), "hostName")
+    .hget(getRoomKey(roomId), "roomCode")
+    .hget(getRoomKey(roomId), "isOngoing")
+    .scard(getRoomPlayerSetKey(roomId))
     .exec();
 
   if (!response) {
@@ -271,7 +280,7 @@ export const getHostNameFromRoomId = async (roomId?: string | null) => {
     return Promise.resolve(null);
   }
 
-  return await redisClient.hget(`room:${roomId}`, "hostName");
+  return await redisClient.hget(getRoomKey(roomId), "hostName");
 };
 
 export const getDisconnectedUsers = async (): Promise<
@@ -298,7 +307,7 @@ export const getDisconnectedUsers = async (): Promise<
         value[key] = response[i + 1][j + 1];
       }
       results.push({
-        playerId: response[i].replace("player:", ""),
+        playerId: response[i].replace(`${PLAYER_KEY}:`, ""),
         roomId: value.roomId,
       });
     }
@@ -319,13 +328,13 @@ export const fetchUser = async (
 
   const response = await redisClient
     .multi()
-    .hget(`player:${playerId}`, "playerName")
-    .hget(`player:${playerId}`, "avatarId")
-    .hget(`player:${playerId}`, "secret")
-    .hget(`player:${playerId}`, "transient")
-    .hget(`player:${playerId}`, "viewingResults")
-    .hget(`player:${playerId}`, "spectating")
-    .hget(`player:${playerId}`, "roomId")
+    .hget(getPlayerKey(playerId), "playerName")
+    .hget(getPlayerKey(playerId), "avatarId")
+    .hget(getPlayerKey(playerId), "secret")
+    .hget(getPlayerKey(playerId), "transient")
+    .hget(getPlayerKey(playerId), "viewingResults")
+    .hget(getPlayerKey(playerId), "spectating")
+    .hget(getPlayerKey(playerId), "roomId")
     .exec();
 
   if (!response) {

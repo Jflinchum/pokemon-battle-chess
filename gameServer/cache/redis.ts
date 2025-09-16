@@ -8,7 +8,24 @@ import { FormatID } from "../../shared/models/PokemonBattleChessManager.js";
 import { MatchLog } from "../../shared/types/Game.js";
 import { Color } from "chess.js";
 import { Lock, Redlock } from "@sesamecare-oss/redlock";
-import { REDIS_KEY_EXPIRY } from "../../shared/constants/redisConstants.js";
+import {
+  REDIS_KEY_EXPIRY,
+  ROOM_KEY,
+} from "../../shared/constants/redisConstants.js";
+import {
+  getRoomKey,
+  getRoomPlayerSetKey,
+  getRoomPokemonMoveHistoryKey,
+  getRoomWhiteMatchHistoryKey,
+  getRoomBlackMatchHistoryKey,
+  getRoomPokemonBoardKey,
+  getRoomPokemonBanKey,
+  getRoomSquareModifiersKey,
+  getRoomLockKey,
+  getRandomMatchmakingQueueKey,
+  getDraftMatchmakingQueueKey,
+  getPlayerKey,
+} from "../../shared/cache/redis.js";
 
 /**
  *
@@ -64,7 +81,7 @@ export const doesRoomExist = async (roomId?: string | null) => {
   if (!roomId) {
     return 0;
   }
-  return await redisClient.exists(`room:${roomId}`);
+  return await redisClient.exists(getRoomKey(roomId));
 };
 
 export const fetchRoomCode = async (roomId: string) => {
@@ -72,7 +89,7 @@ export const fetchRoomCode = async (roomId: string) => {
 };
 
 export const fetchPlayerSecret = async (playerId: string) => {
-  return await redisClient.hget(`player:${playerId}`, "secret");
+  return await redisClient.hget(getPlayerKey(playerId), "secret");
 };
 
 export const fetchUser = async (
@@ -84,13 +101,13 @@ export const fetchUser = async (
 
   const response = await redisClient
     .multi()
-    .hget(`player:${playerId}`, "playerName")
-    .hget(`player:${playerId}`, "avatarId")
-    .hget(`player:${playerId}`, "secret")
-    .hget(`player:${playerId}`, "transient")
-    .hget(`player:${playerId}`, "viewingResults")
-    .hget(`player:${playerId}`, "spectating")
-    .hget(`player:${playerId}`, "roomId")
+    .hget(getPlayerKey(playerId), "playerName")
+    .hget(getPlayerKey(playerId), "avatarId")
+    .hget(getPlayerKey(playerId), "secret")
+    .hget(getPlayerKey(playerId), "transient")
+    .hget(getPlayerKey(playerId), "viewingResults")
+    .hget(getPlayerKey(playerId), "spectating")
+    .hget(getPlayerKey(playerId), "roomId")
     .exec();
 
   if (!response) {
@@ -135,16 +152,16 @@ export const fetchGame = async (
   }
   const response = await redisClient
     .multi()
-    .hget(`room:${roomId}`, "roomCode")
-    .hget(`room:${roomId}`, "publicSeed")
-    .hget(`room:${roomId}`, "hostId")
-    .hget(`room:${roomId}`, "player1Id")
-    .hget(`room:${roomId}`, "player2Id")
-    .hget(`room:${roomId}`, "whitePlayerId")
-    .hget(`room:${roomId}`, "blackPlayerId")
-    .hget(`room:${roomId}`, "isOngoing")
-    .hget(`room:${roomId}`, "isQuickPlay")
-    .smembers(`roomPlayerSet:${roomId}`)
+    .hget(getRoomKey(roomId), "roomCode")
+    .hget(getRoomKey(roomId), "publicSeed")
+    .hget(getRoomKey(roomId), "hostId")
+    .hget(getRoomKey(roomId), "player1Id")
+    .hget(getRoomKey(roomId), "player2Id")
+    .hget(getRoomKey(roomId), "whitePlayerId")
+    .hget(getRoomKey(roomId), "blackPlayerId")
+    .hget(getRoomKey(roomId), "isOngoing")
+    .hget(getRoomKey(roomId), "isQuickPlay")
+    .smembers(getRoomPlayerSetKey(roomId))
     .exec();
   if (!response) {
     return null;
@@ -190,7 +207,7 @@ export const fetchGame = async (
 
 export const setRoomToOngoing = async (roomId: string, isOngoing: boolean) => {
   return await redisClient.hset(
-    `room:${roomId}`,
+    getRoomKey(roomId),
     "isOngoing",
     isOngoing ? 1 : 0,
   );
@@ -201,55 +218,56 @@ export const removePlayerIdFromRoom = async (
   playerId: string,
   activePlayerSlot: 0 | 1 | 2,
 ): Promise<void> => {
-  const roomHostId = await redisClient.hget(`room:${roomId}`, "hostId");
+  const roomHostId = await redisClient.hget(getRoomKey(roomId), "hostId");
 
   if (roomHostId === playerId) {
     await deleteRoom(roomId);
-  } else {
+  } else if (activePlayerSlot) {
     const activePlayerSlotPromise = activePlayerSlot
-      ? redisClient.hdel(`room:${roomId}`, `player${activePlayerSlot}Id`)
+      ? redisClient.hdel(getRoomKey(roomId), `player${activePlayerSlot}Id`)
       : Promise.resolve();
 
     await Promise.all([
-      redisClient.srem(`roomPlayerSet:${roomId}`, playerId),
-      redisClient.del(`player:${playerId}`),
+      redisClient.srem(getRoomPlayerSetKey(roomId), playerId),
+      redisClient.del(getPlayerKey(playerId)),
       activePlayerSlotPromise,
     ]);
   }
 };
 
 export const addPlayerToCache = async (user: User) => {
+  const key = getPlayerKey(user.playerId);
   return redisClient
     .multi()
-    .hset(`player:${user.playerId}`, {
+    .hset(key, {
       playerName: user.playerName,
       avatarId: user.avatarId,
       secret: user.playerSecret,
       viewingResults: 0,
       roomId: user.connectedRoom,
     })
-    .expire(`player:${user.playerId}`, REDIS_KEY_EXPIRY)
+    .expire(key, REDIS_KEY_EXPIRY)
     .exec();
 };
 
 export const deletePlayerFromCache = async (playerId: string) => {
-  return await redisClient.del(`player:${playerId}`);
+  return await redisClient.del(getPlayerKey(playerId));
 };
 
 export const deleteRoom = async (roomId: string) => {
-  const playerIdList = await redisClient.smembers(`roomPlayerSet:${roomId}`);
+  const playerIdList = await redisClient.smembers(getRoomPlayerSetKey(roomId));
 
   return Promise.all([
-    ...playerIdList.map((id) => redisClient.del(`player:${id}`)),
+    ...playerIdList.map((id) => redisClient.del(getPlayerKey(id))),
     redisClient
       .multi()
-      .del(`roomPlayerSet:${roomId}`)
-      .del(`room:${roomId}`)
-      .del(`roomWhiteMatchHistory:${roomId}`)
-      .del(`roomBlackMatchHistory:${roomId}`)
-      .del(`roomPokemonBoard:${roomId}`)
-      .del(`roomPokemonMoveHistory:${roomId}`)
-      .del(`roomPokemonBan:${roomId}`)
+      .del(getRoomPlayerSetKey(roomId))
+      .del(getRoomKey(roomId))
+      .del(getRoomWhiteMatchHistoryKey(roomId))
+      .del(getRoomBlackMatchHistoryKey(roomId))
+      .del(getRoomPokemonBoardKey(roomId))
+      .del(getRoomPokemonMoveHistoryKey(roomId))
+      .del(getRoomPokemonBanKey(roomId))
       .exec(),
   ]);
 };
@@ -258,7 +276,7 @@ export const setUserAsTransient = async (
   playerId: string,
   transientTimestamp: number,
 ) => {
-  return await redisClient.hset(`player:${playerId}`, {
+  return await redisClient.hset(getPlayerKey(playerId), {
     transient: transientTimestamp,
   });
 };
@@ -268,8 +286,8 @@ export const getUserTransientStatus = async (
 ): Promise<{ transientTimestamp?: string; currentRoomId?: string }> => {
   const response = await redisClient
     .multi()
-    .hget(`player:${playerId}`, "transient")
-    .hget(`player:${playerId}`, `roomId`)
+    .hget(getPlayerKey(playerId), "transient")
+    .hget(getPlayerKey(playerId), `roomId`)
     .exec();
 
   if (!response) {
@@ -311,7 +329,7 @@ export const getRoomIdFromHostId = async (
       }
       results.push({ id: response[i], value });
     }
-    return results.map(({ id }) => id.replace("room:", ""));
+    return results.map(({ id }) => id.replace(`${ROOM_KEY}:`, ""));
   } catch {
     return;
   }
@@ -324,7 +342,7 @@ export const createRoom = async (
 ) => {
   await redisClient
     .multi()
-    .hset(`room:${roomId}`, {
+    .hset(getRoomKey(roomId), {
       publicSeed: room.publicSeed,
       roomCode: room.password,
       isOngoing: isQuickPlay ? 1 : 0,
@@ -346,7 +364,7 @@ export const createRoom = async (
       blackPlayerTimerPaused: 1,
       isQuickPlay: isQuickPlay ? 1 : 0,
     })
-    .expire(`room:${roomId}`, REDIS_KEY_EXPIRY)
+    .expire(getRoomKey(roomId), REDIS_KEY_EXPIRY)
     .exec();
 };
 
@@ -354,14 +372,14 @@ export const addPlayerIdToRoomPlayerSet = async (
   roomId: string,
   playerId: string,
 ): Promise<void> => {
-  await redisClient.sadd(`roomPlayerSet:${roomId}`, playerId);
+  await redisClient.sadd(getRoomPlayerSetKey(roomId), playerId);
 };
 
 export const movePlayerToActive = async (roomId: string, playerId: string) => {
   const response = await redisClient
     .multi()
-    .hget(`room:${roomId}`, "player1Id")
-    .hget(`room:${roomId}`, `player2Id`)
+    .hget(getRoomKey(roomId), "player1Id")
+    .hget(getRoomKey(roomId), `player2Id`)
     .exec();
 
   if (!response) {
@@ -382,11 +400,11 @@ export const movePlayerToActive = async (roomId: string, playerId: string) => {
 };
 
 export const setPlayerAsPlayer1 = async (roomId: string, playerId: string) => {
-  return await redisClient.hset(`room:${roomId}`, "player1Id", playerId);
+  return await redisClient.hset(getRoomKey(roomId), "player1Id", playerId);
 };
 
 export const setPlayerAsPlayer2 = async (roomId: string, playerId: string) => {
-  return await redisClient.hset(`room:${roomId}`, "player2Id", playerId);
+  return await redisClient.hset(getRoomKey(roomId), "player2Id", playerId);
 };
 
 export const movePlayerToInactive = async (
@@ -395,8 +413,8 @@ export const movePlayerToInactive = async (
 ) => {
   const response = await redisClient
     .multi()
-    .hget(`room:${roomId}`, "player1Id")
-    .hget(`room:${roomId}`, `player2Id`)
+    .hget(getRoomKey(roomId), "player1Id")
+    .hget(getRoomKey(roomId), `player2Id`)
     .exec();
 
   if (!response) {
@@ -406,19 +424,19 @@ export const movePlayerToInactive = async (
   const [player1, player2] = response.map(([, result]) => result);
 
   if ((player1 as unknown as string) === playerId) {
-    await redisClient.hdel(`room:${roomId}`, "player1Id");
+    await redisClient.hdel(getRoomKey(roomId), "player1Id");
   } else if ((player2 as unknown as string) === playerId) {
-    await redisClient.hdel(`room:${roomId}`, "player2Id");
+    await redisClient.hdel(getRoomKey(roomId), "player2Id");
   }
 };
 
 const getRoomHash = async (roomId: string, key: string) => {
-  return await redisClient.hget(`room:${roomId}`, key);
+  return await redisClient.hget(getRoomKey(roomId), key);
 };
 
 export const fetchAllUsersInRoom = async (roomId: string): Promise<User[]> => {
   const connectedPlayerIds = await redisClient.smembers(
-    `roomPlayerSet:${roomId}`,
+    getRoomPlayerSetKey(roomId),
   );
   const cachedUsers = await Promise.all(
     connectedPlayerIds.map((id) => {
@@ -473,20 +491,20 @@ export const fetchGameOptions = async (
 ): Promise<GameOptions | null> => {
   const response = await redisClient
     .multi()
-    .hget(`room:${roomId}`, "format")
-    .hget(`room:${roomId}`, `atkBuff`)
-    .hget(`room:${roomId}`, `defBuff`)
-    .hget(`room:${roomId}`, `spaBuff`)
-    .hget(`room:${roomId}`, `spdBuff`)
-    .hget(`room:${roomId}`, `speBuff`)
-    .hget(`room:${roomId}`, `accuracyBuff`)
-    .hget(`room:${roomId}`, `evasionBuff`)
-    .hget(`room:${roomId}`, `weatherWars`)
-    .hget(`room:${roomId}`, `timersEnabled`)
-    .hget(`room:${roomId}`, `banTimerDuration`)
-    .hget(`room:${roomId}`, `chessTimerDuration`)
-    .hget(`room:${roomId}`, `chessTimerIncrement`)
-    .hget(`room:${roomId}`, `pokemonTimerIncrement`)
+    .hget(getRoomKey(roomId), "format")
+    .hget(getRoomKey(roomId), `atkBuff`)
+    .hget(getRoomKey(roomId), `defBuff`)
+    .hget(getRoomKey(roomId), `spaBuff`)
+    .hget(getRoomKey(roomId), `spdBuff`)
+    .hget(getRoomKey(roomId), `speBuff`)
+    .hget(getRoomKey(roomId), `accuracyBuff`)
+    .hget(getRoomKey(roomId), `evasionBuff`)
+    .hget(getRoomKey(roomId), `weatherWars`)
+    .hget(getRoomKey(roomId), `timersEnabled`)
+    .hget(getRoomKey(roomId), `banTimerDuration`)
+    .hget(getRoomKey(roomId), `chessTimerDuration`)
+    .hget(getRoomKey(roomId), `chessTimerIncrement`)
+    .hget(getRoomKey(roomId), `pokemonTimerIncrement`)
     .exec();
 
   if (!response) {
@@ -530,7 +548,7 @@ export const fetchGameOptions = async (
 
 export const setPlayerViewingResults = async (playerId: string, v: boolean) => {
   return await redisClient.hset(
-    `player:${playerId}`,
+    getPlayerKey(playerId),
     "viewingResults",
     v ? 1 : 0,
   );
@@ -555,7 +573,11 @@ export const setPlayerSpectating = async (
   } else {
     await movePlayerToInactive(roomId, playerId);
   }
-  return await redisClient.hset(`player:${playerId}`, "spectating", s ? 1 : 0);
+  return await redisClient.hset(
+    getPlayerKey(playerId),
+    "spectating",
+    s ? 1 : 0,
+  );
 };
 
 export const fetchPlayerSpectating = async (
@@ -563,7 +585,7 @@ export const fetchPlayerSpectating = async (
 ): Promise<boolean> => {
   return (
     parseInt(
-      (await redisClient.hget(`player:${playerId}`, "spectating")) || "0",
+      (await redisClient.hget(getPlayerKey(playerId), "spectating")) || "0",
     ) === 1
   );
 };
@@ -572,7 +594,7 @@ export const setGameRoomOptions = async (
   roomId: string,
   options: GameOptions,
 ) => {
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     requestedSeed:
       process.env.NODE_ENV === "production" ? "" : options.gameSeed,
     format: options.format,
@@ -593,15 +615,17 @@ export const setGameRoomOptions = async (
 };
 
 export const setGameRoomSeed = async (roomId: string, seed: string) => {
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     publicSeed: seed,
   });
 };
 
 export const getRequestedGameSeed = async (roomId: string) => {
   return (
-    ((await redisClient.hget(`room:${roomId}`, "requestedSeed")) as PRNGSeed) ||
-    ""
+    ((await redisClient.hget(
+      getRoomKey(roomId),
+      "requestedSeed",
+    )) as PRNGSeed) || ""
   );
 };
 
@@ -609,14 +633,14 @@ export const setRoomSquareModifierTarget = async (
   roomId: string,
   squareModifierTarget: number,
 ) => {
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     squareModifierTarget,
   });
 };
 
 export const getRoomSquareModifierTarget = async (roomId: string) => {
-  const cachedSquareModifierTarget = await redisClient.hget(
-    `room:${roomId}`,
+  const cachedSquareModifierTarget = await getRoomHash(
+    roomId,
     "squareModifierTarget",
   );
   if (!cachedSquareModifierTarget) {
@@ -632,25 +656,24 @@ export const setRoomSquareModifiers = async (
   if (!squareModifiers.length) {
     return;
   }
-
   return redisClient
     .multi()
-    .del(`roomSquareModifiers:${roomId}`)
-    .rpush(`roomSquareModifiers:${roomId}`, ...squareModifiers)
-    .expire(`roomSquareModifiers:${roomId}`, REDIS_KEY_EXPIRY)
+    .del(getRoomSquareModifiersKey(roomId))
+    .rpush(getRoomSquareModifiersKey(roomId), ...squareModifiers)
+    .expire(getRoomSquareModifiersKey(roomId), REDIS_KEY_EXPIRY)
     .exec();
 };
 
 export const getRoomSquareModifiers = async (
   roomId: string,
 ): Promise<number[]> => {
-  return (await redisClient.lrange(`roomSquareModifiers:${roomId}`, 0, -1)).map(
-    (i) => parseInt(i),
-  );
+  return (
+    await redisClient.lrange(getRoomSquareModifiersKey(roomId), 0, -1)
+  ).map((i) => parseInt(i));
 };
 
 export const clearRoomSquareModifiers = async (roomId: string) => {
-  return await redisClient.del(`roomSquareModifiers:${roomId}`);
+  return await redisClient.del(getRoomSquareModifiersKey(roomId));
 };
 
 export const setWhitePlayerPokemonMove = async (
@@ -658,16 +681,16 @@ export const setWhitePlayerPokemonMove = async (
   pokemonMove: string | null,
 ) => {
   if (!pokemonMove) {
-    return await redisClient.hdel(`room:${roomId}`, "whitePlayerPokemonMove");
+    return await redisClient.hdel(getRoomKey(roomId), "whitePlayerPokemonMove");
   } else {
-    return await redisClient.hset(`room:${roomId}`, {
+    return await redisClient.hset(getRoomKey(roomId), {
       whitePlayerPokemonMove: pokemonMove,
     });
   }
 };
 
 export const getWhitePlayerPokemonMove = async (roomId: string) => {
-  return await redisClient.hget(`room:${roomId}`, "whitePlayerPokemonMove");
+  return await getRoomHash(roomId, "whitePlayerPokemonMove");
 };
 
 export const setBlackPlayerPokemonMove = async (
@@ -675,16 +698,16 @@ export const setBlackPlayerPokemonMove = async (
   pokemonMove: string | null,
 ) => {
   if (!pokemonMove) {
-    return await redisClient.hdel(`room:${roomId}`, "blackPlayerPokemonMove");
+    return await redisClient.hdel(getRoomKey(roomId), "blackPlayerPokemonMove");
   } else {
-    return await redisClient.hset(`room:${roomId}`, {
+    return await redisClient.hset(getRoomKey(roomId), {
       blackPlayerPokemonMove: pokemonMove,
     });
   }
 };
 
 export const getBlackPlayerPokemonMove = async (roomId: string) => {
-  return await redisClient.hget(`room:${roomId}`, "blackPlayerPokemonMove");
+  return await getRoomHash(roomId, "blackPlayerPokemonMove");
 };
 
 export const resetMatchHistory = async (roomId: string) => {
@@ -695,11 +718,11 @@ export const resetMatchHistory = async (roomId: string) => {
 };
 
 const resetWhiteMatchHistory = async (roomId: string) => {
-  return await redisClient.del(`roomWhiteMatchHistory:${roomId}`);
+  return await redisClient.del(getRoomWhiteMatchHistoryKey(roomId));
 };
 
 const resetBlackMatchHistory = async (roomId: string) => {
-  return await redisClient.del(`roomBlackMatchHistory:${roomId}`);
+  return await redisClient.del(getRoomBlackMatchHistoryKey(roomId));
 };
 
 export const pushMatchHistory = async (roomId: string, matchLog: MatchLog) => {
@@ -715,8 +738,8 @@ export const pushWhiteMatchHistory = async (
 ) => {
   return await redisClient
     .multi()
-    .rpush(`roomWhiteMatchHistory:${roomId}`, ...matchLogString)
-    .expire(`roomWhiteMatchHistory:${roomId}`, REDIS_KEY_EXPIRY)
+    .rpush(getRoomWhiteMatchHistoryKey(roomId), ...matchLogString)
+    .expire(getRoomWhiteMatchHistoryKey(roomId), REDIS_KEY_EXPIRY)
     .exec();
 };
 
@@ -726,17 +749,17 @@ export const pushBlackMatchHistory = async (
 ) => {
   return await redisClient
     .multi()
-    .rpush(`roomBlackMatchHistory:${roomId}`, ...matchLogString)
-    .expire(`roomBlackMatchHistory:${roomId}`, REDIS_KEY_EXPIRY)
+    .rpush(getRoomBlackMatchHistoryKey(roomId), ...matchLogString)
+    .expire(getRoomBlackMatchHistoryKey(roomId), REDIS_KEY_EXPIRY)
     .exec();
 };
 
 export const getWhiteMatchHistory = async (roomId: string) => {
-  return await redisClient.lrange(`roomWhiteMatchHistory:${roomId}`, 0, -1);
+  return await redisClient.lrange(getRoomWhiteMatchHistoryKey(roomId), 0, -1);
 };
 
 export const getBlackMatchHistory = async (roomId: string) => {
-  return await redisClient.lrange(`roomBlackMatchHistory:${roomId}`, 0, -1);
+  return await redisClient.lrange(getRoomBlackMatchHistoryKey(roomId), 0, -1);
 };
 
 export const initializeGameStart = async (
@@ -744,7 +767,7 @@ export const initializeGameStart = async (
   whitePlayerId: string,
   blackPlayerId: string,
 ) => {
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     isOngoing: 1,
     whitePlayerId,
     blackPlayerId,
@@ -757,18 +780,18 @@ export const setGeneratedPokemonIndices = async (
 ) => {
   return await redisClient
     .multi()
-    .del(`roomPokemonBoard:${roomId}`)
-    .rpush(`roomPokemonBoard:${roomId}`, ...boardIndices)
-    .expire(`roomPokemonBoard:${roomId}`, REDIS_KEY_EXPIRY)
+    .del(getRoomPokemonBoardKey(roomId))
+    .rpush(getRoomPokemonBoardKey(roomId), ...boardIndices)
+    .expire(getRoomPokemonBoardKey(roomId), REDIS_KEY_EXPIRY)
     .exec();
 };
 
 export const getRoomBoard = async (roomId: string) => {
-  return await redisClient.hget(`room:${roomId}`, "chessBoard");
+  return await getRoomHash(roomId, "chessBoard");
 };
 
 export const setChessBoard = async (roomId: string, chessBoard: string) => {
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     chessBoard,
   });
 };
@@ -776,7 +799,7 @@ export const setChessBoard = async (roomId: string, chessBoard: string) => {
 export const getRoomPokemonIndices = async (
   roomId: string,
 ): Promise<number[]> => {
-  return (await redisClient.lrange(`roomPokemonBoard:${roomId}`, 0, -1)).map(
+  return (await redisClient.lrange(getRoomPokemonBoardKey(roomId), 0, -1)).map(
     (i) => parseInt(i),
   );
 };
@@ -786,15 +809,15 @@ export const setPokemonBattleSeed = async (
   battleSeed?: string,
 ) => {
   if (!battleSeed) {
-    return await redisClient.hdel(`room:${roomId}`, "battleSeed");
+    return await redisClient.hdel(getRoomKey(roomId), "battleSeed");
   }
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     battleSeed,
   });
 };
 
 export const getPokemonBattleSeed = async (roomId: string) => {
-  return await redisClient.hget(`room:${roomId}`, "battleSeed");
+  return await getRoomHash(roomId, "battleSeed");
 };
 
 export const setPokemonBattleStakes = async (
@@ -802,9 +825,9 @@ export const setPokemonBattleStakes = async (
   currentBattleStakes?: { san: string; color: Color },
 ) => {
   if (!currentBattleStakes) {
-    return await redisClient.hdel(`room:${roomId}`, "currentBattleStakes");
+    return await redisClient.hdel(getRoomKey(roomId), "currentBattleStakes");
   }
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     currentBattleStakes: JSON.stringify(currentBattleStakes),
   });
 };
@@ -813,7 +836,7 @@ export const getPokemonBattleStakes = async (
   roomId: string,
 ): Promise<{ san: string; color: Color } | null> => {
   const currentPokemonBattleStakes = await redisClient.hget(
-    `room:${roomId}`,
+    getRoomKey(roomId),
     "currentBattleStakes",
   );
   try {
@@ -830,7 +853,7 @@ export const getPokemonBattleStakes = async (
 };
 
 export const clearPokemonMoveHistory = async (roomId: string) => {
-  return await redisClient.del(`roomPokemonMoveHistory:${roomId}`);
+  return await redisClient.del(getRoomPokemonMoveHistoryKey(roomId));
 };
 
 export const pushPokemonMoveHistory = async (
@@ -839,31 +862,31 @@ export const pushPokemonMoveHistory = async (
   p2Move: string,
 ) => {
   return await redisClient.rpush(
-    `roomPokemonMoveHistory:${roomId}`,
+    getRoomPokemonMoveHistoryKey(roomId),
     p1Move,
     p2Move,
   );
 };
 
 export const getPokemonMoveHistory = async (roomId: string) => {
-  return await redisClient.lrange(`roomPokemonMoveHistory:${roomId}`, 0, -1);
+  return await redisClient.lrange(getRoomPokemonMoveHistoryKey(roomId), 0, -1);
 };
 
 export const pushPokemonBanList = async (
   roomId: string,
   pokemonIndex: number,
 ) => {
-  return await redisClient.rpush(`roomPokemonBan:${roomId}`, pokemonIndex);
+  return await redisClient.rpush(getRoomPokemonBanKey(roomId), pokemonIndex);
 };
 
 export const getPokemonBanList = async (roomId: string): Promise<number[]> => {
-  return (await redisClient.lrange(`roomPokemonBan:${roomId}`, 0, -1)).map(
+  return (await redisClient.lrange(getRoomPokemonBanKey(roomId), 0, -1)).map(
     (i) => parseInt(i),
   );
 };
 
 export const clearPokemonBanList = async (roomId: string) => {
-  return await redisClient.del(`roomPokemonBan:${roomId}`);
+  return await redisClient.del(getRoomPokemonBanKey(roomId));
 };
 
 export const setWhiteTimerExpiration = async (
@@ -872,17 +895,17 @@ export const setWhiteTimerExpiration = async (
 ) => {
   if (!timerExpiration) {
     return await redisClient.hdel(
-      `room:${roomId}`,
+      getRoomKey(roomId),
       "whitePlayerTimerExpiration",
     );
   }
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     whitePlayerTimerExpiration: timerExpiration,
   });
 };
 
 export const getWhiteTimerExpiration = async (roomId: string) => {
-  return await redisClient.hget(`room:${roomId}`, "whitePlayerTimerExpiration");
+  return await getRoomHash(roomId, "whitePlayerTimerExpiration");
 };
 
 export const setBlackTimerExpiration = async (
@@ -891,17 +914,17 @@ export const setBlackTimerExpiration = async (
 ) => {
   if (!timerExpiration) {
     return await redisClient.hdel(
-      `room:${roomId}`,
+      getRoomKey(roomId),
       "blackPlayerTimerExpiration",
     );
   }
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     blackPlayerTimerExpiration: timerExpiration,
   });
 };
 
 export const getBlackTimerExpiration = async (roomId: string) => {
-  return await redisClient.hget(`room:${roomId}`, "blackPlayerTimerExpiration");
+  return await getRoomHash(roomId, "blackPlayerTimerExpiration");
 };
 
 export const setWhiteTimeSinceLastMove = async (
@@ -910,20 +933,17 @@ export const setWhiteTimeSinceLastMove = async (
 ) => {
   if (!timestamp) {
     return await redisClient.hdel(
-      `room:${roomId}`,
+      getRoomKey(roomId),
       "whitePlayerTimeSinceLastMove",
     );
   }
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     whitePlayerTimeSinceLastMove: timestamp,
   });
 };
 
 export const getWhiteTimeSinceLastMove = async (roomId: string) => {
-  return await redisClient.hget(
-    `room:${roomId}`,
-    "whitePlayerTimeSinceLastMove",
-  );
+  return await getRoomHash(roomId, "whitePlayerTimeSinceLastMove");
 };
 
 export const setBlackTimeSinceLastMove = async (
@@ -932,44 +952,37 @@ export const setBlackTimeSinceLastMove = async (
 ) => {
   if (!timestamp) {
     return await redisClient.hdel(
-      `room:${roomId}`,
+      getRoomKey(roomId),
       "blackPlayerTimeSinceLastMove",
     );
   }
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     blackPlayerTimeSinceLastMove: timestamp,
   });
 };
 
 export const getBlackTimeSinceLastMove = async (roomId: string) => {
-  return await redisClient.hget(
-    `room:${roomId}`,
-    "blackPlayerTimeSinceLastMove",
-  );
+  return await getRoomHash(roomId, "blackPlayerTimeSinceLastMove");
 };
 
 export const setWhiteTimerPaused = async (roomId: string, paused: boolean) => {
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     whitePlayerTimerPaused: paused ? 1 : 0,
   });
 };
 
 export const getWhiteTimerPaused = async (roomId: string) => {
-  return (
-    (await redisClient.hget(`room:${roomId}`, "whitePlayerTimerPaused")) === "1"
-  );
+  return (await getRoomHash(roomId, "whitePlayerTimerPaused")) === "1";
 };
 
 export const setBlackTimerPaused = async (roomId: string, paused: boolean) => {
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     blackPlayerTimerPaused: paused ? 1 : 0,
   });
 };
 
 export const getBlackTimerPaused = async (roomId: string) => {
-  return (
-    (await redisClient.hget(`room:${roomId}`, "blackPlayerTimerPaused")) === "1"
-  );
+  return (await getRoomHash(roomId, "blackPlayerTimerPaused")) === "1";
 };
 
 export const setRoomTimers = async (
@@ -990,7 +1003,7 @@ export const setRoomTimers = async (
     blackPlayerTimerPaused: boolean;
   },
 ) => {
-  return await redisClient.hset(`room:${roomId}`, {
+  return await redisClient.hset(getRoomKey(roomId), {
     whitePlayerTimerExpiration,
     whitePlayerTimeSinceLastMove,
     whitePlayerTimerPaused: whitePlayerTimerPaused ? 1 : 0,
@@ -1001,7 +1014,10 @@ export const setRoomTimers = async (
 };
 
 export const setLockForRoom = async (roomId: string, expireTime?: number) => {
-  return await redlock.acquire([`roomLock:${roomId}`], expireTime || 60 * 1000);
+  return await redlock.acquire(
+    [getRoomLockKey(roomId)],
+    expireTime || 60 * 1000,
+  );
 };
 
 export const releaseLockForRoom = async (lock: Lock) => {
@@ -1011,43 +1027,43 @@ export const releaseLockForRoom = async (lock: Lock) => {
 export const pushPlayerToRandomQueue = async (user: User) => {
   return await redisClient
     .multi()
-    .rpush("randomMatchmakingQueue", user.playerId)
-    .hset(`player:${user.playerId}`, {
+    .rpush(getRandomMatchmakingQueueKey(), user.playerId)
+    .hset(getPlayerKey(user.playerId), {
       playerName: user.playerName,
       avatarId: user.avatarId,
       secret: user.playerSecret,
       viewingResults: 0,
     })
-    .expire(`player:${user.playerId}`, REDIS_KEY_EXPIRY)
+    .expire(getPlayerKey(user.playerId), REDIS_KEY_EXPIRY)
     .exec();
 };
 
 export const getFirstPlayerInRandomQueue = async () => {
-  return await redisClient.lpop("randomMatchmakingQueue");
+  return await redisClient.lpop(getRandomMatchmakingQueueKey());
 };
 
 export const removePlayerFromRandomQueue = async (playerId: string) => {
-  return await redisClient.lrem("randomMatchmakingQueue", 0, playerId);
+  return await redisClient.lrem(getRandomMatchmakingQueueKey(), 0, playerId);
 };
 
 export const pushPlayerToDraftQueue = async (user: User) => {
   return await redisClient
     .multi()
-    .rpush("draftMatchmakingQueue", user.playerId)
-    .hset(`player:${user.playerId}`, {
+    .rpush(getDraftMatchmakingQueueKey(), user.playerId)
+    .hset(getPlayerKey(user.playerId), {
       playerName: user.playerName,
       avatarId: user.avatarId,
       secret: user.playerSecret,
       viewingResults: 0,
     })
-    .expire(`player:${user.playerId}`, REDIS_KEY_EXPIRY)
+    .expire(getPlayerKey(user.playerId), REDIS_KEY_EXPIRY)
     .exec();
 };
 
 export const getFirstPlayerInDraftQueue = async () => {
-  return await redisClient.lpop("draftMatchmakingQueue");
+  return await redisClient.lpop(getDraftMatchmakingQueueKey());
 };
 
 export const removePlayerFromDraftQueue = async (playerId: string) => {
-  return await redisClient.lrem("draftMatchmakingQueue", 0, playerId);
+  return await redisClient.lrem(getDraftMatchmakingQueueKey(), 0, playerId);
 };
