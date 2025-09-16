@@ -33,7 +33,7 @@
 .gameManagerActionHeader {
   font-weight: 800;
   overflow: hidden;
-  flex-basis: 17px;
+  flex-basis: 20px;
 
   @container (width > 80px) {
     flex-basis: auto;
