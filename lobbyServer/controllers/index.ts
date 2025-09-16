@@ -25,6 +25,10 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     res.sendFile(path.join(path.resolve(), "./dist/index.html"));
   });
 
+  app.get("/favicon.svg", (_, res) => {
+    res.sendFile(path.join(path.resolve(), "./dist/favicon.svg"));
+  });
+
   app.get("/health", (_, res) => {
     res.status(200).send("Ok");
   });
