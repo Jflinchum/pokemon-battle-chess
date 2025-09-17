@@ -352,6 +352,9 @@ export const registerSocketEvents = (
               "There was an issue starting the game. Try recreating the room.",
           });
         }
+        return cb({
+          status: "ok",
+        });
       },
     );
 
