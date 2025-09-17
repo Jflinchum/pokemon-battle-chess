@@ -26,7 +26,7 @@ const handleCommonServerResponse = (
   if (err) {
     console.trace();
     console.error(err);
-    return reject("Could not connect to the server");
+    return reject("Could not connect to the server. Please try again");
   } else if (resp?.status === "err") {
     console.trace();
     console.error(resp);
