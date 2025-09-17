@@ -226,7 +226,7 @@ export const removePlayerIdFromRoom = async (
 
   if (roomHostId === playerId) {
     await deleteRoom(roomId);
-  } else if (activePlayerSlot) {
+  } else {
     const activePlayerSlotPromise = activePlayerSlot
       ? redisClient.hdel(getRoomKey(roomId), `player${activePlayerSlot}Id`)
       : Promise.resolve();
