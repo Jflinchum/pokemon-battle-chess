@@ -23,6 +23,7 @@ const Room = () => {
     () => gameState.players,
     [gameState.players],
   );
+
   const {
     requestStartGame,
     requestToggleSpectating,

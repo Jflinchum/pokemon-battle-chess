@@ -1,12 +1,12 @@
 import { Redis } from "ioredis";
 import { PRNGSeed } from "@pkmn/sim";
+import { Color } from "chess.js";
 import { getConfig } from "../config.js";
 import GameRoom from "../models/GameRoom.js";
 import User from "../../shared/models/User.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import { FormatID } from "../../shared/models/PokemonBattleChessManager.js";
 import { MatchLog } from "../../shared/types/Game.js";
-import { Color } from "chess.js";
 import { Lock, Redlock } from "@sesamecare-oss/redlock";
 import {
   REDIS_KEY_EXPIRY,
@@ -397,18 +397,28 @@ export const movePlayerToActive = async (roomId: string, playerId: string) => {
   }
 
   if (!player1) {
-    return setPlayerAsPlayer1(roomId, playerId);
+    return await setPlayerAsPlayer1(roomId, playerId);
   } else if (!player2) {
-    return setPlayerAsPlayer2(roomId, playerId);
+    return await setPlayerAsPlayer2(roomId, playerId);
+  } else {
+    return await redisClient.hset(getPlayerKey(playerId), "spectating", 1);
   }
 };
 
 export const setPlayerAsPlayer1 = async (roomId: string, playerId: string) => {
-  return await redisClient.hset(getRoomKey(roomId), "player1Id", playerId);
+  return await redisClient
+    .multi()
+    .hset(getRoomKey(roomId), "player1Id", playerId)
+    .hset(getPlayerKey(playerId), "spectating", 0)
+    .exec();
 };
 
 export const setPlayerAsPlayer2 = async (roomId: string, playerId: string) => {
-  return await redisClient.hset(getRoomKey(roomId), "player2Id", playerId);
+  return await redisClient
+    .multi()
+    .hset(getRoomKey(roomId), "player2Id", playerId)
+    .hset(getPlayerKey(playerId), "spectating", 0)
+    .exec();
 };
 
 export const movePlayerToInactive = async (
@@ -428,9 +438,17 @@ export const movePlayerToInactive = async (
   const [player1, player2] = response.map(([, result]) => result);
 
   if ((player1 as unknown as string) === playerId) {
-    await redisClient.hdel(getRoomKey(roomId), "player1Id");
+    await redisClient
+      .multi()
+      .hdel(getRoomKey(roomId), "player1Id")
+      .hset(getPlayerKey(playerId), "spectating", 1)
+      .exec();
   } else if ((player2 as unknown as string) === playerId) {
-    await redisClient.hdel(getRoomKey(roomId), "player2Id");
+    await redisClient
+      .multi()
+      .hdel(getRoomKey(roomId), "player2Id")
+      .hset(getPlayerKey(playerId), "spectating", 1)
+      .exec();
   }
 };
 
@@ -570,18 +588,13 @@ export const setPlayersViewingResults = async (
 export const setPlayerSpectating = async (
   roomId: string,
   playerId: string,
-  s: boolean,
+  moveToSpectating: boolean,
 ) => {
-  if (s) {
-    await movePlayerToActive(roomId, playerId);
-  } else {
+  if (moveToSpectating) {
     await movePlayerToInactive(roomId, playerId);
+  } else {
+    await movePlayerToActive(roomId, playerId);
   }
-  return await redisClient.hset(
-    getPlayerKey(playerId),
-    "spectating",
-    s ? 1 : 0,
-  );
 };
 
 export const fetchPlayerSpectating = async (
