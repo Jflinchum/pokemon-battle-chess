@@ -12,6 +12,7 @@ import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameMan
 import { useSocketRequests } from "../../../util/useSocketRequests";
 import { setGameOptions as setLocalGameOptions } from "../../../util/localWebData";
 import "./Room.css";
+import { toast } from "react-toastify";
 
 const Room = () => {
   const { gameState } = useGameState();
@@ -49,24 +50,32 @@ const Room = () => {
     };
   }, [gameState.isHost]);
 
-  const handleStartGame = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
+  const handleStartGame = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
       setLocalGameOptions(gameOptions);
-      requestStartGame();
-    },
-    [requestStartGame, gameOptions],
-  );
-
-  const handleToggleSpectating = () => {
-    requestToggleSpectating();
+      await requestStartGame();
+    } catch (err) {
+      toast(`Error: ${err}`, { type: "error" });
+    }
+  };
+  const handleToggleSpectating = async () => {
+    try {
+      await requestToggleSpectating();
+    } catch (err) {
+      toast(`Error: ${err}`, { type: "error" });
+    }
   };
 
   const handleRoomOptionsChange = useCallback(
-    (options: GameOptions) => {
+    async (options: GameOptions) => {
       if (options && gameState.isHost) {
-        requestChangeGameOptions(options);
-        setGameOptions(options);
+        try {
+          await requestChangeGameOptions(options);
+          setGameOptions(options);
+        } catch (err) {
+          toast(`Error: ${err}`, { type: "error" });
+        }
       }
     },
     [requestChangeGameOptions, setGameOptions, gameState.isHost],

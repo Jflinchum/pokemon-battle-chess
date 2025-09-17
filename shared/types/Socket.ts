@@ -19,29 +19,65 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  requestChessMove: (args: RequestChessMoveArgs) => void;
-  requestDraftPokemon: (args: RequestDraftPokemonArgs) => void;
-  requestPokemonMove: (args: RequestPokemonMoveArgs, cb: () => void) => void;
+  requestChessMove: (
+    args: RequestChessMoveArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
+  requestDraftPokemon: (
+    args: RequestDraftPokemonArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
+  requestPokemonMove: (
+    args: RequestPokemonMoveArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
   requestValidateTimers: (args: CommonClientArgs) => void;
   setViewingResults: (args: SetViewingResultsArgs) => void;
-  requestEndGameAsHost: (args: CommonClientArgs) => void;
-  requestStartGame: (args: CommonClientArgs) => void;
-  requestToggleSpectating: (args: CommonClientArgs) => void;
-  requestChangeGameOptions: (args: RequestChangeGameOptionsArgs) => void;
-  requestKickPlayer: (args: RequestKickPlayerArgs) => void;
+  requestEndGameAsHost: (
+    args: CommonClientArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
+  requestStartGame: (
+    args: CommonClientArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
+  requestToggleSpectating: (
+    args: CommonClientArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
+  requestChangeGameOptions: (
+    args: RequestChangeGameOptionsArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
+  requestKickPlayer: (
+    args: RequestKickPlayerArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
   requestMovePlayerToSpectator: (
     args: RequestMovePlayerToSpectatorArgs,
+    cb: (resp: CommonServerResponse) => void,
   ) => void;
-  joinRoom: (args: RequestJoinGameArgs) => void;
+  joinRoom: (
+    args: RequestJoinGameArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
   requestSync: (args: CommonClientArgs) => void;
   sendChatMessage: (args: SendChatMessageArgs) => void;
-  matchSearch: (args: MatchSearchArgs) => void;
+  matchSearch: (
+    args: MatchSearchArgs,
+    cb: (resp: CommonServerResponse) => void,
+  ) => void;
 }
 
 export interface CommonClientArgs {
   roomId: string;
   playerId: string;
   secretId: string;
+}
+
+export interface CommonServerResponse {
+  status: "ok" | "err";
+  message?: string;
 }
 
 interface MatchSearchArgs {

@@ -150,6 +150,10 @@ export const fetchGame = async (
   if (!roomId) {
     return null;
   }
+
+  if (!(await doesRoomExist(roomId))) {
+    return null;
+  }
   const response = await redisClient
     .multi()
     .hget(getRoomKey(roomId), "roomCode")

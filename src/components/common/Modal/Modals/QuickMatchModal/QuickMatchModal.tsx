@@ -5,6 +5,8 @@ import { useUserState } from "../../../../../context/UserState/UserStateContext"
 import Spinner from "../../../Spinner/Spinner";
 import { socket } from "../../../../../socket";
 import "./QuickMatchModal.css";
+import { useSocketRequests } from "../../../../../util/useSocketRequests";
+import { toast } from "react-toastify";
 
 type QuickMatchOption = "random" | "draft";
 
@@ -17,25 +19,26 @@ const quickMatchOptionDescriptionMapping: Record<QuickMatchOption, string> = {
 
 const QuickMatchModal = () => {
   const { dispatch } = useModalState();
-  const { userState, dispatch: userStateDispatch } = useUserState();
+  const { dispatch: userStateDispatch } = useUserState();
   const [searching, setSearching] = useState(false);
   const [quickMatchOption, setQuickMatchOption] =
     useState<QuickMatchOption>("random");
 
+  const { requestMatchSearch } = useSocketRequests();
+
   useEffect(() => {
     let timeout: NodeJS.Timeout | null;
     if (searching) {
-      // We set a 1 second delay before starting search in order to allow the user to cancel it if they need to
-      timeout = setTimeout(() => {
+      // We set a 2 second delay before starting search in order to allow the user to cancel it if they need to
+      timeout = setTimeout(async () => {
         socket.connect();
-        socket.emit("matchSearch", {
-          playerId: userState.id,
-          playerName: userState.name,
-          avatarId: userState.avatarId,
-          secretId: userState.secretId,
-          matchQueue: quickMatchOption,
-        });
-      }, 1000);
+
+        try {
+          await requestMatchSearch(quickMatchOption);
+        } catch (err) {
+          toast(`Error: ${err}`, { type: "error" });
+        }
+      }, 2000);
     } else {
       socket.disconnect();
     }
@@ -46,14 +49,7 @@ const QuickMatchModal = () => {
         timeout = null;
       }
     };
-  }, [
-    searching,
-    quickMatchOption,
-    userState.avatarId,
-    userState.name,
-    userState.id,
-    userState.secretId,
-  ]);
+  }, [searching, quickMatchOption, requestMatchSearch]);
 
   useEffect(() => {
     socket.on("foundMatch", async ({ roomId }) => {

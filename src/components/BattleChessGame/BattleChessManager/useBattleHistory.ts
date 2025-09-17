@@ -24,7 +24,7 @@ interface BattleHistoryProps {
   }: {
     sanMove: string;
     moveFailed?: boolean;
-  }) => Error | void;
+  }) => Promise<Error | undefined>;
   onPokemonBattleStart: (
     p1Pokemon: PokemonBeginBattleData["p1Pokemon"],
     p2Pokemon: PokemonBeginBattleData["p2Pokemon"],

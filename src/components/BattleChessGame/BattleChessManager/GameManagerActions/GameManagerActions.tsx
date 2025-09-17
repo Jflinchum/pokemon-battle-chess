@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCog,
@@ -40,8 +41,12 @@ const GameManagerActions = () => {
     downloadReplay(gameState);
   };
 
-  const handleReturnEveryoneToRoom = () => {
-    requestReturnEveryoneToRoom();
+  const handleReturnEveryoneToRoom = async () => {
+    try {
+      await requestReturnEveryoneToRoom();
+    } catch (err) {
+      toast(`Error: ${err}`, { type: "error" });
+    }
   };
 
   return (

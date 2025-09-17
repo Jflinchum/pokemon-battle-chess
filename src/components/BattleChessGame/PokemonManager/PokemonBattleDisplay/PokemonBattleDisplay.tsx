@@ -63,13 +63,13 @@ const PokemonBattleDisplay = ({
     setMoveChosen(undefined);
   }, [fullBattleLog]);
 
-  const handleMoveSelect = (move: string) => {
-    requestPokemonMove(move, (err) => {
-      if (err) {
-        setMoveChosen(undefined);
-        toast("Error: Please reselect your move.", { type: "error" });
-      }
-    });
+  const handleMoveSelect = async (move: string) => {
+    try {
+      await requestPokemonMove(move);
+    } catch (err) {
+      setMoveChosen(undefined);
+      toast(`Error: ${err}. Please reselect your move`, { type: "error" });
+    }
   };
 
   return (

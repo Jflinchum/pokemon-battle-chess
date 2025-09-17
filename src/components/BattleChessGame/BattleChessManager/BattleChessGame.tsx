@@ -210,7 +210,7 @@ export const BattleChessGame = ({
     [pokemonManager, chessManager, errorRecoveryAttempts, resetMatchHistory],
   );
 
-  const handleOnMove = (san: string) => {
+  const handleOnMove = async (san: string) => {
     if (chessManager.turn() !== color) {
       const verboseChessMove = getVerboseSanChessMove(
         san,
@@ -220,7 +220,11 @@ export const BattleChessGame = ({
         simulateMove(verboseChessMove);
       }
     } else {
-      requestChessMove(san);
+      try {
+        await requestChessMove(san);
+      } catch (err) {
+        toast(`Error: ${err}`, { type: "error" });
+      }
     }
   };
 
@@ -231,7 +235,13 @@ export const BattleChessGame = ({
   };
 
   const onMove = useCallback(
-    ({ sanMove, moveFailed }: { sanMove: string; moveFailed?: boolean }) => {
+    async ({
+      sanMove,
+      moveFailed,
+    }: {
+      sanMove: string;
+      moveFailed?: boolean;
+    }) => {
       let castledRookSquare;
 
       const verboseChessMove = getVerboseSanChessMove(sanMove, chessManager);
@@ -297,8 +307,13 @@ export const BattleChessGame = ({
       );
       if (validatePremoveQueue()) {
         if (chessManager.turn() === color && preMoveQueue.length > 0) {
-          requestChessMove(preMoveQueue[0].san);
-          setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
+          try {
+            await requestChessMove(preMoveQueue[0].san);
+          } catch (err) {
+            toast(`Error: ${err}`, { type: "error" });
+          } finally {
+            setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
+          }
         }
       }
       if (capturedPieceSquare) {
@@ -540,17 +555,25 @@ export const BattleChessGame = ({
             chessManager={chessManager}
             pokemonManager={pokemonManager}
             boardState={currentPokemonBoard}
-            onDraftPokemon={(sq, pkmnIndex) => {
+            onDraftPokemon={async (sq, pkmnIndex) => {
               if (validateDraftPick(sq, color!)) {
-                requestDraftPokemon(sq, pkmnIndex);
-                setIsDrafting(!!pokemonManager.draftPieces.length);
+                try {
+                  await requestDraftPokemon(sq, pkmnIndex);
+                  setIsDrafting(!!pokemonManager.draftPieces.length);
+                } catch (err) {
+                  toast(`Error: ${err}`, { type: "error" });
+                }
               }
             }}
-            onBanPokemon={(pkmnIndex) => {
+            onBanPokemon={async (pkmnIndex) => {
               if (gameState.isSpectator) {
                 return;
               }
-              requestBanPokemon(pkmnIndex);
+              try {
+                await requestBanPokemon(pkmnIndex);
+              } catch (err) {
+                toast(`Error: ${err}`, { type: "error" });
+              }
             }}
           />
         )}

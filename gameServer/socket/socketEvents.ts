@@ -81,7 +81,7 @@ export const registerSocketEvents = (
 
     socket.on(
       "matchSearch",
-      async ({ playerName, playerId, secretId, avatarId, matchQueue }) => {
+      async ({ playerName, playerId, secretId, avatarId, matchQueue }, cb) => {
         if (
           !playerId ||
           !secretId ||
@@ -90,7 +90,7 @@ export const registerSocketEvents = (
           !matchQueue
         ) {
           console.log("Incorrect parameters for quick play");
-          return;
+          return cb({ status: "err", message: "Invalid request" });
         }
         const user = new User(playerName, playerId, avatarId || "1", secretId);
         player = user;
@@ -152,77 +152,87 @@ export const registerSocketEvents = (
             io.to(room.roomId).emit("currentTimers", timers);
           }
         }
+
+        return cb({ status: "ok" });
       },
     );
 
-    socket.on("joinRoom", async ({ roomId, playerId, roomCode, secretId }) => {
-      console.log(`${playerId} requested to join room ${roomId}`);
-      if (
-        !(await gameRoomManager.verifyPlayerConnection(
-          { roomId, playerId, secretId },
-          { roomCode },
-        ))
-      ) {
-        socket.disconnect();
-        return;
-      }
-      const user = await gameRoomManager.getUser(playerId);
-      const room = await gameRoomManager.getCachedRoom(roomId);
-      if (!user || !room) {
-        socket.disconnect();
-        return;
-      }
-      player = user;
-      player.setRoom(roomId);
-
-      gameRoomManager.clearPlayerTransientState(playerId);
-
-      socket.join([roomId, playerId]);
-      const connectedPlayers =
-        await gameRoomManager.getPublicPlayerList(roomId);
-      io.to(roomId).emit("connectedPlayers", connectedPlayers);
-      socket.emit(
-        "changeGameOptions",
-        await gameRoomManager.getRoomOptions(roomId),
-      );
-      console.log(`Player ${playerId} joined room ${roomId}`);
-
-      if (room.isOngoing && room.whitePlayer && room.blackPlayer) {
-        socket
-          .timeout(5000)
-          .emit(
-            "startSync",
-            { history: await room.getHistory(playerId) },
-            (err) => {
-              if (err) {
-                resync(room, playerId);
-              }
-            },
-          );
-
-        if (room.roomGameOptions.timersEnabled) {
-          await room.setTimerState();
-
-          if (room.gameTimer) {
-            socket.emit(
-              "currentTimers",
-              room.gameTimer.getTimersWithLastMoveShift(),
-            );
-          }
+    socket.on(
+      "joinRoom",
+      async ({ roomId, playerId, roomCode, secretId }, cb) => {
+        console.log(`${playerId} requested to join room ${roomId}`);
+        if (
+          !(await gameRoomManager.verifyPlayerConnection(
+            { roomId, playerId, secretId },
+            { roomCode },
+          ))
+        ) {
+          socket.disconnect();
+          return cb({ status: "err", message: "Could not verify player" });
         }
+        const user = await gameRoomManager.getUser(playerId);
+        const room = await gameRoomManager.getCachedRoom(roomId);
+        if (!user || !room) {
+          socket.disconnect();
+          return cb({ status: "err", message: "Could not find room" });
+        }
+        player = user;
+        player.setRoom(roomId);
+
+        gameRoomManager.clearPlayerTransientState(playerId);
+
+        socket.join([roomId, playerId]);
+        const connectedPlayers =
+          await gameRoomManager.getPublicPlayerList(roomId);
+        io.to(roomId).emit("connectedPlayers", connectedPlayers);
         socket.emit(
-          "startGame",
-          room.blackPlayer?.playerId === playerId
-            ? room.buildStartGameArgs("b", room.whitePlayer, room.blackPlayer)
-            : room.buildStartGameArgs("w", room.whitePlayer, room.blackPlayer),
-          true,
+          "changeGameOptions",
+          await gameRoomManager.getRoomOptions(roomId),
         );
-      }
-    });
+        console.log(`Player ${playerId} joined room ${roomId}`);
+
+        if (room.isOngoing && room.whitePlayer && room.blackPlayer) {
+          socket
+            .timeout(5000)
+            .emit(
+              "startSync",
+              { history: await room.getHistory(playerId) },
+              (err) => {
+                if (err) {
+                  resync(room, playerId);
+                }
+              },
+            );
+
+          if (room.roomGameOptions.timersEnabled) {
+            await room.setTimerState();
+
+            if (room.gameTimer) {
+              socket.emit(
+                "currentTimers",
+                room.gameTimer.getTimersWithLastMoveShift(),
+              );
+            }
+          }
+          socket.emit(
+            "startGame",
+            room.blackPlayer?.playerId === playerId
+              ? room.buildStartGameArgs("b", room.whitePlayer, room.blackPlayer)
+              : room.buildStartGameArgs(
+                  "w",
+                  room.whitePlayer,
+                  room.blackPlayer,
+                ),
+            true,
+          );
+        }
+        return cb({ status: "ok" });
+      },
+    );
 
     socket.on(
       "requestToggleSpectating",
-      async ({ roomId, playerId, secretId }) => {
+      async ({ roomId, playerId, secretId }, cb) => {
         const roomExists = await gameRoomManager.cachedRoomExists(roomId);
         console.log(
           `${playerId} requested to change to spectator for ${roomId}`,
@@ -230,11 +240,11 @@ export const registerSocketEvents = (
 
         if (!roomExists || !playerId) {
           console.log(`${playerId} mismatch for ${roomId}.`);
-          return;
+          return cb({ status: "err", message: "Could not find room" });
         }
         const user = await gameRoomManager.getUser(playerId);
         if (!user) {
-          return;
+          return cb({ status: "err", message: "Could not find player" });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -243,19 +253,20 @@ export const registerSocketEvents = (
             secretId,
           }))
         ) {
-          return;
+          return cb({ status: "err", message: "Could not verify player" });
         }
 
         await gameRoomManager.togglePlayerSpectating({ roomId, playerId });
         const connectedPlayers =
           await gameRoomManager.getPublicPlayerList(roomId);
         io.to(roomId).emit("connectedPlayers", connectedPlayers);
+        return cb({ status: "ok" });
       },
     );
 
     socket.on(
       "requestChangeGameOptions",
-      async ({ roomId, playerId, options, secretId }) => {
+      async ({ roomId, playerId, options, secretId }, cb) => {
         const room = await gameRoomManager.getCachedRoom(roomId);
         console.log(
           `${playerId} requested to change game options for ${roomId}`,
@@ -263,7 +274,7 @@ export const registerSocketEvents = (
 
         if (!room || room.hostPlayer?.playerId !== playerId) {
           console.log(`${playerId} mismatch for ${roomId}.`);
-          return;
+          return cb({ status: "err", message: "Could not find room" });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -273,74 +284,25 @@ export const registerSocketEvents = (
           }))
         ) {
           console.log("Unable to verify player connection");
-          return;
+          return cb({ status: "err", message: "Could not verify player" });
         }
 
         await gameRoomManager.setRoomOptions(roomId, options);
 
         socket.broadcast.emit("changeGameOptions", options);
+        return cb({ status: "ok" });
       },
     );
 
-    socket.on("requestStartGame", async ({ roomId, playerId, secretId }) => {
-      const room = await gameRoomManager.getCachedRoom(roomId);
-      console.log(`${playerId} requested to start game for ${roomId}`);
-
-      if (!room || room.hostPlayer?.playerId !== playerId) {
-        console.log(`${playerId} mismatch for ${roomId}.`);
-        return;
-      }
-      if (
-        !(await gameRoomManager.verifyPlayerConnection({
-          roomId,
-          playerId,
-          secretId,
-        }))
-      ) {
-        console.log("Unable to verify player.");
-        return;
-      }
-      if (!room.player1 || !room.player2) {
-        console.log("Player 1 and player 2 slots are not filled.");
-        return;
-      }
-
-      try {
-        const { whiteStartGame, blackStartGame, timers } =
-          await room.initializeGame();
-        io.to(whiteStartGame.whitePlayer.playerId).emit(
-          "startGame",
-          whiteStartGame,
-        );
-        io.to(blackStartGame.blackPlayer.playerId).emit(
-          "startGame",
-          blackStartGame,
-        );
-        room.getSpectators()?.forEach((spectatorPlayerId) => {
-          io.to(spectatorPlayerId).emit("startGame", whiteStartGame);
-        });
-        io.to(roomId).emit(
-          "connectedPlayers",
-          await gameRoomManager.getPublicPlayerList(roomId),
-        );
-
-        if (timers) {
-          io.to(roomId).emit("currentTimers", timers);
-        }
-      } catch (e) {
-        console.log("Issue starting game: ", (e as unknown as Error).message);
-      }
-    });
-
     socket.on(
-      "requestEndGameAsHost",
-      async ({ roomId, playerId, secretId }) => {
+      "requestStartGame",
+      async ({ roomId, playerId, secretId }, cb) => {
         const room = await gameRoomManager.getCachedRoom(roomId);
-        console.log(`${playerId} requested to end game for ${roomId}`);
+        console.log(`${playerId} requested to start game for ${roomId}`);
 
         if (!room || room.hostPlayer?.playerId !== playerId) {
           console.log(`${playerId} mismatch for ${roomId}.`);
-          return;
+          return cb({ status: "err", message: "Could not find room" });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -350,7 +312,68 @@ export const registerSocketEvents = (
           }))
         ) {
           console.log("Unable to verify player.");
-          return;
+          return cb({ status: "err", message: "Could not verify player" });
+        }
+        if (!room.player1 || !room.player2) {
+          console.log("Player 1 and player 2 slots are not filled.");
+          return cb({
+            status: "err",
+            message: "Could not find Player 1 or Player 2",
+          });
+        }
+
+        try {
+          const { whiteStartGame, blackStartGame, timers } =
+            await room.initializeGame();
+          io.to(whiteStartGame.whitePlayer.playerId).emit(
+            "startGame",
+            whiteStartGame,
+          );
+          io.to(blackStartGame.blackPlayer.playerId).emit(
+            "startGame",
+            blackStartGame,
+          );
+          room.getSpectators()?.forEach((spectatorPlayerId) => {
+            io.to(spectatorPlayerId).emit("startGame", whiteStartGame);
+          });
+          io.to(roomId).emit(
+            "connectedPlayers",
+            await gameRoomManager.getPublicPlayerList(roomId),
+          );
+
+          if (timers) {
+            io.to(roomId).emit("currentTimers", timers);
+          }
+        } catch (e) {
+          console.log("Issue starting game: ", (e as unknown as Error).message);
+          return cb({
+            status: "err",
+            message:
+              "There was an issue starting the game. Try recreating the room.",
+          });
+        }
+      },
+    );
+
+    socket.on(
+      "requestEndGameAsHost",
+      async ({ roomId, playerId, secretId }, cb) => {
+        const room = await gameRoomManager.getCachedRoom(roomId);
+        console.log(`${playerId} requested to end game for ${roomId}`);
+
+        if (!room || room.hostPlayer?.playerId !== playerId) {
+          console.log(`${playerId} mismatch for ${roomId}.`);
+          return cb({ status: "err", message: "Could not find room" });
+        }
+        if (
+          !(await gameRoomManager.verifyPlayerConnection({
+            roomId,
+            playerId,
+            secretId,
+          }))
+        ) {
+          console.log("Unable to verify player.");
+          return cb({ status: "err", message: "Could not find player" });
         }
 
         io.to(roomId).emit(
@@ -362,12 +385,13 @@ export const registerSocketEvents = (
           "connectedPlayers",
           await gameRoomManager.getPublicPlayerList(roomId),
         );
+        return cb({ status: "ok" });
       },
     );
 
     socket.on(
       "requestKickPlayer",
-      async ({ roomId, playerId, kickedPlayerId, secretId }) => {
+      async ({ roomId, playerId, kickedPlayerId, secretId }, cb) => {
         const room = await gameRoomManager.getCachedRoom(roomId);
         console.log(
           `${playerId} requested to kick ${kickedPlayerId} for ${roomId}`,
@@ -375,12 +399,15 @@ export const registerSocketEvents = (
 
         if (!room || !kickedPlayerId || !playerId) {
           console.log(`${playerId} mismatch for ${roomId}.`);
-          return;
+          return cb({ status: "err", message: "Could not find room" });
         }
         const kickedPlayer = await gameRoomManager.getUser(kickedPlayerId);
         const host = await gameRoomManager.getUser(playerId);
         if (!kickedPlayer || !host || room.hostPlayer?.playerId !== playerId) {
-          return;
+          return cb({
+            status: "err",
+            message: "Could not find player to kick",
+          });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -389,7 +416,7 @@ export const registerSocketEvents = (
             secretId,
           }))
         ) {
-          return;
+          return cb({ status: "err", message: "Could not verify player" });
         }
 
         io.to(kickedPlayer.playerId)
@@ -398,12 +425,13 @@ export const registerSocketEvents = (
             io.in(kickedPlayer.playerId).disconnectSockets();
           });
         gameRoomManager.playerLeaveRoom(roomId, kickedPlayerId);
+        return cb({ status: "ok" });
       },
     );
 
     socket.on(
       "requestMovePlayerToSpectator",
-      async ({ roomId, playerId, spectatorPlayerId, secretId }) => {
+      async ({ roomId, playerId, spectatorPlayerId, secretId }, cb) => {
         const room = await gameRoomManager.getCachedRoom(roomId);
         console.log(
           `${playerId} requested to change ${spectatorPlayerId} to spectator for ${roomId}`,
@@ -411,12 +439,15 @@ export const registerSocketEvents = (
 
         if (!room || !playerId || !spectatorPlayerId) {
           console.log(`${playerId} mismatch for ${roomId}.`);
-          return;
+          return cb({ status: "err", message: "Could not find room" });
         }
         const spectatorUser = await gameRoomManager.getUser(spectatorPlayerId);
         const host = await gameRoomManager.getUser(playerId);
         if (!spectatorUser || !host || room.hostPlayer?.playerId !== playerId) {
-          return;
+          return cb({
+            status: "err",
+            message: "Could not find player to move to spectator",
+          });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -425,7 +456,7 @@ export const registerSocketEvents = (
             secretId,
           }))
         ) {
-          return;
+          return cb({ status: "err", message: "Could not verify player" });
         }
 
         await gameRoomManager.togglePlayerSpectating({
@@ -436,6 +467,7 @@ export const registerSocketEvents = (
           "connectedPlayers",
           await gameRoomManager.getPublicPlayerList(roomId),
         );
+        return cb({ status: "ok" });
       },
     );
 
@@ -491,14 +523,14 @@ export const registerSocketEvents = (
 
     socket.on(
       "requestChessMove",
-      async ({ sanMove, roomId, playerId, secretId }) => {
+      async ({ sanMove, roomId, playerId, secretId }, cb) => {
         const room = await gameRoomManager.getCachedRoom(roomId);
         console.log(
           `${playerId} requested to chess move ${sanMove} for ${roomId}`,
         );
         if (!room || !playerId) {
           console.log(`${playerId} mismatch for ${roomId}`);
-          return;
+          return cb({ status: "err", message: "Could not find room" });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -507,7 +539,7 @@ export const registerSocketEvents = (
             secretId,
           }))
         ) {
-          return;
+          return cb({ status: "err", message: "Could not verify player" });
         }
 
         const streamOutputs = await room.validateAndEmitChessMove({
@@ -516,7 +548,7 @@ export const registerSocketEvents = (
         });
 
         if (!streamOutputs) {
-          return;
+          return cb({ status: "err", message: "Chess move not valid" });
         }
         const { whiteStreamOutput, blackStreamOutput, timers } = streamOutputs;
 
@@ -559,14 +591,13 @@ export const registerSocketEvents = (
         if (timers) {
           io.to(roomId).emit("currentTimers", timers);
         }
+        return cb({ status: "ok" });
       },
     );
 
     socket.on(
       "requestPokemonMove",
       async ({ pokemonMove, roomId, playerId, secretId }, cb) => {
-        cb();
-
         const room = await gameRoomManager.getCachedRoom(roomId);
         console.log(
           `${playerId} requested to chess move ${pokemonMove} for ${roomId}`,
@@ -574,7 +605,7 @@ export const registerSocketEvents = (
 
         if (!room || !playerId) {
           console.log(`${playerId} mismatch for ${roomId}`);
-          return;
+          return cb({ status: "err", message: "Could not find room" });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -583,7 +614,7 @@ export const registerSocketEvents = (
             secretId,
           }))
         ) {
-          return;
+          return cb({ status: "err", message: "Could not verify player" });
         }
 
         const streamOutputs = await room.validateAndEmitPokemonMove({
@@ -592,7 +623,7 @@ export const registerSocketEvents = (
         });
 
         if (!streamOutputs) {
-          return;
+          return cb({ status: "err", message: "Could not validate move" });
         }
         const { whiteStreamOutput, blackStreamOutput, timers } = streamOutputs;
 
@@ -635,19 +666,16 @@ export const registerSocketEvents = (
         if (timers) {
           io.to(roomId).emit("currentTimers", timers);
         }
+        return cb({ status: "ok" });
       },
     );
 
     socket.on(
       "requestDraftPokemon",
-      async ({
-        roomId,
-        playerId,
-        square,
-        draftPokemonIndex,
-        isBan,
-        secretId,
-      }) => {
+      async (
+        { roomId, playerId, square, draftPokemonIndex, isBan, secretId },
+        cb,
+      ) => {
         const room = await gameRoomManager.getCachedRoom(roomId);
         console.log(
           `${playerId} requested to ${isBan ? "ban" : "draft"} pokemon ${draftPokemonIndex} at ${square} for ${roomId}`,
@@ -655,7 +683,7 @@ export const registerSocketEvents = (
 
         if (!room || !playerId) {
           console.log(`${playerId} mismatch for ${roomId}`);
-          return;
+          return cb({ status: "err", message: "Could not find room" });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -664,7 +692,7 @@ export const registerSocketEvents = (
             secretId,
           }))
         ) {
-          return;
+          return cb({ status: "err", message: "Could not verify player" });
         }
 
         let matchOutput: MatchLog[] | undefined;
@@ -679,6 +707,7 @@ export const registerSocketEvents = (
             timer = output?.timer;
           } catch (err) {
             console.log(err);
+            return cb({ status: "err", message: "Could not ban pokemon" });
           }
         } else {
           try {
@@ -691,6 +720,7 @@ export const registerSocketEvents = (
             timer = output?.timer;
           } catch (err) {
             console.log(err);
+            return cb({ status: "err", message: "Could not draft pokemon" });
           }
         }
 
@@ -709,6 +739,7 @@ export const registerSocketEvents = (
         if (timer) {
           io.to(roomId).emit("currentTimers", timer);
         }
+        return cb({ status: "ok" });
       },
     );
 

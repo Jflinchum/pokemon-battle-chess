@@ -35,7 +35,14 @@ const RoomManager = () => {
   }, [gameState.inGame, stopSongs]);
 
   useEffect(() => {
-    requestJoinGame();
+    const joinRoomOnMount = async () => {
+      try {
+        await requestJoinGame();
+      } catch (err) {
+        toast(`Error: ${err}`, { type: "error" });
+      }
+    };
+    joinRoomOnMount();
   }, [requestJoinGame]);
 
   useEffect(() => {

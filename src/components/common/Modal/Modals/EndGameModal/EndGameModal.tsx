@@ -60,7 +60,7 @@ const EndGameModal = () => {
     dispatch({ type: "CLOSE_MODAL" });
   };
 
-  const handleReturn = () => {
+  const handleReturn = async () => {
     gameStateDispatch({ type: "RETURN_TO_ROOM" });
     requestSetViewingResults(false);
     dispatch({ type: "CLOSE_MODAL" });

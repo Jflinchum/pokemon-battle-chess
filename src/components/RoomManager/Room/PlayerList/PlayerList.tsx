@@ -9,6 +9,7 @@ import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./PlayerList.css";
 import Tooltip from "../../../common/Tooltip/Tooltip";
+import { toast } from "react-toastify";
 
 interface PlayerListProps extends React.HTMLAttributes<HTMLDivElement> {
   players: Player[];
@@ -20,12 +21,20 @@ const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
   const { requestKickPlayer, requestMovePlayerToSpectator } =
     useSocketRequests();
 
-  const handleKickClick = (playerId: string) => {
-    requestKickPlayer(playerId);
+  const handleKickClick = async (playerId: string) => {
+    try {
+      await requestKickPlayer(playerId);
+    } catch (err) {
+      toast(`Error: ${err}`, { type: "error" });
+    }
   };
 
-  const handleMovePlayerToSpectator = (playerId: string) => {
-    requestMovePlayerToSpectator(playerId);
+  const handleMovePlayerToSpectator = async (playerId: string) => {
+    try {
+      await requestMovePlayerToSpectator(playerId);
+    } catch (err) {
+      toast(`Error: ${err}`, { type: "error" });
+    }
   };
 
   return (
