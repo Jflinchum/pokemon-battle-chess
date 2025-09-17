@@ -5,7 +5,7 @@ import { useUserState } from "../../../context/UserState/UserStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { joinRoom } from "../../../service/lobby";
 import { useDebounce } from "../../../utils";
-import Input from "../../common/Input/Input";
+import TextInput from "../../common/TextInput/TextInput";
 import "./RoomList.css";
 
 export interface Room {
@@ -68,7 +68,7 @@ const RoomList = ({ availableRooms, onSearch }: RoomListProps) => {
       <div className="roomListTopActions">
         <span>Rooms:</span>
         <span className="roomSearchContainer">
-          <Input
+          <TextInput
             containerType="underline"
             label="Room Search"
             value={roomSearch}

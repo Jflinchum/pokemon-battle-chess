@@ -1,7 +1,7 @@
 import { useState, RefObject } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import Input from "../Input/Input";
+import TextInput from "../TextInput/TextInput";
 import "./PasscodeInput.css";
 
 interface PasscodeInputProps {
@@ -21,7 +21,7 @@ const PasscodeInput = ({
   return (
     <div className="passcodeInputContainer">
       <div className="passcodeInputWrapper">
-        <Input
+        <TextInput
           label={label}
           maxLength={16}
           ref={ref}
@@ -39,7 +39,7 @@ const PasscodeInput = ({
               <FontAwesomeIcon icon={faEyeSlash} size="lg" />
             )}
           </button>
-        </Input>
+        </TextInput>
       </div>
     </div>
   );

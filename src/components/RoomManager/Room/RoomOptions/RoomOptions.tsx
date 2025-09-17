@@ -3,8 +3,8 @@ import { BoostID, BoostsTable } from "@pkmn/data";
 import { FormatID } from "../../../../context/GameState/GameStateContext";
 import { GameOptions } from "../../../../../shared/types/GameOptions";
 import { GameTimerOptions, TimerId } from "./GameTimerOptions/GameTimerOptions";
-import "./RoomOptions.css";
 import Button from "../../../common/Button/Button";
+import "./RoomOptions.css";
 
 const advantageOptions: { stat: BoostID; label: string }[] = [
   { stat: "atk", label: "Attack" },
@@ -166,6 +166,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
           </div>
           <input
             checked={gameOptions.weatherWars}
+            disabled={!isHost}
             type="checkbox"
             onChange={(e) => setWeatherWars(e.target.checked)}
           />

@@ -1,14 +1,14 @@
 import { RefObject, useEffect, useRef, useState } from "react";
-import "./Input.css";
+import "./TextInput.css";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   containerType?: "bordered" | "underline";
   label?: string;
   ref?: RefObject<HTMLInputElement | null>;
   valid?: boolean;
 }
 
-const Input = ({
+const TextInput = ({
   containerType = "bordered",
   label,
   valid,
@@ -18,7 +18,7 @@ const Input = ({
   onFocus,
   onBlur,
   ...props
-}: InputProps) => {
+}: TextInputProps) => {
   const internalRef = useRef(null);
   const inputRef = ref || internalRef;
   const [labelShifted, setLabelShifted] = useState(false);
@@ -58,4 +58,4 @@ const Input = ({
   );
 };
 
-export default Input;
+export default TextInput;

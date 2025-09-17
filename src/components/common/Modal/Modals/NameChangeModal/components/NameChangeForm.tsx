@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useModalState } from "../../../../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../../../../context/UserState/UserStateContext";
 import Button from "../../../../Button/Button";
-import Input from "../../../../Input/Input";
+import TextInput from "../../../../TextInput/TextInput";
 import "./NameChangeForm.css";
 import { isStringProfane } from "../../../../../../../shared/util/profanityFilter";
 import { toast } from "react-toastify";
@@ -44,7 +44,7 @@ export const NameChangeForm = ({ closeModalOnSubmit }: NameChangeFormProps) => {
 
   return (
     <form onSubmit={handleChangeName} className="nameChangeForm">
-      <Input
+      <TextInput
         className="nameChangeInput"
         label="Name"
         ref={inputRef}
