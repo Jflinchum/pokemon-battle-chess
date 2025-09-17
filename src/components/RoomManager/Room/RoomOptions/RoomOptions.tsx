@@ -5,6 +5,7 @@ import { GameOptions } from "../../../../../shared/types/GameOptions";
 import { GameTimerOptions, TimerId } from "./GameTimerOptions/GameTimerOptions";
 import Button from "../../../common/Button/Button";
 import "./RoomOptions.css";
+import { Input } from "../../../common/Input/Input";
 
 const advantageOptions: { stat: BoostID; label: string }[] = [
   { stat: "atk", label: "Attack" },
@@ -164,7 +165,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               will come and go throughout the match.
             </p>
           </div>
-          <input
+          <Input
             checked={gameOptions.weatherWars}
             disabled={!isHost}
             type="checkbox"

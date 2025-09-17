@@ -40,7 +40,7 @@ const TextInput = ({
         <span className="inputLabelText">{label}</span>
         <input
           aria-invalid={`${valid === false ? "true" : "false"}`}
-          className="input"
+          className="textInput"
           onFocus={(e) => {
             setLabelShifted(true);
             onFocus?.(e);
