@@ -93,53 +93,60 @@ const MenuOptions = () => {
           </div>
         )}
         <NavOptionButton
+          aria-describedby="quickPlay"
           className="menuOptionButtonContainer"
           onClick={handleQuickMatchClick}
         >
           <FontAwesomeIcon icon={faChessKing} />
-          <span>Quick Play</span>
+          <span id="quickPlay">Quick Play</span>
         </NavOptionButton>
         <NavOptionButton
+          aria-describedby="createNewRoom"
           className="menuOptionButtonContainer"
           onClick={handleCreateRoom}
         >
           <FontAwesomeIcon icon={faDoorOpen} />
-          <span>Create New Room</span>
+          <span id="createNewRoom">Create New Room</span>
         </NavOptionButton>
         <NavOptionButton
+          aria-describedby="customize"
           className="menuOptionButtonContainer"
           onClick={handleCustomize}
         >
           <FontAwesomeIcon icon={faFaceGrin} />
-          <span>Customize</span>
+          <span id="customize">Customize</span>
         </NavOptionButton>
         <NavOptionButton
+          aria-describedby="howToPlay"
           className="menuOptionButtonContainer"
           onClick={handleHowToPlay}
         >
           <FontAwesomeIcon icon={faNoteSticky} />
-          <span>How to Play</span>
+          <span id="howToPlay">How to Play</span>
         </NavOptionButton>
         <NavOptionButton
+          aria-describedby="watchReplay"
           className="menuOptionButtonContainer"
           onClick={handleUploadReplayClick}
         >
           <FontAwesomeIcon icon={faUpload} />
-          <span>Watch Replay</span>
+          <span id="watchReplay">Watch Replay</span>
         </NavOptionButton>
         <NavOptionButton
+          aria-describedby="gameOptions"
           className="menuOptionButtonContainer"
           onClick={handleOptionsClick}
         >
           <FontAwesomeIcon icon={faCog} />
-          <span>Options</span>
+          <span id="gameOptions">Options</span>
         </NavOptionButton>
         <NavOptionButton
+          aria-describedby="credits"
           className="menuOptionButtonContainer"
           onClick={handleCreditsClick}
         >
           <FontAwesomeIcon icon={faCertificate} />
-          <span>Credits</span>
+          <span id="credits">Credits</span>
         </NavOptionButton>
       </div>
       <input

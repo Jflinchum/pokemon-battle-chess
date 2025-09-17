@@ -19,7 +19,11 @@ const NavOptions = ({
     <div className={`${className}`} {...props}>
       {open && <div className="navBackdrop" onClick={() => setOpen(false)} />}
       <div className="navMobileNav">
-        <button onClick={() => setOpen(!open)} className="navMobileButton">
+        <button
+          aria-label="Main Options"
+          onClick={() => setOpen(!open)}
+          className="navMobileButton"
+        >
           <span>
             <FontAwesomeIcon size="2x" icon={open ? faX : faBars} />
           </span>

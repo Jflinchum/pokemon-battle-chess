@@ -119,20 +119,20 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
         {import.meta.env.DEV ? (
           <li className="roomOption">
             <div className="roomOptionLabel">
-              <label htmlFor="seed">Pokemon Generation Seed:</label>
+              <span id="pokemonGenerationSeed">Pokemon Generation Seed:</span>
               <p>DEV ONLY - Sets the seed used for generating Pokemon.</p>
             </div>
-            <input
+            <Input
               value={gameSeed}
               onChange={(e) => setGameSeed(e.target.value)}
-              name="seed"
               disabled={!isHost}
+              aria-describedby="pokemonGenerationSeed"
             />
           </li>
         ) : null}
         <li className="roomOption">
           <div className="roomOptionLabel">
-            <label>Pokemon Assignments:</label>
+            <span id="pokemonAssignmentsOption">Pokemon Assignments:</span>
             <p>
               Random will randomly assign a Pokemon to each chess piece and then
               start the match.
@@ -151,6 +151,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               highlighted={format === formatOption.id}
               className="roomOptionButtons"
               onClick={() => setFormat(formatOption.id)}
+              aria-describedby="pokemonAssignmentsOption"
             >
               {formatOption.label}
             </Button>
@@ -158,7 +159,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
         </li>
         <li className="roomOption">
           <div className="roomOptionLabel">
-            <label htmlFor="format">Weather Wars:</label>
+            <span id="weatherWarsFormat">Weather Wars:</span>
             <p>
               Enabling this mode will create different weather and terrain
               effects on random chess squares. These weather and terrain effects
@@ -166,16 +167,20 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
             </p>
           </div>
           <Input
+            name="weatherWarsFormatInput"
             checked={gameOptions.weatherWars}
             disabled={!isHost}
             type="checkbox"
             onChange={(e) => setWeatherWars(e.target.checked)}
+            aria-describedby="weatherWarsFormat"
           />
         </li>
-        <hr></hr>
+        <li>
+          <hr></hr>
+        </li>
         <li className="roomOption">
           <div className="roomOptionLabel">
-            <label>Offense Advantage:</label>
+            <span id="offenseAdvantage">Offense Advantage:</span>
             <p>
               If a chess piece attacks another, this will decide what buffs they
               get at the start of the match.
@@ -187,9 +192,10 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               .map((adv) => (
                 <li key={adv.stat}>
                   <select
-                    name={adv.stat}
+                    id={adv.stat}
                     disabled={!isHost}
                     value={gameOptions.offenseAdvantage[adv.stat]}
+                    aria-describedby="offenseAdvantage"
                     onChange={(e) =>
                       setOffenseAdvantage({
                         ...offenseAdvantage,
@@ -208,21 +214,10 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               ))}
           </ul>
         </li>
-        <hr></hr>
+        <li>
+          <hr></hr>
+        </li>
         <li className="roomOption">
-          <div className="roomOptionLabel">
-            <label htmlFor="gameTimer">Game Timer:</label>
-            <p>
-              Adds a timer to the game. If players run out of time during the
-              draft/ban phase, a random pokemon will be chosen and randomly
-              assigned. If players run out of time in the match, then they will
-              lose.
-            </p>
-            <p>
-              Long is 30 minutes. Normal is 15 minutes. Bullet is 2 minutes.
-              Each move you make in game will prolong your timer.
-            </p>
-          </div>
           <GameTimerOptions
             timerId={currentTimerId}
             onChange={setTimerId}
@@ -232,7 +227,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
         {gameOptions.format === "draft" && currentTimerId !== "No Timer" && (
           <li className="roomOption">
             <div className="roomOptionLabel">
-              <label htmlFor="banTimer">Draft/Ban Timer:</label>
+              <span id="banTimer">Draft/Ban Timer:</span>
               <p>
                 Amount of time (in seconds) that the player has to ban and draft
                 a pokemon.
@@ -240,7 +235,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
             </div>
             <select
               className="roomOptionBanTimer"
-              name="banTimerDuration"
+              aria-describedby="banTimer"
               value={gameOptions.banTimerDuration}
               onChange={(e) => setBanTimer(parseInt(e.target.value))}
               disabled={!isHost}

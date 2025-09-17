@@ -46,6 +46,7 @@ const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
           {players.map((player) => (
             <li key={player.playerId}>
               <img
+                alt={`${player.playerName} Avatar`}
                 className="playerListSprite"
                 src={Sprites.getAvatar(player.avatarId || "1")}
               />

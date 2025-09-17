@@ -101,7 +101,10 @@ const Room = () => {
               <div className="player">
                 {player1 ? (
                   <>
-                    <img src={Sprites.getAvatar(player1?.avatarId || "1")} />
+                    <img
+                      alt={`Player 1 ${player1.playerName} Avatar`}
+                      src={Sprites.getAvatar(player1?.avatarId || "1")}
+                    />
                     <PlayerName player={player1} />
                   </>
                 ) : null}
@@ -110,7 +113,10 @@ const Room = () => {
               <div className="player">
                 {player2 ? (
                   <>
-                    <img src={Sprites.getAvatar(player2?.avatarId || "1")} />
+                    <img
+                      alt={`Player 2 ${player2.playerName} Avatar`}
+                      src={Sprites.getAvatar(player2?.avatarId || "1")}
+                    />
                     <PlayerName player={player2} />
                   </>
                 ) : null}

@@ -56,6 +56,7 @@ const RandomPokemonBackground = ({
 
   return (
     <img
+      alt={pkmn.pkmn}
       onAnimationIteration={() =>
         setPkmn(getRandomBackgroundPokemon(availablePokemon))
       }
