@@ -49,12 +49,12 @@ export const HowToPlayScreen1 = () => {
 
   return (
     <>
-      <p>Welcome to Pokemon Gambit!</p>
+      <p>Welcome to Pokémon Gambit!</p>
       <p>
-        This game makes an attempt to merge both Pokemon's battle system and
+        This game makes an attempt to merge both Pokémon's battle system and
         Chess together to create a layered strategy game. A game will start off
         as any normal Chess game, except{" "}
-        <b>each Chess piece will be assigned a Pokemon.</b>
+        <b>each Chess piece will be assigned a Pokémon.</b>
       </p>
       <div className="gameDemoContainer">
         <BattleChessGame

@@ -50,7 +50,7 @@ export const GameSettings = () => {
           </select>
         </li>
         <li>
-          <label htmlFor="2dSpritesOption">Use Pokemon 2D Sprites</label>
+          <label htmlFor="2dSpritesOption">Use Pokémon 2D Sprites</label>
           <input
             id="2dSpritesOption"
             className="gameSettingsInput"

@@ -82,7 +82,7 @@ const LobbyManager = () => {
       <div className="lobbyContainer">
         <MenuOptions />
         <div className="roomListLobbyContainer">
-          <h1 className="mainMenuHeader">Pokemon Gambit</h1>
+          <h1 className="mainMenuHeader">Pokémon Gambit</h1>
           <div className="roomListContainer">
             <RoomList
               availableRooms={availableRooms}

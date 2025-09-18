@@ -11,7 +11,7 @@ const PokemonOfTheDay = ({ className = "" }: { className?: string }) => {
 
   return randPokemon ? (
     <div className={`${className} pokemonOfTheDay`}>
-      <b>Pokemon of the day!</b>
+      <b>Pokémon of the day!</b>
       <span>{dexPokemon.name}</span>
       <PokemonSprite
         pokemonIdentifier={randPokemon}

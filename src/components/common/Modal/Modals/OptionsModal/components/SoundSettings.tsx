@@ -39,7 +39,7 @@ export const SoundSettings = () => {
     <div className="optionsActions">
       <ul>
         <li>
-          <label>Music</label>
+          <span>Music</span>
           <VolumeSlider
             initialVolume={userState.volumePreference.musicVolume * 100}
             onVolumeUpdate={(volume) =>
@@ -50,7 +50,7 @@ export const SoundSettings = () => {
           />
         </li>
         <li>
-          <label>Chess Sound Effects</label>
+          <span>Chess Sound Effects</span>
           <VolumeSlider
             initialVolume={userState.volumePreference.pieceVolume * 100}
             onVolumeUpdate={(volume) =>
@@ -61,7 +61,7 @@ export const SoundSettings = () => {
           />
         </li>
         <li>
-          <label>Pokemon Sound Effects</label>
+          <span>Pokémon Sound Effects</span>
           <VolumeSlider
             initialVolume={userState.volumePreference.pokemonBattleVolume * 100}
             onVolumeUpdate={(volume) =>

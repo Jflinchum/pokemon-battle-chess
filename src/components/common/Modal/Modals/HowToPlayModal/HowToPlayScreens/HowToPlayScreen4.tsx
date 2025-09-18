@@ -74,7 +74,7 @@ export const HowToPlayScreen4 = () => {
     <>
       <b>Weather Wars</b>
       <p>
-        One game mode within Pokemon Gambit is <b>"Weather Wars"</b>. In this
+        One game mode within Pokémon Gambit is <b>"Weather Wars"</b>. In this
         game mode, weather and terrain will appear throughout the chessboard
         that will take affect when a battle starts on that chess square.
       </p>
@@ -83,7 +83,7 @@ export const HowToPlayScreen4 = () => {
         the weather or terrain will{" "}
         <b>stay on the board after the battle is over.</b> Weather and terrain
         will only disappear from a square <b>after a set amount of battles</b>{" "}
-        on that square, or if another Pokemon overrides it.
+        on that square, or if another Pokémon overrides it.
       </p>
       <div className="gameDemoContainer">
         <BattleChessGame

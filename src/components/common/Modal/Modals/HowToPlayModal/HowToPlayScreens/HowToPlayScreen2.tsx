@@ -69,7 +69,7 @@ export const HowToPlayScreen2 = () => {
       <b>Taking a Piece</b>
       <p>
         Whenever you attempt to attack another Chess piece with your piece,{" "}
-        <b>you will first need to win a Pokemon battle!</b> If you win, you
+        <b>you will first need to win a Pokémon battle!</b> If you win, you
         successfully take the piece. However, if you lose,{" "}
         <b>your Chess piece will be taken instead!</b>
       </p>

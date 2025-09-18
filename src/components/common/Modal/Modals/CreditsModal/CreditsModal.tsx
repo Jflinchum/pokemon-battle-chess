@@ -9,7 +9,7 @@ const CreditsModal = () => {
       <h2 className="creditsModalTitle">Credits</h2>
       <div className="creditsModalBody">
         <p>
-          Pokemon Gambit is a non profit, open source project. All rights to The
+          Pokémon Gambit is a non profit, open source project. All rights to The
           Pokémon Company®
         </p>
         <p>
@@ -23,7 +23,7 @@ const CreditsModal = () => {
           </span>
         </p>
         <p>
-          Huge thanks to Pokemon Showdown for their open source Pokemon Battle
+          Huge thanks to Pokémon Showdown for their open source Pokémon Battle
           Simulator.
         </p>
         <p>
