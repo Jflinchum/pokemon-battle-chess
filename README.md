@@ -2,6 +2,8 @@
 
 A mixture between Pokemon and Chess! Each chess piece gets assigned a Pokemon, which you can then do battle with when you attempt to take a piece!
 
+You can view it live, here: https://pokemon-gambit.com/
+
 ## How to Run
 
 - Before running this project, you'll want to set up some localhost certs for running https locally.
