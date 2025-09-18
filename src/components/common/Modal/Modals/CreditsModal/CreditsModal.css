@@ -1,6 +1,6 @@
 .creditsModalContainer {
   text-align: center;
-  min-width: 30vw;
+  max-width: 800px;
 }
 
 .creditsModalTitle {
