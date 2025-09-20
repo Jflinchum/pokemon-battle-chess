@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -37,9 +38,9 @@ const GameManagerActions = () => {
     requestSetViewingResults(false);
   };
 
-  const handleDownloadReplay = () => {
+  const handleDownloadReplay = useCallback(() => {
     downloadReplay(gameState);
-  };
+  }, [gameState]);
 
   const handleReturnEveryoneToRoom = async () => {
     try {

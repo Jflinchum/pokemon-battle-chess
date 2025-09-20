@@ -68,6 +68,8 @@ const MenuOptions = () => {
         const matchReplay = JSON.parse(reader.result as string) as ReplayData;
         if (validateReplay(matchReplay)) {
           gameStateDispatch({ type: "START_REPLAY", payload: matchReplay });
+        } else {
+          toast("Error: Replay file invalid", { type: "error" });
         }
       } catch (err) {
         toast("Error: Unable to read replay file", { type: "error" });
