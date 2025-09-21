@@ -125,6 +125,12 @@ const modifyTypeAbilities: Record<
     }
     return move.type;
   },
+  multitype: (move: Move, pokemon: Pokemon) => {
+    if (move.name === "Judgment") {
+      return pokemon.types[0];
+    }
+    return move.type;
+  },
   refrigerate: (move: Move, pokemon: Pokemon) => {
     const noModifyType = [
       "judgment",
