@@ -5,7 +5,11 @@ import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBatt
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
 import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
 import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromotionChoice";
-import { getVerboseChessMove } from "./util";
+import {
+  getCastleSquare,
+  getVerboseChessMove,
+  userAttemptingCastle,
+} from "./util";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useDebounce } from "../../../utils";
 import { ChessData } from "../../../../shared/types/Game";
@@ -117,12 +121,7 @@ const ChessManager = ({
       // Set the current square in state and highlight any potential moves for that square
       updateSelection(square);
     }
-    if (
-      selectedSquare &&
-      getVerboseChessMove(selectedSquare, square, chessManager)?.color === color
-    ) {
-      movePiece({ fromSquare: selectedSquare, toSquare: square });
-    }
+    handleMovePiece({ square });
   };
 
   const handleSquareHover = useDebounce(
@@ -133,11 +132,26 @@ const ChessManager = ({
   );
 
   const handlePieceDrop = ({ square }: PokemonChessBoardSquare) => {
-    if (
-      selectedSquare &&
-      getVerboseChessMove(selectedSquare, square, chessManager)?.color === color
-    ) {
-      movePiece({ fromSquare: selectedSquare, toSquare: square });
+    return handleMovePiece({ square });
+  };
+
+  const handleMovePiece = ({ square }: PokemonChessBoardSquare) => {
+    if (selectedSquare) {
+      const verboseChessMove = getVerboseChessMove(
+        selectedSquare,
+        square,
+        chessManager,
+      );
+      if (verboseChessMove) {
+        if (verboseChessMove.color === color) {
+          movePiece({ fromSquare: selectedSquare, toSquare: square });
+        }
+      } else if (userAttemptingCastle(selectedSquare, square, chessManager)) {
+        const castleSquare = getCastleSquare(square);
+        if (castleSquare) {
+          movePiece({ fromSquare: selectedSquare, toSquare: castleSquare });
+        }
+      }
     }
   };
 

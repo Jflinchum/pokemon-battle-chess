@@ -86,3 +86,33 @@ export const speciesOverride = (species: string) => {
   }
   return species;
 };
+
+/**
+ * Our chess library infers castling by moving the king to the square before the rook.
+ * To make it easier on the user, we also support it if they move the king over the rook.
+ */
+export const userAttemptingCastle = (
+  fromSquare: Square,
+  toSquare: Square,
+  chessManager: Chess,
+) => {
+  const pieceFrom = chessManager.get(fromSquare);
+  const pieceTo = chessManager.get(toSquare);
+
+  return (
+    pieceFrom?.color === pieceTo?.color &&
+    pieceFrom?.type === "k" &&
+    pieceTo?.type === "r"
+  );
+};
+
+export const getCastleSquare = (toSquare: Square): Square | undefined => {
+  const castleMapping: Partial<Record<Square, Square>> = {
+    h1: "g1",
+    a1: "c1",
+    h8: "g8",
+    a8: "c8",
+  };
+
+  return castleMapping[toSquare];
+};
