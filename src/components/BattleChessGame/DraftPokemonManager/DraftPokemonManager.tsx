@@ -88,8 +88,8 @@ const DraftPokemonManager = ({
           {draftTurnPick === gameState.gameSettings.color ? (
             <strong>
               {pokemonManager.draftPieces.length > 32
-                ? 'Select a pokemon that you want to ban, and the click "Ban Pokemon"!'
-                : "Select a pokemon you want to draft, and then select the chess piece to draft it!"}
+                ? `Ban a Pokémon! You have ${3 - Math.floor(pokemonManager.banPieces.length / 2)} bans left.`
+                : "Select a Pokémon you want to draft, and then select the chess piece to draft it!"}
             </strong>
           ) : (
             <strong>Waiting for opponent...</strong>
