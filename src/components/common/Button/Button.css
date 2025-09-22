@@ -9,8 +9,16 @@
   color: white;
   transition: filter 0.25s;
   box-sizing: border-box;
+  text-decoration: none;
+  font-size: 0.8em;
+
   &:hover {
     background-color: var(--gray-6);
+  }
+
+  &:visited {
+    color: white;
+    text-decoration: none;
   }
 
   &:active {

@@ -1,25 +1,26 @@
 import "./Button.css";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonLinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   color?: "primary" | "secondary" | "danger";
   highlighted?: boolean;
 }
 
-const Button = ({
+const ButtonLink = ({
   children,
   highlighted,
   className = "",
   color = "secondary",
   ...props
-}: ButtonProps) => {
+}: ButtonLinkProps) => {
   return (
-    <button
+    <a
       className={`button ${color} ${highlighted ? "highlightedButton" : ""} ${className}`}
       {...props}
     >
       {children}
-    </button>
+    </a>
   );
 };
 
-export default Button;
+export default ButtonLink;

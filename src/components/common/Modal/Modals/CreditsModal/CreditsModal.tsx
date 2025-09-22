@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import Button from "../../../Button/Button";
 import "./CreditsModal.css";
+import ButtonLink from "../../../Button/ButtonLink";
 
 const CreditsModal = () => {
   return (
@@ -33,19 +33,15 @@ const CreditsModal = () => {
         </p>
 
         <div>
-          {
-            // TODO - make this an a tag
-          }
-          <Button
-            onClick={() =>
-              (window.location.href =
-                "https://github.com/Jflinchum/pokemon-battle-chess")
-            }
+          <ButtonLink
+            href={"https://github.com/Jflinchum/pokemon-battle-chess"}
+            target="_blank"
+            rel="noopener noreferrer"
             className="creditsGithubButton"
           >
             <FontAwesomeIcon icon={faGithub} size="3x" />
             <span>Github</span>
-          </Button>
+          </ButtonLink>
         </div>
       </div>
     </div>
