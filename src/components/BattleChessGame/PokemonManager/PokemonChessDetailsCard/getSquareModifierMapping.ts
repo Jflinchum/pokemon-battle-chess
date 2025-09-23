@@ -53,5 +53,14 @@ export const getSquareModifierMapping = (
         label: "Sun",
         desc: "Boosts the power of Fire type moves by 50% and decreases the power of Water type moves by 50%.",
       };
+    case "trickroom":
+      return {
+        label: "Trickroom",
+        desc: "Reverses the move order so that Pokémon with a lower Speed stat attack first, while those with a higher Speed stat will attack last.",
+      };
+    default:
+      return {
+        label: condition,
+      };
   }
 };

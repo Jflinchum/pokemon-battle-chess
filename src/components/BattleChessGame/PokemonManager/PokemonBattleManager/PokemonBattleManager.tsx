@@ -43,6 +43,9 @@ const PokemonBattleManager = ({
   const [terrainState, setTerrainState] = useState<
     { id: TerrainName | TerrainId; turns: number } | undefined
   >();
+  const [pseudoWeather, setPseudoWeatherState] = useState<
+    Battle["field"]["pseudoWeather"] | undefined
+  >();
   const [p1ActivePokemon, setP1ActivePokemon] = useState<Pokemon | null>(null);
   const [p2ActivePokemon, setP2ActivePokemon] = useState<Pokemon | null>(null);
   const [moves, setMoves] = useState<PokemonMoveChoice[]>([]);
@@ -131,6 +134,7 @@ const PokemonBattleManager = ({
         );
         setWeatherState(getWeatherStateFromBattle(battle));
         setTerrainState(getTerrainStateFromBattle(battle));
+        setPseudoWeatherState(getPseudoWeatherStateFromBattle(battle));
         setProcessedBattleLog(
           currentPokemonMoveHistory.slice(
             0,
@@ -174,6 +178,7 @@ const PokemonBattleManager = ({
       logFormatter={formatter}
       weatherState={weatherState}
       terrainState={terrainState}
+      pseudoWeatherState={pseudoWeather}
       p1ActivePokemon={p1ActivePokemon}
       p2ActivePokemon={p2ActivePokemon}
       p1PokemonSet={p1PokemonSet}
@@ -181,6 +186,16 @@ const PokemonBattleManager = ({
       perspective={perspective}
     />
   );
+};
+
+const getPseudoWeatherStateFromBattle = (
+  battle: Battle,
+): Battle["field"]["pseudoWeather"] | undefined => {
+  if (!battle) {
+    return;
+  }
+
+  return battle.field.pseudoWeather;
 };
 
 const getWeatherStateFromBattle = (battle: Battle) => {

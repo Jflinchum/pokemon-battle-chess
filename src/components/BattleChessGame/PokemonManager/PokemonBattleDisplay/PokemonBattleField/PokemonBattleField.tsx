@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pokemon, TerrainName, WeatherName } from "@pkmn/client";
+import { Battle, Pokemon, TerrainName, WeatherName } from "@pkmn/client";
 import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet } from "@pkmn/data";
 import { PRNG } from "@pkmn/sim";
@@ -31,6 +31,7 @@ interface PokemonBattleFieldProps {
     id: TerrainName | TerrainId;
     turns: number;
   };
+  pseudoWeatherState?: Battle["field"]["pseudoWeather"];
   p1PokemonSet: PokemonSet;
   p2PokemonSet: PokemonSet;
 }
@@ -43,6 +44,7 @@ const PokemonBattleField = ({
   p2ActivePokemon,
   weatherState,
   terrainState,
+  pseudoWeatherState,
   p1PokemonSet,
   p2PokemonSet,
 }: PokemonBattleFieldProps) => {
@@ -57,9 +59,11 @@ const PokemonBattleField = ({
     <PokemonBattleBackground prng={prng}>
       <PokemonWeatherBackground weatherType={weatherState?.id} />
       <PokemonWeatherBackground weatherType={terrainState?.id} />
+      <PokemonWeatherBackground />
       <PokemonBattleConditions
         weatherState={weatherState}
         terrainState={terrainState}
+        pseudoWeatherState={pseudoWeatherState}
       />
       {p1ActivePokemon && (
         <PokemonFieldSprite

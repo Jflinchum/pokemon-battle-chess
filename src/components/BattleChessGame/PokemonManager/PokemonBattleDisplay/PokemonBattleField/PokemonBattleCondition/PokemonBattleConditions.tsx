@@ -1,17 +1,17 @@
-import { TerrainName, WeatherName } from "@pkmn/client";
+import { Battle, TerrainName, WeatherName } from "@pkmn/client";
 import { getSquareModifierMapping } from "../../../PokemonChessDetailsCard/getSquareModifierMapping";
-import "./PokemonBattleConditions.css";
 import Tooltip from "../../../../../common/Tooltip/Tooltip";
 import {
   TerrainId,
   WeatherId,
 } from "../../../../../../../shared/types/PokemonTypes";
+import "./PokemonBattleConditions.css";
 
 const PokemonBattleConditionLabel = ({
   condition,
 }: {
   condition?: {
-    id: WeatherName | WeatherId | TerrainName | TerrainId;
+    id: WeatherName | WeatherId | TerrainName | TerrainId | string;
     turns: number;
   };
 }) => {
@@ -42,6 +42,7 @@ const PokemonBattleConditionLabel = ({
 export const PokemonBattleConditions = ({
   weatherState,
   terrainState,
+  pseudoWeatherState,
 }: {
   weatherState?: {
     id: WeatherName | WeatherId;
@@ -51,6 +52,7 @@ export const PokemonBattleConditions = ({
     id: TerrainName | TerrainId;
     turns: number;
   };
+  pseudoWeatherState?: Battle["field"]["pseudoWeather"];
 }) => {
   if (!weatherState && !terrainState) return null;
 
@@ -58,6 +60,17 @@ export const PokemonBattleConditions = ({
     <div className="pokemonBattleConditions">
       <PokemonBattleConditionLabel condition={weatherState} />
       <PokemonBattleConditionLabel condition={terrainState} />
+      {pseudoWeatherState
+        ? Object.keys(pseudoWeatherState).map((pseudoWeatherKey) => (
+            <PokemonBattleConditionLabel
+              key={pseudoWeatherKey}
+              condition={{
+                id: pseudoWeatherKey,
+                turns: pseudoWeatherState[pseudoWeatherKey].minDuration,
+              }}
+            />
+          ))
+        : null}
     </div>
   );
 };

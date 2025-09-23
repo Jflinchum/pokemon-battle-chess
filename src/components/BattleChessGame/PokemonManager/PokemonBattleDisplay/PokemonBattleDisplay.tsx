@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { LogFormatter } from "@pkmn/view";
 import { PRNG } from "@pkmn/sim";
-import { Pokemon, TerrainName, WeatherName } from "@pkmn/client";
+import { Battle, Pokemon, TerrainName, WeatherName } from "@pkmn/client";
 import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet, SideID } from "@pkmn/data";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
@@ -29,6 +29,7 @@ interface PokemonBattleDisplayProps {
     id: TerrainName | TerrainId;
     turns: number;
   };
+  pseudoWeatherState?: Battle["field"]["pseudoWeather"];
   p1ActivePokemon: Pokemon | null;
   p2ActivePokemon: Pokemon | null;
   moves: PokemonMoveChoice[];
@@ -46,6 +47,7 @@ const PokemonBattleDisplay = ({
   logFormatter,
   weatherState,
   terrainState,
+  pseudoWeatherState,
   p1ActivePokemon,
   p2ActivePokemon,
   p1PokemonSet,
@@ -83,6 +85,7 @@ const PokemonBattleDisplay = ({
           p2ActivePokemon={p2ActivePokemon}
           weatherState={weatherState}
           terrainState={terrainState}
+          pseudoWeatherState={pseudoWeatherState}
           p1PokemonSet={p1PokemonSet}
           p2PokemonSet={p2PokemonSet}
         />
