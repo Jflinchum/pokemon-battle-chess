@@ -1,6 +1,11 @@
 import { WeatherName, TerrainName } from "@pkmn/client";
 import { WeatherId, TerrainId } from "../../../../../shared/types/PokemonTypes";
 
+/**
+ * Outputs a label and description of a battle field condition to be rendered to the user.
+ * There will likely be extra conditions not defined here that may need to be added over time,
+ * as there are plenty of pseudoweathers that pokemon has
+ */
 export const getSquareModifierMapping = (
   condition: WeatherId | TerrainId | WeatherName | TerrainName,
 ) => {
