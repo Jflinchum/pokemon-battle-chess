@@ -6,6 +6,7 @@ import { GameTimerOptions, TimerId } from "./GameTimerOptions/GameTimerOptions";
 import Button from "../../../common/Button/Button";
 import "./RoomOptions.css";
 import { Input } from "../../../common/Input/Input";
+import { ToggleSwitch } from "../../../common/ToggleSwitch/ToggleSwitch";
 
 const advantageOptions: { stat: BoostID; label: string }[] = [
   { stat: "atk", label: "Attack" },
@@ -166,11 +167,10 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               will come and go throughout the match.
             </p>
           </div>
-          <Input
+          <ToggleSwitch
             name="weatherWarsFormatInput"
             checked={gameOptions.weatherWars}
             disabled={!isHost}
-            type="checkbox"
             onChange={(e) => setWeatherWars(e.target.checked)}
             aria-describedby="weatherWarsFormat"
           />

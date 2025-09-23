@@ -1,4 +1,5 @@
 import { useUserState } from "../../../../../../context/UserState/UserStateContext";
+import { ToggleSwitch } from "../../../../ToggleSwitch/ToggleSwitch";
 import "./GameSettings.css";
 
 const animationSpeedMap: Record<string, string> = {
@@ -51,10 +52,9 @@ export const GameSettings = () => {
         </li>
         <li>
           <label htmlFor="2dSpritesOption">Use Pokémon 2D Sprites</label>
-          <input
+          <ToggleSwitch
             id="2dSpritesOption"
             className="gameSettingsInput"
-            type="checkbox"
             checked={userState.use2DSprites}
             onChange={(e) => handle2DSpriteChange(e.target.checked)}
           />
@@ -63,10 +63,9 @@ export const GameSettings = () => {
           <label htmlFor="disableAnimatedBackground">
             Disable Animated Background
           </label>
-          <input
+          <ToggleSwitch
             id="disableAnimatedBackground"
             className="gameSettingsInput"
-            type="checkbox"
             checked={!userState.animatedBackgroundEnabled}
             onChange={(e) => handleAnimatedBackgroundChange(!e.target.checked)}
           />
