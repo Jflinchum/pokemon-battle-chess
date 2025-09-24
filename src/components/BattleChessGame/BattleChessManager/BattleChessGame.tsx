@@ -412,12 +412,6 @@ export const BattleChessGame = ({
     matchLogIndex,
   });
 
-  useEffect(() => {
-    if (!gameState.isCatchingUp && gameState.isSkippingAhead) {
-      dispatch({ type: "SET_SKIPPING_AHEAD", payload: false });
-    }
-  }, [gameState.isSkippingAhead, gameState.isCatchingUp, dispatch]);
-
   /**
    * Clear out the timeout for starting and ending a battle if we start skipping ahead.
    * This is to prevent unintended side effects while we're not rendering anything.

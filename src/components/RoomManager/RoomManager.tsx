@@ -132,12 +132,8 @@ const RoomManager = () => {
 
       if (!isSyncing) {
         setMatchHistory(undefined);
-      } else if (
-        settings.blackPlayer?.playerId === userState.id ||
-        settings.whitePlayer?.playerId === userState.id
-      ) {
-        dispatch({ type: "SET_SKIPPING_AHEAD", payload: true });
       }
+
       if (gameState.matchEnded && gameState.inGame) {
         /**
          * If the user is still viewing results from the previous game, let them know that returning to the room
@@ -152,7 +148,15 @@ const RoomManager = () => {
           },
         );
       }
-      dispatch({ type: "START_MATCH", payload: settings });
+      dispatch({
+        type: "START_MATCH",
+        payload: {
+          settings,
+          isSkippingAhead:
+            settings.blackPlayer?.playerId === userState.id ||
+            settings.whitePlayer?.playerId === userState.id,
+        },
+      });
     });
 
     socket.on("kickedFromRoom", (cb) => {

@@ -43,7 +43,10 @@ type GameStateAction =
   | { type: "END_MATCH" }
   | { type: "START_REPLAY"; payload: ReplayData }
   | { type: "START_DEMO" }
-  | { type: "START_MATCH"; payload: GameSettings };
+  | {
+      type: "START_MATCH";
+      payload: { settings: GameSettings; isSkippingAhead: boolean };
+    };
 
 export const GameStateContext = createContext<GameStateType | null>(null);
 
@@ -120,9 +123,10 @@ export const gameStateReducer = (
         ...gameState,
         inGame: true,
         matchEnded: false,
+        isSkippingAhead: action.payload.isSkippingAhead,
         gameSettings: {
           ...gameState.gameSettings,
-          ...action.payload,
+          ...action.payload.settings,
         },
       };
     case "RETURN_TO_ROOM":

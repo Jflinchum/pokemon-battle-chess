@@ -223,6 +223,7 @@ const useBattleHistory = ({
       }
 
       if (matchLogIndex.current === currentMatchLog.length) {
+        dispatch({ type: "SET_SKIPPING_AHEAD", payload: false });
         dispatch({ type: "SET_CATCHING_UP", payload: false });
       }
     };
