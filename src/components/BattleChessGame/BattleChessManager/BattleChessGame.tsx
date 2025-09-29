@@ -311,11 +311,10 @@ export const BattleChessGame = ({
       if (validatePremoveQueue()) {
         if (chessManager.turn() === color && preMoveQueue.length > 0) {
           try {
+            setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
             await requestChessMove(preMoveQueue[0].san);
           } catch (err) {
             toast(`Error: ${err}`, { type: "error" });
-          } finally {
-            setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
           }
         }
       }
