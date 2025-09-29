@@ -77,6 +77,9 @@ export const BattleChessGame = ({
   const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<
     { args: ArgType; kwArgs: KWArgType }[]
   >([]);
+  const [currentSquareModifiers, setCurrentSquareModifiers] = useState<
+    SquareModifier[]
+  >(pokemonManager.squareModifiers);
   const prng = useMemo(
     () => new PRNG(gameState.gameSettings.seed || "1234,1234"),
     [gameState.gameSettings.seed],
@@ -375,6 +378,7 @@ export const BattleChessGame = ({
   const onWeatherChange = useCallback(
     (squareModifiers: SquareModifier[]) => {
       pokemonManager.updateSquareModifiers(squareModifiers);
+      setCurrentSquareModifiers(pokemonManager.squareModifiers);
     },
     [pokemonManager],
   );
@@ -382,6 +386,7 @@ export const BattleChessGame = ({
   const onWeatherRemove = useCallback(
     (squares: Square[]) => {
       pokemonManager.removeSquareModifiers(squares);
+      setCurrentSquareModifiers(pokemonManager.squareModifiers);
     },
     [pokemonManager],
   );
@@ -534,6 +539,7 @@ export const BattleChessGame = ({
             currentMatchLog.filter((log) => log.type === "chess") as ChessData[]
           }
           board={simulatedBoard}
+          squareModifiers={currentSquareModifiers}
           battleSquare={battleSquare}
           onMove={(san) => {
             if (gameState.isSpectator) {

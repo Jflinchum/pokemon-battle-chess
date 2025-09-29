@@ -1,10 +1,12 @@
 import PokemonChessPieceSprite from "../PokemonChessPieceSprite/PokemonChessPieceSprite";
 import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
 import { PokemonChessBoardSquare } from "../../../../../types/chess/PokemonChessBoardSquare";
+import { SquareModifier } from "../../../../../../shared/models/PokemonBattleChessManager";
 import "./ChessSquare.css";
 
 interface ChessSquareProps {
   square: PokemonChessBoardSquare;
+  squareModifier?: SquareModifier;
   backgroundColor: "white" | "black";
   onClick: (arg0: PokemonChessBoardSquare) => void;
   onSquareHover?: (arg0?: PokemonChessBoardSquare | null) => void;
@@ -40,6 +42,7 @@ const getSquareHighlightClass = (
 
 const ChessSquare = ({
   square,
+  squareModifier,
   backgroundColor,
   onPieceDrop,
   onPieceDrag,
@@ -75,18 +78,18 @@ const ChessSquare = ({
         className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${square?.pokemon || square?.type ? "pieceSquare" : ""}`}
       />
       <div className="squareWeatherContainer">
-        {square?.modifiers?.weather && (
+        {squareModifier?.modifiers?.weather && (
           <PokemonWeatherBackground
-            key={square.modifiers.weather.id}
+            key={squareModifier.modifiers.weather.id}
             className="squareWeather"
-            weatherType={square.modifiers.weather.id}
+            weatherType={squareModifier.modifiers.weather.id}
           />
         )}
-        {square?.modifiers?.terrain && (
+        {squareModifier?.modifiers?.terrain && (
           <PokemonWeatherBackground
-            key={square.modifiers.terrain.id}
+            key={squareModifier.modifiers.terrain.id}
             className="squareWeather"
-            weatherType={square.modifiers.terrain.id}
+            weatherType={squareModifier.modifiers.terrain.id}
           />
         )}
       </div>

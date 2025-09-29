@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Chess, Square, Move, Color, PieceSymbol } from "chess.js";
 import ChessBoard from "./ChessBoard/ChessBoard";
-import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
+import {
+  PokemonBattleChessManager,
+  SquareModifier,
+} from "../../../../shared/models/PokemonBattleChessManager";
 import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
 import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
 import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromotionChoice";
@@ -29,6 +32,7 @@ interface ChessManagerProps {
   chessMoveHistory: ChessData[];
   battleSquare?: Square;
   preMoveQueue?: { from: Square; to: Square; promotion?: PieceSymbol }[];
+  squareModifiers: SquareModifier[];
 }
 
 const ChessManager = ({
@@ -43,6 +47,7 @@ const ChessManager = ({
   onMove,
   chessMoveHistory,
   preMoveQueue,
+  squareModifiers,
 }: ChessManagerProps) => {
   /**
    * TODO:
@@ -194,6 +199,7 @@ const ChessManager = ({
           <ChessBoard
             color={color}
             boardState={board}
+            squareModifiers={squareModifiers}
             onSquareClick={handleSquareClick}
             onSquareHover={handleSquareHover}
             onPieceDrag={handlePieceDrag}
@@ -208,8 +214,14 @@ const ChessManager = ({
         <PokemonChessDetailsCard
           chessMoveHistory={chessMoveHistory}
           squareModifier={
-            pokemonManager.getModifiersFromSquare(hoveredSquare) ||
-            pokemonManager.getModifiersFromSquare(selectedSquare)
+            pokemonManager.getModifiersFromSquare(
+              hoveredSquare,
+              squareModifiers,
+            ) ||
+            pokemonManager.getModifiersFromSquare(
+              selectedSquare,
+              squareModifiers,
+            )
           }
           pokemon={
             pokemonManager.getPokemonFromSquare(hoveredSquare)?.pkmn ||

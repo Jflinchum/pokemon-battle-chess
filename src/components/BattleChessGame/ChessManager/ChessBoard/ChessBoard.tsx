@@ -2,11 +2,13 @@ import { Color, PieceSymbol, Square } from "chess.js";
 import { getSquareColor } from "../util";
 import ChessSquare from "./ChessSquare/ChessSquare";
 import { PokemonChessBoardSquare } from "../../../../types/chess/PokemonChessBoardSquare";
+import { SquareModifier } from "../../../../../shared/models/PokemonBattleChessManager";
 import "./ChessBoard.css";
 
 interface ChessBoardProps {
   color: Color;
   boardState: PokemonChessBoardSquare[][];
+  squareModifiers: SquareModifier[];
   onSquareClick: (arg0: PokemonChessBoardSquare) => void;
   onSquareHover?: (arg0?: PokemonChessBoardSquare | null) => void;
   onPieceDrag: (arg0: PokemonChessBoardSquare) => void;
@@ -21,6 +23,7 @@ interface ChessBoardProps {
 const ChessBoard = ({
   color,
   boardState,
+  squareModifiers,
   onSquareClick,
   onSquareHover,
   onPieceDrag,
@@ -56,6 +59,9 @@ const ChessBoard = ({
               <ChessSquare
                 key={columnIndex}
                 square={boardSquare}
+                squareModifier={squareModifiers.find(
+                  (sqMod) => sqMod.square === boardSquare.square,
+                )}
                 backgroundColor={getSquareColor(
                   normalizedRowIndex(rowIndex),
                   columnIndex,
