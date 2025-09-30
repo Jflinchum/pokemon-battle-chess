@@ -8,7 +8,7 @@ import "./ChessBoard.css";
 interface ChessBoardProps {
   color: Color;
   boardState: PokemonChessBoardSquare[][];
-  squareModifiers: SquareModifier[];
+  squareModifiers?: SquareModifier[];
   onSquareClick: (arg0: PokemonChessBoardSquare) => void;
   onSquareHover?: (arg0?: PokemonChessBoardSquare | null) => void;
   onPieceDrag: (arg0: PokemonChessBoardSquare) => void;
@@ -23,7 +23,7 @@ interface ChessBoardProps {
 const ChessBoard = ({
   color,
   boardState,
-  squareModifiers,
+  squareModifiers = [],
   onSquareClick,
   onSquareHover,
   onPieceDrag,
