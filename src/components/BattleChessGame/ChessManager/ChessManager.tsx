@@ -9,7 +9,7 @@ import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/P
 import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
 import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromotionChoice";
 import {
-  getCastleSquare,
+  getCastlingSquareFromCornerSquares,
   getVerboseChessMove,
   userAttemptingCastle,
 } from "./util";
@@ -151,8 +151,13 @@ const ChessManager = ({
         if (verboseChessMove.color === color) {
           movePiece({ fromSquare: selectedSquare, toSquare: square });
         }
-      } else if (userAttemptingCastle(selectedSquare, square, chessManager)) {
-        const castleSquare = getCastleSquare(square);
+      } else if (
+        userAttemptingCastle(
+          chessManager.get(selectedSquare),
+          chessManager.get(square),
+        )
+      ) {
+        const castleSquare = getCastlingSquareFromCornerSquares(square);
         if (castleSquare) {
           movePiece({ fromSquare: selectedSquare, toSquare: castleSquare });
         }

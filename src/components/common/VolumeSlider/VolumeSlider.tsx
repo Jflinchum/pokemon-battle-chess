@@ -8,7 +8,7 @@ import { useMemo, useState } from "react";
 import { useDebounce } from "../../../utils";
 import "./VolumeSlider.css";
 
-interface VolumeSliderProps
+export interface VolumeSliderProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   initialVolume?: number;
   onVolumeUpdate?: (volume: number) => void;
@@ -52,11 +52,13 @@ export const VolumeSlider = ({
   return (
     <span className="volumeSliderContainer">
       <FontAwesomeIcon
+        data-testid="volume-slider-icon"
         icon={volumeIcon}
         size="xs"
         onClick={handleVolumeIconClick}
       />
       <input
+        data-testid="volume-slider-input"
         type="range"
         value={volume}
         onChange={(e) => handleChange(parseInt(e.target.value))}
