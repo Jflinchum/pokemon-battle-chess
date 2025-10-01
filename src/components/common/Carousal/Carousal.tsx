@@ -8,7 +8,7 @@ import {
 import Button from "../Button/Button";
 import "./Carousal.css";
 
-interface CarousalProps {
+export interface CarousalProps {
   screens: React.ReactNode[];
   wrapScreens?: boolean;
   className?: string;
@@ -31,6 +31,7 @@ export const Carousal = ({
       </div>
       <div className="carousalActions">
         <Button
+          data-testid="carousal-previous-button"
           className="carousalArrowButtons"
           color="primary"
           disabled={!wrapScreens && screenIndex === 0}
@@ -50,6 +51,7 @@ export const Carousal = ({
               className={`carousalScreenSelectorItem`}
               key={index}
               aria-label={`Slide ${index + 1}`}
+              data-testid="carousal-screen-selector-button"
             >
               <FontAwesomeIcon
                 icon={faCircle}
@@ -61,6 +63,7 @@ export const Carousal = ({
           ))}
         </div>
         <Button
+          data-testid="carousal-next-button"
           className="carousalArrowButtons"
           color="primary"
           disabled={!wrapScreens && screenIndex === screens.length - 1}
