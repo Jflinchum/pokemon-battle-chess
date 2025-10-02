@@ -23,7 +23,7 @@
     "injectData": "node util/dev/dataInjection.js",
     "prepare": "node -e \"if (process.env.NODE_ENV !== 'production'){ process.exit(1)} \" || husky",
     "test": "vitest",
-    "test:watch": "vitest --watch"
+    "test:coverage": "vitest --coverage"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
@@ -71,6 +71,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-react-hooks": "^5.1.0",
