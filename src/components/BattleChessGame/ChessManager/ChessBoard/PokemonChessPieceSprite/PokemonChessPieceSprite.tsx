@@ -5,27 +5,37 @@ import { PokemonSprite } from "../../../../common/Pokemon/PokemonSprite/PokemonS
 import ChessPieceSprite from "../ChessPieceSprite/ChessPieceSprite";
 import "./PokemonChessPieceSprite.css";
 
-interface PokemonChessPieceSpriteProps {
-  type?: PieceSymbol;
-  color?: Color;
+export interface PokemonChessPieceSpriteProps {
+  chessPieceType?: PieceSymbol;
+  chessPieceColor?: Color;
   pokemon?: PokemonSet;
   onDragStart?: (e: React.DragEvent) => void;
 }
 
 const PokemonChessPieceSprite = ({
-  type,
-  color,
+  chessPieceType,
+  chessPieceColor,
   pokemon,
   onDragStart,
 }: PokemonChessPieceSpriteProps) => {
-  if (!type || !color) {
+  if (!chessPieceType || !chessPieceColor) {
     return null;
   }
 
   return (
-    <div draggable className="pieceSpriteContainer" onDragStart={onDragStart}>
-      {type && color && (
-        <ChessPieceSprite type={type} color={color} className="chessPiece" />
+    <div
+      draggable
+      className="pieceSpriteContainer"
+      onDragStart={onDragStart}
+      data-testid="pokemon-chess-piece-container"
+    >
+      {chessPieceType && chessPieceColor && (
+        <ChessPieceSprite
+          type={chessPieceType}
+          color={chessPieceColor}
+          className="chessPiece"
+          data-testid="pokemon-chess-piece"
+        />
       )}
       {pokemon && (
         <PokemonSprite
@@ -34,6 +44,7 @@ const PokemonChessPieceSprite = ({
           gender={pokemon.gender as GenderName}
           shiny={pokemon.shiny}
           useDiv
+          data-testid="pokemon-chess-piece-pokemon-sprite"
         />
       )}
     </div>

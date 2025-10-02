@@ -94,8 +94,8 @@ const ChessSquare = ({
         )}
       </div>
       <PokemonChessPieceSprite
-        type={square?.type}
-        color={square?.color}
+        chessPieceType={square?.type}
+        chessPieceColor={square?.color}
         pokemon={square.pokemon}
         onDragStart={() => {
           onPieceDrag(square);

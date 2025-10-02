@@ -4,13 +4,13 @@ import { Dex, GenderName } from "@pkmn/dex";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { speciesOverride } from "../../../BattleChessGame/ChessManager/util";
 
-interface PokemonSprite extends HTMLAttributes<HTMLImageElement> {
+export interface PokemonSprite extends HTMLAttributes<HTMLImageElement> {
   pokemonIdentifier: string;
   isSubstitute?: boolean;
   gender?: GenderName;
   shiny?: boolean;
   side?: "p1" | "p2";
-  // When implemented within draggables, image dragging take priority over draggable. Use a div with a background image in those cases
+  // When implemented within draggables, browser image dragging take priority over draggable. Use a div with a background image in those cases
   useDiv?: boolean;
 }
 
