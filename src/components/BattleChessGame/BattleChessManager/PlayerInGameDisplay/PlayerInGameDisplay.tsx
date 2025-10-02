@@ -47,7 +47,7 @@ const PlayerInGameDisplay = ({
         <Timer
           timerExpiration={timer.timerExpiration}
           paused={timer.pause}
-          hasStarted={timer.hasStarted}
+          roundUpRenderedTime={!timer.hasStarted}
           className="playerTimer"
         />
       )}

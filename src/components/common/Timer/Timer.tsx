@@ -3,10 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
 import "./Timer.css";
 
-interface TimerProps {
+export interface TimerProps {
   timerExpiration: number;
   paused: boolean;
-  hasStarted: boolean;
+  roundUpRenderedTime: boolean;
   className?: string;
 }
 
@@ -23,24 +23,24 @@ const formatMillisecondsToTime = (milliseconds: number) => {
   if (milliseconds < 0) {
     return "0:00";
   }
-  // Report seconds in 32.142 format
+  // Report seconds in SS.mm format
   if (milliseconds < 60 * 1000) {
     return `${Math.floor(milliseconds / 1000)}.${Math.floor((milliseconds % 1000) / 10) < 10 ? "0" : ""}${Math.floor((milliseconds % 1000) / 10)}`;
   }
-  // Report minutes in 1:32 format
+  // Report minutes in MM:SS format
   return `${Math.floor(milliseconds / (60 * 1000))}:${milliseconds % (60 * 1000) < 1000 * 10 ? "0" : ""}${Math.floor((milliseconds % (60 * 1000)) / 1000)}`;
 };
 
 const Timer = ({
   timerExpiration,
   paused,
-  hasStarted,
+  roundUpRenderedTime,
   className = "",
 }: TimerProps) => {
   const [time, setTime] = useState<number>(
-    hasStarted
-      ? getTimeLeftInMilliSeconds(timerExpiration)
-      : getTimeLeftRoundedUpToNearestSecond(timerExpiration),
+    roundUpRenderedTime
+      ? getTimeLeftRoundedUpToNearestSecond(timerExpiration)
+      : getTimeLeftInMilliSeconds(timerExpiration),
   );
   const [timeInterval, setTimeInterval] = useState<number>(
     getTimeLeftInMilliSeconds(timerExpiration) < 60 * 1000 ? 10 : 1000,
@@ -54,6 +54,7 @@ const Timer = ({
     if (!paused) {
       timerRef.current = setInterval(() => {
         setTime(() => getTimeLeftInMilliSeconds(timerExpiration));
+        // If we're above a minute, report the time every second. Otherwise, set the interval for every 10ms
         if (
           getTimeLeftInMilliSeconds(timerExpiration) < 60 * 1000 + 1000 &&
           timeInterval === 1000
@@ -71,15 +72,18 @@ const Timer = ({
   }, [paused, timerExpiration, timeInterval]);
 
   useEffect(() => {
-    const timeLeft = hasStarted
-      ? getTimeLeftInMilliSeconds(timerExpiration)
-      : getTimeLeftRoundedUpToNearestSecond(timerExpiration);
+    const timeLeft = roundUpRenderedTime
+      ? getTimeLeftRoundedUpToNearestSecond(timerExpiration)
+      : getTimeLeftInMilliSeconds(timerExpiration);
     setTime(timeLeft);
     setTimeInterval(timeLeft < 60 * 1000 ? 10 : 1000);
-  }, [timerExpiration, hasStarted]);
+  }, [timerExpiration, roundUpRenderedTime]);
 
   return (
-    <span className={`timer ${paused ? "paused" : ""} ${className}`}>
+    <span
+      className={`timer ${paused ? "paused" : ""} ${className}`}
+      data-testid="timer"
+    >
       <FontAwesomeIcon icon={faHourglass} />{" "}
       <span>{formatMillisecondsToTime(time)}</span>
     </span>
