@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import PlayerName, { PlayerNameProps } from "../PlayerName";
-import { getMockPlayer } from "../../../../../testUtils/playerUtils";
+import { getMockPlayer } from "../../../../../testUtils/player";
 
 const setup = (props: PlayerNameProps = { player: getMockPlayer() }) => {
   const utils = render(<PlayerName {...props} />);

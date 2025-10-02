@@ -3,7 +3,7 @@ import {
   getCastlingSquareFromCornerSquares,
   userAttemptingCastle,
 } from "../util";
-import { getAllChessBoardSquares } from "../../../../testUtils/chessUtils";
+import { getAllChessBoardSquares } from "../../../../testUtils/chess";
 import { Square } from "chess.js";
 
 describe("util.it.ts", () => {
