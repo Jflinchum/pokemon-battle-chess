@@ -6,7 +6,7 @@ import {
 import { getAllChessBoardSquares } from "../../../../testUtils/chess";
 import { Square } from "chess.js";
 
-describe("util.it.ts", () => {
+describe("ChessManager/util.test.ts", () => {
   describe("userAttemptingToCastle", () => {
     it("should return true when given a white king and white rook", () => {
       expect(

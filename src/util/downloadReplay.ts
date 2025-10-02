@@ -42,7 +42,7 @@ export const downloadReplay = (gameState: GameState, error?: Error) => {
   };
 
   const fileName = `${new Date().getFullYear()}-${new Date().getDate()}-${new Date().getDay()}-${new Date().getHours()}${new Date().getMinutes()}${new Date().getSeconds()}`;
-  const json = JSON.stringify(replayData, null, 2);
+  const json = JSON.stringify(replayData);
   const blob = new Blob([json], { type: "application/json" });
   const href = URL.createObjectURL(blob);
 
