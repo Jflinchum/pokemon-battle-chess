@@ -52,20 +52,27 @@ const GameManagerActions = () => {
 
   return (
     <NavOptions minimal={true} className="gameManagerActionContainer">
-      <div className="gameManagerActionHeaderContainer">
+      <div
+        className="gameManagerActionHeaderContainer"
+        data-testid="game-manager-game-header"
+      >
         <span className="gameManagerActionHeader">Pokemon</span>
         <span className="gameManagerActionHeader">Gambit</span>
       </div>
-      <div className="gameManagerActions">
+      <div
+        className="gameManagerActions"
+        data-testid="game-manager-game-actions"
+      >
         {gameState.isCatchingUp &&
           !gameState.isSkippingAhead &&
           !gameState.isWatchingReplay && (
             <NavOptionButton
               className="gameManagerAction"
+              data-testid="game-manager-skip-ahead-button"
               onClick={() => {
                 dispatchGameState({
                   type: "SET_SKIPPING_AHEAD",
-                  payload: !gameState.isSkippingAhead,
+                  payload: true,
                 });
               }}
             >
@@ -83,6 +90,7 @@ const GameManagerActions = () => {
           !gameState.isWatchingReplay && (
             <NavOptionButton
               className="gameManagerAction"
+              data-testid="game-manager-return-to-room-button"
               onClick={handleReturn}
             >
               <span className="gameManagerActionIcon">
@@ -93,6 +101,7 @@ const GameManagerActions = () => {
           )}
         <NavOptionButton
           className="gameManagerAction"
+          data-testid="game-manager-return-to-menu-button"
           onClick={() => handleLeaveRoom()}
         >
           <span className="gameManagerActionIcon">
@@ -106,6 +115,7 @@ const GameManagerActions = () => {
           gameState.isHost && (
             <NavOptionButton
               className="gameManagerAction"
+              data-testid="game-manager-return-everyone-button"
               onClick={() => handleReturnEveryoneToRoom()}
             >
               <span className="gameManagerActionIcon">
@@ -118,6 +128,7 @@ const GameManagerActions = () => {
           )}
         <NavOptionButton
           className="gameManagerAction"
+          data-testid="game-manager-options-button"
           onClick={() => handleOptionsClick()}
         >
           <span className="gameManagerActionIcon">
@@ -128,6 +139,7 @@ const GameManagerActions = () => {
         {!gameState.isWatchingReplay && gameState.matchHistory && (
           <NavOptionButton
             className="gameManagerAction"
+            data-testid="game-manager-download-replay-button"
             onClick={() => handleDownloadReplay()}
           >
             <span className="gameManagerActionIcon">

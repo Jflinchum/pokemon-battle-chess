@@ -24,7 +24,7 @@ export interface GameState {
   gameSettings: GameSettings;
 }
 
-interface GameStateType {
+export interface GameStateType {
   gameState: GameState;
   dispatch: Dispatch<GameStateAction>;
 }

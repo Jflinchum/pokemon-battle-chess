@@ -18,7 +18,7 @@ export interface VolumePreference {
   musicVolume: number;
 }
 
-interface UserState {
+export interface UserState {
   name: string;
   avatarId: string;
   id: string;
@@ -32,7 +32,7 @@ interface UserState {
   chatHistory: ChatMessage[];
 }
 
-interface UserStateType {
+export interface UserStateType {
   userState: UserState;
   dispatch: Dispatch<UserStateAction>;
 }

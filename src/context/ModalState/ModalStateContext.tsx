@@ -73,13 +73,13 @@ type ModalStateAction =
     }
   | { type: "CLOSE_MODAL"; payload?: object };
 
-interface ModalState {
+export interface ModalState {
   currentModal: ModalName;
   required?: boolean;
   modalProps?: RoomCodeModalProps | EndGameModalProps | GenericModalProps;
 }
 
-interface ModalStateType {
+export interface ModalStateType {
   modalState: ModalState;
   dispatch: Dispatch<ModalStateAction>;
 }
