@@ -44,5 +44,6 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./src/testUtils/vitest.setup.ts"],
+    globalSetup: "./src/testUtils/vitest.global-setup.ts",
   },
 });

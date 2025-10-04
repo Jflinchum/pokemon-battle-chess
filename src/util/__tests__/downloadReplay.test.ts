@@ -87,7 +87,7 @@ describe("downloadReplay.ts", () => {
     expect(global.document.body.appendChild).toHaveBeenCalledOnce();
     expect(global.document.body.removeChild).toHaveBeenCalledOnce();
     expect(mockLink.click).toHaveBeenCalledOnce();
-    expect(mockLink.download).toBe("2025-2-4-15147.replay");
+    expect(mockLink.download).toBe("2025-2-4-19147.replay");
   });
 
   it("should set the downloaded Blob to the match history and relevant game settings and while disabling timers", async () => {
