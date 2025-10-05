@@ -85,7 +85,7 @@ const PokemonChessDetailsCard = ({
                       className="pokemonDetailsSquareModifier"
                     >
                       <PokemonWeatherBackground
-                        weatherType={squareMod.id}
+                        modifierType={squareMod.id}
                         className="detailsCardWeather"
                       />
                       <span>

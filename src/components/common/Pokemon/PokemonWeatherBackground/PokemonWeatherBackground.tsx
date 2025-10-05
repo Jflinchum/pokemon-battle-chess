@@ -41,18 +41,23 @@ const getWeatherBackground = (
   }
 };
 
-export const PokemonWeatherBackground = ({
-  weatherType,
-  className = "",
-}: {
-  weatherType?: WeatherId | TerrainId | WeatherName | TerrainName;
+interface PokemonWeatherBackgroundProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  modifierType?: WeatherId | TerrainId | WeatherName | TerrainName;
   className?: string;
-}) => {
-  const weatherBackground = getWeatherBackground(weatherType);
-  return weatherBackground ? (
+}
+
+export const PokemonWeatherBackground = ({
+  modifierType,
+  className = "",
+  ...props
+}: PokemonWeatherBackgroundProps) => {
+  const modifierBackground = getWeatherBackground(modifierType);
+  return modifierBackground ? (
     <div
       className={`pokemonWeatherBackground ${className}`}
-      style={{ backgroundImage: `url(${weatherBackground})` }}
+      style={{ backgroundImage: `url(${modifierBackground})` }}
+      {...props}
     />
   ) : null;
 };

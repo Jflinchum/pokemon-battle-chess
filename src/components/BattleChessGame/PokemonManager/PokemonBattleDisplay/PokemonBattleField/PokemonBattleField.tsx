@@ -57,8 +57,8 @@ const PokemonBattleField = ({
 
   return (
     <PokemonBattleBackground prng={prng}>
-      <PokemonWeatherBackground weatherType={weatherState?.id} />
-      <PokemonWeatherBackground weatherType={terrainState?.id} />
+      <PokemonWeatherBackground modifierType={weatherState?.id} />
+      <PokemonWeatherBackground modifierType={terrainState?.id} />
       <PokemonWeatherBackground />
       <PokemonBattleConditions
         weatherState={weatherState}

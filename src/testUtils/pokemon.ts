@@ -1,6 +1,8 @@
 import { PokemonSet } from "@pkmn/data";
 
-export const getMockPokemonSet = (): PokemonSet<string> => {
+export const getMockPokemonSet = (
+  overrides: Partial<PokemonSet<string>> = {},
+): PokemonSet<string> => {
   return {
     name: "Pikachu",
     species: "pikachu",
@@ -27,5 +29,6 @@ export const getMockPokemonSet = (): PokemonSet<string> => {
       spe: 31,
     },
     item: "Light Ball",
+    ...overrides,
   };
 };
