@@ -1,6 +1,7 @@
 import { Color, PieceSymbol, Square } from "chess.js";
 import { PokemonChessBoardSquare } from "../types/chess/PokemonChessBoardSquare";
 import { getMockPokemonSet } from "./pokemon";
+import { ChessData } from "../../shared/types/Game";
 
 export const getAllChessBoardSquares = (
   excludeSquare: Square[] = [],
@@ -45,3 +46,16 @@ export const createEmptyBoard = (): PokemonChessBoardSquare[][] => {
 
   return twoDimensionalChessBoard.reverse();
 };
+
+export const createMockChessMove = (
+  color: Color,
+  san: string,
+  failed?: boolean,
+): ChessData => ({
+  type: "chess",
+  data: {
+    color,
+    san,
+    failed,
+  },
+});

@@ -12,14 +12,21 @@ const ChessMoveHistoryItem = ({
   blackMove?: ChessData;
 }) => {
   return (
-    <li className="moveHistoryRow">
-      <span className="moveHistoryTurnLabel">{turn}.</span>
+    <li className="moveHistoryRow" data-testid="chess-move-history-row">
       <span
+        className="moveHistoryTurnLabel"
+        data-testid="chess-move-history-turn-label"
+      >
+        {turn}.
+      </span>
+      <span
+        data-testid="chess-move-history-white-move"
         className={`moveHistoryMoveLabel ${whiteMove?.data.failed === true ? "moveHistoryFail" : whiteMove?.data.failed === false ? "moveHistoryWin" : ""}`}
       >
         {whiteMove?.data.san}
       </span>
       <span
+        data-testid="chess-move-history-black-move"
         className={`moveHistoryMoveLabel ${blackMove?.data.failed === true ? "moveHistoryFail" : blackMove?.data.failed === false ? "moveHistoryWin" : ""}`}
       >
         {blackMove?.data.san}
@@ -28,11 +35,11 @@ const ChessMoveHistoryItem = ({
   );
 };
 
-const ChessMoveHistory = ({
-  chessMoveHistory,
-}: {
+export interface ChessMoveHistoryProps {
   chessMoveHistory: ChessData[];
-}) => {
+}
+
+const ChessMoveHistory = ({ chessMoveHistory }: ChessMoveHistoryProps) => {
   const containerRef = useRef<HTMLUListElement>(null);
   useEffect(() => {
     const element = containerRef.current;
@@ -61,8 +68,12 @@ const ChessMoveHistory = ({
 
   return (
     <>
-      <p>Chess Move History</p>
-      <ul className="moveHistoryContainer" ref={containerRef}>
+      <p data-testid="chess-move-history-title">Chess Move History</p>
+      <ul
+        className="moveHistoryContainer"
+        ref={containerRef}
+        data-testid="chess-move-history-container"
+      >
         {moveListItem?.map((move) => move)}
       </ul>
     </>
