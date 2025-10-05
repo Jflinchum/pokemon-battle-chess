@@ -1,3 +1,4 @@
+import { Color } from "chess.js";
 import PokemonChessPieceSprite from "../PokemonChessPieceSprite/PokemonChessPieceSprite";
 import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
 import { PokemonChessBoardSquare } from "../../../../../types/chess/PokemonChessBoardSquare";
@@ -5,6 +6,7 @@ import { SquareModifier } from "../../../../../../shared/models/PokemonBattleChe
 import "./ChessSquare.css";
 
 export interface ChessSquareProps {
+  perspective: Color;
   square: PokemonChessBoardSquare;
   squareModifier?: SquareModifier;
   backgroundColor: "white" | "black";
@@ -41,6 +43,7 @@ const getSquareHighlightClass = (
 };
 
 const ChessSquare = ({
+  perspective,
   square,
   squareModifier,
   backgroundColor,
@@ -108,7 +111,8 @@ const ChessSquare = ({
           }}
         />
       ) : null}
-      {square.square[0] === "a" && (
+      {((perspective === "w" && square.square[0] === "a") ||
+        (perspective === "b" && square.square[0] === "h")) && (
         <span
           data-testid="chess-square-rank-label"
           className="squareText squareNum"
@@ -116,7 +120,8 @@ const ChessSquare = ({
           {square.square[1]}
         </span>
       )}
-      {square.square[1] === "1" && (
+      {((perspective === "w" && square.square[1] === "1") ||
+        (perspective === "b" && square.square[1] === "8")) && (
         <span
           data-testid="chess-square-file-label"
           className="squareText squareChar"

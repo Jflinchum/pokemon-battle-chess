@@ -31,6 +31,7 @@ const setup = (props: Partial<ChessSquareProps> = {}) => {
   const onPieceDragMock = vi.fn();
   const utils = render(
     <ChessSquare
+      perspective="w"
       square={squareMock}
       squareModifier={getMockSquareModifiers()}
       backgroundColor="white"
@@ -244,15 +245,18 @@ describe("ChessSquare", () => {
       ["f", "1"],
       ["g", "1"],
       ["h", "1"],
-    ])("should render %s file label correctly", (rank, file) => {
-      const { chessSquareFileLabel } = setup({
-        square: {
-          square: `${rank}${file}` as Square,
-        },
-      });
-      expect(chessSquareFileLabel).toBeInTheDocument();
-      expect(chessSquareFileLabel).toHaveTextContent(rank);
-    });
+    ])(
+      "should render %s file label correctly for white perspective",
+      (rank, file) => {
+        const { chessSquareFileLabel } = setup({
+          square: {
+            square: `${rank}${file}` as Square,
+          },
+        });
+        expect(chessSquareFileLabel).toBeInTheDocument();
+        expect(chessSquareFileLabel).toHaveTextContent(rank);
+      },
+    );
 
     it.each([
       ["a", "1"],
@@ -263,15 +267,64 @@ describe("ChessSquare", () => {
       ["a", "6"],
       ["a", "7"],
       ["a", "8"],
-    ])("should render %s rank label correctly", (rank, file) => {
-      const { chessSquareRankLabel } = setup({
-        square: {
-          square: `${rank}${file}` as Square,
-        },
-      });
-      expect(chessSquareRankLabel).toBeInTheDocument();
-      expect(chessSquareRankLabel).toHaveTextContent(file);
-    });
+    ])(
+      "should render %s rank label correctly for black perspective",
+      (rank, file) => {
+        const { chessSquareRankLabel } = setup({
+          square: {
+            square: `${rank}${file}` as Square,
+          },
+        });
+        expect(chessSquareRankLabel).toBeInTheDocument();
+        expect(chessSquareRankLabel).toHaveTextContent(file);
+      },
+    );
+
+    it.each([
+      ["a", "8"],
+      ["b", "8"],
+      ["c", "8"],
+      ["d", "8"],
+      ["e", "8"],
+      ["f", "8"],
+      ["g", "8"],
+      ["h", "8"],
+    ])(
+      "should render %s file label correctly for black perspective",
+      (rank, file) => {
+        const { chessSquareFileLabel } = setup({
+          square: {
+            square: `${rank}${file}` as Square,
+          },
+          perspective: "b",
+        });
+        expect(chessSquareFileLabel).toBeInTheDocument();
+        expect(chessSquareFileLabel).toHaveTextContent(rank);
+      },
+    );
+
+    it.each([
+      ["h", "1"],
+      ["h", "2"],
+      ["h", "3"],
+      ["h", "4"],
+      ["h", "5"],
+      ["h", "6"],
+      ["h", "7"],
+      ["h", "8"],
+    ])(
+      "should render %s rank label correctly for black perspective",
+      (rank, file) => {
+        const { chessSquareRankLabel } = setup({
+          square: {
+            square: `${rank}${file}` as Square,
+          },
+          perspective: "b",
+        });
+        expect(chessSquareRankLabel).toBeInTheDocument();
+        expect(chessSquareRankLabel).toHaveTextContent(file);
+      },
+    );
   });
 
   describe("Chess Piece Rendering", () => {

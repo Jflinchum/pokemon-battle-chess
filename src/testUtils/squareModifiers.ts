@@ -2,10 +2,14 @@ import { SquareModifier } from "../../shared/models/PokemonBattleChessManager";
 
 export const getMockSquareModifiers = (
   overrides: Partial<SquareModifier> = {},
+  modifierOverrides: Partial<SquareModifier["modifiers"]> = {},
 ): SquareModifier => {
   return {
     square: "a1",
-    modifiers: getMockModifiers(),
+    modifiers: {
+      ...getMockModifiers(),
+      ...modifierOverrides,
+    },
     ...overrides,
   };
 };
