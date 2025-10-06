@@ -7,7 +7,7 @@ import { Timer as TimerType } from "../../../../../shared/types/Game.js";
 import Timer from "../../../common/Timer/Timer";
 import "./PlayerInGameDisplay.css";
 
-interface PlayerInGameDisplayProps {
+export interface PlayerInGameDisplayProps {
   playerAvatarId?: string;
   playerName?: string;
   connectionIssues?: boolean;
@@ -32,6 +32,8 @@ const PlayerInGameDisplay = ({
       <img
         className="playerGameDisplaySprite"
         src={Sprites.getAvatar(playerAvatarId || 1)}
+        alt={`${playerName}'s Avatar`}
+        data-testid="player-in-game-display-avatar"
       />
       <div className="nameContainer">
         {connectionIssues ? (
@@ -39,6 +41,7 @@ const PlayerInGameDisplay = ({
             icon={faPlugCircleXmark}
             className="nameIcon"
             title="Connection Issues"
+            data-testid="player-in-game-display-connection-issues-icon"
           />
         ) : null}
         {playerName}

@@ -11,14 +11,9 @@ const setup = (props: Partial<TakenChessPiecesProps> = {}) => {
     getMockUserStateContext(),
   );
 
-  const defaultPieces = [
-    { type: "p" as PieceSymbol, color: "w" as Color },
-    { type: "b" as PieceSymbol, color: "w" as Color },
-  ];
-
   const utils = render(
     <TakenChessPieces
-      takenPieces={props.takenPieces || createMockPokemonPieces(defaultPieces)}
+      takenPieces={props.takenPieces || createMockPokemonPieces()}
     />,
   );
 

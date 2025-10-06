@@ -61,9 +61,15 @@ export const createMockChessMove = (
 });
 
 export const createMockPokemonPieces = (
-  pieces: { type: PieceSymbol; color: Color }[],
+  pieces?: { type: PieceSymbol; color: Color }[],
 ) => {
-  return pieces.map((piece, index) => ({
+  const defaultPieces = [
+    { type: "p" as PieceSymbol, color: "w" as Color },
+    { type: "b" as PieceSymbol, color: "w" as Color },
+  ];
+
+  const mockPieces = pieces || defaultPieces;
+  return mockPieces.map((piece, index) => ({
     type: piece.type,
     color: piece.color,
     pkmn: getMockPokemonSet(),
