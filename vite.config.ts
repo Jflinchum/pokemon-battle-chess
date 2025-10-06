@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import fs from "fs";
 import { config } from "./lobbyServer/config";
 import { SecureContextOptions } from "tls";
+import { configDefaults } from "vitest/config";
 
 const httpsOptions: {
   key?: SecureContextOptions["key"];
@@ -45,5 +46,9 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./src/testUtils/vitest.setup.ts"],
     globalSetup: "./src/testUtils/vitest.global-setup.ts",
+    coverage: {
+      exclude: [...configDefaults.exclude, "util/*", "src/testUtils/*"],
+    },
+    exclude: [...configDefaults.exclude, "util/*", "src/testUtils/*"],
   },
 });
