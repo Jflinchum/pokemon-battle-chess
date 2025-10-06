@@ -2,15 +2,22 @@ import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessMan
 import PokemonChessPieceSprite from "../ChessBoard/PokemonChessPieceSprite/PokemonChessPieceSprite";
 import "./TakenChessPieces.css";
 
-interface TakenChessPiecesProps {
+export interface TakenChessPiecesProps {
   takenPieces: PokemonPiece[];
 }
 
 const TakenChessPieces = ({ takenPieces }: TakenChessPiecesProps) => {
   return (
-    <div className="takenChessPiecesContainer">
+    <div
+      className="takenChessPiecesContainer"
+      data-testid="taken-pieces-container"
+    >
       {takenPieces.map((piece, index) => (
-        <div className="pieceContainer" key={index}>
+        <div
+          className="pieceContainer"
+          key={index}
+          data-testid={`taken-piece-${piece.type}`}
+        >
           <PokemonChessPieceSprite
             chessPieceType={piece.type}
             chessPieceColor={piece.color}
