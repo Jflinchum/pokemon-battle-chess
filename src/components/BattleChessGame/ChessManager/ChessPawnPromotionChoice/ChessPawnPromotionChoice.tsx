@@ -1,56 +1,75 @@
-import { Move, PieceSymbol } from "chess.js";
+import { Color, PieceSymbol, Square } from "chess.js";
 import { allPieceTypes } from "../constants";
 import ChessPieceSprite from "../ChessBoard/ChessPieceSprite/ChessPieceSprite";
 import "./ChessPawnPromotionChoice.css";
 import { createPortal } from "react-dom";
 import { useMemo } from "react";
 
-interface ChessPawnPromotionChoiceProps {
-  pawnPromotionMove: Move;
+interface ChessPawnPromotionMenuProps {
+  color: Color;
+  onPromotionChoice: (chosenPiece: PieceSymbol) => void;
+  onPromotionCancel: () => void;
+}
+
+export interface ChessPawnPromotionChoiceProps {
+  toSquare: Square;
+  color: Color;
   onPromotionChoice: (chosenPiece: PieceSymbol) => void;
   onPromotionCancel: () => void;
 }
 
 const ChessPawnPromotionMenu = ({
-  pawnPromotionMove,
+  color,
   onPromotionChoice,
   onPromotionCancel,
-}: ChessPawnPromotionChoiceProps) => {
+}: ChessPawnPromotionMenuProps) => {
   return (
-    <div className="chessPiecePromotionMenu">
+    <div
+      className="chessPiecePromotionMenu"
+      data-testid="chess-piece-promotion-menu"
+    >
       {allPieceTypes
         .filter((p) => p !== "p" && p !== "k")
         .map((piece) => (
           <button
             key={piece}
             className="chessPiecePromotionButton"
+            data-testid={`chess-piece-promotion-choice-${piece}`}
             onClick={() => onPromotionChoice(piece)}
           >
-            <ChessPieceSprite type={piece} color={pawnPromotionMove.color} />
+            <ChessPieceSprite type={piece} color={color} />
           </button>
         ))}
-      <button onClick={onPromotionCancel}>Cancel</button>
+      <button
+        data-testid="chess-piece-promotion-cancel"
+        onClick={onPromotionCancel}
+      >
+        Cancel
+      </button>
     </div>
   );
 };
 
 const ChessPawnPromotionChoice = ({
-  pawnPromotionMove,
+  toSquare,
+  color,
   onPromotionChoice,
   onPromotionCancel,
 }: ChessPawnPromotionChoiceProps) => {
   const squareElement = useMemo(
-    () =>
-      document.body.querySelectorAll(`#chessSquare-${pawnPromotionMove.to}`)[0],
-    [pawnPromotionMove],
+    () => document.body.querySelectorAll(`#chessSquare-${toSquare}`)[0],
+    [toSquare],
   );
   if (squareElement) {
     return (
       <>
         {createPortal(
-          <div className="chessPiecePromotionPortal">
+          <div
+            className="chessPiecePromotionPortal"
+            data-testid="chess-piece-promotion-portal"
+          >
             <ChessPawnPromotionMenu
-              pawnPromotionMove={pawnPromotionMove}
+              color={color}
               onPromotionChoice={onPromotionChoice}
               onPromotionCancel={onPromotionCancel}
             />
@@ -62,7 +81,7 @@ const ChessPawnPromotionChoice = ({
   }
   return (
     <ChessPawnPromotionMenu
-      pawnPromotionMove={pawnPromotionMove}
+      color={color}
       onPromotionChoice={onPromotionChoice}
       onPromotionCancel={onPromotionCancel}
     />

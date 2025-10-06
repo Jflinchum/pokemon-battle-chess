@@ -179,7 +179,8 @@ const ChessManager = ({
     >
       {requestedPawnPromotion && (
         <ChessPawnPromotionChoice
-          pawnPromotionMove={requestedPawnPromotion}
+          color={requestedPawnPromotion.color}
+          toSquare={requestedPawnPromotion.to}
           onPromotionCancel={() => {
             setRequestedPawnPromotion(null);
             setHighlightedSquare([]);
