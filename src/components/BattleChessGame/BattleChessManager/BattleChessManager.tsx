@@ -63,7 +63,8 @@ function BattleChessManager({
       <GameManagerActions />
       <div className="battleChessContainer">
         <PlayerInGameDisplay
-          player={topPlayer}
+          playerName={topPlayer?.playerName}
+          playerAvatarId={topPlayer?.avatarId}
           connectionIssues={
             gameState.players.find(
               (player) => player.playerId === topPlayer?.playerId,
@@ -84,7 +85,8 @@ function BattleChessManager({
           draftMode={gameState.gameSettings.options.format === "draft"}
         />
         <PlayerInGameDisplay
-          player={bottomPlayer}
+          playerName={bottomPlayer?.playerName}
+          playerAvatarId={bottomPlayer?.avatarId}
           connectionIssues={
             gameState.players.find(
               (player) => player.playerId === bottomPlayer?.playerId,

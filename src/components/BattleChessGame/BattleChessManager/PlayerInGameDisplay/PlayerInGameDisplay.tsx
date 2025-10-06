@@ -1,7 +1,6 @@
 import { Sprites } from "@pkmn/img";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { Player } from "../../../../../shared/types/Player";
 import TakenChessPieces from "../../ChessManager/TakenChessPieces/TakenChessPieces";
 import { PokemonPiece } from "../../../../../shared/models/PokemonBattleChessManager";
 import { Timer as TimerType } from "../../../../../shared/types/Game.js";
@@ -9,7 +8,8 @@ import Timer from "../../../common/Timer/Timer";
 import "./PlayerInGameDisplay.css";
 
 interface PlayerInGameDisplayProps {
-  player?: Player;
+  playerAvatarId?: string;
+  playerName?: string;
   connectionIssues?: boolean;
   takenChessPieces: PokemonPiece[];
   timer?: TimerType["white"] | TimerType["black"];
@@ -17,20 +17,21 @@ interface PlayerInGameDisplayProps {
 }
 
 const PlayerInGameDisplay = ({
-  player,
+  playerAvatarId,
+  playerName,
   connectionIssues,
   takenChessPieces,
   timer,
   className = "",
 }: PlayerInGameDisplayProps) => {
-  if (!player) {
+  if (!playerName && !playerAvatarId) {
     return null;
   }
   return (
     <div className={`playerGameDisplayContainer ${className}`}>
       <img
         className="playerGameDisplaySprite"
-        src={Sprites.getAvatar(player.avatarId || 1)}
+        src={Sprites.getAvatar(playerAvatarId || 1)}
       />
       <div className="nameContainer">
         {connectionIssues ? (
@@ -40,7 +41,7 @@ const PlayerInGameDisplay = ({
             title="Connection Issues"
           />
         ) : null}
-        {player?.playerName}
+        {playerName}
       </div>
       <TakenChessPieces takenPieces={takenChessPieces} />
       {timer && (
