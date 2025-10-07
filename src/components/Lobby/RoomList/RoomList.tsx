@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import RoomListItem from "./RoomListItem";
+import RoomListItem from "./RoomListItem/RoomListItem";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { joinRoom } from "../../../service/lobby";
