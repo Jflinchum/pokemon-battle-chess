@@ -1,19 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import RoomListItem, { RoomListItemProps } from "../RoomListItem";
 import { render, screen } from "@testing-library/react";
-import { Room } from "../../RoomList";
 import userEvent from "@testing-library/user-event";
-
-const createMockRoom = (overrides: Partial<Room> = {}): Room => {
-  return {
-    roomId: "1234",
-    hostName: "TestName",
-    hasPassword: false,
-    playerCount: 3,
-    isOngoing: false,
-    ...overrides,
-  };
-};
+import RoomListItem, { RoomListItemProps } from "../RoomListItem";
+import { createMockRoom } from "../../../../../testUtils/room";
 
 const setup = (props: Partial<RoomListItemProps> = {}) => {
   global.ResizeObserver = vi.fn().mockImplementation(() => ({
