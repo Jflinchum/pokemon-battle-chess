@@ -4,20 +4,27 @@ import { faEllipsis, faLock, faUser } from "@fortawesome/free-solid-svg-icons";
 import Tooltip from "../../../common/Tooltip/Tooltip";
 import "./RoomListItem.css";
 
-interface RoomListItem {
+export interface RoomListItemProps {
   room: Room;
   onClick: () => void;
 }
 
-const RoomListItem = ({ room, onClick }: RoomListItem) => {
+const RoomListItem = ({ room, onClick }: RoomListItemProps) => {
   return (
     <li>
-      <button className="roomListItemButton" onClick={onClick}>
-        <span>{room.hostName}</span>
+      <button
+        data-testid="room-list-item-button"
+        className="roomListItemButton"
+        onClick={onClick}
+      >
+        <span data-testid="room-list-item-name">{room.hostName}</span>
         <span className="roomListIconContainer">
           {room.hasPassword && (
             <>
-              <span data-tooltip-id="roomListPasscodeIcon">
+              <span
+                data-testid="room-list-item-lock-icon"
+                data-tooltip-id="roomListPasscodeIcon"
+              >
                 <FontAwesomeIcon icon={faLock} />
               </span>
               <Tooltip anchorSelect={`[data-tooltip-id=roomListPasscodeIcon]`}>
@@ -27,7 +34,10 @@ const RoomListItem = ({ room, onClick }: RoomListItem) => {
           )}
           {room.isOngoing && (
             <>
-              <span data-tooltip-id="roomListInProgressIcon">
+              <span
+                data-testid="room-list-item-in-progress-icon"
+                data-tooltip-id="roomListInProgressIcon"
+              >
                 <FontAwesomeIcon icon={faEllipsis} />
               </span>
               <Tooltip
@@ -37,7 +47,10 @@ const RoomListItem = ({ room, onClick }: RoomListItem) => {
               </Tooltip>
             </>
           )}
-          <span data-tooltip-id="roomListPlayerCountIcon">
+          <span
+            data-testid="room-list-item-player-count"
+            data-tooltip-id="roomListPlayerCountIcon"
+          >
             <FontAwesomeIcon icon={faUser} /> {room.playerCount}
           </span>
           <Tooltip anchorSelect={`[data-tooltip-id=roomListPlayerCountIcon]`}>
