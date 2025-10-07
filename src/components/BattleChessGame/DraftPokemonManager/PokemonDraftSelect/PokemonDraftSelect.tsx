@@ -3,7 +3,7 @@ import { PokemonSprite } from "../../../common/Pokemon/PokemonSprite/PokemonSpri
 import Button from "../../../common/Button/Button";
 import "./PokemonDraftSelect.css";
 
-interface PokemonDraftSelectProps {
+export interface PokemonDraftSelectProps {
   draftablePokemon: { set: PokemonSet; index: number }[];
   bannedPokemon: { set: PokemonSet; index: number }[];
   onPokemonSelect: (index: number) => void;
@@ -26,6 +26,7 @@ const PokemonDraftSelect = ({
             onClick={() => {
               onPokemonSelect(pokemon.index);
             }}
+            data-testid={`pokemon-draft-button-${pokemon.index}`}
           >
             <div
               draggable
@@ -46,9 +47,7 @@ const PokemonDraftSelect = ({
           <button
             disabled
             className={"bannedDraft"}
-            onClick={() => {
-              onPokemonSelect(pokemon.index);
-            }}
+            data-testid={`pokemon-banned-button-${pokemon.index}`}
           >
             <PokemonSprite
               className="pokemonDraftSprite"
