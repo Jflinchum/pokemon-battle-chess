@@ -1,13 +1,12 @@
 import Button from "../../common/Button/Button";
 import "./RejoinMessage.css";
 
-export const RejoinMessage = ({
-  data,
-  closeToast,
-}: {
+export interface RejoinMessageProps {
   data: { onYesClick: () => void; onNoClick: () => void };
   closeToast: () => void;
-}) => {
+}
+
+export const RejoinMessage = ({ data, closeToast }: RejoinMessageProps) => {
   const handleYesClick = () => {
     data.onYesClick();
     closeToast();
@@ -25,11 +24,14 @@ export const RejoinMessage = ({
         re-join?
       </span>
       <div className="rejoinButtonContainer">
-        <Button onClick={handleNoClick}>No</Button>
+        <Button onClick={handleNoClick} data-testid="rejoin-message-no-button">
+          No
+        </Button>
         <Button
           onClick={handleYesClick}
           color="primary"
           className="rejoinSubmit"
+          data-testid="rejoin-message-yes-button"
         >
           Yes
         </Button>
