@@ -11,13 +11,10 @@ interface ChatToggleProps {
 const ChatToggle = ({ className }: ChatToggleProps) => {
   const [open, setOpen] = useState(false);
   const [newMessageNotification, setNewMessageNotification] = useState(0);
-  const openRef = useRef(open);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  openRef.current = open;
-
-  const handleMessage = () => {
-    if (!openRef.current) {
+  const handleNewMessage = () => {
+    if (!open) {
       setNewMessageNotification((curr) => ++curr);
     }
   };
@@ -45,7 +42,7 @@ const ChatToggle = ({ className }: ChatToggleProps) => {
       </button>
       <ChatDisplay
         inputRef={inputRef}
-        onMessage={handleMessage}
+        onMessage={handleNewMessage}
         className="chatActionDisplay"
       />
     </div>
