@@ -3,7 +3,9 @@ import { ReplayData } from "../util/downloadReplay";
 import { getMockGameState } from "./gameState";
 import { getMockPlayer } from "./player";
 
-export const getMockReplayData = (): ReplayData => {
+export const getMockReplayData = (
+  overrides: Partial<ReplayData> = {},
+): ReplayData => {
   return {
     players: [
       getMockPlayer({ isPlayer1: true, color: "w", isHost: true }),
@@ -17,6 +19,7 @@ export const getMockReplayData = (): ReplayData => {
       timersEnabled: false,
     },
     matchHistory: getMockMatchHistory(),
+    ...overrides,
   };
 };
 
