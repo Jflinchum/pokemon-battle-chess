@@ -16,7 +16,7 @@ export interface Room {
   isOngoing: boolean;
 }
 
-interface RoomListProps {
+export interface RoomListProps {
   availableRooms: Room[];
   onSearch: (searchTerm: string) => void;
 }
@@ -77,6 +77,7 @@ const RoomList = ({ availableRooms, onSearch }: RoomListProps) => {
               searchDebounce(e.target.value);
             }}
             className="roomSearch"
+            data-testid="room-list-search-input"
           />
         </span>
       </div>

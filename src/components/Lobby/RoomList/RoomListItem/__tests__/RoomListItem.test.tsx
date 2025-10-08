@@ -5,6 +5,10 @@ import RoomListItem, { RoomListItemProps } from "../RoomListItem";
 import { createMockRoom } from "../../../../../testUtils/room";
 
 const setup = (props: Partial<RoomListItemProps> = {}) => {
+  /**
+   * Under the hood, the Tooltip library we're using leverages resize observer.
+   * We must mock that out for these tests.
+   */
   global.ResizeObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),

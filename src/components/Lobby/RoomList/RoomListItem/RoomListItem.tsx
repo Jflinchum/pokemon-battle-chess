@@ -11,7 +11,7 @@ export interface RoomListItemProps {
 
 const RoomListItem = ({ room, onClick }: RoomListItemProps) => {
   return (
-    <li>
+    <li data-testid="room-list-item">
       <button
         data-testid="room-list-item-button"
         className="roomListItemButton"
