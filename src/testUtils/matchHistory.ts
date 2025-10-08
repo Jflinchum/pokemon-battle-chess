@@ -1,4 +1,24 @@
 import { MatchHistory } from "../../shared/types/Game";
+import { ReplayData } from "../util/downloadReplay";
+import { getMockGameState } from "./gameState";
+import { getMockPlayer } from "./player";
+
+export const getMockReplayData = (): ReplayData => {
+  return {
+    players: [
+      getMockPlayer({ isPlayer1: true, color: "w", isHost: true }),
+      getMockPlayer({ isPlayer2: true, color: "b" }),
+    ],
+    whitePlayer: getMockPlayer({ isPlayer1: true, color: "w", isHost: true }),
+    blackPlayer: getMockPlayer({ isPlayer2: true, color: "b" }),
+    seed: "1234,test-seed",
+    options: {
+      ...getMockGameState().gameSettings.options,
+      timersEnabled: false,
+    },
+    matchHistory: getMockMatchHistory(),
+  };
+};
 
 export const getMockMatchHistory = (): MatchHistory => [
   {

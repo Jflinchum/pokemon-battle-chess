@@ -83,14 +83,19 @@ const MenuOptions = () => {
   return (
     <NavOptions>
       <div className="menuOptions">
-        {userState.name && (
+        {userState.name && userState.avatarId && (
           <div>
             <p className="nameContainer">
               <b>Name: </b>
-              <span className="username">{userState.name}</span>
+              <span className="username" data-testid="menu-option-username">
+                {userState.name}
+              </span>
             </p>
             <div className="avatarContainer">
-              <img src={Sprites.getAvatar(parseInt(userState.avatarId))} />
+              <img
+                data-testid="menu-option-avatar"
+                src={Sprites.getAvatar(parseInt(userState.avatarId))}
+              />
             </div>
           </div>
         )}
@@ -98,6 +103,7 @@ const MenuOptions = () => {
           aria-describedby="quickPlay"
           className="menuOptionButtonContainer"
           onClick={handleQuickMatchClick}
+          data-testid="menu-option-quick-play"
         >
           <FontAwesomeIcon icon={faChessKing} />
           <span id="quickPlay">Quick Play</span>
@@ -106,6 +112,7 @@ const MenuOptions = () => {
           aria-describedby="createNewRoom"
           className="menuOptionButtonContainer"
           onClick={handleCreateRoom}
+          data-testid="menu-option-create-new-room"
         >
           <FontAwesomeIcon icon={faDoorOpen} />
           <span id="createNewRoom">Create New Room</span>
@@ -114,6 +121,7 @@ const MenuOptions = () => {
           aria-describedby="customize"
           className="menuOptionButtonContainer"
           onClick={handleCustomize}
+          data-testid="menu-option-customize"
         >
           <FontAwesomeIcon icon={faFaceGrin} />
           <span id="customize">Customize</span>
@@ -122,6 +130,7 @@ const MenuOptions = () => {
           aria-describedby="howToPlay"
           className="menuOptionButtonContainer"
           onClick={handleHowToPlay}
+          data-testid="menu-option-how-to-play"
         >
           <FontAwesomeIcon icon={faNoteSticky} />
           <span id="howToPlay">How to Play</span>
@@ -130,6 +139,7 @@ const MenuOptions = () => {
           aria-describedby="watchReplay"
           className="menuOptionButtonContainer"
           onClick={handleUploadReplayClick}
+          data-testid="menu-option-watch-replay"
         >
           <FontAwesomeIcon icon={faUpload} />
           <span id="watchReplay">Watch Replay</span>
@@ -138,6 +148,7 @@ const MenuOptions = () => {
           aria-describedby="gameOptions"
           className="menuOptionButtonContainer"
           onClick={handleOptionsClick}
+          data-testid="menu-option-options"
         >
           <FontAwesomeIcon icon={faCog} />
           <span id="gameOptions">Options</span>
@@ -146,6 +157,7 @@ const MenuOptions = () => {
           aria-describedby="credits"
           className="menuOptionButtonContainer"
           onClick={handleCreditsClick}
+          data-testid="menu-option-credits"
         >
           <FontAwesomeIcon icon={faCertificate} />
           <span id="credits">Credits</span>
@@ -157,9 +169,10 @@ const MenuOptions = () => {
         ref={inputRef}
         onChange={handleUploadReplay}
         accept=".replay"
+        data-testid="menu-option-replay-upload-input"
       />
 
-      <div className="pokemonOfTheDayContainer">
+      <div className="pokemonOfTheDayContainer" data-testid="menu-option-potd">
         <PokemonOfTheDay />
       </div>
     </NavOptions>
