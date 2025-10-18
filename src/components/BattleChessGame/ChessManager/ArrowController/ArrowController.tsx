@@ -16,11 +16,25 @@ const buildArrowPointsFromSquare = (
   perspective: Color,
 ): { points: string; rotation: string; scale: string; translate: string } => {
   const squareDimension = 12.5;
-  const fromX = getNumberFromSquareLetter(from[0]);
+
+  /**
+   * For these coordinates, we have to inverse the number if the player is black.
+   * One confusing thing about this is that a Chess board square is one-indexed, but our function
+   * getNumberFromSquareLetter is zero-indexed. zero-indexed feels better to use throughout the codebase,
+   * but leads to some confusing instances such as here.
+   */
+  const fromX =
+    perspective === "w"
+      ? getNumberFromSquareLetter(from[0])
+      : 7 - getNumberFromSquareLetter(from[0]);
   const fromY =
     perspective === "w" ? 8 - parseInt(from[1]) : parseInt(from[1]) - 1;
-  const toX = getNumberFromSquareLetter(to[0]);
+  const toX =
+    perspective === "w"
+      ? getNumberFromSquareLetter(to[0])
+      : 7 - getNumberFromSquareLetter(to[0]);
   const toY = perspective === "w" ? 8 - parseInt(to[1]) : parseInt(to[1]) - 1;
+
   const distanceHoriz = Math.abs(fromX - toX);
   const distanceVert = Math.abs(fromY - toY);
   const positionOffsetX = (3 * squareDimension) / 8;
