@@ -40,7 +40,9 @@ const QuickMatchModal = () => {
         }
       }, 2000);
     } else {
-      socket.disconnect();
+      if (socket.connected) {
+        socket.disconnect();
+      }
     }
 
     return () => {
@@ -64,7 +66,10 @@ const QuickMatchModal = () => {
 
     return () => {
       socket.off("foundMatch");
-      socket.disconnect();
+
+      if (socket.connected) {
+        socket.disconnect();
+      }
     };
   }, [dispatch, userStateDispatch]);
 
