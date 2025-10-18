@@ -168,15 +168,13 @@ const useBattleHistory = ({
             break;
           }
           case "chess": {
-            const err = onMove({
+            onMove({
               sanMove: currentLog.data.san,
               moveFailed: currentLog.data.failed,
             });
             matchLogIndex.current++;
-            if (!err) {
-              catchUpTimer = timer(timeBetweenSteps);
-              await catchUpTimer.start();
-            }
+            catchUpTimer = timer(timeBetweenSteps);
+            await catchUpTimer.start();
             break;
           }
           case "pokemon":
@@ -221,12 +219,17 @@ const useBattleHistory = ({
             }
         }
       }
-
-      if (matchLogIndex.current === currentMatchLog.length) {
-        dispatch({ type: "SET_SKIPPING_AHEAD", payload: false });
-        dispatch({ type: "SET_CATCHING_UP", payload: false });
-      }
     };
+
+    if (
+      matchLogIndex.current >= currentMatchLog.length ||
+      currentMatchLog.length === 0
+    ) {
+      if (skipToEndOfSync) {
+        dispatch({ type: "SET_SKIPPING_AHEAD", payload: false });
+      }
+      dispatch({ type: "SET_CATCHING_UP", payload: false });
+    }
 
     catchUpToCurrentState();
 
