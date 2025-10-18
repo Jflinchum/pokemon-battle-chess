@@ -19,6 +19,10 @@ export interface RoomCodeModalProps {
   roomId: string;
 }
 
+export interface NameModalProps {
+  userFirstTime: boolean;
+}
+
 export interface EndGameModalProps {
   reason: EndGameReason;
   victor?: Color | "";
@@ -41,7 +45,7 @@ type ModalStateAction =
     }
   | {
       type: "OPEN_NAME_MODAL";
-      payload: { required?: boolean; modalProps?: object };
+      payload: { required?: boolean; modalProps?: NameModalProps };
     }
   | {
       type: "OPEN_OPTIONS_MODAL";
@@ -76,7 +80,11 @@ type ModalStateAction =
 export interface ModalState {
   currentModal: ModalName;
   required?: boolean;
-  modalProps?: RoomCodeModalProps | EndGameModalProps | GenericModalProps;
+  modalProps?:
+    | NameModalProps
+    | RoomCodeModalProps
+    | EndGameModalProps
+    | GenericModalProps;
 }
 
 export interface ModalStateType {
@@ -115,6 +123,7 @@ export const modalStateReducer = (
         ...modalState,
         currentModal: "NAME_CHANGE",
         required: action.payload.required,
+        modalProps: action.payload.modalProps as NameModalProps,
       };
     case "OPEN_CREATE_ROOM_MODAL":
       return {

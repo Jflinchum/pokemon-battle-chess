@@ -57,7 +57,10 @@ const MainMenu = () => {
 
   useEffect(() => {
     if (userState.name.length === 0) {
-      dispatch({ type: "OPEN_NAME_MODAL", payload: { required: true } });
+      dispatch({
+        type: "OPEN_NAME_MODAL",
+        payload: { required: true, modalProps: { userFirstTime: true } },
+      });
       return;
     }
   }, [dispatch, userState.name]);
