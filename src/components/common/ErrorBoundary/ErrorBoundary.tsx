@@ -1,8 +1,8 @@
 import * as React from "react";
 import sadPikachu from "../../../assets/pokemonAssets/sadPikachu.png";
-import "./ErrorBoundary.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboard, faDownload } from "@fortawesome/free-solid-svg-icons";
+import "./ErrorBoundary.css";
 
 class ErrorBoundary extends React.Component<
   {
@@ -41,8 +41,11 @@ class ErrorBoundary extends React.Component<
             <div>
               <p>
                 It looks like you were recently in a match. If you're able to,
-                please use the following button to download the replay and post
-                it over at{" "}
+                please use the following button to download the replay
+                {this.state.hasError && this.state.error ? (
+                  <>/error</>
+                ) : null}{" "}
+                and post it over at{" "}
                 <a
                   href={
                     "https://github.com/Jflinchum/pokemon-battle-chess/issues/new"
@@ -61,18 +64,23 @@ class ErrorBoundary extends React.Component<
                 </button>
               </div>
             </div>
-          ) : (
+          ) : null}
+          {this.state.hasError && this.state.error ? (
             <p>
-              If you're able to, please use the following button to copy the
-              error and post it over at{" "}
-              <a
-                href={
-                  "https://github.com/Jflinchum/pokemon-battle-chess/issues/new"
-                }
-              >
-                https://github.com/Jflinchum/pokemon-battle-chess/issues/new
-              </a>
-              <div>
+              {this.props.hasMatchHistory ? null : (
+                <span>
+                  If you're able to, please use the following button to copy the
+                  error and post it over at{" "}
+                  <a
+                    href={
+                      "https://github.com/Jflinchum/pokemon-battle-chess/issues/new"
+                    }
+                  >
+                    https://github.com/Jflinchum/pokemon-battle-chess/issues/new
+                  </a>
+                </span>
+              )}
+              <span className="errorBoundaryCopyErrorContainer">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(
@@ -86,9 +94,9 @@ class ErrorBoundary extends React.Component<
                 >
                   <FontAwesomeIcon icon={faClipboard} /> Copy Error
                 </button>
-              </div>
+              </span>
             </p>
-          )}
+          ) : null}
           <p>
             It would be super helpful if you include a brief description of what
             happened. Thanks!
