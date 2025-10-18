@@ -22,8 +22,8 @@
     "postinstall": "patch-package",
     "injectData": "node util/dev/dataInjection.js",
     "prepare": "node -e \"if (process.env.NODE_ENV !== 'production'){ process.exit(1)} \" || husky",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test": "vitest --silent",
+    "test:coverage": "vitest --coverage --silent"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
