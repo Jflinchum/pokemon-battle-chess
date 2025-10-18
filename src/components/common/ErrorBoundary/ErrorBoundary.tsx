@@ -48,10 +48,10 @@ class ErrorBoundary extends React.Component<
                 and post it over at{" "}
                 <a
                   href={
-                    "https://github.com/Jflinchum/pokemon-battle-chess/issues/new"
+                    "https://github.com/Jflinchum/pokemon-battle-chess/issues"
                   }
                 >
-                  https://github.com/Jflinchum/pokemon-battle-chess/issues/new
+                  https://github.com/Jflinchum/pokemon-battle-chess/issues
                 </a>
               </p>
               <div>
@@ -73,10 +73,10 @@ class ErrorBoundary extends React.Component<
                   error and post it over at{" "}
                   <a
                     href={
-                      "https://github.com/Jflinchum/pokemon-battle-chess/issues/new"
+                      "https://github.com/Jflinchum/pokemon-battle-chess/issues"
                     }
                   >
-                    https://github.com/Jflinchum/pokemon-battle-chess/issues/new
+                    https://github.com/Jflinchum/pokemon-battle-chess/issues
                   </a>
                 </span>
               )}

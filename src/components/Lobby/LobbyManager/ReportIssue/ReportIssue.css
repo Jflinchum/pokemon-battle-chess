@@ -1,0 +1,21 @@
+.reportIssueContainer {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+}
+
+.reportIssueButton {
+  background-color: var(--dark-translucent-bg);
+  color: white;
+  border: none;
+
+  cursor: pointer;
+  border-radius: 20%;
+  padding: 6px;
+}
+
+.reportIssueButtonClosed {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}

@@ -14,6 +14,7 @@ import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
 import usePageVisibility from "../../../util/usePageVisibility";
 import "./LobbyManager.css";
+import { ReportIssue } from "./ReportIssue/ReportIssue";
 
 const LobbyManager = () => {
   const [availableRooms, setAvailableRooms] = useState([]);
@@ -81,6 +82,7 @@ const LobbyManager = () => {
       <AnimatedBackground />
       <div className="lobbyContainer">
         <MenuOptions />
+        <ReportIssue />
         <div className="roomListLobbyContainer">
           <h1 className="mainMenuHeader">Pokémon Gambit</h1>
           <div className="roomListContainer">
