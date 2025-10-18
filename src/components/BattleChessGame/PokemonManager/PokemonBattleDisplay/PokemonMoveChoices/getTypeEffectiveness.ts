@@ -10,14 +10,16 @@ export const getTypeEffectiveness = (
   if (!currentPokemon || !opponentPokemon) {
     return {};
   }
-  const type = modifyTypeAbilities[
-    currentPokemon.set?.ability.toLowerCase() || ""
-  ]
-    ? modifyTypeAbilities[currentPokemon.set!.ability.toLowerCase()](
-        move,
-        currentPokemon,
-      )
+
+  const abilityModifier =
+    modifyTypeAbilities[currentPokemon.set?.ability.toLowerCase() || ""];
+  let type = abilityModifier
+    ? abilityModifier(move, currentPokemon)
     : move.type;
+
+  const moveModifier = modifyTypeMoves[move.id || ""];
+  type = moveModifier ? moveModifier(move, currentPokemon) : type;
+
   const effectiveness = Dex.getEffectiveness(type, opponentPokemon);
   const abilityImmunity = immunityAbilities[
     opponentPokemon.set?.ability.toLowerCase() || ""
@@ -34,6 +36,16 @@ export const getTypeEffectiveness = (
     effectiveness,
     notImmune,
   };
+};
+
+const modifyTypeMoves: Record<
+  string,
+  (move: Move, pokemon: Pokemon) => TypeName
+> = {
+  revelationdance: (_, pokemon: Pokemon) => {
+    const oricorioType = pokemon.types.filter((type) => type !== "Flying")[0];
+    return oricorioType;
+  },
 };
 
 // Taken from onModifyType
