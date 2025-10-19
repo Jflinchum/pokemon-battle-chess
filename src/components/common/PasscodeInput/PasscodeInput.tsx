@@ -1,6 +1,6 @@
-import { useState, RefObject } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { RefObject, useState } from "react";
 import TextInput from "../TextInput/TextInput";
 import "./PasscodeInput.css";
 

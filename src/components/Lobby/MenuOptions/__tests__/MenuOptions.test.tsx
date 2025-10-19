@@ -1,16 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { toast } from "react-toastify";
-import MenuOptions from "../MenuOptions";
-import * as ValidateReplay from "../validateReplay";
-import * as UserStateContext from "../../../../context/UserState/UserStateContext";
-import * as ModalStateContext from "../../../../context/ModalState/ModalStateContext";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as GameStateContext from "../../../../context/GameState/GameStateContext";
-import { getMockUserStateContext } from "../../../../testUtils/userState";
-import { getMockModalStateContext } from "../../../../testUtils/modalState";
+import * as ModalStateContext from "../../../../context/ModalState/ModalStateContext";
+import * as UserStateContext from "../../../../context/UserState/UserStateContext";
 import { getMockGameStateContext } from "../../../../testUtils/gameState";
 import { getMockReplayData } from "../../../../testUtils/matchHistory";
+import { getMockModalStateContext } from "../../../../testUtils/modalState";
+import { getMockUserStateContext } from "../../../../testUtils/userState";
+import MenuOptions from "../MenuOptions";
+import * as ValidateReplay from "../validateReplay";
 
 vi.mock("./../validateReplay");
 vi.mock("react-toastify");

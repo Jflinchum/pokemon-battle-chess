@@ -1,7 +1,7 @@
-import { Room } from "../RoomList";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis, faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Tooltip from "../../../common/Tooltip/Tooltip";
+import { Room } from "../RoomList";
 import "./RoomListItem.css";
 
 export interface RoomListItemProps {

@@ -1,15 +1,15 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import ChessBoard, { ChessBoardProps } from "../ChessBoard";
+import userEvent from "@testing-library/user-event";
 import { Color, Square } from "chess.js";
-import { getMockSquareModifiers } from "../../../../../testUtils/squareModifiers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as UserStateContext from "../../../../../context/UserState/UserStateContext";
-import { getMockUserStateContext } from "../../../../../testUtils/userState";
 import {
   createEmptyBoard,
   createMockPokemonChessBoardSquare,
 } from "../../../../../testUtils/chess";
-import userEvent from "@testing-library/user-event";
+import { getMockSquareModifiers } from "../../../../../testUtils/squareModifiers";
+import { getMockUserStateContext } from "../../../../../testUtils/userState";
+import ChessBoard, { ChessBoardProps } from "../ChessBoard";
 
 const mockBoard = createEmptyBoard();
 // Adding some pieces for testing

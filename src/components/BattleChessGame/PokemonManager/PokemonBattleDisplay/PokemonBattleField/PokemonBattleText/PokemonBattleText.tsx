@@ -1,12 +1,12 @@
 import { ArgType, BattleArgsKWArgType } from "@pkmn/protocol";
-import { CustomArgTypes } from "../../../../../../../shared/types/PokemonTypes";
-import "./PokemonBattleText.css";
-import { useEffect, useState } from "react";
-import { useDebounce } from "../../../../../../utils";
 import { LogFormatter } from "@pkmn/view";
-import StylizedText from "../../../../../common/StylizedText/StylizedText";
+import { useEffect, useState } from "react";
+import { CustomArgTypes } from "../../../../../../../shared/types/PokemonTypes";
 import { useGameState } from "../../../../../../context/GameState/GameStateContext";
+import { useDebounce } from "../../../../../../utils";
+import StylizedText from "../../../../../common/StylizedText/StylizedText";
 import { shouldDelayBattleOutput } from "../../../utils/shouldDelayBattleOutput";
+import "./PokemonBattleText.css";
 
 interface PokemonBattleTextProps {
   battleHistory: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType }[];

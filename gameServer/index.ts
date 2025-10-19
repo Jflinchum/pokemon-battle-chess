@@ -1,18 +1,18 @@
-import express from "express";
-import { Server } from "socket.io";
-import cors from "cors";
-import http from "http";
 import { createAdapter } from "@socket.io/redis-streams-adapter";
+import cors from "cors";
+import express from "express";
+import http from "http";
 import { Redis } from "ioredis";
-import GameRoomManager from "./models/GameRoomManager.js";
-import { getConfig } from "./config.js";
-import { registerSocketEvents } from "./socket/socketEvents.js";
-import { registerRoutes } from "./controllers/index.js";
-import { registerSocketIoAdmin } from "./socket/socketIoAdmin.js";
+import { Server } from "socket.io";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../shared/types/Socket.js";
+import { getConfig } from "./config.js";
+import { registerRoutes } from "./controllers/index.js";
+import GameRoomManager from "./models/GameRoomManager.js";
+import { registerSocketEvents } from "./socket/socketEvents.js";
+import { registerSocketIoAdmin } from "./socket/socketIoAdmin.js";
 
 const configSettings = getConfig();
 

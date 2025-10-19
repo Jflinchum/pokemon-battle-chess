@@ -1,6 +1,6 @@
-import { useReducer, ReactElement } from "react";
-import { modalStateReducer, ModalStateContext } from "./ModalStateContext";
+import { ReactElement, useReducer } from "react";
 import Modal from "../../components/common/Modal/Modal";
+import { ModalStateContext, modalStateReducer } from "./ModalStateContext";
 
 const ModalStateProvider = ({ children }: { children: ReactElement }) => {
   const [modalState, dispatch] = useReducer(modalStateReducer, {

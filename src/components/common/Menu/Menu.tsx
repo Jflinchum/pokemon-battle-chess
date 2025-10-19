@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { MenuOptions } from "./MenuOptions/MenuOptions";
 import "./Menu.css";
+import { MenuOptions } from "./MenuOptions/MenuOptions";
 
 interface MenuProps {
   navLabels: string[];

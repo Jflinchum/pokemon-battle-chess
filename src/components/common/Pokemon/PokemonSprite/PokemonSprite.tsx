@@ -1,6 +1,6 @@
-import { HTMLAttributes } from "react";
-import { Sprites } from "@pkmn/img";
 import { Dex, GenderName } from "@pkmn/dex";
+import { Sprites } from "@pkmn/img";
+import { HTMLAttributes } from "react";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { speciesOverride } from "../../../BattleChessGame/ChessManager/util";
 

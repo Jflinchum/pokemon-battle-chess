@@ -1,15 +1,15 @@
-import { Sprites } from "@pkmn/img";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faX } from "@fortawesome/free-solid-svg-icons";
-import PlayerName from "../PlayerName/PlayerName";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Sprites } from "@pkmn/img";
+import { toast } from "react-toastify";
 import { Player } from "../../../../../shared/types/Player";
-import Button from "../../../common/Button/Button";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
-import "./PlayerList.css";
+import Button from "../../../common/Button/Button";
 import Tooltip from "../../../common/Tooltip/Tooltip";
-import { toast } from "react-toastify";
+import PlayerName from "../PlayerName/PlayerName";
+import "./PlayerList.css";
 
 interface PlayerListProps extends React.HTMLAttributes<HTMLDivElement> {
   players: Player[];

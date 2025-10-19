@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Chess } from "chess.js";
 import { PokemonSet } from "@pkmn/data";
+import { Chess } from "chess.js";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PokemonBattleChessManager } from "../../../../../shared/models/PokemonBattleChessManager";
-import { BattleChessGame } from "../../../BattleChessGame/BattleChessManager/BattleChessGame";
 import { MatchHistory } from "../../../../../shared/types/Game";
+import { BattleChessGame } from "../../../BattleChessGame/BattleChessManager/BattleChessGame";
 
 export const HowToPlayScreen2 = () => {
   const pokemonManager = useMemo(

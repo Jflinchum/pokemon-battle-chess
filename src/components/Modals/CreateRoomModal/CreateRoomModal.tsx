@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
-import { useGameState } from "../../../context/GameState/GameStateContext";
 import { createNewRoom } from "../../../service/lobby";
 import CreateRoomForm from "./CreateRoomForm/CreateRoomForm";
 import "./CreateRoomModal.css";

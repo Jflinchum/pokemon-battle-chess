@@ -1,43 +1,43 @@
-import {
-  useState,
-  useMemo,
-  useRef,
-  useEffect,
-  useCallback,
-  RefObject,
-} from "react";
-import { toast } from "react-toastify";
-import { Color, Chess, Square } from "chess.js";
+import { PokemonSet } from "@pkmn/data";
 import { ArgType, KWArgType } from "@pkmn/protocol";
 import { PRNG } from "@pkmn/sim";
-import { PokemonSet } from "@pkmn/data";
+import { Chess, Color, Square } from "chess.js";
+import {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { toast } from "react-toastify";
 import {
   PokemonBattleChessManager,
   SquareModifier,
 } from "../../../../shared/models/PokemonBattleChessManager";
 import {
-  getVerboseSanChessMove,
-  mergeBoardAndPokemonState,
-} from "../ChessManager/util";
-import { getCastledRookSquare } from "../../../../shared/util/getCastledRookSquare";
-import useBattleHistory from "./useBattleHistory";
-import { useUserState } from "../../../context/UserState/UserStateContext";
-import { useModalState } from "../../../context/ModalState/ModalStateContext";
-import { useGameState } from "../../../context/GameState/GameStateContext";
-import { CurrentBattle } from "./BattleChessManager";
-import { useSocketRequests } from "../../../util/useSocketRequests";
-import { useMusicPlayer } from "../../../util/useMusicPlayer";
-import movePieceFX from "../../../assets/chessAssets/audio/movePiece.ogg";
-import capturePieceFX from "../../../assets/chessAssets/audio/capturePiece.ogg";
-import Spinner from "../../common/Spinner/Spinner";
-import ChessManager from "../ChessManager/ChessManager";
-import PokemonBattleManager from "../PokemonManager/PokemonBattleManager/PokemonBattleManager";
-import {
   ChessData,
   EndGameReason,
   MatchHistory,
 } from "../../../../shared/types/Game.js";
+import { getCastledRookSquare } from "../../../../shared/util/getCastledRookSquare";
+import capturePieceFX from "../../../assets/chessAssets/audio/capturePiece.ogg";
+import movePieceFX from "../../../assets/chessAssets/audio/movePiece.ogg";
+import { useGameState } from "../../../context/GameState/GameStateContext";
+import { useModalState } from "../../../context/ModalState/ModalStateContext";
+import { useUserState } from "../../../context/UserState/UserStateContext";
+import { useMusicPlayer } from "../../../util/useMusicPlayer";
+import { useSocketRequests } from "../../../util/useSocketRequests";
+import Spinner from "../../common/Spinner/Spinner";
+import ChessManager from "../ChessManager/ChessManager";
+import {
+  getVerboseSanChessMove,
+  mergeBoardAndPokemonState,
+} from "../ChessManager/util";
 import DraftPokemonManager from "../DraftPokemonManager/DraftPokemonManager";
+import PokemonBattleManager from "../PokemonManager/PokemonBattleManager/PokemonBattleManager";
+import { CurrentBattle } from "./BattleChessManager";
+import useBattleHistory from "./useBattleHistory";
 import { usePremoves } from "./usePremove";
 
 export const BattleChessGame = ({

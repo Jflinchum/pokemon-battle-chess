@@ -1,6 +1,6 @@
+import { useEffect, useRef } from "react";
 import { ChessData } from "../../../../../shared/types/Game.js";
 import "./ChessMoveHistory.css";
-import { useEffect, useRef } from "react";
 
 const ChessMoveHistoryItem = ({
   turn,

@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import {
-  ServerToClientEvents,
   ClientToServerEvents,
+  ServerToClientEvents,
 } from "../shared/types/Socket";
 
 const url =

@@ -1,48 +1,48 @@
+import { Color } from "chess.js";
 import { Server } from "socket.io";
-import GameRoom from "./GameRoom.js";
 import User from "../../shared/models/User.js";
+import { GameOptions } from "../../shared/types/GameOptions.js";
+import { Player } from "../../shared/types/Player.js";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../../shared/types/Socket.js";
 import {
   createRoom as createRoomInCache,
-  movePlayerToActive,
+  deletePlayerFromCache,
   deleteRoom,
   doesRoomExist,
-  fetchRoomCode,
-  fetchPlayerSecret,
-  fetchUser,
   fetchAllUsersInRoom,
+  fetchBlackPlayerId,
+  fetchGame,
+  fetchGameOptions,
   fetchHostPlayerId,
   fetchPlayer1Id,
   fetchPlayer2Id,
-  fetchWhitePlayerId,
-  fetchBlackPlayerId,
-  fetchGameOptions,
-  fetchGame,
+  fetchPlayerSecret,
   fetchPlayerSpectating,
-  setPlayerSpectating,
-  setGameRoomOptions,
-  removePlayerIdFromRoom,
-  setUserAsTransient,
-  pushPlayerToRandomQueue,
-  pushPlayerToDraftQueue,
-  removePlayerFromRandomQueue,
-  removePlayerFromDraftQueue,
-  getFirstPlayerInRandomQueue,
+  fetchRoomCode,
+  fetchUser,
+  fetchWhitePlayerId,
   getFirstPlayerInDraftQueue,
+  getFirstPlayerInRandomQueue,
   getRoomIdFromHostId,
+  getUserTransientStatus,
+  movePlayerToActive,
+  pushPlayerToDraftQueue,
+  pushPlayerToRandomQueue,
+  removePlayerFromDraftQueue,
+  removePlayerFromRandomQueue,
+  removePlayerIdFromRoom,
+  setGameRoomOptions,
   setPlayerAsPlayer1,
   setPlayerAsPlayer2,
-  deletePlayerFromCache,
-  getUserTransientStatus,
+  setPlayerSpectating,
+  setUserAsTransient,
 } from "../cache/redis.js";
-import { Player } from "../../shared/types/Player.js";
-import { Color } from "chess.js";
-import { GameOptions } from "../../shared/types/GameOptions.js";
 import { DEFAULT_GAME_OPTIONS } from "../constants/gameConstants.js";
 import { transientDisconnectTime } from "../constants/userConstants.js";
+import GameRoom from "./GameRoom.js";
 
 interface GameRoomList {
   [roomId: string]: GameRoom;

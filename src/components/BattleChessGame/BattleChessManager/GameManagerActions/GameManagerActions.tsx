@@ -1,6 +1,3 @@
-import { useCallback } from "react";
-import { toast } from "react-toastify";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCog,
   faDoorOpen,
@@ -8,13 +5,16 @@ import {
   faFlag,
   faForwardFast,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useCallback } from "react";
+import { toast } from "react-toastify";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
-import { useUserState } from "../../../../context/UserState/UserStateContext";
-import NavOptions from "../../../common/NavOptions/NavOptions";
-import { NavOptionButton } from "../../../common/NavOptions/NavOptionButton/NavOptionButton";
 import { useModalState } from "../../../../context/ModalState/ModalStateContext";
+import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { downloadReplay } from "../../../../util/downloadReplay";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
+import { NavOptionButton } from "../../../common/NavOptions/NavOptionButton/NavOptionButton";
+import NavOptions from "../../../common/NavOptions/NavOptions";
 import "./GameManagerActions.css";
 
 const GameManagerActions = () => {

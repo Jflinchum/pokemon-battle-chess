@@ -1,10 +1,10 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import fs from "fs";
-import { config } from "./lobbyServer/config";
 import { SecureContextOptions } from "tls";
+import { defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
+import { config } from "./lobbyServer/config";
 
 const httpsOptions: {
   key?: SecureContextOptions["key"];

@@ -1,6 +1,6 @@
-import { Dex } from "@pkmn/dex";
-import { Move } from "@pkmn/data";
 import { Pokemon } from "@pkmn/client";
+import { Move } from "@pkmn/data";
+import { Dex } from "@pkmn/dex";
 import PokemonMoveButton from "../../../../common/PokemonMoveButton/PokemonMoveButton";
 import { PokemonMoveTooltip } from "../PokemonMoveTooltip/PokemonMoveTooltip";
 import { getTypeEffectiveness } from "./getTypeEffectiveness";

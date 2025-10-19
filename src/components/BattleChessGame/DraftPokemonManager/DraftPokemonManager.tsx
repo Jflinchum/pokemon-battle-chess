@@ -1,13 +1,13 @@
-import { useState } from "react";
 import { Chess, Color, Square } from "chess.js";
-import { useGameState } from "../../../context/GameState/GameStateContext";
-import PokemonDraftSelect from "./PokemonDraftSelect/PokemonDraftSelect";
-import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
+import { useState } from "react";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
-import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
-import Button from "../../common/Button/Button";
+import { useGameState } from "../../../context/GameState/GameStateContext";
 import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
+import Button from "../../common/Button/Button";
+import ChessBoard from "../ChessManager/ChessBoard/ChessBoard";
+import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
 import "./DraftPokemonManager.css";
+import PokemonDraftSelect from "./PokemonDraftSelect/PokemonDraftSelect";
 
 interface DraftPokemonManagerProps {
   chessManager: Chess;

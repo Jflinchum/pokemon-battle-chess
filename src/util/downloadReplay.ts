@@ -1,9 +1,9 @@
-import { toast } from "react-toastify";
 import { PRNGSeed } from "@pkmn/sim";
+import { toast } from "react-toastify";
 import { MatchHistory } from "../../shared/types/Game.js";
-import { GameState } from "../context/GameState/GameStateContext.js";
-import { Player } from "../../shared/types/Player.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
+import { Player } from "../../shared/types/Player.js";
+import { GameState } from "../context/GameState/GameStateContext.js";
 
 export interface ReplayData {
   players: Player[];

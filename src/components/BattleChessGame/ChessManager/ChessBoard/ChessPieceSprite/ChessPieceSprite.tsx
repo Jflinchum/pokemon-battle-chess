@@ -1,16 +1,16 @@
-import { PieceSymbol, Color } from "chess.js";
-import blackPawn from "../../../../../assets/chessAssets/sprites/blackPawn.png";
-import blackRook from "../../../../../assets/chessAssets/sprites/blackRook.png";
-import blackKnight from "../../../../../assets/chessAssets/sprites/blackKnight.png";
+import { Color, PieceSymbol } from "chess.js";
 import blackBishop from "../../../../../assets/chessAssets/sprites/blackBishop.png";
-import blackQueen from "../../../../../assets/chessAssets/sprites/blackQueen.png";
 import blackKing from "../../../../../assets/chessAssets/sprites/blackKing.png";
-import whitePawn from "../../../../../assets/chessAssets/sprites/whitePawn.png";
-import whiteRook from "../../../../../assets/chessAssets/sprites/whiteRook.png";
-import whiteKnight from "../../../../../assets/chessAssets/sprites/whiteKnight.png";
+import blackKnight from "../../../../../assets/chessAssets/sprites/blackKnight.png";
+import blackPawn from "../../../../../assets/chessAssets/sprites/blackPawn.png";
+import blackQueen from "../../../../../assets/chessAssets/sprites/blackQueen.png";
+import blackRook from "../../../../../assets/chessAssets/sprites/blackRook.png";
 import whiteBishop from "../../../../../assets/chessAssets/sprites/whiteBishop.png";
-import whiteQueen from "../../../../../assets/chessAssets/sprites/whiteQueen.png";
 import whiteKing from "../../../../../assets/chessAssets/sprites/whiteKing.png";
+import whiteKnight from "../../../../../assets/chessAssets/sprites/whiteKnight.png";
+import whitePawn from "../../../../../assets/chessAssets/sprites/whitePawn.png";
+import whiteQueen from "../../../../../assets/chessAssets/sprites/whiteQueen.png";
+import whiteRook from "../../../../../assets/chessAssets/sprites/whiteRook.png";
 
 const getPieceImage = (pieceType: PieceSymbol, pieceColor: Color) => {
   if (pieceColor === "b") {

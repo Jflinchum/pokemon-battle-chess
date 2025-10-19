@@ -1,16 +1,20 @@
+import { BoostID } from "@pkmn/data";
+import { Protocol } from "@pkmn/protocol";
+import {
+  Battle,
+  BattleStreams,
+  PRNG,
+  PRNGSeed,
+  Dex as SimDex,
+  Teams,
+} from "@pkmn/sim";
+import { ObjectReadWriteStream } from "@pkmn/streams";
 import { Chess, Color, Move, Piece, Square } from "chess.js";
 import {
-  Dex as SimDex,
-  BattleStreams,
-  Teams,
-  PRNGSeed,
-  Battle,
-} from "@pkmn/sim";
-import { BoostID } from "@pkmn/data";
-import { PRNG } from "@pkmn/sim";
-import { Protocol } from "@pkmn/protocol";
-import { ObjectReadWriteStream } from "@pkmn/streams";
-import User from "../../shared/models/User.js";
+  HIGH_SQUARE_MODIFIER_TARGET,
+  LOW_SQUARE_MODIFIER_TARGET,
+  SQUARE_MODIFIER_TARGET,
+} from "../../shared/constants/gameConstants.js";
 import {
   PokemonBattleChessManager,
   PokemonPiece,
@@ -18,17 +22,17 @@ import {
   TerrainNames,
   WeatherNames,
 } from "../../shared/models/PokemonBattleChessManager.js";
+import User from "../../shared/models/User.js";
+import { ChessBoardSquare } from "../../shared/types/ChessBoardSquare.js";
 import {
   EndGameReason,
   MatchHistory,
   MatchLog,
   Timer,
 } from "../../shared/types/Game.js";
-import { ChessBoardSquare } from "../../shared/types/ChessBoardSquare.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
-import GameTimer from "./GameTimer.js";
-import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes.js";
 import { Player } from "../../shared/types/Player.js";
+import { TerrainId, WeatherId } from "../../shared/types/PokemonTypes.js";
 import { getCastledRookSquare } from "../../shared/util/getCastledRookSquare.js";
 import {
   clearPokemonBanList,
@@ -89,11 +93,7 @@ import {
   DEFAULT_GAME_OPTIONS,
   POKE_SIMULATOR_TERMINATOR,
 } from "../constants/gameConstants.js";
-import {
-  SQUARE_MODIFIER_TARGET,
-  LOW_SQUARE_MODIFIER_TARGET,
-  HIGH_SQUARE_MODIFIER_TARGET,
-} from "../../shared/constants/gameConstants.js";
+import GameTimer from "./GameTimer.js";
 
 export default class GameRoom {
   public roomId: string;

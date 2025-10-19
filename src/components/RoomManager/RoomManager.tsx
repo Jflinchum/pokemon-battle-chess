@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
-import { useGameState } from "../../context/GameState/GameStateContext";
-import { useUserState } from "../../context/UserState/UserStateContext";
-import { useModalState } from "../../context/ModalState/ModalStateContext";
-import { socket } from "../../socket";
-import Room from "./Room/Room";
-import ChatToggle from "./Chat/ChatToggle/ChatToggle";
 import { MatchHistory, Timer } from "../../../shared/types/Game";
 import { Player } from "../../../shared/types/Player";
+import { useGameState } from "../../context/GameState/GameStateContext";
+import { useModalState } from "../../context/ModalState/ModalStateContext";
+import { useUserState } from "../../context/UserState/UserStateContext";
+import { socket } from "../../socket";
 import { useMusicPlayer } from "../../util/useMusicPlayer";
 import { useSocketRequests } from "../../util/useSocketRequests";
+import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
+import ChatToggle from "./Chat/ChatToggle/ChatToggle";
+import Room from "./Room/Room";
 import "./RoomManager.css";
 
 const RoomManager = () => {

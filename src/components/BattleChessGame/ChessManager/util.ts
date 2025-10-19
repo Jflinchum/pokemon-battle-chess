@@ -1,7 +1,7 @@
 import { Chess, Piece, PieceSymbol, Square } from "chess.js";
-import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
-import { ChessBoardSquare } from "../../../../shared/types/ChessBoardSquare";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
+import { ChessBoardSquare } from "../../../../shared/types/ChessBoardSquare";
+import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
 
 export const getSquareColor = (
   rowIndex: number,

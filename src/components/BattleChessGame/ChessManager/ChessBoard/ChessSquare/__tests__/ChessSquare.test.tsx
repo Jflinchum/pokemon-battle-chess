@@ -1,15 +1,15 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
-import ChessSquare, { ChessSquareProps } from "../ChessSquare";
 import { Color, PieceSymbol, Square } from "chess.js";
-import { getMockPokemonSet } from "../../../../../../testUtils/pokemon";
-import { getMockUserStateContext } from "../../../../../../testUtils/userState";
+import { describe, expect, it, vi } from "vitest";
 import * as UserStateContext from "../../../../../../context/UserState/UserStateContext";
+import { getMockPokemonSet } from "../../../../../../testUtils/pokemon";
 import {
   getMockModifiers,
   getMockSquareModifiers,
 } from "../../../../../../testUtils/squareModifiers";
+import { getMockUserStateContext } from "../../../../../../testUtils/userState";
+import ChessSquare, { ChessSquareProps } from "../ChessSquare";
 
 const squareMock = {
   square: "a1" as Square,

@@ -1,7 +1,3 @@
-import { useRef } from "react";
-import { toast } from "react-toastify";
-import { Sprites } from "@pkmn/img";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCertificate,
   faChessKing,
@@ -11,15 +7,19 @@ import {
   faNoteSticky,
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Sprites } from "@pkmn/img";
+import { useRef } from "react";
+import { toast } from "react-toastify";
+import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
-import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
-import NavOptions from "../../common/NavOptions/NavOptions";
-import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
 import { ReplayData } from "../../../util/downloadReplay";
-import { useGameState } from "../../../context/GameState/GameStateContext";
-import { validateReplay } from "./validateReplay";
+import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
+import NavOptions from "../../common/NavOptions/NavOptions";
+import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
 import "./MenuOptions.css";
+import { validateReplay } from "./validateReplay";
 
 const MenuOptions = () => {
   const { dispatch } = useModalState();

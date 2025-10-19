@@ -1,21 +1,21 @@
-import { useState } from "react";
 import { Battle, Pokemon, TerrainName, WeatherName } from "@pkmn/client";
-import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet } from "@pkmn/data";
+import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PRNG } from "@pkmn/sim";
-import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";
-import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
+import { LogFormatter } from "@pkmn/view";
+import { useState } from "react";
 import {
   CustomArgTypes,
   TerrainId,
   WeatherId,
 } from "../../../../../../shared/types/PokemonTypes";
-import { PokemonBattleConditions } from "./PokemonBattleCondition/PokemonBattleConditions";
+import { useUserState } from "../../../../../context/UserState/UserStateContext";
+import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
 import { PokemonBattleBackground } from "./PokemonBattleBackground/PokemonBattleBackground";
+import { PokemonBattleConditions } from "./PokemonBattleCondition/PokemonBattleConditions";
 import "./PokemonBattleField.css";
 import { PokemonBattleText } from "./PokemonBattleText/PokemonBattleText";
-import { LogFormatter } from "@pkmn/view";
-import { useUserState } from "../../../../../context/UserState/UserStateContext";
+import PokemonFieldSprite from "./PokemonFieldSprite/PokemonFieldSprite";
 
 interface PokemonBattleFieldProps {
   prng: PRNG;

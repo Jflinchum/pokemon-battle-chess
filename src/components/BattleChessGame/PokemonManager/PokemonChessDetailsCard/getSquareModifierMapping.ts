@@ -1,5 +1,5 @@
-import { WeatherName, TerrainName } from "@pkmn/client";
-import { WeatherId, TerrainId } from "../../../../../shared/types/PokemonTypes";
+import { TerrainName, WeatherName } from "@pkmn/client";
+import { TerrainId, WeatherId } from "../../../../../shared/types/PokemonTypes";
 
 /**
  * Outputs a label and description of a battle field condition to be rendered to the user.

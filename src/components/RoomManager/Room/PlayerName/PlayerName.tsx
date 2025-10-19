@@ -1,10 +1,10 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCrown,
   faBookOpen,
+  faCrown,
   faEye,
   faPlugCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Player } from "../../../../../shared/types/Player";
 import "./PlayerName.css";
 

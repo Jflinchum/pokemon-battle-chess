@@ -1,7 +1,7 @@
-import { useReducer, ReactElement } from "react";
+import { ReactElement, useReducer } from "react";
 import {
-  gameStateReducer,
   GameStateContext,
+  gameStateReducer,
   getInitialGameState,
 } from "./GameStateContext";
 

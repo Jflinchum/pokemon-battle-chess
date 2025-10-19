@@ -1,18 +1,18 @@
-import { useState, useEffect, useCallback } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCaretLeft,
   faCaretRight,
   faRefresh,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import RoomList from "../RoomList/RoomList";
-import MenuOptions from "../MenuOptions/MenuOptions";
-import { getAvailableRooms } from "../../../service/lobby";
 import { useGameState } from "../../../context/GameState/GameStateContext";
-import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
+import { getAvailableRooms } from "../../../service/lobby";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
 import usePageVisibility from "../../../util/usePageVisibility";
+import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
+import MenuOptions from "../MenuOptions/MenuOptions";
+import RoomList from "../RoomList/RoomList";
 import "./LobbyManager.css";
 import { ReportIssue } from "./ReportIssue/ReportIssue";
 

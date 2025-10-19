@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import TakenChessPieces, { TakenChessPiecesProps } from "../TakenChessPieces";
 import { Color, PieceSymbol } from "chess.js";
-import { createMockPokemonPieces } from "../../../../../testUtils/chess";
+import { describe, expect, it, vi } from "vitest";
 import * as UserStateContext from "../../../../../context/UserState/UserStateContext";
+import { createMockPokemonPieces } from "../../../../../testUtils/chess";
 import { getMockUserStateContext } from "../../../../../testUtils/userState";
+import TakenChessPieces, { TakenChessPiecesProps } from "../TakenChessPieces";
 
 const setup = (props: Partial<TakenChessPiecesProps> = {}) => {
   vi.spyOn(UserStateContext, "useUserState").mockReturnValue(

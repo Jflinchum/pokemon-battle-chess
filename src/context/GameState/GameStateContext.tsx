@@ -1,12 +1,12 @@
 import { createContext, useContext, type Dispatch } from "react";
+import { MatchHistory } from "../../../shared/types/Game.js";
+import { GameSettings } from "../../../shared/types/GameOptions.ts";
+import { Player } from "../../../shared/types/Player.ts";
+import { ReplayData } from "../../util/downloadReplay.ts";
 import {
   getDefaultGameOptions,
   getGameOptions,
 } from "../../util/localWebData.ts";
-import { Player } from "../../../shared/types/Player.ts";
-import { ReplayData } from "../../util/downloadReplay.ts";
-import { MatchHistory } from "../../../shared/types/Game.js";
-import { GameSettings } from "../../../shared/types/GameOptions.ts";
 
 export type FormatID = "random" | "draft";
 

@@ -1,22 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Dex } from "@pkmn/dex";
-import { PokemonSet, Generations, SideID } from "@pkmn/data";
-import { KWArgType } from "@pkmn/protocol";
 import { Battle, Pokemon, TerrainName, WeatherName } from "@pkmn/client";
+import { Generations, PokemonSet, SideID } from "@pkmn/data";
+import { Dex } from "@pkmn/dex";
+import { KWArgType } from "@pkmn/protocol";
 import { PRNG } from "@pkmn/sim";
 import { LogFormatter } from "@pkmn/view";
-import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CustomArgTypes,
   TerrainId,
   WeatherId,
 } from "../../../../../shared/types/PokemonTypes";
-import { PokemonMoveChoice } from "../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices";
-import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
+import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { timer } from "../../../../utils";
-import { usePokemonAudioFx } from "./usePokemonAudioFx";
+import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
+import { PokemonMoveChoice } from "../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices";
 import { shouldDelayBattleOutput } from "../utils/shouldDelayBattleOutput";
+import { usePokemonAudioFx } from "./usePokemonAudioFx";
 
 interface PokemonBattleManagerProps {
   prng: PRNG;

@@ -1,14 +1,14 @@
-import { useMemo } from "react";
 import { Sprites } from "@pkmn/img";
+import { useMemo } from "react";
+import { EndGameReason } from "../../../../shared/types/Game";
+import { useGameState } from "../../../context/GameState/GameStateContext";
 import {
   EndGameModalProps,
   useModalState,
 } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
-import { useGameState } from "../../../context/GameState/GameStateContext";
-import Button from "../../common/Button/Button";
-import { EndGameReason } from "../../../../shared/types/Game";
 import { useSocketRequests } from "../../../util/useSocketRequests";
+import Button from "../../common/Button/Button";
 import "./EndGameModal.css";
 
 const getEndGameTitle = (

@@ -1,9 +1,9 @@
 import { RefObject, useEffect, useRef, useState } from "react";
-import { socket } from "../../../../socket";
+import { cleanString } from "../../../../../shared/util/profanityFilter";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
+import { socket } from "../../../../socket";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./ChatDisplay.css";
-import { cleanString } from "../../../../../shared/util/profanityFilter";
 
 interface ChatDisplayProps {
   onMessage?: (message: ChatMessage) => void;

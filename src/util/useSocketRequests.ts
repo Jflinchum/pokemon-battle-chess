@@ -1,12 +1,12 @@
 import { Square } from "chess.js";
 import { useCallback, useMemo } from "react";
-import { socket } from "../socket";
-import { useUserState } from "../context/UserState/UserStateContext";
 import { GameOptions } from "../../shared/types/GameOptions";
 import {
   CommonClientArgs,
   CommonServerResponse,
 } from "../../shared/types/Socket";
+import { useUserState } from "../context/UserState/UserStateContext";
+import { socket } from "../socket";
 
 const SOCKET_TIMEOUT = 10 * 1000;
 

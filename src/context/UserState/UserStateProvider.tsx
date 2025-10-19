@@ -1,4 +1,4 @@
-import { useReducer, ReactElement } from "react";
+import { ReactElement, useReducer } from "react";
 import {
   get2DSpritePreference,
   getAnimatedBackgroundPreference,
@@ -9,7 +9,7 @@ import {
   getOrInitializeUUID,
   getVolumePreference,
 } from "../../util/localWebData.ts";
-import { userStateReducer, UserStateContext } from "./UserStateContext.tsx";
+import { UserStateContext, userStateReducer } from "./UserStateContext.tsx";
 
 const UserStateProvider = ({ children }: { children: ReactElement }) => {
   const [userState, dispatch] = useReducer(userStateReducer, {

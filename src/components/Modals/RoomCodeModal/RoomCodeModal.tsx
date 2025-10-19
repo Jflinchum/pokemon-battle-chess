@@ -4,10 +4,10 @@ import {
   RoomCodeModalProps,
   useModalState,
 } from "../../../context/ModalState/ModalStateContext";
-import PasscodeInput from "../../common/PasscodeInput/PasscodeInput";
-import Button from "../../common/Button/Button";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { joinRoom } from "../../../service/lobby";
+import Button from "../../common/Button/Button";
+import PasscodeInput from "../../common/PasscodeInput/PasscodeInput";
 import "./RoomCodeModal.css";
 
 const RoomCodeModal = () => {

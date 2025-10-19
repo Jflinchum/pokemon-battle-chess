@@ -1,14 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { toast } from "react-toastify";
-import RoomList, { RoomListProps } from "../RoomList";
-import * as UserStateContext from "../../../../context/UserState/UserStateContext";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as ModalStateContext from "../../../../context/ModalState/ModalStateContext";
+import * as UserStateContext from "../../../../context/UserState/UserStateContext";
 import * as LobbyService from "../../../../service/lobby";
-import { getMockUserStateContext } from "../../../../testUtils/userState";
 import { getMockModalStateContext } from "../../../../testUtils/modalState";
 import { createMockRoom } from "../../../../testUtils/room";
+import { getMockUserStateContext } from "../../../../testUtils/userState";
+import RoomList, { RoomListProps } from "../RoomList";
 
 vi.mock("react-toastify");
 vi.mock("../../../../service/lobby");

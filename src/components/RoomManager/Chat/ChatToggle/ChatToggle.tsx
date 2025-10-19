@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretUp, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useRef, useState } from "react";
 import ChatDisplay from "../ChatDisplay/ChatDisplay";
 import "./ChatToggle.css";
 

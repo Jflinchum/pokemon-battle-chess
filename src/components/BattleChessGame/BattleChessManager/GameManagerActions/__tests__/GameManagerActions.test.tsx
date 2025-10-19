@@ -1,19 +1,19 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { toast } from "react-toastify";
-import GameManagerActions from "../GameManagerActions";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as GameStateContext from "../../../../../context/GameState/GameStateContext";
-import * as UserStateContext from "../../../../../context/UserState/UserStateContext";
 import * as ModalStateContext from "../../../../../context/ModalState/ModalStateContext";
-import * as SocketRequests from "../../../../../util/useSocketRequests";
-import * as DownloadReplay from "../../../../../util/downloadReplay";
+import * as UserStateContext from "../../../../../context/UserState/UserStateContext";
 import { getMockGameStateContext } from "../../../../../testUtils/gameState";
-import { getMockUserStateContext } from "../../../../../testUtils/userState";
+import { getMockMatchHistory } from "../../../../../testUtils/matchHistory";
 import { getMockModalStateContext } from "../../../../../testUtils/modalState";
 import { getMockSocketRequests } from "../../../../../testUtils/socket";
-import { getMockMatchHistory } from "../../../../../testUtils/matchHistory";
+import { getMockUserStateContext } from "../../../../../testUtils/userState";
+import * as DownloadReplay from "../../../../../util/downloadReplay";
 import { getDefaultGameOptions } from "../../../../../util/localWebData";
+import * as SocketRequests from "../../../../../util/useSocketRequests";
+import GameManagerActions from "../GameManagerActions";
 
 vi.mock("react-toastify");
 vi.mock("../../../../../util/downloadReplay");

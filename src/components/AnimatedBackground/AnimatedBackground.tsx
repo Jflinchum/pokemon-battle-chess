@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
 import { Sprites } from "@pkmn/img";
 import { Color, PieceSymbol } from "chess.js";
+import { useMemo, useState } from "react";
+import { useUserState } from "../../context/UserState/UserStateContext";
 import ChessPieceSprite from "../BattleChessGame/ChessManager/ChessBoard/ChessPieceSprite/ChessPieceSprite";
 import { getRandomPokemon } from "../Lobby/PokemonOfTheDay/PokemonOfTheDayUtil";
 import "./AnimatedBackground.css";
-import { useUserState } from "../../context/UserState/UserStateContext";
 
 const getRandomChessPiece = () => {
   const chessPieces: PieceSymbol[] = ["p", "b", "n", "r", "k", "q"];

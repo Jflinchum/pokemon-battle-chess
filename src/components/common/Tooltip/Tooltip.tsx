@@ -1,4 +1,4 @@
-import { Tooltip as ReactTooltip, ITooltip } from "react-tooltip";
+import { ITooltip, Tooltip as ReactTooltip } from "react-tooltip";
 import "./Tooltip.css";
 
 interface TooltipProps extends ITooltip {

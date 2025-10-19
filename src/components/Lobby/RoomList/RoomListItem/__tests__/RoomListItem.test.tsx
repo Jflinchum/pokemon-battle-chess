@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import RoomListItem, { RoomListItemProps } from "../RoomListItem";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockRoom } from "../../../../../testUtils/room";
+import RoomListItem, { RoomListItemProps } from "../RoomListItem";
 
 const setup = (props: Partial<RoomListItemProps> = {}) => {
   /**

@@ -1,11 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import "@testing-library/jest-dom";
-import { PokemonSprite } from "../PokemonSprite";
 import { Sprites } from "@pkmn/img";
+import "@testing-library/jest-dom";
+import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as UserStateContext from "../../../../../context/UserState/UserStateContext";
 import { getMockUserStateContext } from "../../../../../testUtils/userState";
 import * as SpeciesOverride from "../../../../BattleChessGame/ChessManager/util";
+import { PokemonSprite } from "../PokemonSprite";
 
 // Mock the external dependencies
 vi.mock("@pkmn/img", () => ({

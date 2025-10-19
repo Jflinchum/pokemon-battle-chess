@@ -1,11 +1,11 @@
+import { Chess, Color, Move, PieceSymbol, Square } from "chess.js";
 import { useCallback, useMemo, useState } from "react";
-import { Chess, Square, PieceSymbol, Move, Color } from "chess.js";
 import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
+import { useGameState } from "../../../context/GameState/GameStateContext";
 import {
   getVerboseChessMove,
   mergeBoardAndPokemonState,
 } from "../ChessManager/util";
-import { useGameState } from "../../../context/GameState/GameStateContext";
 
 const createChessManagerCopy = (chessManager: Chess, color: Color) => {
   const chessManagerCopy = new Chess(chessManager.fen(), {

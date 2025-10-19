@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { Sprites } from "@pkmn/img";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import { GameOptions } from "../../../../shared/types/GameOptions";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { socket } from "../../../socket";
+import { setGameOptions as setLocalGameOptions } from "../../../util/localWebData";
+import { useSocketRequests } from "../../../util/useSocketRequests";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
+import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameManagerActions/GameManagerActions";
 import Button from "../../common/Button/Button";
 import PlayerList from "./PlayerList/PlayerList";
 import PlayerName from "./PlayerName/PlayerName";
-import RoomOptions from "./RoomOptions/RoomOptions";
-import { GameOptions } from "../../../../shared/types/GameOptions";
-import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameManagerActions/GameManagerActions";
-import { useSocketRequests } from "../../../util/useSocketRequests";
-import { setGameOptions as setLocalGameOptions } from "../../../util/localWebData";
 import "./Room.css";
-import { toast } from "react-toastify";
+import RoomOptions from "./RoomOptions/RoomOptions";
 
 const Room = () => {
   const { gameState } = useGameState();

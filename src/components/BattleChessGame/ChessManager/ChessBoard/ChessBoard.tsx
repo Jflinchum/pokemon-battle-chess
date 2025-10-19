@@ -1,9 +1,9 @@
 import { Color, PieceSymbol, Square } from "chess.js";
-import { getSquareColor } from "../util";
-import ChessSquare from "./ChessSquare/ChessSquare";
-import { PokemonChessBoardSquare } from "../../../../types/chess/PokemonChessBoardSquare";
 import { SquareModifier } from "../../../../../shared/models/PokemonBattleChessManager";
+import { PokemonChessBoardSquare } from "../../../../types/chess/PokemonChessBoardSquare";
+import { getSquareColor } from "../util";
 import "./ChessBoard.css";
+import ChessSquare from "./ChessSquare/ChessSquare";
 
 export interface ChessBoardProps {
   color: Color;

@@ -1,6 +1,6 @@
-import { Dex } from "@pkmn/dex";
-import { Move, TypeName } from "@pkmn/data";
 import { Pokemon } from "@pkmn/client";
+import { Move, TypeName } from "@pkmn/data";
+import { Dex } from "@pkmn/dex";
 
 export const getTypeEffectiveness = (
   move: Move,

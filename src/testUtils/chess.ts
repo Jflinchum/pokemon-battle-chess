@@ -1,7 +1,7 @@
 import { Color, PieceSymbol, Square } from "chess.js";
+import { ChessData } from "../../shared/types/Game";
 import { PokemonChessBoardSquare } from "../types/chess/PokemonChessBoardSquare";
 import { getMockPokemonSet } from "./pokemon";
-import { ChessData } from "../../shared/types/Game";
 
 export const getAllChessBoardSquares = (
   excludeSquare: Square[] = [],

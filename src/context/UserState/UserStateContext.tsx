@@ -1,4 +1,6 @@
 import { createContext, useContext, type Dispatch } from "react";
+import { ChatMessage } from "../../components/RoomManager/Chat/ChatDisplay/ChatDisplay.tsx";
+import { leaveRoom } from "../../service/lobby.tsx";
 import {
   clearMostRecentRoom,
   set2DSpritePreference,
@@ -9,8 +11,6 @@ import {
   setName,
   setVolumePreference,
 } from "../../util/localWebData.ts";
-import { leaveRoom } from "../../service/lobby.tsx";
-import { ChatMessage } from "../../components/RoomManager/Chat/ChatDisplay/ChatDisplay.tsx";
 
 export interface VolumePreference {
   pieceVolume: number;

@@ -1,6 +1,6 @@
 import { GenderName, PokemonSet } from "@pkmn/data";
-import { PokemonSprite } from "../../../common/Pokemon/PokemonSprite/PokemonSprite";
 import Button from "../../../common/Button/Button";
+import { PokemonSprite } from "../../../common/Pokemon/PokemonSprite/PokemonSprite";
 import "./PokemonDraftSelect.css";
 
 export interface PokemonDraftSelectProps {

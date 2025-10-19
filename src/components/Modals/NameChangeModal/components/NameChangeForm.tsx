@@ -1,10 +1,10 @@
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { useState, useRef, useEffect } from "react";
+import { isStringProfane } from "../../../../../shared/util/profanityFilter";
 import { useModalState } from "../../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
 import Button from "../../../common/Button/Button";
 import TextInput from "../../../common/TextInput/TextInput";
-import { isStringProfane } from "../../../../../shared/util/profanityFilter";
 import "./NameChangeForm.css";
 
 interface NameChangeFormProps {

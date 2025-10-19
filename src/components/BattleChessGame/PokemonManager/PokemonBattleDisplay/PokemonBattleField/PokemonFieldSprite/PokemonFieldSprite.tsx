@@ -1,10 +1,10 @@
 import { Pokemon } from "@pkmn/client";
 import { BoostID, GenderName, PokemonSet } from "@pkmn/data";
-import ProgressBar from "../../../../../common/ProgressBar/ProgressBar";
-import PokemonStatus from "../../../../../common/Pokemon/PokemonStatus/PokemonStatus";
-import Tooltip from "../../../../../common/Tooltip/Tooltip";
 import { GenderIcon } from "../../../../../common/GenderIcon/GenderIcon";
 import { PokemonSprite } from "../../../../../common/Pokemon/PokemonSprite/PokemonSprite";
+import PokemonStatus from "../../../../../common/Pokemon/PokemonStatus/PokemonStatus";
+import ProgressBar from "../../../../../common/ProgressBar/ProgressBar";
+import Tooltip from "../../../../../common/Tooltip/Tooltip";
 import { PokemonBattleDetailsCard } from "../../PokemonBattleDetails/PokemonBattleDetails";
 import "./PokemonFieldSprite.css";
 

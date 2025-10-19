@@ -1,5 +1,5 @@
-import { InternalConfig } from "./config.js";
 import { getDisconnectedUsers, roomExists } from "./cache/redis.js";
+import { InternalConfig } from "./config.js";
 
 const DISCONNECTED_USER_INTERVAL = 1000 * 60 * 3;
 

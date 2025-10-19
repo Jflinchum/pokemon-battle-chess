@@ -1,18 +1,17 @@
-import { useMemo } from "react";
-import { PokemonSet, TypeName } from "@pkmn/data";
+import { GenderName, PokemonSet, TypeName } from "@pkmn/data";
 import { Dex } from "@pkmn/dex";
 import { Icons } from "@pkmn/img";
-import { GenderName } from "@pkmn/data";
-import PokemonMoveChoices from "../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices";
-import PokemonType from "../../../common/Pokemon/PokemonType/PokemonType";
-import ChessMoveHistory from "../../ChessManager/ChessMoveHistory/ChessMoveHistory";
-import Tooltip from "../../../common/Tooltip/Tooltip";
-import { ChessData } from "../../../../../shared/types/Game.js";
-import { GenderIcon } from "../../../common/GenderIcon/GenderIcon";
+import { useMemo } from "react";
 import { SquareModifier } from "../../../../../shared/models/PokemonBattleChessManager";
-import { PokemonWeatherBackground } from "../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
-import { PokemonSprite } from "../../../common/Pokemon/PokemonSprite/PokemonSprite";
+import { ChessData } from "../../../../../shared/types/Game.js";
 import shinyIcon from "../../../../assets/pokemonAssets/shiny.png";
+import { GenderIcon } from "../../../common/GenderIcon/GenderIcon";
+import { PokemonSprite } from "../../../common/Pokemon/PokemonSprite/PokemonSprite";
+import PokemonType from "../../../common/Pokemon/PokemonType/PokemonType";
+import { PokemonWeatherBackground } from "../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
+import Tooltip from "../../../common/Tooltip/Tooltip";
+import ChessMoveHistory from "../../ChessManager/ChessMoveHistory/ChessMoveHistory";
+import PokemonMoveChoices from "../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices";
 import { getSquareModifierMapping } from "./getSquareModifierMapping";
 import "./PokemonChessDetailsCard.css";
 

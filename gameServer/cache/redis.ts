@@ -1,31 +1,31 @@
-import { Redis } from "ioredis";
 import { PRNGSeed } from "@pkmn/sim";
-import { Color } from "chess.js";
-import { getConfig } from "../config.js";
-import GameRoom from "../models/GameRoom.js";
-import User from "../../shared/models/User.js";
-import { GameOptions } from "../../shared/types/GameOptions.js";
-import { FormatID } from "../../shared/models/PokemonBattleChessManager.js";
-import { MatchLog } from "../../shared/types/Game.js";
 import { Lock, Redlock } from "@sesamecare-oss/redlock";
+import { Color } from "chess.js";
+import { Redis } from "ioredis";
+import {
+  getDraftMatchmakingQueueKey,
+  getPlayerKey,
+  getRandomMatchmakingQueueKey,
+  getRoomBlackMatchHistoryKey,
+  getRoomKey,
+  getRoomLockKey,
+  getRoomPlayerSetKey,
+  getRoomPokemonBanKey,
+  getRoomPokemonBoardKey,
+  getRoomPokemonMoveHistoryKey,
+  getRoomSquareModifiersKey,
+  getRoomWhiteMatchHistoryKey,
+} from "../../shared/cache/redis.js";
 import {
   REDIS_KEY_EXPIRY,
   ROOM_KEY,
 } from "../../shared/constants/redisConstants.js";
-import {
-  getRoomKey,
-  getRoomPlayerSetKey,
-  getRoomPokemonMoveHistoryKey,
-  getRoomWhiteMatchHistoryKey,
-  getRoomBlackMatchHistoryKey,
-  getRoomPokemonBoardKey,
-  getRoomPokemonBanKey,
-  getRoomSquareModifiersKey,
-  getRoomLockKey,
-  getRandomMatchmakingQueueKey,
-  getDraftMatchmakingQueueKey,
-  getPlayerKey,
-} from "../../shared/cache/redis.js";
+import { FormatID } from "../../shared/models/PokemonBattleChessManager.js";
+import User from "../../shared/models/User.js";
+import { MatchLog } from "../../shared/types/Game.js";
+import { GameOptions } from "../../shared/types/GameOptions.js";
+import { getConfig } from "../config.js";
+import GameRoom from "../models/GameRoom.js";
 
 /**
  *

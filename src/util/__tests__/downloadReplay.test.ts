@@ -1,8 +1,8 @@
 import { toast } from "react-toastify";
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { downloadReplay } from "../downloadReplay";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getMockGameState } from "../../testUtils/gameState";
 import { getMockPlayer } from "../../testUtils/player";
+import { downloadReplay } from "../downloadReplay";
 import { getDefaultGameOptions } from "../localWebData";
 
 vi.mock("react-toastify");

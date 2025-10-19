@@ -1,15 +1,15 @@
-import { useMemo, useRef } from "react";
-import { Color, Chess } from "chess.js";
 import { PokemonSet, SideID } from "@pkmn/data";
-import PlayerInGameDisplay from "./PlayerInGameDisplay/PlayerInGameDisplay";
+import { Chess, Color } from "chess.js";
+import { useMemo, useRef } from "react";
+import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import { MatchHistory, Timer } from "../../../../shared/types/Game.js";
-import GameManagerActions from "./GameManagerActions/GameManagerActions";
+import { useGameState } from "../../../context/GameState/GameStateContext";
+import ChatDisplay from "../../RoomManager/Chat/ChatDisplay/ChatDisplay";
 import PlayerList from "../../RoomManager/Room/PlayerList/PlayerList";
 import { BattleChessGame } from "./BattleChessGame";
-import { useGameState } from "../../../context/GameState/GameStateContext";
-import { PokemonBattleChessManager } from "../../../../shared/models/PokemonBattleChessManager";
 import "./BattleChessManager.css";
-import ChatDisplay from "../../RoomManager/Chat/ChatDisplay/ChatDisplay";
+import GameManagerActions from "./GameManagerActions/GameManagerActions";
+import PlayerInGameDisplay from "./PlayerInGameDisplay/PlayerInGameDisplay";
 
 export interface CurrentBattle {
   p1Pokemon: PokemonSet;

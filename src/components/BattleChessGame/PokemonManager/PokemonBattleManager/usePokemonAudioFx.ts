@@ -1,23 +1,23 @@
-import { useMemo, useCallback, useEffect } from "react";
 import { Dex } from "@pkmn/dex";
-import { useUserState } from "../../../../context/UserState/UserStateContext";
+import { BattleArgsKWArgsTypes, BattleArgsKWArgType } from "@pkmn/protocol";
+import { useCallback, useEffect, useMemo } from "react";
+import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
+import eatBerryPokemon from "../../../../assets/pokemonAssets/audio/fx/berry-eat.mp3";
 import damageEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-effective.wav";
 import damageNotEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-not-very-effective.wav";
 import damageSuperEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-super-effective.wav";
-import statIncreaseEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/stat-increase.mp3";
-import statDecreaseEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/stat-decrease.mp3";
 import healEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/heal-effect.wav";
+import activateItemPokemon from "../../../../assets/pokemonAssets/audio/fx/item-activate.mp3";
 import faintEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/pokemon-faint.wav";
+import statDecreaseEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/stat-decrease.mp3";
+import statIncreaseEffectPokemon from "../../../../assets/pokemonAssets/audio/fx/stat-increase.mp3";
 import statusBurnPokemon from "../../../../assets/pokemonAssets/audio/fx/status-burn.mp3";
 import statusConfusePokemon from "../../../../assets/pokemonAssets/audio/fx/status-confuse.mp3";
 import statusFrozenPokemon from "../../../../assets/pokemonAssets/audio/fx/status-frozen.mp3";
 import statusParaPokemon from "../../../../assets/pokemonAssets/audio/fx/status-para.mp3";
 import statusPoisonPokemon from "../../../../assets/pokemonAssets/audio/fx/status-poison.mp3";
 import statusSleepPokemon from "../../../../assets/pokemonAssets/audio/fx/status-sleep.mp3";
-import eatBerryPokemon from "../../../../assets/pokemonAssets/audio/fx/berry-eat.mp3";
-import activateItemPokemon from "../../../../assets/pokemonAssets/audio/fx/item-activate.mp3";
-import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
-import { BattleArgsKWArgsTypes, BattleArgsKWArgType } from "@pkmn/protocol";
+import { useUserState } from "../../../../context/UserState/UserStateContext";
 
 const getPokemonCryUrlPath = (baseSpecies: string) => {
   const mapping: Record<string, string> = {

@@ -1,16 +1,16 @@
 import { Redis } from "ioredis";
 import {
+  getPlayerKey,
+  getRoomKey,
+  getRoomPlayerSetKey,
+} from "../../shared/cache/redis.js";
+import { getConfig } from "../config.js";
+import {
   PLAYER_KEY,
   REDIS_KEY_EXPIRY,
   ROOM_KEY,
 } from "./../../shared/constants/redisConstants.js";
-import { getConfig } from "../config.js";
 import User from "./../../shared/models/User.js";
-import {
-  getRoomKey,
-  getRoomPlayerSetKey,
-  getPlayerKey,
-} from "../../shared/cache/redis.js";
 
 /**
  *

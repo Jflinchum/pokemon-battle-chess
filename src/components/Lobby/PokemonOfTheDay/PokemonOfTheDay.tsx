@@ -1,9 +1,9 @@
-import { useMemo } from "react";
 import { Dex } from "@pkmn/dex";
-import { getRandomPokemonOfTheDay } from "./PokemonOfTheDayUtil";
+import { useMemo } from "react";
 import { generateDailyNumber } from "../../../utils";
 import { PokemonSprite } from "../../common/Pokemon/PokemonSprite/PokemonSprite";
 import "./PokemonOfTheDay.css";
+import { getRandomPokemonOfTheDay } from "./PokemonOfTheDayUtil";
 
 const PokemonOfTheDay = ({ className = "" }: { className?: string }) => {
   const randPokemon = useMemo(() => getRandomPokemonOfTheDay(), []);

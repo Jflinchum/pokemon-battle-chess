@@ -1,15 +1,10 @@
-import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { LogFormatter } from "@pkmn/view";
-import { PRNG } from "@pkmn/sim";
 import { Battle, Pokemon, TerrainName, WeatherName } from "@pkmn/client";
-import { BattleArgsKWArgType } from "@pkmn/protocol";
 import { PokemonSet, SideID } from "@pkmn/data";
-import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
-import PokemonMoveChoices, {
-  PokemonMoveChoice,
-} from "./PokemonMoveChoices/PokemonMoveChoices";
-import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
+import { BattleArgsKWArgType } from "@pkmn/protocol";
+import { PRNG } from "@pkmn/sim";
+import { LogFormatter } from "@pkmn/view";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   CustomArgTypes,
   TerrainId,
@@ -18,6 +13,11 @@ import {
 import { useGameState } from "../../../../context/GameState/GameStateContext";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./PokemonBattleDisplay.css";
+import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
+import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
+import PokemonMoveChoices, {
+  PokemonMoveChoice,
+} from "./PokemonMoveChoices/PokemonMoveChoices";
 
 interface PokemonBattleDisplayProps {
   fullBattleLog: { args: CustomArgTypes; kwArgs: BattleArgsKWArgType }[];

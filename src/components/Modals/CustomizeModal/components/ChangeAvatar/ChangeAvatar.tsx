@@ -1,6 +1,6 @@
 import { Sprites } from "@pkmn/img";
-import { avatarIdMapping } from "./avatarUtil";
 import { useUserState } from "../../../../../context/UserState/UserStateContext";
+import { avatarIdMapping } from "./avatarUtil";
 import "./ChangeAvatar.css";
 
 export const ChangeAvatar = () => {

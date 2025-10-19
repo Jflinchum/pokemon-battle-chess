@@ -1,6 +1,6 @@
-import PokemonMoveInfoButton from "./PokemonMoveInfoButton";
-import "./PokemonMoveChoices.css";
 import { Pokemon } from "@pkmn/client";
+import "./PokemonMoveChoices.css";
+import PokemonMoveInfoButton from "./PokemonMoveInfoButton";
 
 export interface PokemonMoveChoice {
   id: string;

@@ -1,10 +1,10 @@
-import { useRef, useEffect } from "react";
-import { BattleArgsKWArgType, Protocol } from "@pkmn/protocol";
 import { SideID } from "@pkmn/data";
+import { BattleArgsKWArgType, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from "@pkmn/view";
-import StylizedText from "../../../../common/StylizedText/StylizedText";
-import { useGameState } from "../../../../../context/GameState/GameStateContext";
+import { useEffect, useRef } from "react";
 import { CustomArgTypes } from "../../../../../../shared/types/PokemonTypes";
+import { useGameState } from "../../../../../context/GameState/GameStateContext";
+import StylizedText from "../../../../common/StylizedText/StylizedText";
 import "./PokemonBattleLog.css";
 
 interface PokemonBattleLogProps {

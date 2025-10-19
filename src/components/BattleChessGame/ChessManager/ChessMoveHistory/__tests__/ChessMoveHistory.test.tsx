@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-import ChessMoveHistory, { ChessMoveHistoryProps } from "../ChessMoveHistory";
+import { describe, expect, it } from "vitest";
 import { createMockChessMove } from "../../../../../testUtils/chess";
+import ChessMoveHistory, { ChessMoveHistoryProps } from "../ChessMoveHistory";
 
 const defaultMoves = [
   createMockChessMove("w", "e4"),

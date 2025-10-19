@@ -1,8 +1,8 @@
 import { Color } from "chess.js";
-import PokemonChessPieceSprite from "../PokemonChessPieceSprite/PokemonChessPieceSprite";
-import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
-import { PokemonChessBoardSquare } from "../../../../../types/chess/PokemonChessBoardSquare";
 import { SquareModifier } from "../../../../../../shared/models/PokemonBattleChessManager";
+import { PokemonChessBoardSquare } from "../../../../../types/chess/PokemonChessBoardSquare";
+import { PokemonWeatherBackground } from "../../../../common/Pokemon/PokemonWeatherBackground/PokemonWeatherBackground";
+import PokemonChessPieceSprite from "../PokemonChessPieceSprite/PokemonChessPieceSprite";
 import "./ChessSquare.css";
 
 export interface ChessSquareProps {

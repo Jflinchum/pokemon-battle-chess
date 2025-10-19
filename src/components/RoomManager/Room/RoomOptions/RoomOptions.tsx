@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
 import { BoostID, BoostsTable } from "@pkmn/data";
-import { FormatID } from "../../../../context/GameState/GameStateContext";
+import { useEffect, useMemo, useState } from "react";
 import { GameOptions } from "../../../../../shared/types/GameOptions";
-import { GameTimerOptions, TimerId } from "./GameTimerOptions/GameTimerOptions";
+import { FormatID } from "../../../../context/GameState/GameStateContext";
 import Button from "../../../common/Button/Button";
-import "./RoomOptions.css";
 import { Input } from "../../../common/Input/Input";
 import { ToggleSwitch } from "../../../common/ToggleSwitch/ToggleSwitch";
+import { GameTimerOptions, TimerId } from "./GameTimerOptions/GameTimerOptions";
+import "./RoomOptions.css";
 
 const advantageOptions: { stat: BoostID; label: string }[] = [
   { stat: "atk", label: "Attack" },

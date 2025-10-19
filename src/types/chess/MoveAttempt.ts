@@ -1,4 +1,4 @@
-import { Square, PieceSymbol } from "chess.js";
+import { PieceSymbol, Square } from "chess.js";
 
 export type MoveAttempt = {
   fromSquare: Square;

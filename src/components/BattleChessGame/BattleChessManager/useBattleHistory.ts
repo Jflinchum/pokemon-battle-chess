@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
-import { Color, Square } from "chess.js";
 import { ArgType, KWArgType, Protocol } from "@pkmn/protocol";
-import { socket } from "../../../socket";
+import { Color, Square } from "chess.js";
+import { useEffect, useState } from "react";
+import { SquareModifier } from "../../../../shared/models/PokemonBattleChessManager";
 import {
   EndGameReason,
   MatchLog,
   PokemonBeginBattleData,
 } from "../../../../shared/types/Game.js";
-import { timer } from "../../../utils";
-import { CurrentBattle } from "./BattleChessManager";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
-import { SquareModifier } from "../../../../shared/models/PokemonBattleChessManager";
+import { socket } from "../../../socket";
+import { timer } from "../../../utils";
+import { CurrentBattle } from "./BattleChessManager";
 
 interface BattleHistoryProps {
   matchHistory?: MatchLog[];

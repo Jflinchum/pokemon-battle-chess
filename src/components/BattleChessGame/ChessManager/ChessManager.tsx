@@ -1,24 +1,24 @@
+import { Chess, Color, Move, PieceSymbol, Square } from "chess.js";
 import { useState } from "react";
-import { Chess, Square, Move, Color, PieceSymbol } from "chess.js";
-import ChessBoard from "./ChessBoard/ChessBoard";
 import {
   PokemonBattleChessManager,
   SquareModifier,
 } from "../../../../shared/models/PokemonBattleChessManager";
-import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
+import { ChessData } from "../../../../shared/types/Game";
+import { useGameState } from "../../../context/GameState/GameStateContext";
+import { MoveAttempt } from "../../../types/chess/MoveAttempt";
 import { PokemonChessBoardSquare } from "../../../types/chess/PokemonChessBoardSquare";
+import { useDebounce } from "../../../utils";
+import PokemonChessDetailsCard from "../PokemonManager/PokemonChessDetailsCard/PokemonChessDetailsCard";
+import { Arrow, ArrowController } from "./ArrowController/ArrowController";
+import ChessBoard from "./ChessBoard/ChessBoard";
+import "./ChessManager.css";
 import ChessPawnPromotionChoice from "./ChessPawnPromotionChoice/ChessPawnPromotionChoice";
 import {
   getCastlingSquareFromCornerSquares,
   getVerboseChessMove,
   userAttemptingCastle,
 } from "./util";
-import { useGameState } from "../../../context/GameState/GameStateContext";
-import { useDebounce } from "../../../utils";
-import { ChessData } from "../../../../shared/types/Game";
-import { Arrow, ArrowController } from "./ArrowController/ArrowController";
-import "./ChessManager.css";
-import { MoveAttempt } from "../../../types/chess/MoveAttempt";
 
 interface ChessManagerProps {
   hide?: boolean;

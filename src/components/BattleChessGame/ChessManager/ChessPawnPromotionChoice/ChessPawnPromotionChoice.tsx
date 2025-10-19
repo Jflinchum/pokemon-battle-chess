@@ -1,9 +1,9 @@
 import { Color, PieceSymbol, Square } from "chess.js";
-import { allPieceTypes } from "../constants";
-import ChessPieceSprite from "../ChessBoard/ChessPieceSprite/ChessPieceSprite";
-import "./ChessPawnPromotionChoice.css";
-import { createPortal } from "react-dom";
 import { useMemo } from "react";
+import { createPortal } from "react-dom";
+import ChessPieceSprite from "../ChessBoard/ChessPieceSprite/ChessPieceSprite";
+import { allPieceTypes } from "../constants";
+import "./ChessPawnPromotionChoice.css";
 
 interface ChessPawnPromotionMenuProps {
   color: Color;

@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { Color, PieceSymbol, Square } from "chess.js";
+import { describe, expect, it, vi } from "vitest";
+import { allPieceTypes } from "../../constants";
 import ChessPawnPromotionChoice, {
   ChessPawnPromotionChoiceProps,
 } from "../ChessPawnPromotionChoice";
-import { Color, PieceSymbol, Square } from "chess.js";
-import { allPieceTypes } from "../../constants";
 
 const createSquareElement = (square: Square) => {
   const div = document.createElement("div");

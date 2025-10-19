@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import * as UserStateContext from "../../../../../context/UserState/UserStateContext";
+import { createMockPokemonPieces } from "../../../../../testUtils/chess";
+import { getMockUserStateContext } from "../../../../../testUtils/userState";
 import PlayerInGameDisplay, {
   PlayerInGameDisplayProps,
 } from "../PlayerInGameDisplay";
-import { createMockPokemonPieces } from "../../../../../testUtils/chess";
-import * as UserStateContext from "../../../../../context/UserState/UserStateContext";
-import { getMockUserStateContext } from "../../../../../testUtils/userState";
 
 vi.mock("@pkmn/img", () => ({
   Sprites: {

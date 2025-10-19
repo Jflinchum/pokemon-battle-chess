@@ -1,12 +1,7 @@
-import { PieceSymbol, Color, Square, SQUARES } from "chess.js";
 import { PokemonSet } from "@pkmn/data";
-import { PRNG, PRNGSeed } from "@pkmn/sim";
 import { Dex } from "@pkmn/dex";
-import { PokeSimRandomGen } from "./PokeSimRandomGen.js";
-import { WeatherId, TerrainId } from "../types/PokemonTypes.js";
-import { ChessBoardSquare } from "../types/ChessBoardSquare.js";
-import { getWeightedRandom } from "../util/getWeightedRandom.js";
-import { getSquareIndexIn1DArray } from "../util/chessSquareIndex.js";
+import { PRNG, PRNGSeed } from "@pkmn/sim";
+import { Color, PieceSymbol, Square, SQUARES } from "chess.js";
 import {
   HIGH_SQUARE_MODIFIER_DURATION,
   HIGH_SQUARE_MODIFIER_TARGET,
@@ -15,6 +10,11 @@ import {
   SQUARE_MOD_X_DISTANCE_PROBABILITIES,
   SQUARE_MOD_Y_DISTANCE_PROBABILITY,
 } from "../constants/gameConstants.js";
+import { ChessBoardSquare } from "../types/ChessBoardSquare.js";
+import { TerrainId, WeatherId } from "../types/PokemonTypes.js";
+import { getSquareIndexIn1DArray } from "../util/chessSquareIndex.js";
+import { getWeightedRandom } from "../util/getWeightedRandom.js";
+import { PokeSimRandomGen } from "./PokeSimRandomGen.js";
 
 export const WeatherNames: WeatherId[] = [
   "sandstorm",

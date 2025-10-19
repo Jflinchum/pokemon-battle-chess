@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
-import GameRoomManager from "../models/GameRoomManager.js";
+import User from "../../shared/models/User.js";
+import { MatchLog, Timer } from "../../shared/types/Game.js";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
@@ -8,14 +9,13 @@ import {
   cleanString,
   isStringProfane,
 } from "../../shared/util/profanityFilter.js";
-import User from "../../shared/models/User.js";
 import {
   addPlayerIdToRoomPlayerSet,
   addPlayerToCache,
   setPlayerViewingResults,
 } from "../cache/redis.js";
-import { MatchLog, Timer } from "../../shared/types/Game.js";
 import GameRoom from "../models/GameRoom.js";
+import GameRoomManager from "../models/GameRoomManager.js";
 
 export const registerSocketEvents = (
   io: Server<ClientToServerEvents, ServerToClientEvents>,

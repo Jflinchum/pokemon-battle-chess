@@ -1,8 +1,8 @@
-import UserStateProvider from "./context/UserState/UserStateProvider";
+import MainMenu from "./components/MainMenu/MainMenu";
+import AudioProvider from "./context/AudioState/AudioProvider";
 import GameStateProvider from "./context/GameState/GameStateProvider";
 import ModalStateProvider from "./context/ModalState/ModalStateProvider";
-import AudioProvider from "./context/AudioState/AudioProvider";
-import MainMenu from "./components/MainMenu/MainMenu";
+import UserStateProvider from "./context/UserState/UserStateProvider";
 
 function App() {
   return (

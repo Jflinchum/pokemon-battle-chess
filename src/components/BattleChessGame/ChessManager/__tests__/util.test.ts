@@ -1,10 +1,10 @@
+import { Square } from "chess.js";
 import { describe, expect, it } from "vitest";
+import { getAllChessBoardSquares } from "../../../../testUtils/chess";
 import {
   getCastlingSquareFromCornerSquares,
   userAttemptingCastle,
 } from "../util";
-import { getAllChessBoardSquares } from "../../../../testUtils/chess";
-import { Square } from "chess.js";
 
 describe("ChessManager/util.test.ts", () => {
   describe("userAttemptingToCastle", () => {

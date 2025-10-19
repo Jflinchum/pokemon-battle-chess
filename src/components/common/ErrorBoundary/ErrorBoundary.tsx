@@ -1,7 +1,7 @@
+import { faClipboard, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as React from "react";
 import sadPikachu from "../../../assets/pokemonAssets/sadPikachu.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClipboard, faDownload } from "@fortawesome/free-solid-svg-icons";
 import "./ErrorBoundary.css";
 
 class ErrorBoundary extends React.Component<

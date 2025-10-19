@@ -1,12 +1,12 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { Color, PieceSymbol } from "chess.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as UserStateContext from "../../../../../../context/UserState/UserStateContext";
+import { getMockPokemonSet } from "../../../../../../testUtils/pokemon";
+import { getMockUserStateContext } from "../../../../../../testUtils/userState";
 import PokemonChessPieceSprite, {
   PokemonChessPieceSpriteProps,
 } from "../PokemonChessPieceSprite";
-import { getMockPokemonSet } from "../../../../../../testUtils/pokemon";
-import { getMockUserStateContext } from "../../../../../../testUtils/userState";
 
 import { Sprites } from "@pkmn/img";
 

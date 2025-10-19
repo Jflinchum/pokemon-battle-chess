@@ -1,14 +1,14 @@
+import { TerrainName, WeatherName } from "@pkmn/client";
+import { TerrainId, WeatherId } from "../../../../../shared/types/PokemonTypes";
 import electricTerrain from "../../../../assets/pokemonAssets/weather/weather-electricterrain.png";
-import psychicTerrain from "../../../../assets/pokemonAssets/weather/weather-psychicterrain.png";
 import grassyTerrain from "../../../../assets/pokemonAssets/weather/weather-grassyterrain.png";
-import mistyTerrain from "../../../../assets/pokemonAssets/weather/weather-mistyterrain.png";
 import hailWeather from "../../../../assets/pokemonAssets/weather/weather-hail.png";
+import mistyTerrain from "../../../../assets/pokemonAssets/weather/weather-mistyterrain.png";
+import psychicTerrain from "../../../../assets/pokemonAssets/weather/weather-psychicterrain.png";
 import raindanceWeather from "../../../../assets/pokemonAssets/weather/weather-raindance.jpg";
 import sandstormWeather from "../../../../assets/pokemonAssets/weather/weather-sandstorm.png";
 import sunnydayWeather from "../../../../assets/pokemonAssets/weather/weather-sunnyday.jpg";
-import { WeatherId, TerrainId } from "../../../../../shared/types/PokemonTypes";
 import "./PokemonWeatherBackground.css";
-import { TerrainName, WeatherName } from "@pkmn/client";
 
 const getWeatherBackground = (
   weather?: WeatherId | TerrainId | WeatherName | TerrainName,

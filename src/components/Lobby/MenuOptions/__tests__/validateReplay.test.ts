@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { validateReplay } from "../validateReplay";
+import { describe, expect, it } from "vitest";
 import { getMockReplayData } from "../../../../testUtils/matchHistory";
 import { ReplayData } from "../../../../util/downloadReplay";
+import { validateReplay } from "../validateReplay";
 
 describe("validateReplay", () => {
   describe("Valid Cases", () => {

@@ -1,10 +1,10 @@
-import { useMemo } from "react";
 import { Pokemon } from "@pkmn/client";
 import { TypeName } from "@pkmn/data";
 import { Dex } from "@pkmn/dex";
+import { useMemo } from "react";
+import { GenderIcon } from "../../../../common/GenderIcon/GenderIcon";
 import PokemonType from "../../../../common/Pokemon/PokemonType/PokemonType";
 import Tooltip from "../../../../common/Tooltip/Tooltip";
-import { GenderIcon } from "../../../../common/GenderIcon/GenderIcon";
 import { PokemonMoveTooltip } from "../PokemonMoveTooltip/PokemonMoveTooltip";
 import "./PokemonBattleDetails.css";
 

@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { VolumeSlider } from "../../../common/VolumeSlider/VolumeSlider";
+import movePieceFX from "../../../../assets/chessAssets/audio/movePiece.ogg";
+import damageEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-effective.wav";
 import {
   VolumePreference,
   useUserState,
 } from "../../../../context/UserState/UserStateContext";
-import movePieceFX from "../../../../assets/chessAssets/audio/movePiece.ogg";
-import damageEffectivePokemon from "../../../../assets/pokemonAssets/audio/fx/damage-effective.wav";
+import { VolumeSlider } from "../../../common/VolumeSlider/VolumeSlider";
 
 export const SoundSettings = () => {
   const { userState, dispatch } = useUserState();

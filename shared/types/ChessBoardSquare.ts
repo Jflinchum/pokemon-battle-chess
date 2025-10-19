@@ -1,4 +1,4 @@
-import { PieceSymbol, Color, Square } from "chess.js";
+import { Color, PieceSymbol, Square } from "chess.js";
 
 export type ChessBoardSquare = {
   square: Square;

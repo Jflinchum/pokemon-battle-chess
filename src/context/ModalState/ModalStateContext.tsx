@@ -1,5 +1,5 @@
-import { createContext, useContext, type Dispatch } from "react";
 import { Color } from "chess.js";
+import { createContext, useContext, type Dispatch } from "react";
 import { EndGameReason } from "../../../shared/types/Game.js";
 
 export type ModalName =

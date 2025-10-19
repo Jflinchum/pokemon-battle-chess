@@ -1,10 +1,10 @@
 import { Battle, TerrainName, WeatherName } from "@pkmn/client";
-import { getSquareModifierMapping } from "../../../PokemonChessDetailsCard/getSquareModifierMapping";
-import Tooltip from "../../../../../common/Tooltip/Tooltip";
 import {
   TerrainId,
   WeatherId,
 } from "../../../../../../../shared/types/PokemonTypes";
+import Tooltip from "../../../../../common/Tooltip/Tooltip";
+import { getSquareModifierMapping } from "../../../PokemonChessDetailsCard/getSquareModifierMapping";
 import "./PokemonBattleConditions.css";
 
 const PokemonBattleConditionLabel = ({

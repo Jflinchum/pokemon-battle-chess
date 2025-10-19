@@ -1,9 +1,9 @@
 import { Express } from "express";
 import User from "../../shared/models/User.js";
-import GameRoom from "../models/GameRoom.js";
-import GameRoomManager from "../models/GameRoomManager.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
 import { doesRoomExist, setPlayerViewingResults } from "../cache/redis.js";
+import GameRoom from "../models/GameRoom.js";
+import GameRoomManager from "../models/GameRoomManager.js";
 
 interface APIResponse<Data> {
   data?: Data;

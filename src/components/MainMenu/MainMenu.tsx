@@ -1,21 +1,20 @@
 import { useCallback, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import LobbyManager from "../Lobby/LobbyManager/LobbyManager";
-import RoomManager from "../RoomManager/RoomManager";
-import { useUserState } from "../../context/UserState/UserStateContext";
-import { useModalState } from "../../context/ModalState/ModalStateContext";
 import { useGameState } from "../../context/GameState/GameStateContext";
-import ErrorBoundary from "../common/ErrorBoundary/ErrorBoundary";
-import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
+import { useModalState } from "../../context/ModalState/ModalStateContext";
+import { useUserState } from "../../context/UserState/UserStateContext";
+import { getRoom, joinRoom } from "../../service/lobby";
+import { downloadReplay } from "../../util/downloadReplay";
 import {
   clearMostRecentRoom,
   getMostRecentRoom,
 } from "../../util/localWebData";
-import { getRoom } from "../../service/lobby";
-import { RejoinMessage } from "./RejoinMessage/RejoinMessage";
-import { joinRoom } from "../../service/lobby";
+import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
+import ErrorBoundary from "../common/ErrorBoundary/ErrorBoundary";
+import LobbyManager from "../Lobby/LobbyManager/LobbyManager";
+import RoomManager from "../RoomManager/RoomManager";
 import "./MainMenu.css";
-import { downloadReplay } from "../../util/downloadReplay";
+import { RejoinMessage } from "./RejoinMessage/RejoinMessage";
 
 const MainMenu = () => {
   const { userState, dispatch: userStateDispatch } = useUserState();
