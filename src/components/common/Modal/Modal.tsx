@@ -69,6 +69,8 @@ const Modal = () => {
     <>
       {modalState.currentModal ? (
         <>
+          {/* The <div> element is capturing events to allow the user to click out of the modal container to close it */}
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
           <div className="modalBackdrop" onClick={handleCloseModal} />
           {
             <div className="modalContainer">

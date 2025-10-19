@@ -95,6 +95,7 @@ const MenuOptions = () => {
               <img
                 data-testid="menu-option-avatar"
                 src={Sprites.getAvatar(parseInt(userState.avatarId))}
+                alt="Player avatar character"
               />
             </div>
           </div>

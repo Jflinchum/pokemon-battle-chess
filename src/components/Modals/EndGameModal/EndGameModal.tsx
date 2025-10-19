@@ -100,12 +100,18 @@ const EndGameModal = () => {
         <div className="endGamePlayerList">
           <div className="endGamePlayer">
             <p>{player1?.playerName}</p>
-            <img src={Sprites.getAvatar(player1?.avatarId || 1)} />
+            <img
+              src={Sprites.getAvatar(player1?.avatarId || 1)}
+              alt={`Player 1 Avatar - ${player1?.playerName}`}
+            />
           </div>
           <p>vs</p>
           <div className="endGamePlayer">
             <p>{player2?.playerName}</p>
-            <img src={Sprites.getAvatar(player2?.avatarId || 1)} />
+            <img
+              src={Sprites.getAvatar(player2?.avatarId || 1)}
+              alt={`Player 2 Avatar - ${player2?.playerName}`}
+            />
           </div>
         </div>
       )}

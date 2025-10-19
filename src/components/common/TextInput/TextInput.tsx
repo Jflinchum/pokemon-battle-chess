@@ -29,32 +29,40 @@ const TextInput = ({
     }
   }, [inputRef, setLabelShifted]);
 
+  const getAriaInvalid = (valid?: boolean): "true" | "false" => {
+    return valid === false ? "true" : "false";
+  };
+
   return (
-    <div
-      className={`inputContainer ${valid === false ? "invalidInput" : ""} ${containerType} ${className} ${labelShifted || inputRef?.current?.value?.length || 0 > 0 ? "focused" : ""}`}
-      onClick={() => {
-        inputRef.current?.focus();
-      }}
-    >
-      <label className="inputLabel">
-        <span className="inputLabelText">{label}</span>
-        <input
-          aria-invalid={`${valid === false ? "true" : "false"}`}
-          className="textInput"
-          onFocus={(e) => {
-            setLabelShifted(true);
-            onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            setLabelShifted(false);
-            onBlur?.(e);
-          }}
-          ref={inputRef}
-          {...props}
-        />
-      </label>
-      {children}
-    </div>
+    <>
+      {/* The <div> element is capturing events to help focus the input when the user clicks around the input */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
+      <div
+        className={`inputContainer ${valid === false ? "invalidInput" : ""} ${containerType} ${className} ${labelShifted || inputRef?.current?.value?.length || 0 > 0 ? "focused" : ""}`}
+        onClick={() => {
+          inputRef.current?.focus();
+        }}
+      >
+        <label className="inputLabel">
+          <span className="inputLabelText">{label}</span>
+          <input
+            aria-invalid={getAriaInvalid(valid)}
+            className="textInput"
+            onFocus={(e) => {
+              setLabelShifted(true);
+              onFocus?.(e);
+            }}
+            onBlur={(e) => {
+              setLabelShifted(false);
+              onBlur?.(e);
+            }}
+            ref={inputRef}
+            {...props}
+          />
+        </label>
+        {children}
+      </div>
+    </>
   );
 };
 

@@ -3,10 +3,11 @@ import "./ToggleSwitch.css";
 
 export const ToggleSwitch = ({
   className,
+  id,
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement>) => {
   return (
-    <label className="switch">
+    <label className="switch" htmlFor={id}>
       <Input
         className={`checkbox ${className || ""}`}
         type="checkbox"

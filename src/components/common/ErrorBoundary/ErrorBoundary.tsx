@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div className="errorBoundaryContainer">
-          <img src={sadPikachu} />
+          <img src={sadPikachu} alt="Sad Pikachu" />
           <p>Uh oh! Something went wrong!</p>
           {this.props.hasMatchHistory ? (
             <div>

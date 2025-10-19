@@ -102,7 +102,11 @@ const PokemonChessDetailsCard = ({
                   <GenderIcon gender={pokemon.gender} />
                   <span>Lv{pokemon.level}</span>
                   {pokemon.shiny && (
-                    <img src={shinyIcon} className="pokemonDetailsShiny" />
+                    <img
+                      src={shinyIcon}
+                      className="pokemonDetailsShiny"
+                      alt="Shiny Pokemon icon"
+                    />
                   )}
                 </p>
                 <div className="pokemonDetailsTypingContainer">

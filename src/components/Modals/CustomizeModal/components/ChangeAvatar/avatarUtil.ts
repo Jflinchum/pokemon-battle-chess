@@ -1,4 +1,4 @@
-export const avatarIdMapping = {
+export const avatarIdMapping: Record<number, string> = {
   1: "lucas",
   2: "dawn",
   3: "youngster-gen4dp",

@@ -58,78 +58,82 @@ const ChessSquare = ({
   isBattleSquare,
 }: ChessSquareProps) => {
   return (
-    <div
-      id={`chessSquare-${square.square}`}
-      className={`chessSquare ${backgroundColor}ChessSquare`}
-      data-testid="chess-square-container"
-      onMouseEnter={() => {
-        onSquareHover?.(square);
-      }}
-      onMouseLeave={() => {
-        onSquareHover?.(null);
-      }}
-      onClick={() => {
-        onClick(square);
-      }}
-      onDrop={() => {
-        onPieceDrop(square);
-      }}
-      onDragOver={(e) => {
-        e.preventDefault();
-      }}
-    >
+    <>
+      {/* The <div> element is capturing events to allow the user move chess pieces around the board */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
       <div
-        data-testid="chess-square-color"
-        className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${square?.pokemon || square?.type ? "pieceSquare" : ""}`}
-      />
-      <div className="squareWeatherContainer">
-        {squareModifier?.modifiers?.weather && (
-          <PokemonWeatherBackground
-            data-testid="chess-square-weather-modifiers"
-            key={squareModifier.modifiers.weather.id}
-            className="squareWeather"
-            modifierType={squareModifier.modifiers.weather.id}
+        id={`chessSquare-${square.square}`}
+        className={`chessSquare ${backgroundColor}ChessSquare`}
+        data-testid="chess-square-container"
+        onMouseEnter={() => {
+          onSquareHover?.(square);
+        }}
+        onMouseLeave={() => {
+          onSquareHover?.(null);
+        }}
+        onClick={() => {
+          onClick(square);
+        }}
+        onDrop={() => {
+          onPieceDrop(square);
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+        }}
+      >
+        <div
+          data-testid="chess-square-color"
+          className={`squareColorFilter ${getSquareHighlightClass(selected, possibleMove, mostRecentMove, isBattleSquare, isPreMove)} ${square?.pokemon || square?.type ? "pieceSquare" : ""}`}
+        />
+        <div className="squareWeatherContainer">
+          {squareModifier?.modifiers?.weather && (
+            <PokemonWeatherBackground
+              data-testid="chess-square-weather-modifiers"
+              key={squareModifier.modifiers.weather.id}
+              className="squareWeather"
+              modifierType={squareModifier.modifiers.weather.id}
+            />
+          )}
+          {squareModifier?.modifiers?.terrain && (
+            <PokemonWeatherBackground
+              data-testid="chess-square-terrain-modifiers"
+              key={squareModifier.modifiers.terrain.id}
+              className="squareWeather"
+              modifierType={squareModifier.modifiers.terrain.id}
+            />
+          )}
+        </div>
+        {square.type && square.color ? (
+          <PokemonChessPieceSprite
+            data-testid="chess-square-piece-sprite"
+            chessPieceType={square.type}
+            chessPieceColor={square.color}
+            pokemon={square.pokemon}
+            onDragStart={() => {
+              onPieceDrag(square);
+            }}
           />
+        ) : null}
+        {((perspective === "w" && square.square[0] === "a") ||
+          (perspective === "b" && square.square[0] === "h")) && (
+          <span
+            data-testid="chess-square-rank-label"
+            className="squareText squareNum"
+          >
+            {square.square[1]}
+          </span>
         )}
-        {squareModifier?.modifiers?.terrain && (
-          <PokemonWeatherBackground
-            data-testid="chess-square-terrain-modifiers"
-            key={squareModifier.modifiers.terrain.id}
-            className="squareWeather"
-            modifierType={squareModifier.modifiers.terrain.id}
-          />
+        {((perspective === "w" && square.square[1] === "1") ||
+          (perspective === "b" && square.square[1] === "8")) && (
+          <span
+            data-testid="chess-square-file-label"
+            className="squareText squareChar"
+          >
+            {square.square[0]}
+          </span>
         )}
       </div>
-      {square.type && square.color ? (
-        <PokemonChessPieceSprite
-          data-testid="chess-square-piece-sprite"
-          chessPieceType={square.type}
-          chessPieceColor={square.color}
-          pokemon={square.pokemon}
-          onDragStart={() => {
-            onPieceDrag(square);
-          }}
-        />
-      ) : null}
-      {((perspective === "w" && square.square[0] === "a") ||
-        (perspective === "b" && square.square[0] === "h")) && (
-        <span
-          data-testid="chess-square-rank-label"
-          className="squareText squareNum"
-        >
-          {square.square[1]}
-        </span>
-      )}
-      {((perspective === "w" && square.square[1] === "1") ||
-        (perspective === "b" && square.square[1] === "8")) && (
-        <span
-          data-testid="chess-square-file-label"
-          className="squareText squareChar"
-        >
-          {square.square[0]}
-        </span>
-      )}
-    </div>
+    </>
   );
 };
 

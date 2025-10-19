@@ -173,6 +173,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
             disabled={!isHost}
             onChange={(e) => setWeatherWars(e.target.checked)}
             aria-describedby="weatherWarsFormat"
+            id="weather-wars-format-switch"
           />
         </li>
         <li>

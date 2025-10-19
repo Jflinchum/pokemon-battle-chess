@@ -17,6 +17,8 @@ const NavOptions = ({
 
   return (
     <div className={`${className}`} {...props}>
+      {/* The <div> element is capturing events to allow the user to click out of the nav container to close it */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
       {open && <div className="navBackdrop" onClick={() => setOpen(false)} />}
       <div className="navMobileNav">
         <button

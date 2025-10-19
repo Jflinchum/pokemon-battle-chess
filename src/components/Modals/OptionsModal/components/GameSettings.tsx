@@ -36,8 +36,9 @@ export const GameSettings = () => {
     <div className="optionsActions">
       <ul>
         <li>
-          <label>Game Speed</label>
+          <label htmlFor="game-speed-select">Game Speed</label>
           <select
+            id="game-speed-select"
             value={userState.animationSpeedPreference}
             onChange={(e) =>
               handleAnimationSpeedPreferenceChange(parseInt(e.target.value))
