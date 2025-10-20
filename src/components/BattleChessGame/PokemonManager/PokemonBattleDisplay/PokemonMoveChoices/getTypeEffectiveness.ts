@@ -44,7 +44,12 @@ const modifyTypeMoves: Record<
 > = {
   revelationdance: (_, pokemon: Pokemon) => {
     const oricorioType = pokemon.types.filter((type) => type !== "Flying")[0];
-    return oricorioType;
+    return oricorioType || "Normal";
+  },
+  ivycudgel: (_, pokemon: Pokemon) => {
+    const ogerponType = pokemon.types.filter((type) => type !== "Grass")[0];
+
+    return ogerponType || "Grass";
   },
 };
 
