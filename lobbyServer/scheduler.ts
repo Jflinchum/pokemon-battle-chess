@@ -30,11 +30,15 @@ export const registerScheduler = (config: InternalConfig) => {
         }
       });
 
-      const roomsWithNoUsers = await getRoomsWithNoUsers();
+      try {
+        const roomsWithNoUsers = await getRoomsWithNoUsers();
 
-      roomsWithNoUsers.forEach((roomId) => {
-        deleteRoom(roomId);
-      });
+        roomsWithNoUsers.forEach((roomId) => {
+          deleteRoom(roomId);
+        });
+      } catch (err) {
+        console.log("Could not clean up rooms with no users", err);
+      }
     }, DISCONNECTED_USER_INTERVAL);
   };
 
