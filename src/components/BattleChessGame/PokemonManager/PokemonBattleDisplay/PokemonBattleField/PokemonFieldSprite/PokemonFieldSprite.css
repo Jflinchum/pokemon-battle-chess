@@ -21,13 +21,6 @@
   }
 }
 
-.pokemonShadow {
-  position: absolute;
-  filter: brightness(0) blur(1px);
-  z-index: var(--pokemon-battle-sprite-shadow);
-  transform: translate(-130%, 45%) skew(80deg) scaleY(10%);
-}
-
 .p1Pokemon {
   display: flex;
   flex-direction: column;
@@ -148,11 +141,25 @@
   margin: auto;
 }
 
+@keyframes pokemonAppearanceAnimation {
+  from {
+    filter: brightness(10000%) blur(1px);
+    height: 0px;
+    width: 0px;
+  }
+  to {
+    filter: brightness(100%) blur(0px);
+    height: 100%;
+    width: 100%;
+  }
+}
+
 .pokemonSprite {
   position: relative;
   width: auto;
   height: auto;
   z-index: var(--pokemon-battle-sprite);
+  animation: pokemonAppearanceAnimation 0.5s;
 
   &.brn {
     filter: opacity(0.8) drop-shadow(0px 0px 1px red);
@@ -170,6 +177,13 @@
   &.slp {
     filter: opacity(0.8) drop-shadow(0px 0px 1px blue);
   }
+}
+
+.pokemonShadow {
+  position: absolute;
+  filter: brightness(0) blur(1px);
+  z-index: var(--pokemon-battle-sprite-shadow);
+  transform: translate(-130%, 45%) skew(80deg) scaleY(10%);
 }
 
 .pokemonTooltipTyping {
