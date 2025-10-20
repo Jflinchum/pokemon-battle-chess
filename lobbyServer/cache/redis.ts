@@ -210,6 +210,9 @@ export const getRoomFromName = async (
         const key = response[i + 1][j] as string;
         value[key] = response[i + 1][j + 1];
       }
+      if (!value.hostName) {
+        continue;
+      }
       results.push({ id: response[i], value });
     }
 
