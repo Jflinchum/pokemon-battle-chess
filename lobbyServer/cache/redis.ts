@@ -384,15 +384,28 @@ export const getRoomsWithNoUsers = async (): Promise<string[]> => {
 
   const roomsWithNoUsers: string[] = [];
 
-  allRooms.forEach(async (roomKey) => {
-    const roomId = roomKey.split("room:")[1];
-    const roomPlayerSet = await redisClient.smembers(
-      getRoomPlayerSetKey(roomId),
-    );
-    if (roomId && !roomPlayerSet?.length) {
-      roomsWithNoUsers.push(roomId);
-    }
-  });
+  await Promise.all(
+    allRooms.map(async (roomKey) => {
+      const roomId = roomKey.split("room:")[1];
+      const roomPlayerSet = await redisClient.smembers(
+        getRoomPlayerSetKey(roomId),
+      );
+      let playersRemoved = 0;
+      await Promise.all(
+        roomPlayerSet.map(async (playerId) => {
+          const playerExists = await redisClient.exists(getPlayerKey(playerId));
+          if (!playerExists) {
+            await redisClient.srem(getRoomPlayerSetKey(roomId), playerId);
+            playersRemoved++;
+          }
+        }),
+      );
+
+      if (roomId && playersRemoved >= roomPlayerSet?.length) {
+        roomsWithNoUsers.push(roomId);
+      }
+    }),
+  );
 
   return allRooms;
 };
