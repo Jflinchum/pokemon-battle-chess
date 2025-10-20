@@ -138,7 +138,7 @@ const useBattleHistory = ({
          * in progress so that battle animations can continue playing out.
          * Current Battle gets reset from PokemonBattleManager
          */
-        if (!skipToEndOfSync && currentBattle && currentLog.type === "chess") {
+        if (currentBattle && currentLog.type === "chess") {
           break;
         }
 
