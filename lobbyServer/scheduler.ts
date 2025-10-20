@@ -1,4 +1,9 @@
-import { getDisconnectedUsers, roomExists } from "./cache/redis.js";
+import {
+  deleteRoom,
+  getDisconnectedUsers,
+  getRoomsWithNoUsers,
+  roomExists,
+} from "./cache/redis.js";
 import { InternalConfig } from "./config.js";
 
 const DISCONNECTED_USER_INTERVAL = 1000 * 60 * 3;
@@ -23,6 +28,12 @@ export const registerScheduler = (config: InternalConfig) => {
             }),
           });
         }
+      });
+
+      const roomsWithNoUsers = await getRoomsWithNoUsers();
+
+      roomsWithNoUsers.forEach((roomId) => {
+        deleteRoom(roomId);
       });
     }, DISCONNECTED_USER_INTERVAL);
   };

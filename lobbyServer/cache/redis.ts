@@ -1,8 +1,13 @@
 import { Redis } from "ioredis";
 import {
   getPlayerKey,
+  getRoomBlackMatchHistoryKey,
   getRoomKey,
   getRoomPlayerSetKey,
+  getRoomPokemonBanKey,
+  getRoomPokemonBoardKey,
+  getRoomPokemonMoveHistoryKey,
+  getRoomWhiteMatchHistoryKey,
 } from "../../shared/cache/redis.js";
 import { getConfig } from "../config.js";
 import {
@@ -372,4 +377,40 @@ export const fetchUser = async (
     );
   }
   return null;
+};
+
+export const getRoomsWithNoUsers = async (): Promise<string[]> => {
+  const allRooms = await redisClient.keys(getRoomKey("*"));
+
+  const roomsWithNoUsers: string[] = [];
+
+  allRooms.forEach(async (roomKey) => {
+    const roomId = roomKey.split("room:")[1];
+    const roomPlayerSet = await redisClient.smembers(
+      getRoomPlayerSetKey(roomId),
+    );
+    if (roomId && !roomPlayerSet?.length) {
+      roomsWithNoUsers.push(roomId);
+    }
+  });
+
+  return allRooms;
+};
+
+export const deleteRoom = async (roomId: string): Promise<void> => {
+  const playerIdList = await redisClient.smembers(getRoomPlayerSetKey(roomId));
+
+  await Promise.all([
+    ...playerIdList.map((id) => redisClient.del(getPlayerKey(id))),
+    redisClient
+      .multi()
+      .del(getRoomPlayerSetKey(roomId))
+      .del(getRoomKey(roomId))
+      .del(getRoomWhiteMatchHistoryKey(roomId))
+      .del(getRoomBlackMatchHistoryKey(roomId))
+      .del(getRoomPokemonBoardKey(roomId))
+      .del(getRoomPokemonMoveHistoryKey(roomId))
+      .del(getRoomPokemonBanKey(roomId))
+      .exec(),
+  ]);
 };
