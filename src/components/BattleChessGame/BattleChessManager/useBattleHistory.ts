@@ -24,7 +24,7 @@ interface BattleHistoryProps {
   }: {
     sanMove: string;
     moveFailed?: boolean;
-  }) => Promise<Error | undefined>;
+  }) => Error | undefined;
   onPokemonBattleStart: (
     p1Pokemon: PokemonBeginBattleData["p1Pokemon"],
     p2Pokemon: PokemonBeginBattleData["p2Pokemon"],
@@ -126,6 +126,8 @@ const useBattleHistory = ({
           !gameState.isCatchingUp
         ) {
           dispatch({ type: "SET_CATCHING_UP", payload: true });
+        } else if (matchLogIndex.current >= currentMatchLog.length - 3) {
+          dispatch({ type: "SET_CATCHING_UP", payload: false });
         }
 
         const currentLog = currentMatchLog[matchLogIndex.current];
@@ -168,13 +170,15 @@ const useBattleHistory = ({
             break;
           }
           case "chess": {
-            onMove({
+            const err = onMove({
               sanMove: currentLog.data.san,
               moveFailed: currentLog.data.failed,
             });
             matchLogIndex.current++;
-            catchUpTimer = timer(timeBetweenSteps);
-            await catchUpTimer.start();
+            if (!err) {
+              catchUpTimer = timer(timeBetweenSteps);
+              await catchUpTimer.start();
+            }
             break;
           }
           case "pokemon":
