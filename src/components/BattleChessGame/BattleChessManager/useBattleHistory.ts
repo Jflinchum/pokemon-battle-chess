@@ -223,17 +223,17 @@ const useBattleHistory = ({
             }
         }
       }
-    };
 
-    if (
-      matchLogIndex.current >= currentMatchLog.length ||
-      currentMatchLog.length === 0
-    ) {
-      if (skipToEndOfSync) {
-        dispatch({ type: "SET_SKIPPING_AHEAD", payload: false });
+      if (
+        matchLogIndex.current >= currentMatchLog.length ||
+        currentMatchLog.length === 0
+      ) {
+        if (skipToEndOfSync) {
+          dispatch({ type: "SET_SKIPPING_AHEAD", payload: false });
+        }
+        dispatch({ type: "SET_CATCHING_UP", payload: false });
       }
-      dispatch({ type: "SET_CATCHING_UP", payload: false });
-    }
+    };
 
     catchUpToCurrentState();
 

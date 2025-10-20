@@ -85,8 +85,6 @@ export const BattleChessGame = ({
     [gameState.gameSettings.seed],
   );
   const errorRecoveryAttempts = useRef(0);
-  // The timeout to start/end the pokemon battle when initiating one.
-  const battleTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const { movePieceAudio, capturePieceAudio } = useMemo(() => {
     const movePieceAudio = new Audio(movePieceFX);
@@ -356,7 +354,7 @@ export const BattleChessGame = ({
         setBattleStarted(true);
       } else {
         // Need to cancel this timeout when skip to current turn is clicked
-        battleTimeout.current = setTimeout(() => {
+        setTimeout(() => {
           setBattleStarted(true);
         }, userState.animationSpeedPreference);
       }
@@ -416,16 +414,6 @@ export const BattleChessGame = ({
     skipToEndOfSync: gameState.isSkippingAhead,
     matchLogIndex,
   });
-
-  /**
-   * Clear out the timeout for starting and ending a battle if we start skipping ahead.
-   * This is to prevent unintended side effects while we're not rendering anything.
-   */
-  useEffect(() => {
-    if (gameState.isSkippingAhead && battleTimeout.current) {
-      clearTimeout(battleTimeout.current);
-    }
-  }, [gameState.isSkippingAhead]);
 
   const validateDraftPick = useCallback(
     (square: Square, draftColor: Color) => {
@@ -509,7 +497,7 @@ export const BattleChessGame = ({
               if (gameState.isSkippingAhead) {
                 setCurrentBattle(null);
               } else {
-                battleTimeout.current = setTimeout(() => {
+                setTimeout(() => {
                   setCurrentBattle(null);
                 }, userState.animationSpeedPreference);
               }
