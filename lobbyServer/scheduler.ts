@@ -30,6 +30,14 @@ export const registerScheduler = (config: InternalConfig) => {
         }
       });
 
+      /**
+       * The following is a hack that I would love to remove. Occasionally a transaction to the redis store will fail
+       * in the middle of creating a room. This can cause a couple of issues:
+       * - The room is half created, with no host
+       * - The room is created, however the player is not stored in redis
+       *
+       * The user creating the room will see an error message in this scenario. Memory will still be taken up in redis
+       */
       try {
         const roomsWithNoUsers = await getRoomsWithNoUsers();
 

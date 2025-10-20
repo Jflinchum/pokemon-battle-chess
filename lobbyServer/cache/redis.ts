@@ -401,18 +401,13 @@ export const getRoomsWithNoUsers = async (): Promise<string[]> => {
         }),
       );
 
-      console.log(roomId);
-      console.log(roomPlayerSet);
-      console.log(roomPlayerSet.length);
-      console.log(playersRemoved);
-      console.log("------------------------------");
       if (roomId && playersRemoved >= roomPlayerSet?.length) {
         roomsWithNoUsers.push(roomId);
       }
     }),
   );
 
-  return allRooms;
+  return roomsWithNoUsers;
 };
 
 export const deleteRoom = async (roomId: string): Promise<void> => {
