@@ -61,6 +61,7 @@ import GameRoom from "../models/GameRoom.js";
 
 export const redisClient = new Redis(getConfig().redisUrl, {
   lazyConnect: true,
+  enableOfflineQueue: false,
 });
 
 const connectAndIndexRedis = async () => {

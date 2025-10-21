@@ -33,7 +33,9 @@ const server = http.createServer(app).listen(serverPort, () => {
   console.log(`GameServer is listening on ${serverPort}`);
 });
 
-const redisClient = new Redis(getConfig().redisUrl);
+const redisClient = new Redis(getConfig().redisUrl, {
+  enableOfflineQueue: false,
+});
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   adapter: createAdapter(redisClient),
