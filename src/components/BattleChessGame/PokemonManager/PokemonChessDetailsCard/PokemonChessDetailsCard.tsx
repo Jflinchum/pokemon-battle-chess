@@ -19,12 +19,14 @@ interface PokemonChessDetailsCardProps {
   pokemon?: PokemonSet | null;
   chessMoveHistory?: ChessData[];
   squareModifier?: SquareModifier;
+  minimizeOnColumnLayout?: boolean;
 }
 
 const PokemonChessDetailsCard = ({
   pokemon,
   chessMoveHistory = [],
   squareModifier,
+  minimizeOnColumnLayout,
 }: PokemonChessDetailsCardProps) => {
   const dexPokemon = useMemo(
     () => (pokemon ? Dex.species.get(pokemon.species) : null),
@@ -71,7 +73,9 @@ const PokemonChessDetailsCard = ({
 
   return (
     <>
-      <div className="pokemonDetailsContainer">
+      <div
+        className={`pokemonDetailsContainer ${minimizeOnColumnLayout ? "minimize" : ""}`}
+      >
         <div className="pokemonDetailsPadding">
           <div className="pokemonDetailsTitle">
             <div>

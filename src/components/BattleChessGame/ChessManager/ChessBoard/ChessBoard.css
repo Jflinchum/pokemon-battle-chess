@@ -15,29 +15,51 @@
       height: 60vw;
     }
   }
-}
 
-.chessRow {
-  display: flex;
-  justify-content: center;
-  height: 12.5%;
+  &.minimize {
+    @media (max-width: 1450px) {
+      width: 90vw;
+      height: 45vw;
 
-  &:nth-child(1) {
-    .chessSquare:nth-child(1) {
-      border-top-left-radius: 10px;
-    }
+      .chessRow {
+        height: 25%;
+      }
 
-    .chessSquare:nth-last-child(1) {
-      @media (max-width: 599px) {
-        border-top-right-radius: 10px;
+      @media (min-width: 600px) {
+        width: 60vw;
+        height: 30vw;
       }
     }
   }
 
-  &:nth-last-child(1) {
-    .chessSquare:nth-child(1) {
-      @media (min-width: 600px) {
-        border-bottom-left-radius: 10px;
+  .chessRow {
+    display: flex;
+    justify-content: center;
+    height: 12.5%;
+
+    &.minimizeRow {
+      @media (max-width: 1450px) {
+        display: none;
+      }
+    }
+
+    &:nth-child(1) {
+      .chessSquare:nth-child(1) {
+        border-top-left-radius: 10px;
+      }
+
+      .chessSquare:nth-last-child(1) {
+        @media (max-width: 599px) {
+          border-top-right-radius: 10px;
+        }
+      }
+    }
+
+    &:nth-last-child(1) {
+      .chessSquare:nth-child(1) {
+        @media (min-width: 600px) {
+          border-bottom-left-radius: 10px;
+        }
       }
     }
   }

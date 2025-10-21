@@ -18,7 +18,9 @@ export interface ChessBoardProps {
   mostRecentMove?: { from: Square; to: Square } | null;
   preMoveQueue?: { from: Square; to: Square; promotion?: PieceSymbol }[];
   battleSquare?: Square;
+  minimizeOnColumnLayout?: boolean;
 }
+
 const boardColumnPerspective = (
   squares: PokemonChessBoardSquare[][],
   color: Color,
@@ -41,6 +43,10 @@ const boardRowPersepective = (
   }
 };
 
+const shouldMinimizeChessRow = (rowIndex: number) => {
+  return rowIndex >= 2 && rowIndex <= 5;
+};
+
 const ChessBoard = ({
   color,
   boardState,
@@ -54,11 +60,15 @@ const ChessBoard = ({
   mostRecentMove,
   preMoveQueue = [],
   battleSquare,
+  minimizeOnColumnLayout,
 }: ChessBoardProps) => {
   return (
-    <div className="chessBoard">
+    <div className={`chessBoard ${minimizeOnColumnLayout ? "minimize" : ""}`}>
       {boardColumnPerspective(boardState, color).map((boardRow, rowIndex) => (
-        <div className="chessRow" key={rowIndex}>
+        <div
+          className={`chessRow ${minimizeOnColumnLayout && shouldMinimizeChessRow(rowIndex) ? "minimizeRow" : ""}`}
+          key={rowIndex}
+        >
           {boardRowPersepective(boardRow, color).map(
             (boardSquare, columnIndex) => {
               return (

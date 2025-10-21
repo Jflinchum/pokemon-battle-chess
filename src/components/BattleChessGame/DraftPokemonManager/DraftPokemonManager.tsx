@@ -68,8 +68,10 @@ const DraftPokemonManager = ({
           onPieceDrag={handleSquareClick}
           highlightedSquares={[]}
           selectedSquare={selectedSquare}
+          minimizeOnColumnLayout
         />
         <PokemonChessDetailsCard
+          minimizeOnColumnLayout
           squareModifier={pokemonManager.getModifiersFromSquare(selectedSquare)}
           pokemon={
             pokemonManager.getPokemonFromSquare(selectedSquare)?.pkmn ||

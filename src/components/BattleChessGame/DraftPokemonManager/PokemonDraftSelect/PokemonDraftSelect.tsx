@@ -19,7 +19,7 @@ const PokemonDraftSelect = ({
   return (
     <ul className="pokemonDraftSelectContainer">
       {draftablePokemon.map((pokemon) => (
-        <li key={pokemon.index}>
+        <li key={pokemon.index} className="pokemonDraftItem">
           <Button
             highlighted={selectedDraftablePokemon === pokemon.index}
             className="pokemonDraftOption"
@@ -28,34 +28,33 @@ const PokemonDraftSelect = ({
             }}
             data-testid={`pokemon-draft-button-${pokemon.index}`}
           >
-            <div
-              draggable
-              onDragStart={() => onPokemonSelect(pokemon.index)}
+            <PokemonSprite
               className="pokemonDraftSprite"
-            >
-              <PokemonSprite
-                pokemonIdentifier={pokemon.set.species}
-                gender={pokemon.set.gender as GenderName}
-                shiny={pokemon.set.shiny}
-              />
-            </div>
+              onDragStart={() => onPokemonSelect(pokemon.index)}
+              draggable
+              pokemonIdentifier={pokemon.set.species}
+              gender={pokemon.set.gender as GenderName}
+              shiny={pokemon.set.shiny}
+              useDiv
+            />
           </Button>
         </li>
       ))}
       {bannedPokemon.map((pokemon) => (
-        <li key={pokemon.index}>
-          <button
+        <li key={pokemon.index} className="pokemonDraftItem">
+          <Button
             disabled
             className={"bannedDraft"}
             data-testid={`pokemon-banned-button-${pokemon.index}`}
           >
             <PokemonSprite
+              useDiv
               className="pokemonDraftSprite"
               pokemonIdentifier={pokemon.set.species}
               gender={pokemon.set.gender as GenderName}
               shiny={pokemon.set.shiny}
             />
-          </button>
+          </Button>
         </li>
       ))}
     </ul>

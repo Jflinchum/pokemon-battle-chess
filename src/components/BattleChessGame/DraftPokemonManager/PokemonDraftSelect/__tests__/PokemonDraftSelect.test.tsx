@@ -175,9 +175,9 @@ describe("PokemonDraftSelect", () => {
 
       const spriteImg = screen
         .getByTestId("pokemon-draft-button-0")
-        .querySelector("img");
-      expect(spriteImg).toHaveAttribute("alt", "pikachu");
-      expect(spriteImg).toHaveAttribute("src", "mock-pokemon-url");
+        .querySelector("[role=img]");
+      expect(spriteImg).toHaveAttribute("aria-label", "pikachu");
+      expect(spriteImg).toHaveStyle("background-image: url(mock-pokemon-url)");
       expect(Sprites.getPokemon).toHaveBeenCalledWith("pikachu", {
         gen: "ani",
         gender: "F",
@@ -201,9 +201,9 @@ describe("PokemonDraftSelect", () => {
 
       const spriteImg = screen
         .getByTestId("pokemon-banned-button-0")
-        .querySelector("img");
-      expect(spriteImg).toHaveAttribute("alt", "pikachu");
-      expect(spriteImg).toHaveAttribute("src", "mock-pokemon-url");
+        .querySelector("[role=img]");
+      expect(spriteImg).toHaveAttribute("aria-label", "pikachu");
+      expect(spriteImg).toHaveStyle("background-image: url(mock-pokemon-url)");
       expect(Sprites.getPokemon).toHaveBeenCalledWith("pikachu", {
         gen: "ani",
         gender: "F",
