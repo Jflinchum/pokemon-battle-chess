@@ -91,7 +91,12 @@ export const userStateReducer = (
         chatHistory: [],
       };
     case "LEAVE_ROOM":
-      leaveRoom(userState.currentRoomId, userState.id);
+      try {
+        leaveRoom(userState.currentRoomId, userState.id);
+      } catch (err) {
+        console.error(err);
+      }
+
       clearMostRecentRoom();
       return {
         ...userState,

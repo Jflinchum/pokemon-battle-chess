@@ -1,5 +1,7 @@
 import { socket } from "../socket";
 
+const TIMEOUT_TIME_MS = 5000;
+
 export const createNewRoom = async (
   playerId: string,
   playerName: string,
@@ -19,6 +21,7 @@ export const createNewRoom = async (
       avatarId,
       playerSecret: secretId,
     }),
+    signal: AbortSignal.timeout(TIMEOUT_TIME_MS),
   });
   return response;
 };
@@ -33,6 +36,7 @@ export const leaveRoom = async (roomId: string, playerId: string) => {
       roomId,
       playerId,
     }),
+    signal: AbortSignal.timeout(TIMEOUT_TIME_MS),
   });
   socket.disconnect();
 };
@@ -58,6 +62,7 @@ export const joinRoom = async (
       avatarId,
       playerSecret: secretId,
     }),
+    signal: AbortSignal.timeout(TIMEOUT_TIME_MS),
   });
 
   return response;
@@ -75,6 +80,7 @@ export const getAvailableRooms = async (
       headers: {
         "Cache-Control": "no-cache",
       },
+      signal: AbortSignal.timeout(TIMEOUT_TIME_MS),
     },
   );
 
@@ -90,6 +96,7 @@ export const getRoom = async (
     headers: {
       "Cache-Control": "no-cache",
     },
+    signal: AbortSignal.timeout(TIMEOUT_TIME_MS),
     ...fetchOptions,
   });
 

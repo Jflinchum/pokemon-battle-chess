@@ -39,21 +39,26 @@ const RoomList = ({ availableRooms, onSearch }: RoomListProps) => {
         payload: { modalProps: { roomId: roomId } },
       });
     } else {
-      const response = await joinRoom(
-        roomId,
-        "",
-        userState.id,
-        userState.name,
-        userState.avatarId,
-        userState.secretId,
-      );
-      if (response.status === 200) {
-        dispatch({
-          type: "JOIN_ROOM",
-          payload: { roomId: roomId, roomCode: "" },
-        });
-      } else {
+      try {
+        const response = await joinRoom(
+          roomId,
+          "",
+          userState.id,
+          userState.name,
+          userState.avatarId,
+          userState.secretId,
+        );
+        if (response.status === 200) {
+          dispatch({
+            type: "JOIN_ROOM",
+            payload: { roomId: roomId, roomCode: "" },
+          });
+        } else {
+          toast("Error: Failed to join room.", { type: "error" });
+        }
+      } catch (err) {
         toast("Error: Failed to join room.", { type: "error" });
+        console.error(err);
       }
     }
   };

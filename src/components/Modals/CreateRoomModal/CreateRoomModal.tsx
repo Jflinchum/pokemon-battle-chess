@@ -16,22 +16,27 @@ const CreateRoomModal = () => {
 
   const handleCreateRoom = async ({ password }: { password: string }) => {
     setCreateRoomLoading(true);
-    const response = await createNewRoom(
-      userState.id,
-      userState.name,
-      password,
-      userState.avatarId,
-      userState.secretId,
-    );
-    if (response.status === 200) {
-      const { data } = await response.json();
-      userStateDispatch({
-        type: "SET_ROOM",
-        payload: { roomId: data.roomId, roomCode: password },
-      });
-      dispatchGameState({ type: "CREATE_ROOM" });
-      dispatch({ type: "CLOSE_MODAL" });
-    } else {
+    try {
+      const response = await createNewRoom(
+        userState.id,
+        userState.name,
+        password,
+        userState.avatarId,
+        userState.secretId,
+      );
+      if (response.status === 200) {
+        const { data } = await response.json();
+        userStateDispatch({
+          type: "SET_ROOM",
+          payload: { roomId: data.roomId, roomCode: password },
+        });
+        dispatchGameState({ type: "CREATE_ROOM" });
+        dispatch({ type: "CLOSE_MODAL" });
+      } else {
+        toast("Error: Could not create room.", { type: "error" });
+      }
+    } catch (err) {
+      console.error(err);
       toast("Error: Could not create room.", { type: "error" });
     }
     setCreateRoomLoading(false);

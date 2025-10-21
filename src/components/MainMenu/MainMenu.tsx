@@ -27,22 +27,27 @@ const MainMenu = () => {
 
   const handleYesClick = useCallback(
     async (roomId: string, roomCode: string) => {
-      const response = await joinRoom(
-        roomId,
-        roomCode,
-        userState.id,
-        userState.name,
-        userState.avatarId,
-        userState.secretId,
-      );
+      try {
+        const response = await joinRoom(
+          roomId,
+          roomCode,
+          userState.id,
+          userState.name,
+          userState.avatarId,
+          userState.secretId,
+        );
 
-      if (response.status === 200) {
-        userStateDispatch({
-          type: "JOIN_ROOM",
-          payload: { roomId, roomCode },
-        });
-      } else {
+        if (response.status === 200) {
+          userStateDispatch({
+            type: "JOIN_ROOM",
+            payload: { roomId, roomCode },
+          });
+        } else {
+          toast("Error: Failed to join room.", { type: "error" });
+        }
+      } catch (err) {
         toast("Error: Failed to join room.", { type: "error" });
+        console.error(err);
       }
     },
     [

@@ -19,23 +19,28 @@ const RoomCodeModal = () => {
     e.preventDefault();
     const roomId = (modalState.modalProps as RoomCodeModalProps)?.roomId;
     const roomCode = inputRef.current?.value || "";
-    const response = await joinRoom(
-      roomId,
-      roomCode,
-      userState.id,
-      userState.name,
-      userState.avatarId,
-      userState.secretId,
-    );
-    if (response.status === 401) {
-      toast("Incorrect Password", { type: "error" });
-      return;
-    } else if (response.status > 399) {
+    try {
+      const response = await joinRoom(
+        roomId,
+        roomCode,
+        userState.id,
+        userState.name,
+        userState.avatarId,
+        userState.secretId,
+      );
+      if (response.status === 401) {
+        toast("Incorrect Password", { type: "error" });
+        return;
+      } else if (response.status > 399) {
+        toast("Error: Failed to join room.", { type: "error" });
+        return;
+      }
+      userStateDispatch({ type: "JOIN_ROOM", payload: { roomId, roomCode } });
+      dispatch({ type: "CLOSE_MODAL" });
+    } catch (err) {
       toast("Error: Failed to join room.", { type: "error" });
-      return;
+      console.error(err);
     }
-    userStateDispatch({ type: "JOIN_ROOM", payload: { roomId, roomCode } });
-    dispatch({ type: "CLOSE_MODAL" });
   };
 
   const handleCancelClick = () => {

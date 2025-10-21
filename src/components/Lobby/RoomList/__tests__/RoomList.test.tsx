@@ -188,7 +188,17 @@ describe("RoomList", () => {
       const noPasswordRoom = getRoomItems()[0].querySelector("button");
       await user.click(noPasswordRoom!);
 
-      expect(toast).toHaveBeenCalledWith("Error: Failed to join room.", {
+      expect(toast).toHaveBeenNthCalledWith(1, "Error: Failed to join room.", {
+        type: "error",
+      });
+
+      vi.mocked(LobbyService.joinRoom).mockRejectedValue(
+        new Error("Test error"),
+      );
+
+      await user.click(noPasswordRoom!);
+
+      expect(toast).toHaveBeenNthCalledWith(2, "Error: Failed to join room.", {
         type: "error",
       });
     });
