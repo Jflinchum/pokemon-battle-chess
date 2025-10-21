@@ -51,6 +51,9 @@ export const registerRoutes = (
       playerId,
       password,
     );
+    console.log(
+      `Player ${playerName} (${playerId}) has created a new room ${roomId}`,
+    );
     await gameRoomManager.playerJoinRoom(roomId, playerId);
     gameRoomManager.clearPlayerTransientState(playerId);
 
@@ -98,6 +101,7 @@ export const registerRoutes = (
     } else {
       await gameRoomManager.playerJoinRoom(roomId, playerId);
     }
+    console.log(`Player ${playerName} (${playerId}) has joined room ${roomId}`);
     res.status(200).send({ data: { roomId: roomId } });
   });
 
@@ -116,6 +120,7 @@ export const registerRoutes = (
       return;
     }
 
+    console.log(`Player (${playerId}) has left room ${roomId}`);
     await gameRoomManager.playerLeaveRoom(roomId, playerId);
 
     res.status(200).send();

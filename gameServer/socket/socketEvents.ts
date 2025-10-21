@@ -89,7 +89,7 @@ export const registerSocketEvents = (
           isStringProfane(playerName) ||
           !matchQueue
         ) {
-          console.log("Incorrect parameters for quick play");
+          console.warn("Incorrect parameters for quick play");
           return cb({ status: "err", message: "Invalid request" });
         }
         const user = new User(playerName, playerId, avatarId || "1", secretId);
@@ -97,16 +97,19 @@ export const registerSocketEvents = (
         socket.join(playerId);
 
         await addPlayerToCache(user);
+        console.log(
+          `Player ${playerName} (${playerId}) has joined the matchmaking queue`,
+        );
 
         const nextUserInQueue =
           await gameRoomManager.getPlayerFromQueue(matchQueue);
 
         if (!nextUserInQueue) {
-          console.log("No players in queue. Adding player to queue.");
           gameRoomManager.addPlayerToQueue(user, matchQueue);
         } else if (nextUserInQueue !== playerId) {
-          console.log("Found players in queue. Attempting to create room");
-
+          console.log(
+            `Creating quickplay match between ${playerId} and ${nextUserInQueue}`,
+          );
           const room = await gameRoomManager.createAndCacheNewRoom(
             playerId,
             "",
@@ -189,7 +192,9 @@ export const registerSocketEvents = (
           "changeGameOptions",
           await gameRoomManager.getRoomOptions(roomId),
         );
-        console.log(`Player ${playerId} joined room ${roomId}`);
+        console.log(
+          `Player ${user.playerName} (${playerId}) joined room ${roomId}`,
+        );
 
         if (room.isOngoing && room.whitePlayer && room.blackPlayer) {
           socket
@@ -315,7 +320,7 @@ export const registerSocketEvents = (
           return cb({ status: "err", message: "Could not verify player" });
         }
         if (!room.player1 || !room.player2) {
-          console.log("Player 1 and player 2 slots are not filled.");
+          console.warn("Player 1 and player 2 slots are not filled.");
           return cb({
             status: "err",
             message: "Could not find Player 1 or Player 2",
@@ -345,7 +350,10 @@ export const registerSocketEvents = (
             io.to(roomId).emit("currentTimers", timers);
           }
         } catch (e) {
-          console.log("Issue starting game: ", (e as unknown as Error).message);
+          console.error(
+            "Issue starting game: ",
+            (e as unknown as Error).message,
+          );
           return cb({
             status: "err",
             message:
@@ -709,7 +717,7 @@ export const registerSocketEvents = (
             matchOutput = output?.matchOutput;
             timer = output?.timer;
           } catch (err) {
-            console.log(err);
+            console.error(err);
             return cb({ status: "err", message: "Could not ban pokemon" });
           }
         } else {
@@ -722,7 +730,7 @@ export const registerSocketEvents = (
             matchOutput = output?.matchOutput;
             timer = output?.timer;
           } catch (err) {
-            console.log(err);
+            console.error(err);
             return cb({ status: "err", message: "Could not draft pokemon" });
           }
         }

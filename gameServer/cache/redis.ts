@@ -66,7 +66,7 @@ export const redisClient = new Redis(getConfig().redisUrl, {
 
 const connectAndIndexRedis = async () => {
   redisClient.on("error", (err) => {
-    console.log("Redis Client Error", err);
+    console.error("Redis Client Error", err);
     redisClient.disconnect();
   });
   await redisClient.connect();

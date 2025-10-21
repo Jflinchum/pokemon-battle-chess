@@ -356,7 +356,7 @@ export default class GameRoom {
           return await this.randomDraftPick("b");
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     } else {
       if (timerExpired.white) {
@@ -393,25 +393,25 @@ export default class GameRoom {
     try {
       await this.setGameState();
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return;
     }
     if (!this.whitePlayer || !this.blackPlayer || !this.isOngoing) {
-      console.log("State error");
+      console.error("State error");
       return;
     }
     if (this.currentTurnWhite && this.whitePlayer.playerId !== playerId) {
-      console.log("Player id does not match with white");
+      console.warn("Player id does not match with white");
       return;
     } else if (
       !this.currentTurnWhite &&
       this.blackPlayer.playerId !== playerId
     ) {
-      console.log("Player id does not match with black");
+      console.warn("Player id does not match with black");
       return;
     }
     if (this.currentPokemonBattleStakes) {
-      console.log("Already pokemon stakes. No chess moves allowed");
+      console.warn("Already pokemon stakes. No chess moves allowed");
       return;
     }
     const timerValidationOutput = await this.validateGameTimer();
@@ -427,7 +427,7 @@ export default class GameRoom {
       .moves({ verbose: true, continueOnCheck: true })
       .find((move) => move.san === sanMove);
     if (!chessMove) {
-      console.log("Could not find chess move");
+      console.warn("Could not find chess move");
       return;
     }
 
@@ -449,7 +449,7 @@ export default class GameRoom {
       const attemptedMove = { san: sanMove, color: chessMove.color };
 
       if (!p1Pokemon || !p2Pokemon) {
-        console.log("Could not find pokemon to battle.");
+        console.warn("Could not find pokemon to battle.");
         return;
       }
 
@@ -486,7 +486,7 @@ export default class GameRoom {
         await this.pushWhiteHistory(initialBattleOutput.whiteStream);
         await this.pushBlackHistory(initialBattleOutput.blackStream);
       } else {
-        console.log("No initial battle output");
+        console.warn("No initial battle output");
         return;
       }
     } else {
@@ -801,7 +801,7 @@ export default class GameRoom {
     try {
       await this.setGameState();
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return;
     }
     if (
@@ -810,7 +810,7 @@ export default class GameRoom {
       !this.isOngoing ||
       !this.currentPokemonBattleStakes
     ) {
-      console.log("Players or stakes are not set");
+      console.warn("Players or stakes are not set");
       return;
     }
 
@@ -826,13 +826,11 @@ export default class GameRoom {
     const isUndo = pokemonMove === "undo";
     if (playerId === this.whitePlayer.playerId) {
       if (isUndo) {
-        console.log("Clearing white move");
         await this.setPlayerPokemonMove("w", null);
         if (this.roomGameOptions.timersEnabled) {
           this.gameTimer?.startTimer("w");
         }
       } else {
-        console.log("Setting white player move");
         await this.setPlayerPokemonMove("w", pokemonMove);
         if (this.roomGameOptions.timersEnabled) {
           this.gameTimer?.stopTimer("w");
@@ -840,13 +838,11 @@ export default class GameRoom {
       }
     } else if (playerId === this.blackPlayer.playerId) {
       if (isUndo) {
-        console.log("Clearing black move");
         await this.setPlayerPokemonMove("b", null);
         if (this.roomGameOptions.timersEnabled) {
           this.gameTimer?.startTimer("b");
         }
       } else {
-        console.log("Setting black player move");
         await this.setPlayerPokemonMove("b", pokemonMove);
         if (this.roomGameOptions.timersEnabled) {
           this.gameTimer?.stopTimer("b");
@@ -879,11 +875,10 @@ export default class GameRoom {
           await this.processRoomTimers("pokemonMovesFinalized");
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
         return;
       }
     } else {
-      console.log("Both player moves are not set");
       await this.processRoomTimers("pokemonUpdate");
     }
 
@@ -921,7 +916,7 @@ export default class GameRoom {
       .moves({ verbose: true, continueOnCheck: true })
       .find((move) => move.san === this.currentPokemonBattleStakes!.san);
     if (!chessMove) {
-      console.log("Could not find chess move for pokemon battle stakes");
+      console.error("Could not find chess move for pokemon battle stakes");
       return;
     }
     let capturedPieceSquare: Square;
@@ -945,7 +940,7 @@ export default class GameRoom {
       new PRNG().getSeed();
 
     if (!p1Pokemon || !p2Pokemon) {
-      console.log("Could not find pokemon for pokemon battle");
+      console.warn("Could not find pokemon for pokemon battle");
       return;
     }
 
@@ -1370,7 +1365,7 @@ export default class GameRoom {
     try {
       await this.setGameState();
     } catch (err) {
-      console.log("Error setting state:", (err as unknown as Error).message);
+      console.error("Error setting state:", (err as unknown as Error).message);
     }
     if (
       !this.whitePlayer ||
@@ -1378,7 +1373,7 @@ export default class GameRoom {
       !this.pokemonGameManager.draftPieces.length ||
       this.chessManager.moveNumber() > 1
     ) {
-      console.log("Incorrect state for pokemon ban");
+      console.warn("Incorrect state for pokemon ban");
       return;
     }
 
@@ -1459,7 +1454,7 @@ export default class GameRoom {
     try {
       await this.setGameState();
     } catch (err) {
-      console.log("Error setting state:", (err as unknown as Error).message);
+      console.error("Error setting state:", (err as unknown as Error).message);
     }
     if (
       !square ||
@@ -1470,7 +1465,7 @@ export default class GameRoom {
       !this.pokemonGameManager.draftPieces.length ||
       this.chessManager.moveNumber() > 1
     ) {
-      console.log("Incorrect state for pokemon ban");
+      console.warn("Incorrect state for pokemon ban");
       return;
     }
 

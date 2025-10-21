@@ -88,7 +88,7 @@ export default class GameRoomManager {
     if (gameRoomOptions) {
       return gameRoomOptions;
     }
-    console.log("Defaulting game room options");
+    console.warn("Defaulting game room options");
 
     return {
       format: "random",
@@ -200,13 +200,13 @@ export default class GameRoomManager {
     altOptions?: { roomCode?: string },
   ): Promise<boolean> {
     if (!roomId || !playerId || !secretId) {
-      console.log(`${playerId} mismatch for ${roomId}`);
+      console.warn(`${playerId} mismatch for ${roomId}`);
       return false;
     }
 
     const cachedRoomExist = await doesRoomExist(roomId);
     if (cachedRoomExist === 0) {
-      console.log(`${roomId} does not exist`);
+      console.warn(`${roomId} does not exist`);
       return false;
     }
 
@@ -242,7 +242,7 @@ export default class GameRoomManager {
           roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId, 0)),
         );
       } catch (err) {
-        console.log(err);
+        console.error(err);
         // attempt to continue with creating the new room, anyways
       }
     }
