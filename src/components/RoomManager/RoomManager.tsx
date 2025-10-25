@@ -185,6 +185,7 @@ const RoomManager = () => {
       socket.off("currentTimers");
       socket.off("startGame");
       socket.off("kickedFromRoom");
+      socket.off("health");
       socket.io.off("reconnect");
     };
   }, [
