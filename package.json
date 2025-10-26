@@ -58,6 +58,7 @@
     "patch-package": "^8.0.0",
     "react": "^19",
     "react-dom": "^19",
+    "react-markdown": "^10.1.0",
     "react-toastify": "^11.0.5",
     "react-tooltip": "^5.28.1",
     "socket.io": "^4.8.1",

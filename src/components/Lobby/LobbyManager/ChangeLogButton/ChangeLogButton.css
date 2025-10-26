@@ -1,0 +1,12 @@
+.changeLogButton {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.changeLogButtonMascot {
+  height: 30px;
+  width: 30px;
+}

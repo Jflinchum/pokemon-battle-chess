@@ -1,4 +1,5 @@
 .lobbyContainer {
+  height: 100vh;
   display: flex;
 
   @media (max-width: 600px) {
@@ -7,8 +8,11 @@
 }
 
 .roomListLobbyContainer {
+  height: 100%;
   width: 100%;
   margin: 0 60px;
+  display: flex;
+  flex-direction: column;
 
   @media (max-width: 600px) {
     padding-top: 40px;
@@ -69,4 +73,9 @@
       animation: spin 0.5s infinite;
     }
   }
+}
+
+.lobbyChangeLogButton {
+  margin-top: auto;
+  margin-bottom: 60px;
 }

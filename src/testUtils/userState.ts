@@ -18,6 +18,7 @@ export const getMockUserState = (
     musicVolume: 50,
   },
   use2DSprites: false,
+  enablePremoving: false,
   animatedBackgroundEnabled: true,
   currentRoomId: "room-id",
   currentRoomCode: "room-code",

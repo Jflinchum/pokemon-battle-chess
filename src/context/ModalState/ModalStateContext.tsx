@@ -13,6 +13,7 @@ export type ModalName =
   | "GENERIC"
   | "QUICK_MATCH"
   | "CREDITS"
+  | "CHANGE_LOG"
   | "";
 
 export interface RoomCodeModalProps {
@@ -73,6 +74,10 @@ type ModalStateAction =
     }
   | {
       type: "OPEN_CREDITS_MODAL";
+      payload: { required?: boolean };
+    }
+  | {
+      type: "OPEN_CHANGE_LOG_MODAL";
       payload: { required?: boolean };
     }
   | { type: "CLOSE_MODAL"; payload?: object };
@@ -161,6 +166,12 @@ export const modalStateReducer = (
       return {
         ...modalState,
         currentModal: "CREDITS",
+        required: action.payload.required,
+      };
+    case "OPEN_CHANGE_LOG_MODAL":
+      return {
+        ...modalState,
+        currentModal: "CHANGE_LOG",
         required: action.payload.required,
       };
     case "CLOSE_MODAL":

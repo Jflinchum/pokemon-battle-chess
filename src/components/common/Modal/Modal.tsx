@@ -5,6 +5,7 @@ import {
   ModalName,
   useModalState,
 } from "../../../context/ModalState/ModalStateContext";
+import { ChangeLogModal } from "../../Modals/ChangeLogModal/ChangeLogModal";
 import CreateRoomModal from "../../Modals/CreateRoomModal/CreateRoomModal";
 import CreditsModal from "../../Modals/CreditsModal/CreditsModal";
 import CustomizeModal from "../../Modals/CustomizeModal/CustomizeModal";
@@ -37,6 +38,8 @@ const renderModal = (currentModal: ModalName) => {
       return <CustomizeModal />;
     case "CREDITS":
       return <CreditsModal />;
+    case "CHANGE_LOG":
+      return <ChangeLogModal />;
     case "GENERIC":
       return <GenericModal />;
     default:

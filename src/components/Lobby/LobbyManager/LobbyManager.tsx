@@ -13,6 +13,7 @@ import usePageVisibility from "../../../util/usePageVisibility";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
 import MenuOptions from "../MenuOptions/MenuOptions";
 import RoomList from "../RoomList/RoomList";
+import { ChangeLogButton } from "./ChangeLogButton/ChangeLogButton";
 import "./LobbyManager.css";
 import { ReportIssue } from "./ReportIssue/ReportIssue";
 
@@ -129,6 +130,7 @@ const LobbyManager = () => {
               </button>
             </div>
           </div>
+          <ChangeLogButton className="lobbyChangeLogButton" />
         </div>
       </div>
     </>
