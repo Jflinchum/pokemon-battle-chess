@@ -360,7 +360,12 @@ export default class GameRoomManager {
       const { transientTimestamp, currentRoomId } =
         await getUserTransientStatus(playerId);
 
-      if (transientTimestamp && transientTimestamp !== "0") {
+      if (
+        transientTimestamp &&
+        transientTimestamp !== "0" &&
+        parseInt(transientTimestamp) <=
+          new Date().getTime() + TRANSIENT_DISCONNECT_TIME
+      ) {
         if (currentRoomId) {
           if (currentRoomId === roomId) {
             console.log(
@@ -374,7 +379,10 @@ export default class GameRoomManager {
       }
     }, TRANSIENT_DISCONNECT_TIME);
     this.transientPlayerList[playerId] = transientTimeout;
-    await setUserAsTransient(playerId, new Date().getTime());
+    await setUserAsTransient(
+      playerId,
+      new Date().getTime() + TRANSIENT_DISCONNECT_TIME,
+    );
   }
 
   public async addPlayerToQueue(user: User, queue: "random" | "draft") {

@@ -6,7 +6,7 @@ import {
 } from "./cache/redis.js";
 import { InternalConfig } from "./config.js";
 
-const SCHEDULER_INTERVAL = 1000 * 60;
+const SCHEDULER_INTERVAL = 1000 * 60 * 5;
 
 export const registerScheduler = (config: InternalConfig) => {
   const setUpDisconnectedUserCleanUpInterval = () => {
