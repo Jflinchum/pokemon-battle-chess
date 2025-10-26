@@ -611,7 +611,7 @@ export const registerSocketEvents = (
       async ({ pokemonMove, roomId, playerId, secretId }, cb) => {
         const room = await gameRoomManager.getCachedRoom(roomId);
         console.log(
-          `${playerId} requested to chess move ${pokemonMove} for ${roomId}`,
+          `${playerId} requested pokemon move ${pokemonMove} for ${roomId}`,
         );
 
         if (!room || !playerId) {
