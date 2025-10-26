@@ -61,7 +61,9 @@ export const registerSocketEvents = (
       );
 
       if (room && player) {
-        console.log(`Preparing player for disconnect. ${player.playerId}`);
+        console.log(
+          `Preparing player for disconnect: ${player.playerName} (${player.playerId})`,
+        );
         await gameRoomManager.preparePlayerDisconnect(
           player.playerId,
           room.roomId,

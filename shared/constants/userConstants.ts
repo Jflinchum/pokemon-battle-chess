@@ -1,0 +1,1 @@
+export const TRANSIENT_DISCONNECT_TIME = 5 * 60 * 1000;

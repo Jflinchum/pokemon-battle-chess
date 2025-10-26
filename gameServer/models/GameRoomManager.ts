@@ -1,5 +1,6 @@
 import { Color } from "chess.js";
 import { Server } from "socket.io";
+import { TRANSIENT_DISCONNECT_TIME } from "../../shared/constants/userConstants.js";
 import User from "../../shared/models/User.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import { Player } from "../../shared/types/Player.js";
@@ -41,7 +42,6 @@ import {
   setUserAsTransient,
 } from "../cache/redis.js";
 import { DEFAULT_GAME_OPTIONS } from "../constants/gameConstants.js";
-import { transientDisconnectTime } from "../constants/userConstants.js";
 import GameRoom from "./GameRoom.js";
 
 interface GameRoomList {
@@ -372,7 +372,7 @@ export default class GameRoomManager {
           deletePlayerFromCache(playerId);
         }
       }
-    }, transientDisconnectTime);
+    }, TRANSIENT_DISCONNECT_TIME);
     this.transientPlayerList[playerId] = transientTimeout;
     await setUserAsTransient(playerId, new Date().getTime());
   }

@@ -15,6 +15,7 @@ import {
   REDIS_KEY_EXPIRY,
   ROOM_KEY,
 } from "./../../shared/constants/redisConstants.js";
+import { TRANSIENT_DISCONNECT_TIME } from "./../../shared/constants/userConstants.js";
 import User from "./../../shared/models/User.js";
 
 /**
@@ -297,12 +298,11 @@ export const getHostNameFromRoomId = async (roomId?: string | null) => {
 export const getDisconnectedUsers = async (): Promise<
   { playerId: string; roomId: string }[]
 > => {
-  const IDLE_TIME_UNTIL_DISCONNECT = 1000 * 60 * 3;
   try {
     const response = await redisClient.call(
       "FT.SEARCH",
       "hash-idx:players",
-      `@transient:[1 ${new Date().getTime() + IDLE_TIME_UNTIL_DISCONNECT}]`,
+      `@transient:[1 ${new Date().getTime() + TRANSIENT_DISCONNECT_TIME}]`,
     );
 
     if (!Array.isArray(response) || !response[0]) {

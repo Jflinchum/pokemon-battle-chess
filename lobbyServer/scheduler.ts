@@ -6,7 +6,7 @@ import {
 } from "./cache/redis.js";
 import { InternalConfig } from "./config.js";
 
-const DISCONNECTED_USER_INTERVAL = 1000 * 60 * 3;
+const SCHEDULER_INTERVAL = 1000 * 60;
 
 export const registerScheduler = (config: InternalConfig) => {
   const setUpDisconnectedUserCleanUpInterval = () => {
@@ -47,7 +47,7 @@ export const registerScheduler = (config: InternalConfig) => {
       } catch (err) {
         console.log("Could not clean up rooms with no users", err);
       }
-    }, DISCONNECTED_USER_INTERVAL);
+    }, SCHEDULER_INTERVAL);
   };
 
   setUpDisconnectedUserCleanUpInterval();
