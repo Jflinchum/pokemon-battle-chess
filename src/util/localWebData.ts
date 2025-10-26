@@ -142,6 +142,18 @@ export const set2DSpritePreference = (spritePreference: boolean) => {
   localStorage.setItem("spritePreference", `${spritePreference}`);
 };
 
+export const getPremovingPreference = () => {
+  const defaultPremovePreference = false;
+  const currentPremovePreference = localStorage.getItem("premovingPreference");
+  return currentPremovePreference
+    ? currentPremovePreference === "true"
+    : defaultPremovePreference;
+};
+
+export const setPremovingPreference = (premovingPreference: boolean) => {
+  localStorage.setItem("premovingPreference", `${premovingPreference}`);
+};
+
 export const getAnimatedBackgroundPreference = () => {
   const defaultAnimatedBackgroundPreference = true;
   const animatedBackgroundPreference = localStorage.getItem(

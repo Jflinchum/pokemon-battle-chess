@@ -1,3 +1,15 @@
 .gameSettingsInput {
   justify-self: start;
 }
+
+.gameSettingsDescription {
+  width: 100%;
+  font-style: italic;
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+.gameSettingsSpacer {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}

@@ -7,6 +7,7 @@ import {
   getName,
   getOrInitializeSecretUUID,
   getOrInitializeUUID,
+  getPremovingPreference,
   getVolumePreference,
 } from "../../util/localWebData.ts";
 import { UserStateContext, userStateReducer } from "./UserStateContext.tsx";
@@ -20,6 +21,7 @@ const UserStateProvider = ({ children }: { children: ReactElement }) => {
     animationSpeedPreference: getAnimationSpeedPreference(),
     volumePreference: getVolumePreference(),
     use2DSprites: get2DSpritePreference(),
+    enablePremoving: getPremovingPreference(),
     animatedBackgroundEnabled: getAnimatedBackgroundPreference(),
     currentRoomId: "",
     currentRoomCode: "",

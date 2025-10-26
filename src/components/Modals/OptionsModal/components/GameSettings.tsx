@@ -32,6 +32,13 @@ export const GameSettings = () => {
     });
   };
 
+  const handlePremovingChange = (enablePremove: boolean) => {
+    dispatch({
+      type: "SET_PREMOVING_PREFERENCE",
+      payload: enablePremove,
+    });
+  };
+
   return (
     <div className="optionsActions">
       <ul>
@@ -50,6 +57,11 @@ export const GameSettings = () => {
               </option>
             ))}
           </select>
+          <div className="gameSettingsDescription">
+            Changes the speed of various animations within the game. Primarily
+            impacts Pokémon battles.
+          </div>
+          <hr className="gameSettingsSpacer" />
         </li>
         <li>
           <label htmlFor="2dSpritesOption">Use Pokémon 2D Sprites</label>
@@ -59,6 +71,11 @@ export const GameSettings = () => {
             checked={userState.use2DSprites}
             onChange={(e) => handle2DSpriteChange(e.target.checked)}
           />
+          <div className="gameSettingsDescription">
+            Changes the Pokémon sprites to be animated in 2D. Similar to the
+            style of Pokémon Black and White.
+          </div>
+          <hr className="gameSettingsSpacer" />
         </li>
         <li>
           <label htmlFor="disableAnimatedBackground">
@@ -70,6 +87,25 @@ export const GameSettings = () => {
             checked={!userState.animatedBackgroundEnabled}
             onChange={(e) => handleAnimatedBackgroundChange(!e.target.checked)}
           />
+          <div className="gameSettingsDescription">
+            Disables the animated floating background in the main menu of the
+            game.
+          </div>
+          <hr className="gameSettingsSpacer" />
+        </li>
+        <li>
+          <label htmlFor="enablePremoving">Enable Chess Premoving</label>
+          <ToggleSwitch
+            id="enablePremoving"
+            className="gameSettingsInput"
+            checked={userState.enablePremoving}
+            onChange={(e) => handlePremovingChange(e.target.checked)}
+          />
+          <div className="gameSettingsDescription">
+            Allows you to queue up Chess moves while it isn't your turn. You can
+            clear the queue by right clicking the chess board.
+          </div>
+          <hr className="gameSettingsSpacer" />
         </li>
       </ul>
     </div>

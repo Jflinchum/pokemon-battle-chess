@@ -213,12 +213,14 @@ export const BattleChessGame = ({
 
   const handleOnMove = async (san: string) => {
     if (chessManager.turn() !== color) {
-      const verboseChessMove = getVerboseSanChessMove(
-        san,
-        simulatedChessManager,
-      );
-      if (verboseChessMove) {
-        simulateMove(verboseChessMove);
+      if (userState.enablePremoving) {
+        const verboseChessMove = getVerboseSanChessMove(
+          san,
+          simulatedChessManager,
+        );
+        if (verboseChessMove) {
+          simulateMove(verboseChessMove);
+        }
       }
     } else {
       try {
