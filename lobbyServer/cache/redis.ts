@@ -47,7 +47,8 @@ import User from "./../../shared/models/User.js";
  * roomLock:{roomId}
  */
 
-const redisClient = new Redis(getConfig().redisUrl, {
+const redisClient = new Redis({
+  ...getConfig().redisOptions,
   lazyConnect: true,
   enableOfflineQueue: false,
 });

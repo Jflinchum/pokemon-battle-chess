@@ -1,9 +1,11 @@
+import { RedisOptions } from "ioredis";
+
 export interface InternalConfig {
   keyLocation: string;
   certLocation: string;
   allowedOrigins: string[];
   gameServiceUrl: string;
-  redisUrl: string;
+  redisOptions: Partial<RedisOptions>;
   httpsPort: number;
 }
 
@@ -21,7 +23,10 @@ export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
     gameServiceUrl: process.env.DOCKER_HOST
       ? "http://game-server-service:3003"
       : "http://localhost:3003",
-    redisUrl: "redis://host.docker.internal:6379",
+    redisOptions: {
+      host: "host.docker.internal",
+      port: 6379,
+    },
     httpsPort: 3001,
   },
 
@@ -30,7 +35,10 @@ export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
     certLocation: "nginx/tls.crt",
     allowedOrigins: [],
     gameServiceUrl: "http://game-server-service:3003",
-    redisUrl: "redis://redis-service.default.svc.cluster.local:6379",
+    redisOptions: {
+      sentinels: [{ host: "redis-sentinel", port: 26379 }],
+      name: "mymaster",
+    },
     httpsPort: 3001,
   },
 };
