@@ -25,7 +25,9 @@ export const config: Record<string, GameServerConfig> = {
   prodConfig: {
     allowedOrigins: ["https://pokemon-gambit.com"],
     redisOptions: {
-      sentinels: [{ host: "redis-sentinel", port: 26379 }],
+      sentinels: [
+        { host: "redis-sentinel.default.svc.cluster.local", port: 26379 },
+      ],
       name: "mymaster",
     },
     serverPort: 3003,

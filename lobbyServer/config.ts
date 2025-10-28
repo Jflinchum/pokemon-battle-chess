@@ -36,7 +36,9 @@ export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
     allowedOrigins: [],
     gameServiceUrl: "http://game-server-service:3003",
     redisOptions: {
-      sentinels: [{ host: "redis-sentinel", port: 26379 }],
+      sentinels: [
+        { host: "redis-sentinel.default.svc.cluster.local", port: 26379 },
+      ],
       name: "mymaster",
     },
     httpsPort: 3001,
