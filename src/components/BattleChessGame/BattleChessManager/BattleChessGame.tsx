@@ -70,10 +70,12 @@ export const BattleChessGame = ({
   );
   const [isDrafting, setIsDrafting] = useState<boolean>(!!draftMode);
   const [draftTurnPick, setDraftTurnPick] = useState<Color>("w");
-  const [mostRecentMove, setMostRecentMove] = useState<{
+  const [mostRecentChessMove, setMostRecentChessMove] = useState<{
     from: Square;
     to: Square;
   } | null>(null);
+  const [mostRecentRequestedChessMove, setMostRecentRequestedChessMove] =
+    useState("");
   const [currentPokemonMoveHistory, setCurrentPokemonMoveHistory] = useState<
     { args: ArgType; kwArgs: KWArgType }[]
   >([]);
@@ -164,10 +166,10 @@ export const BattleChessGame = ({
   const arrows = useMemo(() => {
     const finalArrows = [];
 
-    if (mostRecentMove) {
+    if (mostRecentChessMove) {
       finalArrows.push({
-        from: mostRecentMove.from,
-        to: mostRecentMove.to,
+        from: mostRecentChessMove.from,
+        to: mostRecentChessMove.to,
         type: "default" as const,
       });
     }
@@ -186,7 +188,7 @@ export const BattleChessGame = ({
       }
     }
     return finalArrows;
-  }, [mostRecentMove, currentBattle, chessManager]);
+  }, [mostRecentChessMove, currentBattle, chessManager]);
 
   const handleError = useCallback(
     (err: Error) => {
@@ -224,9 +226,29 @@ export const BattleChessGame = ({
       }
     } else {
       try {
-        await requestChessMove(san);
+        const verboseChessMove = getVerboseSanChessMove(
+          san,
+          simulatedChessManager,
+        );
+        if (!verboseChessMove) {
+          toast("Error: Invalid chess move.");
+          return;
+        }
+        if (verboseChessMove.isEnPassant() || verboseChessMove.isCapture()) {
+          setMostRecentChessMove({
+            from: verboseChessMove.from,
+            to: verboseChessMove.to,
+          });
+          await requestChessMove(san);
+        } else {
+          const err = onMove({ sanMove: san });
+          if (!err) {
+            setMostRecentRequestedChessMove(san);
+            await requestChessMove(san);
+          }
+        }
       } catch (err) {
-        toast(`Error: ${err}`, { type: "error" });
+        handleError(err as unknown as Error);
       }
     }
   };
@@ -242,16 +264,28 @@ export const BattleChessGame = ({
       try {
         await requestChessMove(san);
       } catch (err) {
-        toast(`Error: ${err}`, { type: "error" });
+        handleError(err as unknown as Error);
       }
     },
-    [requestChessMove],
+    [requestChessMove, handleError],
   );
 
   const onMove = useCallback(
-    ({ sanMove, moveFailed }: { sanMove: string; moveFailed?: boolean }) => {
-      let castledRookSquare;
-
+    ({
+      sanMove,
+      moveFailed,
+      shouldValidatePremoveQueue = true,
+    }: {
+      sanMove: string;
+      moveFailed?: boolean;
+      shouldValidatePremoveQueue?: boolean;
+    }) => {
+      if (
+        sanMove === mostRecentRequestedChessMove &&
+        chessManager.turn() !== color
+      ) {
+        return;
+      }
       const verboseChessMove = getVerboseSanChessMove(sanMove, chessManager);
 
       if (!verboseChessMove) {
@@ -260,6 +294,7 @@ export const BattleChessGame = ({
         return err;
       }
 
+      let castledRookSquare;
       const fromSquare = verboseChessMove.from;
       const toSquare = verboseChessMove.to;
       const promotion = verboseChessMove.promotion;
@@ -309,14 +344,36 @@ export const BattleChessGame = ({
         );
       }
 
-      setMostRecentMove({ from: fromSquare, to: toSquare });
+      setMostRecentChessMove({ from: fromSquare, to: toSquare });
       setCurrentPokemonBoard(
         mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
       );
-      if (validatePremoveQueue()) {
+      if (shouldValidatePremoveQueue && validatePremoveQueue()) {
         if (chessManager.turn() === color && preMoveQueue.length > 0) {
-          setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
-          requestChessMoveWithErrorHandling(preMoveQueue[0].san);
+          const preMoveSan = preMoveQueue[0].san;
+          const verbosePremove = getVerboseSanChessMove(
+            preMoveSan,
+            chessManager,
+          );
+          if (verbosePremove) {
+            if (verbosePremove.isEnPassant() || verbosePremove.isCapture()) {
+              setMostRecentChessMove({
+                from: verbosePremove.from,
+                to: verbosePremove.to,
+              });
+              requestChessMoveWithErrorHandling(preMoveSan);
+            } else {
+              const err = onMove({
+                sanMove: preMoveSan,
+                shouldValidatePremoveQueue: false,
+              });
+              if (!err) {
+                setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
+                setMostRecentRequestedChessMove(preMoveSan);
+                requestChessMoveWithErrorHandling(preMoveSan);
+              }
+            }
+          }
         }
       }
       if (capturedPieceSquare) {
@@ -326,6 +383,7 @@ export const BattleChessGame = ({
       }
     },
     [
+      mostRecentRequestedChessMove,
       capturePieceAudio,
       chessManager,
       color,
@@ -523,7 +581,7 @@ export const BattleChessGame = ({
           color={color}
           chessManager={simulatedChessManager}
           pokemonManager={simulatedPokemonManager}
-          mostRecentMove={mostRecentMove}
+          mostRecentMove={mostRecentChessMove}
           preMoveQueue={preMoveQueue}
           chessMoveHistory={
             currentMatchLog.filter((log) => log.type === "chess") as ChessData[]
