@@ -74,3 +74,12 @@
     }
   }
 }
+
+.roomSpinnerContainer {
+  display: flex;
+
+  .roomSpinner {
+    margin: auto;
+    padding: 100px 0px;
+  }
+}
