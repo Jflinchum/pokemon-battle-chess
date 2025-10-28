@@ -26,7 +26,18 @@ export const config: Record<string, GameServerConfig> = {
     allowedOrigins: ["https://pokemon-gambit.com"],
     redisOptions: {
       sentinels: [
-        { host: "redis-sentinel.default.svc.cluster.local", port: 26379 },
+        {
+          host: "redis-sentinel-node-0.redis-sentinel-headless.default.svc.cluster.local",
+          port: 26379,
+        },
+        {
+          host: "redis-sentinel-node-1.redis-sentinel-headless.default.svc.cluster.local",
+          port: 26379,
+        },
+        {
+          host: "redis-sentinel-node-2.redis-sentinel-headless.default.svc.cluster.local",
+          port: 26379,
+        },
       ],
       name: "mymaster",
     },

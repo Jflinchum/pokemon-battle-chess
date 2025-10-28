@@ -37,7 +37,18 @@ export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
     gameServiceUrl: "http://game-server-service:3003",
     redisOptions: {
       sentinels: [
-        { host: "redis-sentinel.default.svc.cluster.local", port: 26379 },
+        {
+          host: "redis-sentinel-node-0.redis-sentinel-headless.default.svc.cluster.local",
+          port: 26379,
+        },
+        {
+          host: "redis-sentinel-node-1.redis-sentinel-headless.default.svc.cluster.local",
+          port: 26379,
+        },
+        {
+          host: "redis-sentinel-node-2.redis-sentinel-headless.default.svc.cluster.local",
+          port: 26379,
+        },
       ],
       name: "mymaster",
     },
