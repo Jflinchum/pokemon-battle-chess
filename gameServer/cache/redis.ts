@@ -59,7 +59,8 @@ import GameRoom from "../models/GameRoom.js";
  * roomLock:{roomId}
  */
 
-export const redisClient = new Redis(getConfig().redisUrl, {
+export const redisClient = new Redis({
+  ...getConfig().redisOptions,
   lazyConnect: true,
   enableOfflineQueue: false,
 });
