@@ -284,6 +284,7 @@ export const BattleChessGame = ({
         sanMove === mostRecentRequestedChessMove &&
         chessManager.turn() !== color
       ) {
+        setMostRecentRequestedChessMove("");
         return;
       }
       const verboseChessMove = getVerboseSanChessMove(sanMove, chessManager);
