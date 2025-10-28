@@ -98,23 +98,27 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
 
         try {
           await Promise.all([cacheCreateRoomPromise, cacheAddPlayerPromise]);
-        } catch {
-          res.status(500).send({
-            data: { roomId: gameServerRespBody.data.roomId },
-          });
+        } catch (err) {
+          console.log(
+            "Failed to create rooms in redis: " + (err as unknown as Error),
+          );
+          res.status(500).send();
+          return;
         }
         res.status(200).send({
           data: { roomId: gameServerRespBody.data.roomId },
         });
+        return;
       } else {
         res.status(gameServerResp.status).send();
+        return;
       }
     } catch (err) {
       console.log(
         "Failed to request from game service: " + (err as unknown as Error),
       );
-      console.log(config.gameServiceUrl);
       res.status(500).send();
+      return;
     }
   });
 
