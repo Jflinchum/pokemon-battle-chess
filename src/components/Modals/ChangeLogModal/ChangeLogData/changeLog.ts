@@ -12,6 +12,26 @@ interface ChangeLog {
 
 export const changeLog: ChangeLog[] = [
   {
+    title: "The servers are fixed this time, I swear!",
+    version: "v1.0.2",
+    mascot: {
+      identifier: "Timburr",
+    },
+    body: `
+#### Hello and thank you for checking out Pokémon Gambit!
+This game is currently being actively worked on, so please bear with me if things seem slightly unstable. This update should
+improve server stability. Next patch should hopefully be the final one in my attempts to make this ship sail smoothly, which will then
+allow me to focus on QOL, improve the ease of code contribution, and other fun stuff!
+
+##### Change log for v1.0.2 (This is going to be more technical)
+- Changed from having a single Redis server for data storage to Redis Sentinel with multiple Redis servers
+  - This means that any server restarts will now preserve game data on backup servers, so current games will no longer clear out randomly on you all.
+- Updated the chess UI to be more optimistic about server requests
+  - The swap to Redis Sentinel added a bunch of latency, since the write speed was slower. Now the UI updates immediately when you make a chess move and then confirms
+  it with the server later.
+    `,
+  },
+  {
     title: "Premoves and Stability",
     version: "v1.0.1",
     mascot: {
