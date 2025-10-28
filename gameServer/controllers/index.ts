@@ -47,19 +47,24 @@ export const registerRoutes = (
       return;
     }
 
-    const { roomId } = await gameRoomManager.createAndCacheNewRoom(
-      playerId,
-      password,
-    );
-    console.log(
-      `Player ${playerName} (${playerId}) has created a new room ${roomId}`,
-    );
-    await gameRoomManager.playerJoinRoom(roomId, playerId);
-    gameRoomManager.clearPlayerTransientState(playerId);
+    try {
+      const { roomId } = await gameRoomManager.createAndCacheNewRoom(
+        playerId,
+        password,
+      );
+      console.log(
+        `Player ${playerName} (${playerId}) has created a new room ${roomId}`,
+      );
+      await gameRoomManager.playerJoinRoom(roomId, playerId);
+      gameRoomManager.clearPlayerTransientState(playerId);
 
-    res.status(200).send({
-      data: { roomId },
-    });
+      res.status(200).send({
+        data: { roomId },
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({ message: "Could not create room." });
+    }
   });
 
   /**
@@ -81,28 +86,43 @@ export const registerRoutes = (
     const roomId = req.body.roomId;
     const playerId = req.body.playerId;
     const playerName = req.body.playerName;
-    const roomExists = await doesRoomExist(roomId);
+
+    try {
+      const roomExists = await doesRoomExist(roomId);
+
+      if (!roomExists) {
+        res.status(400).send({ message: "Room is no longer available" });
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({ message: "Unable to find room" });
+    }
 
     if (!roomId || !playerId || !playerName) {
       res.status(400).send({ message: "Missing parameters" });
-      return;
-    } else if (!roomExists) {
-      res.status(400).send({ message: "Room is no longer available" });
       return;
     } else if (isStringProfane(playerName)) {
       res.status(400).send({ message: "Name does not pass profanity filter." });
       return;
     }
 
-    const existingPlayer = await gameRoomManager.getUser(playerId);
-    if (existingPlayer?.transient) {
-      gameRoomManager.clearPlayerTransientState(playerId);
-      await setPlayerViewingResults(existingPlayer.playerId, false);
-    } else {
-      await gameRoomManager.playerJoinRoom(roomId, playerId);
+    try {
+      const existingPlayer = await gameRoomManager.getUser(playerId);
+      if (existingPlayer?.transient) {
+        gameRoomManager.clearPlayerTransientState(playerId);
+        await setPlayerViewingResults(existingPlayer.playerId, false);
+      } else {
+        await gameRoomManager.playerJoinRoom(roomId, playerId);
+      }
+      console.log(
+        `Player ${playerName} (${playerId}) has joined room ${roomId}`,
+      );
+      res.status(200).send({ data: { roomId: roomId } });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({ message: "Unable to add player to room." });
     }
-    console.log(`Player ${playerName} (${playerId}) has joined room ${roomId}`);
-    res.status(200).send({ data: { roomId: roomId } });
   });
 
   /**
@@ -120,8 +140,13 @@ export const registerRoutes = (
       return;
     }
 
-    console.log(`Player (${playerId}) has left room ${roomId}`);
-    await gameRoomManager.playerLeaveRoom(roomId, playerId);
+    try {
+      console.log(`Player (${playerId}) has left room ${roomId}`);
+      await gameRoomManager.playerLeaveRoom(roomId, playerId);
+    } catch (err) {
+      console.error(err);
+      // Continue silently
+    }
 
     res.status(200).send();
   });

@@ -200,6 +200,12 @@ export const BattleChessGame = ({
         console.log(err.stack);
         chessManager.reset();
         pokemonManager.reset();
+        resetSimulators();
+        setCurrentPokemonBoard(
+          mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
+        );
+        setMostRecentRequestedChessMove("");
+        setMostRecentChessMove(null);
         resetMatchHistory();
         errorRecoveryAttempts.current++;
       } else {
@@ -210,7 +216,13 @@ export const BattleChessGame = ({
         console.log("Max error recovery attempts reached.");
       }
     },
-    [pokemonManager, chessManager, errorRecoveryAttempts, resetMatchHistory],
+    [
+      pokemonManager,
+      chessManager,
+      errorRecoveryAttempts,
+      resetMatchHistory,
+      resetSimulators,
+    ],
   );
 
   const handleOnMove = async (san: string) => {

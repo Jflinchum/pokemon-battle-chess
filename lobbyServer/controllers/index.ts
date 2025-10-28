@@ -82,21 +82,20 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
 
       const gameServerRespBody = await gameServerResp.json();
       if (gameServerResp.status === 200) {
-        const cacheCreateRoomPromise = createRoom(
-          gameServerRespBody.data.roomId,
-          password,
-          playerName,
-          playerId,
-        );
-        const cacheAddPlayerPromise = addPlayerIdToRoom(
-          gameServerRespBody.data.roomId,
-          playerName,
-          avatarId,
-          playerSecret,
-          playerId,
-        );
-
         try {
+          const cacheCreateRoomPromise = createRoom(
+            gameServerRespBody.data.roomId,
+            password,
+            playerName,
+            playerId,
+          );
+          const cacheAddPlayerPromise = addPlayerIdToRoom(
+            gameServerRespBody.data.roomId,
+            playerName,
+            avatarId,
+            playerSecret,
+            playerId,
+          );
           await Promise.all([cacheCreateRoomPromise, cacheAddPlayerPromise]);
         } catch (err) {
           console.log(
@@ -147,40 +146,59 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     const password = req.body.password;
     const avatarId = req.body.avatarId;
     const playerSecret = req.body.playerSecret;
-    const doesRoomExist = await roomExists(roomId);
+    try {
+      const doesRoomExist = await roomExists(roomId);
+      if (!doesRoomExist) {
+        res.status(400).send({ message: "Room is no longer available" });
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      // Continue checking other parameters
+    }
 
     if (!roomId || !playerId || !playerName || !playerSecret) {
       res.status(400).send({ message: "Missing parameters" });
-      return;
-    } else if (!doesRoomExist) {
-      res.status(400).send({ message: "Room is no longer available" });
       return;
     } else if (isStringProfane(playerName)) {
       res.status(400).send({ message: "Name does not pass profanity filter." });
       return;
     }
 
-    const roomPasscode = await getRoomPasscode(roomId);
-    if (roomPasscode !== password) {
-      res.status(401).send({ message: "Invalid password" });
+    try {
+      const roomPasscode = await getRoomPasscode(roomId);
+      if (roomPasscode !== password) {
+        res.status(401).send({ message: "Invalid password" });
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      res
+        .status(401)
+        .send({ message: "Unable to verify password. Please try again." });
       return;
     }
 
-    const cachedUser = await fetchUser(playerId);
-    if (cachedUser?.connectedRoom && cachedUser?.connectedRoom !== roomId) {
-      console.log(
-        "User in a different room already. Kicking them out of their previous room",
-      );
-      await fetch(`${config.gameServiceUrl}/game-service/leave-room`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          roomId: cachedUser.connectedRoom,
-          playerId,
-        }),
-      });
+    try {
+      const cachedUser = await fetchUser(playerId);
+      if (cachedUser?.connectedRoom && cachedUser?.connectedRoom !== roomId) {
+        console.log(
+          "User in a different room already. Kicking them out of their previous room",
+        );
+        await fetch(`${config.gameServiceUrl}/game-service/leave-room`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomId: cachedUser.connectedRoom,
+            playerId,
+          }),
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      // Continue silently
     }
 
     const gameServerResp = await fetch(
@@ -228,8 +246,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     async (req, res) => {
       const roomId = req.body.roomId;
       const playerId = req.body.playerId;
-      const doesRoomExist = await roomExists(roomId);
-      if (!roomId || !playerId || !doesRoomExist) {
+      if (!roomId || !playerId) {
         res.status(204).send();
         return;
       }
@@ -277,24 +294,30 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
   >("/lobby-service/get-rooms", async (req, res) => {
     const { page = 1, limit = 10, searchTerm = "" } = req.query || {};
 
-    const roomDetails = await getRoomFromName(page, limit, searchTerm);
+    try {
+      const roomDetails = await getRoomFromName(page, limit, searchTerm);
 
-    const roomResponse = await Promise.all(
-      roomDetails.rooms.map(async (room) => {
-        const playerCount = await getRoomSize(room.roomId);
-        return {
-          ...room,
-          playerCount,
-        };
-      }),
-    );
-
-    res.status(200).send({
-      data: {
-        rooms: roomResponse,
-        pageCount: Math.max(Math.ceil(roomDetails.roomCount / limit), 1),
-      },
-    });
+      const roomResponse = await Promise.all(
+        roomDetails.rooms.map(async (room) => {
+          const playerCount = await getRoomSize(room.roomId);
+          return {
+            ...room,
+            playerCount,
+          };
+        }),
+      );
+      res.status(200).send({
+        data: {
+          rooms: roomResponse,
+          pageCount: Math.max(Math.ceil(roomDetails.roomCount / limit), 1),
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({
+        message: "Error: could not fetch rooms.",
+      });
+    }
   });
 
   /**
@@ -313,15 +336,22 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
   >("/lobby-service/get-room", async (req, res) => {
     const { roomId } = req.query || {};
 
-    const roomListDetails = await getRoomListDetails(roomId);
+    try {
+      const roomListDetails = await getRoomListDetails(roomId);
 
-    if (!roomListDetails) {
+      if (!roomListDetails) {
+        res.status(404).send({ message: "Room not found." });
+        return;
+      }
+
+      res.status(200).send({
+        data: roomListDetails,
+      });
+      return;
+    } catch (err) {
+      console.error(err);
       res.status(404).send({ message: "Room not found." });
       return;
     }
-
-    res.status(200).send({
-      data: roomListDetails,
-    });
   });
 };
