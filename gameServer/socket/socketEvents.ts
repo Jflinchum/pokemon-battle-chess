@@ -537,10 +537,12 @@ export const registerSocketEvents = (
     socket.on(
       "requestChessMove",
       async ({ sanMove, roomId, playerId, secretId }, cb) => {
-        const room = await gameRoomManager.getCachedRoom(roomId);
+        console.time("requestChessMove");
         console.log(
           `${playerId} requested to chess move ${sanMove} for ${roomId}`,
         );
+        const room = await gameRoomManager.getCachedRoom(roomId);
+        console.timeLog("requestChessMove", "Fetched room");
         if (!room || !playerId) {
           console.log(`${playerId} mismatch for ${roomId}`);
           return cb({ status: "err", message: "Could not find room" });
@@ -554,11 +556,16 @@ export const registerSocketEvents = (
         ) {
           return cb({ status: "err", message: "Could not verify player" });
         }
+        console.timeLog("requestChessMove", "Verified player");
 
         const streamOutputs = await room.validateAndEmitChessMove({
           sanMove,
           playerId,
         });
+        console.timeLog(
+          "requestChessMove",
+          "Set game state and validated chess move",
+        );
 
         if (!streamOutputs) {
           return cb({ status: "err", message: "Chess move not valid" });
@@ -604,6 +611,7 @@ export const registerSocketEvents = (
         if (timers) {
           io.to(roomId).emit("currentTimers", timers);
         }
+        console.timeEnd("requestChessMove");
         return cb({ status: "ok" });
       },
     );
