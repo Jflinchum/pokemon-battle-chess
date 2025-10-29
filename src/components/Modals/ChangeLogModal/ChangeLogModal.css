@@ -9,6 +9,8 @@
 
 .changeLogBody {
   text-align: start;
+  max-height: 60vh;
+  overflow-y: scroll;
 }
 
 .changeLogPaginationButton {
