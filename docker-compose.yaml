@@ -61,14 +61,14 @@ services:
     image: "redis:alpine"
     ports:
       - "6379:6379"
-  nginx:
-    image: "nginx:alpine"
+  haproxy:
+    image: haproxy:latest
+    command: sh -c "haproxy -f /usr/local/etc/haproxy/haproxy.cfg"
     ports:
       - "8080:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx/tls.crt:/etc/nginx/ssl/tls.crt
-      - ./nginx/tls.key:/etc/nginx/ssl/tls.key
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./haproxy/tls.pem:/etc/haproxy/ssl/tls.pem
     depends_on:
       - lobby-server-service
       - game-server-service

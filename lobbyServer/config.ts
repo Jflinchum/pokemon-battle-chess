@@ -6,7 +6,7 @@ export interface InternalConfig {
   allowedOrigins: string[];
   gameServiceUrl: string;
   redisOptions: Partial<RedisOptions>;
-  httpsPort: number;
+  httpPort: number;
 }
 
 export const getConfig = () => {
@@ -27,7 +27,7 @@ export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
       host: "host.docker.internal",
       port: 6379,
     },
-    httpsPort: 3001,
+    httpPort: 3001,
   },
 
   prodConfig: {
@@ -41,6 +41,6 @@ export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
       ],
       name: "mymaster",
     },
-    httpsPort: 3001,
+    httpPort: 3001,
   },
 };

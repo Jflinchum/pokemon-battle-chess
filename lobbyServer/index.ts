@@ -1,31 +1,17 @@
 import cors from "cors";
 import express from "express";
-import fs from "fs";
-import https from "https";
+import http from "http";
 import path from "path";
-import { SecureContextOptions } from "tls";
 import { getConfig } from "./config.js";
 import { registerRoutes } from "./controllers/index.js";
 import { registerScheduler } from "./scheduler.js";
 
 const configSettings = getConfig();
 
-const httpsPort = configSettings.httpsPort;
+const httpPort = configSettings.httpPort;
 const allowedOrigins = configSettings.allowedOrigins;
 
 const app = express();
-
-const options: {
-  key?: SecureContextOptions["key"];
-  cert?: SecureContextOptions["cert"];
-} = {};
-
-try {
-  options.key = fs.readFileSync(configSettings.keyLocation);
-  options.cert = fs.readFileSync(configSettings.certLocation);
-} catch (err) {
-  console.log(err);
-}
 
 app.use(
   cors({
@@ -36,8 +22,8 @@ app.use(
   }),
 );
 
-https.createServer(options, app).listen(httpsPort, () => {
-  console.log(`LobbyServer HTTPS is listening on ${httpsPort}`);
+http.createServer(app).listen(httpPort, () => {
+  console.log(`LobbyServer HTTP is listening on ${httpPort}`);
 });
 
 app.use(express.json());
