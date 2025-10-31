@@ -12,6 +12,22 @@ interface ChangeLog {
 
 export const changeLog: ChangeLog[] = [
   {
+    title: "Infrastructure infrastructure",
+    version: "v1.0.3",
+    mascot: {
+      identifier: "Porygon-z",
+    },
+    body: `
+#### Hello and thank you for checking out Pokémon Gambit!
+This patch should be the last update for a while that touches the infrastructure of how the servers are hosted (finally). Upcoming updates should hopefully 
+start to focus on QOL, improve the ease of code contribution, actual fun features!
+
+##### Change log for v1.0.3 (This is going to be more technical)
+- Migrated to a different reverse proxy for a few, much needed, featured:
+  - Now, even if a server restart happens, there will always be a backup reverse proxy to server traffic.
+`,
+  },
+  {
     title: "The servers are fixed this time, I swear!",
     version: "v1.0.2",
     mascot: {

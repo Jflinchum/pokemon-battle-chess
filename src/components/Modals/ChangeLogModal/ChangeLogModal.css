@@ -10,11 +10,15 @@
 .changeLogBody {
   text-align: start;
   max-height: 60vh;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .changeLogPaginationButton {
   cursor: pointer;
   padding: 0px 8px;
   margin: 0px 8px;
+}
+
+.changeLogMascot {
+  padding-right: 6px;
 }

@@ -12,6 +12,7 @@ export const ChangeLogModal = () => {
     <div className="changeLogModalContainer">
       <h2 className="changeLogModalTitle">
         <PokemonSprite
+          className="changeLogMascot"
           pokemonIdentifier={changeLog[currentPage].mascot.identifier}
           gender={changeLog[currentPage].mascot.gender}
         />
