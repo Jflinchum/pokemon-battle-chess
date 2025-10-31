@@ -45,6 +45,7 @@ describe("PokemonSprite", () => {
         "mock-pokemon-url",
       );
       expect(screen.getByRole("img")).toHaveAttribute("alt", "pikachu");
+      expect(screen.getByRole("img")).toHaveAttribute("title", "pikachu");
     });
 
     it("should render as div when useDiv is true", () => {

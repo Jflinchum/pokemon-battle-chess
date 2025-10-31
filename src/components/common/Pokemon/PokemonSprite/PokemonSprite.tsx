@@ -52,6 +52,13 @@ export const PokemonSprite = ({
       />
     );
   } else {
-    return <img alt={pokemonIdentifier} src={sprite} {...props} />;
+    return (
+      <img
+        title={pokemonIdentifier}
+        alt={pokemonIdentifier}
+        src={sprite}
+        {...props}
+      />
+    );
   }
 };
