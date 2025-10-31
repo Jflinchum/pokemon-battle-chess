@@ -9,4 +9,3 @@ spec:
     - name: "game"
       port: 3003
       targetPort: 3003
-  sessionAffinity: ClientIP

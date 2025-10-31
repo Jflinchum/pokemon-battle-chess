@@ -4,7 +4,6 @@ import fs from "fs";
 import { SecureContextOptions } from "tls";
 import { defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
-import { config } from "./lobbyServer/config";
 
 const httpsOptions: {
   key?: SecureContextOptions["key"];
@@ -12,8 +11,8 @@ const httpsOptions: {
 } = {};
 
 try {
-  httpsOptions.key = fs.readFileSync(config.devConfig.keyLocation);
-  httpsOptions.cert = fs.readFileSync(config.devConfig.certLocation);
+  httpsOptions.key = fs.readFileSync("./shared/tls.key");
+  httpsOptions.cert = fs.readFileSync("./shared/tls.crt");
 } catch (err) {
   console.log(err);
 }

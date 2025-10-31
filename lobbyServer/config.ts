@@ -1,8 +1,6 @@
 import { RedisOptions } from "ioredis";
 
 export interface InternalConfig {
-  keyLocation: string;
-  certLocation: string;
   allowedOrigins: string[];
   gameServiceUrl: string;
   redisOptions: Partial<RedisOptions>;
@@ -17,8 +15,6 @@ export const getConfig = () => {
 
 export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
   devConfig: {
-    keyLocation: "nginx/tls.key",
-    certLocation: "nginx/tls.crt",
     allowedOrigins: ["https://localhost:5173"],
     gameServiceUrl: process.env.DOCKER_HOST
       ? "http://game-server-service:3003"
@@ -31,8 +27,6 @@ export const config: Record<"devConfig" | "prodConfig", InternalConfig> = {
   },
 
   prodConfig: {
-    keyLocation: "nginx/tls.key",
-    certLocation: "nginx/tls.crt",
     allowedOrigins: [],
     gameServiceUrl: "http://game-server-service:3003",
     redisOptions: {

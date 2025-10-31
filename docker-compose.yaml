@@ -68,7 +68,6 @@ services:
       - "8080:443"
     volumes:
       - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-      - ./haproxy/tls.pem:/etc/haproxy/ssl/tls.pem
     depends_on:
       - lobby-server-service
       - game-server-service

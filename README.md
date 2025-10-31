@@ -7,7 +7,7 @@ You can view it live, here: https://pokemon-gambit.com/
 ## How to Run
 
 - Before running this project, you'll want to set up some localhost certs for running https locally.
-  - Place the certificate under `nginx/tls.crt` and the private key under `nginx/tls.key`
+  - Place the certificate under `shared/tls.crt` and the private key under `shared/tls.key`
 - Install Docker
 - Run docker compose build
 - Run docker compose up

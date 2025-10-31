@@ -12,8 +12,6 @@ COPY ./shared ./shared
 COPY ./src ./src
 COPY ./index.html ./index.html
 COPY ./vite.config.ts ./vite.config.ts
-# Below is only needed for development, to serve self-signed TLS certs through Vite
-COPY ./nginx ./nginx
 
 # In dev environments, we could go through the process of imitating a CA and adding that to our computer, configuring DNS entries for a cert
 # But the following environment variable is simpler for local development. Just don't do this in production

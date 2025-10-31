@@ -52,12 +52,3 @@ spec:
                 name: game-server-service
                 port:
                   number: 3003
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: haproxy-kubernetes-ingress
-  namespace: default
-data:
-  syslog-server: "address:stdout, format: raw, facility:daemon"
-  ssl-certificate: "nginx-tls"
