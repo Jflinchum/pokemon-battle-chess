@@ -19,6 +19,7 @@ export const ChangeAvatar = () => {
           onClick={() => handleAvatarSelect(id)}
         >
           <img
+            title={`Avatar option ${avatarIdMapping[id as unknown as number]}`}
             src={Sprites.getAvatar(id)}
             alt={`Avatar option ${avatarIdMapping[id as unknown as number]}`}
           />
