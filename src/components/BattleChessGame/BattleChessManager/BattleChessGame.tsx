@@ -636,10 +636,24 @@ export const BattleChessGame = ({
                 } catch (err) {
                   toast(`Error: ${err}`, { type: "error" });
                 }
+              } else {
+                toast("Invalid Pokémon.", {
+                  type: "warning",
+                });
               }
             }}
             onBanPokemon={async (pkmnIndex) => {
               if (gameState.isSpectator) {
+                return;
+              }
+              if (
+                pokemonManager.banPieces.find(
+                  (piece) => piece.index === pkmnIndex,
+                )
+              ) {
+                toast("You need to select a valid Pokémon to ban, first!", {
+                  type: "warning",
+                });
                 return;
               }
               try {
