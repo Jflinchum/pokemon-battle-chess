@@ -20,7 +20,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "postinstall": "patch-package",
-    "injectData": "node util/dev/dataInjection.js",
+    "dev:injectData": "node util/dev/dataInjection.js",
+    "dev:findSeed": "tsx util/dev/seedFinder.ts",
     "prepare": "node -e \"if (process.env.NODE_ENV !== 'production'){ process.exit(1)} \" || husky",
     "test": "vitest --silent",
     "test:coverage": "vitest --coverage --silent"
