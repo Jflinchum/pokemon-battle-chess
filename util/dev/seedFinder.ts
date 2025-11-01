@@ -30,8 +30,10 @@ export const findSeed = (
 };
 
 // Example of usage
-// console.log(
-//   findSeed((pieces) =>
-//     pieces.some((piece) => piece.pkmn.species.toLocaleLowerCase() === "ho-oh"),
-//   ),
-// );
+console.log(
+  findSeed((pieces) =>
+    pieces.some(
+      (piece) => piece.pkmn.species.toLocaleLowerCase() === "regieleki",
+    ),
+  ),
+);

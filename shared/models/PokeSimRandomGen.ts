@@ -1422,12 +1422,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Torrent"],
         teraTypes: ["Ground", "Steel", "Water"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Hydro Pump", "Ice Beam", "Shell Smash", "Tera Blast"],
-        abilities: ["Torrent"],
-        teraTypes: ["Electric", "Grass"],
-      },
     ],
     baseSpecies: "Blastoise",
   },
@@ -1500,19 +1494,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Lightning Rod"],
         teraTypes: ["Grass", "Water"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: [
-          "Encore",
-          "Focus Blast",
-          "Nasty Plot",
-          "Surf",
-          "Tera Blast",
-          "Thunderbolt",
-        ],
-        abilities: ["Lightning Rod"],
-        teraTypes: ["Ice"],
       },
     ],
     baseSpecies: "Raichu",
@@ -1795,12 +1776,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Fur Coat"],
         teraTypes: ["Dark", "Electric"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Dark Pulse", "Nasty Plot", "Tera Blast", "Thunderbolt"],
-        abilities: ["Fur Coat"],
-        teraTypes: ["Fairy", "Poison"],
       },
       {
         role: "Fast Support",
@@ -2289,12 +2264,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Aftermath", "Soundproof", "Static"],
         teraTypes: ["Dark", "Electric"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Taunt", "Tera Blast", "Thunderbolt", "Volt Switch"],
-        abilities: ["Aftermath", "Soundproof", "Static"],
-        teraTypes: ["Ice"],
-      },
     ],
     baseSpecies: "Electrode",
   },
@@ -2623,12 +2592,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Intimidate", "Moxie"],
         teraTypes: ["Ground"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Dragon Dance", "Earthquake", "Tera Blast", "Waterfall"],
-        abilities: ["Intimidate", "Moxie"],
-        teraTypes: ["Flying"],
-      },
     ],
     baseSpecies: "Gyarados",
   },
@@ -2725,12 +2688,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Volt Absorb"],
         teraTypes: ["Electric", "Fairy"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Calm Mind", "Substitute", "Tera Blast", "Thunderbolt"],
-        abilities: ["Volt Absorb"],
-        teraTypes: ["Ice"],
       },
     ],
     baseSpecies: "Jolteon",
@@ -2884,12 +2841,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Dragon Dance", "Earthquake", "Iron Head", "Outrage"],
         abilities: ["Multiscale"],
         teraTypes: ["Steel"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Dragon Dance", "Earthquake", "Outrage", "Tera Blast"],
-        abilities: ["Multiscale"],
-        teraTypes: ["Flying"],
       },
     ],
     baseSpecies: "Dragonite",
@@ -3178,12 +3129,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Chlorophyll"],
         teraTypes: ["Fairy", "Poison"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Giga Drain", "Quiver Dance", "Strength Sap", "Tera Blast"],
-        abilities: ["Chlorophyll"],
-        teraTypes: ["Fire", "Rock"],
       },
     ],
     baseSpecies: "Bellossom",
@@ -3861,12 +3806,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Discharge", "Ice Beam", "Recover", "Tri Attack"],
         abilities: ["Download"],
         teraTypes: ["Electric", "Ghost", "Poison"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Recover", "Shadow Ball", "Tera Blast", "Thunder Wave"],
-        abilities: ["Download"],
-        teraTypes: ["Fairy", "Fighting"],
       },
     ],
     baseSpecies: "Porygon2",
@@ -5571,12 +5510,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Levitate"],
         teraTypes: ["Electric", "Fairy"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Nasty Plot", "Shadow Ball", "Substitute", "Tera Blast"],
-        abilities: ["Levitate"],
-        teraTypes: ["Fighting"],
-      },
     ],
     baseSpecies: "Mismagius",
   },
@@ -6000,12 +5933,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Tinted Lens"],
         teraTypes: ["Bug"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Air Slash", "Bug Buzz", "Protect", "Tera Blast"],
-        abilities: ["Speed Boost"],
-        teraTypes: ["Ground"],
-      },
     ],
     baseSpecies: "Yanmega",
   },
@@ -6091,12 +6018,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
   porygonz: {
     level: 83,
     sets: [
-      {
-        role: "Tera Blast user",
-        movepool: ["Agility", "Nasty Plot", "Shadow Ball", "Tera Blast"],
-        abilities: ["Adaptability"],
-        teraTypes: ["Fighting"],
-      },
       {
         role: "Fast Attacker",
         movepool: [
@@ -7108,19 +7029,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 79,
     sets: [
       {
-        role: "Tera Blast user",
-        movepool: [
-          "Glare",
-          "Leaf Storm",
-          "Leech Seed",
-          "Substitute",
-          "Synthesis",
-          "Tera Blast",
-        ],
-        abilities: ["Contrary"],
-        teraTypes: ["Fire", "Rock"],
-      },
-      {
         role: "Fast Attacker",
         movepool: [
           "Dragon Pulse",
@@ -7348,12 +7256,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
   lilligant: {
     level: 86,
     sets: [
-      {
-        role: "Tera Blast user",
-        movepool: ["Giga Drain", "Quiver Dance", "Sleep Powder", "Tera Blast"],
-        abilities: ["Chlorophyll"],
-        teraTypes: ["Fire", "Rock"],
-      },
       {
         role: "Setup Sweeper",
         movepool: [
@@ -7814,18 +7716,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Levitate"],
         teraTypes: ["Poison", "Steel"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Ice Beam", "Rapid Spin", "Recover", "Tera Blast"],
-        abilities: ["Levitate"],
-        teraTypes: ["Electric"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Freeze-Dry", "Rapid Spin", "Recover", "Tera Blast"],
-        abilities: ["Levitate"],
-        teraTypes: ["Fire"],
-      },
     ],
     baseSpecies: "Cryogonal",
   },
@@ -7979,19 +7869,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Flame Body", "Swarm"],
         teraTypes: ["Fire", "Grass", "Steel"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: [
-          "Bug Buzz",
-          "Fiery Dance",
-          "Fire Blast",
-          "Giga Drain",
-          "Quiver Dance",
-          "Tera Blast",
-        ],
-        abilities: ["Flame Body", "Swarm"],
-        teraTypes: ["Ground", "Water"],
-      },
     ],
     baseSpecies: "Volcarona",
   },
@@ -8127,12 +8004,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         teraTypes: ["Electric", "Grass", "Steel"],
       },
       {
-        role: "Tera Blast user",
-        movepool: ["Focus Blast", "Nasty Plot", "Tera Blast", "Thunderbolt"],
-        abilities: ["Defiant"],
-        teraTypes: ["Flying"],
-      },
-      {
         role: "Wallbreaker",
         movepool: [
           "Acrobatics",
@@ -8166,12 +8037,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Volt Absorb"],
         teraTypes: ["Electric", "Poison", "Psychic"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Focus Blast", "Nasty Plot", "Tera Blast", "Thunderbolt"],
-        abilities: ["Volt Absorb"],
-        teraTypes: ["Flying"],
       },
     ],
     baseSpecies: "Thundurus",
@@ -8254,12 +8119,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 77,
     sets: [
       {
-        role: "Tera Blast user",
-        movepool: ["Dragon Dance", "Icicle Spear", "Scale Shot", "Tera Blast"],
-        abilities: ["Pressure"],
-        teraTypes: ["Ground"],
-      },
-      {
         role: "Wallbreaker",
         movepool: [
           "Draco Meteor",
@@ -8300,12 +8159,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Dragon Dance", "Fusion Bolt", "Icicle Spear", "Scale Shot"],
         abilities: ["Teravolt"],
         teraTypes: ["Electric"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Dragon Dance", "Icicle Spear", "Scale Shot", "Tera Blast"],
-        abilities: ["Teravolt"],
-        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Kyurem",
@@ -8469,12 +8322,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Flame Body"],
         teraTypes: ["Dragon", "Ground"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Brave Bird", "Flare Blitz", "Swords Dance", "Tera Blast"],
-        abilities: ["Flame Body"],
-        teraTypes: ["Ground"],
-      },
     ],
     baseSpecies: "Talonflame",
   },
@@ -8486,12 +8333,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Bug Buzz", "Hurricane", "Quiver Dance", "Sleep Powder"],
         abilities: ["Compound Eyes"],
         teraTypes: ["Flying"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Hurricane", "Quiver Dance", "Sleep Powder", "Tera Blast"],
-        abilities: ["Compound Eyes"],
-        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Vivillon",
@@ -8523,12 +8364,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Calm Mind", "Moonblast", "Protect", "Wish"],
         abilities: ["Flower Veil"],
         teraTypes: ["Steel"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Calm Mind", "Moonblast", "Synthesis", "Tera Blast"],
-        abilities: ["Flower Veil"],
-        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Florges",
@@ -9222,12 +9057,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Shield Dust"],
         teraTypes: ["Ghost"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Bug Buzz", "Moonblast", "Quiver Dance", "Tera Blast"],
-        abilities: ["Shield Dust"],
-        teraTypes: ["Ground"],
-      },
     ],
     baseSpecies: "Ribombee",
   },
@@ -9371,12 +9200,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Corrosion"],
         teraTypes: ["Flying", "Grass"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Fire Blast", "Nasty Plot", "Sludge Wave", "Tera Blast"],
-        abilities: ["Corrosion"],
-        teraTypes: ["Grass"],
-      },
     ],
     baseSpecies: "Salazzle",
   },
@@ -9408,20 +9231,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Calm Mind", "Draining Kiss", "Giga Drain", "Stored Power"],
         abilities: ["Triage"],
         teraTypes: ["Fairy", "Poison", "Steel"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: [
-          "Calm Mind",
-          "Draining Kiss",
-          "Encore",
-          "Giga Drain",
-          "Synthesis",
-          "Taunt",
-          "Tera Blast",
-        ],
-        abilities: ["Triage"],
-        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Comfey",
@@ -9766,12 +9575,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Soul-Heart"],
         teraTypes: ["Fairy", "Flying", "Steel", "Water"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Fleur Cannon", "Iron Head", "Shift Gear", "Tera Blast"],
-        abilities: ["Soul-Heart"],
-        teraTypes: ["Ground"],
-      },
     ],
     baseSpecies: "Magearna",
   },
@@ -9941,12 +9744,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Hustle"],
         teraTypes: ["Dragon", "Grass"],
       },
-      {
-        role: "Tera Blast user",
-        movepool: ["Dragon Dance", "Grav Apple", "Outrage", "Tera Blast"],
-        abilities: ["Hustle"],
-        teraTypes: ["Fire"],
-      },
     ],
     baseSpecies: "Flapple",
   },
@@ -10044,18 +9841,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
   polteageist: {
     level: 79,
     sets: [
-      {
-        role: "Tera Blast user",
-        movepool: [
-          "Shadow Ball",
-          "Shell Smash",
-          "Stored Power",
-          "Strength Sap",
-          "Tera Blast",
-        ],
-        abilities: ["Cursed Body"],
-        teraTypes: ["Fighting"],
-      },
       {
         role: "Setup Sweeper",
         movepool: [
@@ -10165,12 +9950,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 90,
     sets: [
       {
-        role: "Tera Blast user",
-        movepool: ["Alluring Voice", "Calm Mind", "Recover", "Tera Blast"],
-        abilities: ["Aroma Veil"],
-        teraTypes: ["Ground"],
-      },
-      {
         role: "Bulky Setup",
         movepool: [
           "Acid Armor",
@@ -10226,18 +10005,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 82,
     sets: [
       {
-        role: "Tera Blast user",
-        movepool: [
-          "Bug Buzz",
-          "Giga Drain",
-          "Ice Beam",
-          "Quiver Dance",
-          "Tera Blast",
-        ],
-        abilities: ["Ice Scales"],
-        teraTypes: ["Ground"],
-      },
-      {
         role: "Setup Sweeper",
         movepool: [
           "Bug Buzz",
@@ -10285,24 +10052,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Ice Face"],
         teraTypes: ["Water"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: [
-          "Belly Drum",
-          "Ice Spinner",
-          "Liquidation",
-          "Substitute",
-          "Tera Blast",
-        ],
-        abilities: ["Ice Face"],
-        teraTypes: ["Electric"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Belly Drum", "Ice Spinner", "Substitute", "Tera Blast"],
-        abilities: ["Ice Face"],
-        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Eiscue",
@@ -10425,12 +10174,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Draco Meteor", "Fire Blast", "Shadow Ball", "U-turn"],
         abilities: ["Infiltrator"],
         teraTypes: ["Dragon", "Fire", "Ghost"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Dragon Dance", "Dragon Darts", "Fire Blast", "Tera Blast"],
-        abilities: ["Clear Body"],
-        teraTypes: ["Ghost"],
       },
       {
         role: "Fast Support",
@@ -10622,16 +10365,15 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 79,
     sets: [
       {
-        role: "Fast Support",
-        movepool: ["Explosion", "Rapid Spin", "Thunderbolt", "Volt Switch"],
+        role: "Fast Attacker",
+        movepool: [
+          "Ancient Power",
+          "Rapid Spin",
+          "Thunderbolt",
+          "Electro Ball",
+        ],
         abilities: ["Transistor"],
         teraTypes: ["Electric"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Rapid Spin", "Tera Blast", "Thunderbolt", "Volt Switch"],
-        abilities: ["Transistor"],
-        teraTypes: ["Ice"],
       },
     ],
     baseSpecies: "Regieleki",
@@ -10644,12 +10386,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Draco Meteor", "Dragon Dance", "Earthquake", "Outrage"],
         abilities: ["Dragon's Maw"],
         teraTypes: ["Dragon"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Dragon Claw", "Dragon Dance", "Earthquake", "Tera Blast"],
-        abilities: ["Dragon's Maw"],
-        teraTypes: ["Steel"],
       },
       {
         role: "Fast Attacker",
@@ -10693,18 +10429,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Grim Neigh"],
         teraTypes: ["Dark", "Fairy"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: [
-          "Nasty Plot",
-          "Shadow Ball",
-          "Substitute",
-          "Tera Blast",
-          "Will-O-Wisp",
-        ],
-        abilities: ["Grim Neigh"],
-        teraTypes: ["Fighting"],
       },
     ],
     baseSpecies: "Spectrier",
@@ -12599,12 +12323,6 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Beat Up", "Gunk Shot", "Moonblast", "Roost", "U-turn"],
         abilities: ["Toxic Chain"],
         teraTypes: ["Dark", "Steel", "Water"],
-      },
-      {
-        role: "Tera Blast user",
-        movepool: ["Gunk Shot", "Play Rough", "Swords Dance", "Tera Blast"],
-        abilities: ["Toxic Chain"],
-        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Fezandipiti",
