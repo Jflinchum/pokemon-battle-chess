@@ -22,6 +22,7 @@ import { useUserState } from "../../../../context/UserState/UserStateContext";
 const getPokemonCryUrlPath = (baseSpecies: string) => {
   const mapping: Record<string, string> = {
     "kommo-o": "kommoo",
+    "ho-oh": "hooh",
   };
   return mapping[baseSpecies] || baseSpecies;
 };
