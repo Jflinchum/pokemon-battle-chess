@@ -1,7 +1,11 @@
 import { useCallback, useEffect } from "react";
 import { useAudio } from "../context/AudioState/AudioContext";
 import { useUserState } from "../context/UserState/UserStateContext";
-import { getRandomBattleMusic, getRandomOutOfBattleMusic } from "./getMusic";
+import {
+  getRandomBattleMusic,
+  getRandomOutOfBattleMusic,
+  getSpecialBattleMusic,
+} from "./getMusic";
 
 export const useMusicPlayer = () => {
   const { global, battle } = useAudio();
@@ -12,36 +16,55 @@ export const useMusicPlayer = () => {
     battle.volume = userState.volumePreference.musicVolume;
   }, [userState.volumePreference.musicVolume, battle, global]);
 
-  const playGlobalSong = useCallback(() => {
+  const playGlobalSongAndPauseOther = useCallback(() => {
     battle.pause();
     global.play();
   }, [battle, global]);
 
-  const playBattleSong = useCallback(() => {
+  const playBattleSongAndPauseOther = useCallback(() => {
     global.pause();
     battle.play();
   }, [battle, global]);
 
-  const playRandomGlobalSong = useCallback(
+  const playGlobalSong = useCallback(
     ({ force = false, loop = true } = {}) => {
       if (global.paused || force) {
         global.src = getRandomOutOfBattleMusic();
         global.loop = loop;
-        playGlobalSong();
+        playGlobalSongAndPauseOther();
       }
     },
-    [global, playGlobalSong],
+    [global, playGlobalSongAndPauseOther],
   );
 
-  const playRandomBattleSong = useCallback(
-    ({ force = false, loop = true } = {}) => {
+  const playBattleSong = useCallback(
+    ({
+      force = false,
+      loop = true,
+      p1PokemonIdentifier,
+      p2PokemonIdentifier,
+      isDramatic,
+    }: {
+      force?: boolean;
+      loop?: boolean;
+      p1PokemonIdentifier?: string;
+      p2PokemonIdentifier?: string;
+      isDramatic?: boolean;
+    } = {}) => {
       if (battle.paused || force) {
-        battle.src = getRandomBattleMusic();
+        if (isDramatic) {
+          battle.src = getSpecialBattleMusic(
+            p1PokemonIdentifier,
+            p2PokemonIdentifier,
+          );
+        } else {
+          battle.src = getRandomBattleMusic();
+        }
         battle.loop = loop;
-        playBattleSong();
+        playBattleSongAndPauseOther();
       }
     },
-    [battle, playBattleSong],
+    [battle, playBattleSongAndPauseOther],
   );
 
   const stopSongs = () => {
@@ -50,8 +73,8 @@ export const useMusicPlayer = () => {
   };
 
   return {
-    playRandomGlobalSong,
-    playRandomBattleSong,
+    playGlobalSong,
+    playBattleSong,
     stopSongs,
   };
 };

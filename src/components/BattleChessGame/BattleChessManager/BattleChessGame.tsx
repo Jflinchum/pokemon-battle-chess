@@ -106,7 +106,7 @@ export const BattleChessGame = ({
     }
   }, [gameState.matchEnded]);
 
-  const { playRandomGlobalSong, playRandomBattleSong } = useMusicPlayer();
+  const { playGlobalSong, playBattleSong } = useMusicPlayer();
 
   const {
     requestChessMove,
@@ -511,11 +511,23 @@ export const BattleChessGame = ({
       !gameState.isSkippingAhead
     ) {
       if (!demoMode) {
-        playRandomBattleSong();
+        const verboseChessMove = getVerboseSanChessMove(
+          currentBattle.attemptedMove.san,
+          chessManager,
+        );
+        playBattleSong({
+          p1PokemonIdentifier: currentBattle.p1Pokemon.species,
+          p2PokemonIdentifier: currentBattle.p2Pokemon.species,
+          isDramatic:
+            verboseChessMove?.piece === "k" ||
+            verboseChessMove?.captured === "k" ||
+            verboseChessMove?.piece === "q" ||
+            verboseChessMove?.captured === "q",
+        });
       }
     } else {
       if (!demoMode) {
-        playRandomGlobalSong();
+        playGlobalSong();
       }
     }
 
@@ -536,8 +548,8 @@ export const BattleChessGame = ({
     chessManager,
     gameState.isSkippingAhead,
     gameState.isCatchingUp,
-    playRandomBattleSong,
-    playRandomGlobalSong,
+    playBattleSong,
+    playGlobalSong,
     userState.animationSpeedPreference,
     currentBattle,
     demoMode,
