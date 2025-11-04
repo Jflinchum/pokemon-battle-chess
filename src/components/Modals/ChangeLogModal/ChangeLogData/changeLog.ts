@@ -12,6 +12,29 @@ interface ChangeLog {
 
 export const changeLog: ChangeLog[] = [
   {
+    title: "Theme songs!",
+    version: "v1.0.4",
+    mascot: {
+      identifier: "Loudred",
+    },
+    body: `
+#### Hello and thank you for checking out Pokémon Gambit!
+This is a smaller patch that focuses on adding more music variety to the battles. Specifically, I wanted to make the king and queen battles more intense.
+
+##### Change log for v1.0.4 
+- Added various songs that specifically plays during battles when a King or Queen piece is involved
+- Added legendary themes that play for the following legendaries during King/Queen battles:
+  - Zekrom & Reshiram
+  - Dialga & Palkia (and their origin forms)
+  - Ho-oh
+  - Zacian & Zamazenta
+  - Groudon, Kyogre, & Rayquaza
+  - The Regis
+  - Xerneas & Yveltal & Zygarde
+  - Solagaleo, Lunala, and Necrozma
+`,
+  },
+  {
     title: "Infrastructure infrastructure",
     version: "v1.0.3",
     mascot: {
