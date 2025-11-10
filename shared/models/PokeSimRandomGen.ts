@@ -12314,13 +12314,13 @@ const randomSetsJSON: Record<string, RandomSet> = {
     sets: [
       {
         role: "AV Pivot",
-        movepool: ["Beat Up", "Gunk Shot", "Heat Wave", "Moonblast", "U-turn"],
+        movepool: ["Gunk Shot", "Heat Wave", "Moonblast", "U-turn"],
         abilities: ["Toxic Chain"],
         teraTypes: ["Dark", "Steel", "Water"],
       },
       {
         role: "Bulky Attacker",
-        movepool: ["Beat Up", "Gunk Shot", "Moonblast", "Roost", "U-turn"],
+        movepool: ["Gunk Shot", "Moonblast", "Roost", "U-turn"],
         abilities: ["Toxic Chain"],
         teraTypes: ["Dark", "Steel", "Water"],
       },
