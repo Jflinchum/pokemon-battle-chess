@@ -3,7 +3,7 @@ import { Move } from "@pkmn/data";
 import { Dex } from "@pkmn/dex";
 import PokemonMoveButton from "../../../../common/PokemonMoveButton/PokemonMoveButton";
 import { PokemonMoveTooltip } from "../PokemonMoveTooltip/PokemonMoveTooltip";
-import { getTypeEffectiveness } from "./getTypeEffectiveness";
+import { doesMoveDoDamage, getTypeEffectiveness } from "./getTypeEffectiveness";
 import "./PokemonMoveInfoButton.css";
 
 interface PokemonMoveInfoButtonProps {
@@ -94,7 +94,7 @@ const PokemonMoveInfoButton = ({
 
         {effectiveness !== undefined &&
         notImmune !== undefined &&
-        dexMoveInfo.basePower ? (
+        doesMoveDoDamage(dexMoveInfo) ? (
           <TypeEffectiveness
             effectiveness={effectiveness}
             notImmune={notImmune}

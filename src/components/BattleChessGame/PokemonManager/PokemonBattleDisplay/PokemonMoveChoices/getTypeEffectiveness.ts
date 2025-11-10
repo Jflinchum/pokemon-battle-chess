@@ -55,7 +55,7 @@ const modifyTypeMoves: Record<
 
 // Taken from onModifyType
 // https://github.com/pkmn/ps/blob/e9c53799548ca8ba182efed51449d56afbb21f03/sim/data/abilities.ts#L1547
-const modifyTypeAbilities: Record<
+export const modifyTypeAbilities: Record<
   string,
   (move: Move, pokemon: Pokemon) => TypeName
 > = {
@@ -219,4 +219,20 @@ const immunityAbilities: Record<
   "lightning rod": (move: Move) => {
     return move.type !== "Electric";
   },
+};
+
+const damagingMovesThatHaveNoBasePower = [
+  "seismictoss",
+  "beatup",
+  "gyroball",
+  "heavyslam",
+  "heatcrash",
+  "grassknot",
+  "lowkick",
+  "return",
+];
+export const doesMoveDoDamage = (move: Move) => {
+  return (
+    move.basePower > 0 || damagingMovesThatHaveNoBasePower.includes(move.id)
+  );
 };
