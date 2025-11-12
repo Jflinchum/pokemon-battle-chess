@@ -41,7 +41,7 @@ import {
   setPlayerSpectating,
   setUserAsTransient,
 } from "../cache/redis.js";
-import { DEFAULT_GAME_OPTIONS } from "../constants/gameConstants.js";
+import { DEFAULT_GAME_OPTIONS } from "../constants/gameRoomConstants.js";
 import GameRoom from "./GameRoom.js";
 
 interface GameRoomList {

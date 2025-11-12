@@ -27,7 +27,7 @@ const CreateRoomModal = () => {
       if (response.status === 200) {
         const { data } = await response.json();
         userStateDispatch({
-          type: "SET_ROOM",
+          type: "JOIN_ROOM",
           payload: { roomId: data.roomId, roomCode: password },
         });
         dispatchGameState({ type: "CREATE_ROOM" });

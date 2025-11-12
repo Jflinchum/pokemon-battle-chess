@@ -1,10 +1,15 @@
 import { BoostID, BoostsTable } from "@pkmn/data";
 import { useEffect, useMemo, useState } from "react";
 import { GameOptions } from "../../../../../shared/types/GameOptions";
-import { FormatID } from "../../../../context/GameState/GameStateContext";
+import {
+  FormatID,
+  useGameState,
+} from "../../../../context/GameState/GameStateContext";
+import { cpuDifficultyLevels } from "../../../../util/offlineUtil";
 import Button from "../../../common/Button/Button";
 import { Input } from "../../../common/Input/Input";
 import { ToggleSwitch } from "../../../common/ToggleSwitch/ToggleSwitch";
+import { usePlayAgainstComputerUtil } from "../../usePlayAgainstComputerUtil";
 import { GameTimerOptions, TimerId } from "./GameTimerOptions/GameTimerOptions";
 import "./RoomOptions.css";
 
@@ -64,6 +69,8 @@ const getTimerIdFromTimerData = ({
 };
 
 const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
+  const { gameState, dispatch } = useGameState();
+
   const [gameSeed, setGameSeed] = useState("");
   const [format, setFormat] = useState<FormatID>(gameOptions.format);
   const [offenseAdvantage, setOffenseAdvantage] = useState<BoostsTable>(
@@ -113,6 +120,8 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
     onChange,
   ]);
 
+  const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
+
   return (
     <div className="roomOptionsContainer">
       <h3>Room Options</h3>
@@ -129,6 +138,36 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
               disabled={!isHost}
               aria-describedby="pokemonGenerationSeed"
             />
+          </li>
+        ) : null}
+        {isUserInOfflineMode() ? (
+          <li className="roomOption">
+            <div className="roomOptionLabel">
+              <span id="cpuOptions">CPU Difficulty Level:</span>
+              <p>Assign a difficulty to the CPU.</p>
+            </div>
+            <ul>
+              <li key={`difficultyLevel`}>
+                <select
+                  disabled={!isHost}
+                  value={gameState.cpuDifficulty || "Easy"}
+                  aria-describedby="cpuOptions"
+                  onChange={(e) => {
+                    dispatch({
+                      type: "SET_CPU_DIFFICULTY",
+                      payload: e.target
+                        .value as (typeof cpuDifficultyLevels)[number],
+                    });
+                  }}
+                >
+                  {cpuDifficultyLevels.map((level) => (
+                    <option value={level} key={level}>
+                      {level}
+                    </option>
+                  ))}
+                </select>
+              </li>
+            </ul>
           </li>
         ) : null}
         <li className="roomOption">
@@ -218,37 +257,44 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
         <li>
           <hr></hr>
         </li>
-        <li className="roomOption">
-          <GameTimerOptions
-            timerId={currentTimerId}
-            onChange={setTimerId}
-            disabled={!isHost}
-          />
-        </li>
-        {gameOptions.format === "draft" && currentTimerId !== "No Timer" && (
-          <li className="roomOption">
-            <div className="roomOptionLabel">
-              <span id="banTimer">Draft/Ban Timer:</span>
-              <p>
-                Amount of time (in seconds) that the player has to ban and draft
-                a pokemon.
-              </p>
-            </div>
-            <select
-              className="roomOptionBanTimer"
-              aria-describedby="banTimer"
-              value={gameOptions.banTimerDuration}
-              onChange={(e) => setBanTimer(parseInt(e.target.value))}
-              disabled={!isHost}
-            >
-              {import.meta.env.DEV ? <option value={1}>1 second</option> : null}
-              <option value={15}>15 seconds</option>
-              <option value={30}>30 seconds</option>
-              <option value={45}>45 seconds</option>
-              <option value={60}>60 seconds</option>
-            </select>
-          </li>
-        )}
+        {!isUserInOfflineMode() ? (
+          <>
+            <li className="roomOption">
+              <GameTimerOptions
+                timerId={currentTimerId}
+                onChange={setTimerId}
+                disabled={!isHost}
+              />
+            </li>
+            {gameOptions.format === "draft" &&
+              currentTimerId !== "No Timer" && (
+                <li className="roomOption">
+                  <div className="roomOptionLabel">
+                    <span id="banTimer">Draft/Ban Timer:</span>
+                    <p>
+                      Amount of time (in seconds) that the player has to ban and
+                      draft a pokemon.
+                    </p>
+                  </div>
+                  <select
+                    className="roomOptionBanTimer"
+                    aria-describedby="banTimer"
+                    value={gameOptions.banTimerDuration}
+                    onChange={(e) => setBanTimer(parseInt(e.target.value))}
+                    disabled={!isHost}
+                  >
+                    {import.meta.env.DEV ? (
+                      <option value={1}>1 second</option>
+                    ) : null}
+                    <option value={15}>15 seconds</option>
+                    <option value={30}>30 seconds</option>
+                    <option value={45}>45 seconds</option>
+                    <option value={60}>60 seconds</option>
+                  </select>
+                </li>
+              )}
+          </>
+        ) : null}
       </ul>
     </div>
   );

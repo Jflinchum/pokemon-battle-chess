@@ -9,6 +9,7 @@ import { getMockGameStateContext } from "../../../../testUtils/gameState";
 import { getMockReplayData } from "../../../../testUtils/matchHistory";
 import { getMockModalStateContext } from "../../../../testUtils/modalState";
 import { getMockUserStateContext } from "../../../../testUtils/userState";
+import { offlineRoomId } from "../../../../util/offlineUtil";
 import MenuOptions from "../MenuOptions";
 import * as ValidateReplay from "../validateReplay";
 
@@ -53,6 +54,8 @@ const setup = () => {
     getUsername: () => screen.getByTestId("menu-option-username"),
     getAvatar: () => screen.getByTestId("menu-option-avatar"),
     getPokemonOfTheDay: () => screen.getByTestId("menu-option-potd"),
+    getPlayAgainstComputerButton: () =>
+      screen.getByTestId("menu-option-play-bots"),
     getQuickPlayButton: () => screen.getByTestId("menu-option-quick-play"),
     getCreateRoomButton: () =>
       screen.getByTestId("menu-option-create-new-room"),
@@ -104,6 +107,31 @@ describe("MenuOptions", () => {
   });
 
   describe("Menu Buttons", () => {
+    it("should open a new offline room when clicking play against computer", async () => {
+      const {
+        getPlayAgainstComputerButton,
+        mockedUserStateContext,
+        mockedGameStateContext,
+      } = setup();
+      await userEvent.click(getPlayAgainstComputerButton());
+      expect(mockedUserStateContext.dispatch).toHaveBeenCalledWith({
+        type: "JOIN_ROOM",
+        payload: {
+          roomId: offlineRoomId,
+          roomCode: "",
+        },
+      });
+      expect(mockedGameStateContext.dispatch).toHaveBeenCalledWith({
+        type: "CREATE_ROOM",
+        payload: {
+          offline: true,
+          avatarId: "24",
+          playerId: "user1",
+          playerName: "TestUser",
+        },
+      });
+    });
+
     it("should open quick play modal when clicking quick play", async () => {
       const { getQuickPlayButton, mockedModalStateContext } = setup();
       await userEvent.click(getQuickPlayButton());

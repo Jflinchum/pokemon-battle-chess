@@ -1,5 +1,6 @@
 import { Pokemon } from "@pkmn/client";
 import { BoostID, GenderName, PokemonSet } from "@pkmn/data";
+import { mapBoostStageToMultiplier } from "../../../../../../util/pokemonUtil";
 import { GenderIcon } from "../../../../../common/GenderIcon/GenderIcon";
 import { PokemonSprite } from "../../../../../common/Pokemon/PokemonSprite/PokemonSprite";
 import PokemonStatus from "../../../../../common/Pokemon/PokemonStatus/PokemonStatus";
@@ -25,16 +26,6 @@ const getHealthBarColor = (maxHp: number, currentHp: number) => {
     return "yellow";
   } else {
     return "red";
-  }
-};
-
-const mapBoostStageToMultiplier = (stage?: number) => {
-  if (!stage) {
-    return 1;
-  } else if (stage > 0) {
-    return `${(stage + 2) / 2}`.slice(0, 4);
-  } else {
-    return `${2 / (2 - stage)}`.slice(0, 4);
   }
 };
 

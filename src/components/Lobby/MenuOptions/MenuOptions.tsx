@@ -2,6 +2,7 @@ import {
   faCertificate,
   faChessKing,
   faCog,
+  faComputer,
   faDoorOpen,
   faFaceGrin,
   faNoteSticky,
@@ -15,6 +16,7 @@ import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { ReplayData } from "../../../util/downloadReplay";
+import { offlineRoomId } from "../../../util/offlineUtil";
 import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
 import NavOptions from "../../common/NavOptions/NavOptions";
 import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
@@ -23,7 +25,7 @@ import { validateReplay } from "./validateReplay";
 
 const MenuOptions = () => {
   const { dispatch } = useModalState();
-  const { userState } = useUserState();
+  const { userState, dispatch: userStateDispatch } = useUserState();
   const { dispatch: gameStateDispatch } = useGameState();
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,6 +56,22 @@ const MenuOptions = () => {
 
   const handleCreditsClick = () => {
     dispatch({ type: "OPEN_CREDITS_MODAL", payload: {} });
+  };
+
+  const handlePlayBotClick = () => {
+    gameStateDispatch({
+      type: "CREATE_ROOM",
+      payload: {
+        offline: true,
+        playerName: userState.name,
+        playerId: userState.id,
+        avatarId: userState.avatarId,
+      },
+    });
+    userStateDispatch({
+      type: "JOIN_ROOM",
+      payload: { roomId: offlineRoomId, roomCode: "" },
+    });
   };
 
   const handleUploadReplay = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +118,15 @@ const MenuOptions = () => {
             </div>
           </div>
         )}
+        <NavOptionButton
+          aria-describedby="playBots"
+          className="menuOptionButtonContainer"
+          onClick={handlePlayBotClick}
+          data-testid="menu-option-play-bots"
+        >
+          <FontAwesomeIcon icon={faComputer} />
+          <span id="playBots">Play Against Computer</span>
+        </NavOptionButton>
         <NavOptionButton
           aria-describedby="quickPlay"
           className="menuOptionButtonContainer"

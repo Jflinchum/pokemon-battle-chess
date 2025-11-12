@@ -1,3 +1,4 @@
+import { Dex } from "@pkmn/dex";
 import { useCallback, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { useGameState } from "../../context/GameState/GameStateContext";
@@ -20,6 +21,7 @@ const MainMenu = () => {
   const { userState, dispatch: userStateDispatch } = useUserState();
   const { gameState } = useGameState();
   const { dispatch } = useModalState();
+  window.Dex = Dex;
 
   const handleNoClick = useCallback(() => {
     clearMostRecentRoom();

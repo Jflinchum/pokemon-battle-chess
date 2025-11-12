@@ -20,6 +20,7 @@ import {
   EndGameReason,
   MatchHistory,
 } from "../../../../shared/types/Game.js";
+import { getCaptureSquare } from "../../../../shared/util/chessSquareIndex.js";
 import { getCastledRookSquare } from "../../../../shared/util/getCastledRookSquare";
 import capturePieceFX from "../../../assets/chessAssets/audio/capturePiece.ogg";
 import movePieceFX from "../../../assets/chessAssets/audio/movePiece.ogg";
@@ -29,6 +30,7 @@ import { useUserState } from "../../../context/UserState/UserStateContext";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
 import { useSocketRequests } from "../../../util/useSocketRequests";
 import Spinner from "../../common/Spinner/Spinner";
+import { usePlayAgainstComputerUtil } from "../../RoomManager/usePlayAgainstComputerUtil.js";
 import ChessManager from "../ChessManager/ChessManager";
 import {
   getVerboseSanChessMove,
@@ -37,7 +39,9 @@ import {
 import DraftPokemonManager from "../DraftPokemonManager/DraftPokemonManager";
 import PokemonBattleManager from "../PokemonManager/PokemonBattleManager/PokemonBattleManager";
 import { CurrentBattle } from "./BattleChessManager";
+import { useOfflineMode } from "./offlineUtil/useOfflineMode.js";
 import useBattleHistory from "./useBattleHistory";
+import { useGameSocketEvents } from "./useGameSocketEvents.js";
 import { usePremoves } from "./usePremove";
 
 export const BattleChessGame = ({
@@ -60,6 +64,7 @@ export const BattleChessGame = ({
   const { userState } = useUserState();
   const { dispatch: modalStateDispatch } = useModalState();
   const { gameState, dispatch } = useGameState();
+  window.gameSeed = gameState.gameSettings.seed;
 
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(
     null,
@@ -88,6 +93,24 @@ export const BattleChessGame = ({
   );
   const errorRecoveryAttempts = useRef(0);
 
+  const { currentMatchLog, setCurrentMatchLog } = useGameSocketEvents({
+    matchHistory,
+    matchLogIndex,
+  });
+
+  const {
+    requestComputerMove,
+    updateMatchLogFromChessMove,
+    updateMatchLogFromPokemonMove,
+    requestComputerPokemonBanOrDraft,
+  } = useOfflineMode({
+    chessManager,
+    pokemonManager,
+    setCurrentMatchLog,
+    playerColor: color,
+  });
+  const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
+
   const { movePieceAudio, capturePieceAudio } = useMemo(() => {
     const movePieceAudio = new Audio(movePieceFX);
     const capturePieceAudio = new Audio(capturePieceFX);
@@ -113,6 +136,7 @@ export const BattleChessGame = ({
     requestDraftPokemon,
     requestBanPokemon,
     requestSync,
+    requestPokemonMove,
   } = useSocketRequests();
 
   const {
@@ -155,6 +179,41 @@ export const BattleChessGame = ({
       }
     },
     [chessManager, pokemonManager, resetSimulators],
+  );
+
+  const handleOnBan = useCallback(
+    async (pkmnIndex: number) => {
+      if (gameState.isSpectator) {
+        return;
+      }
+      if (pokemonManager.banPieces.find((piece) => piece.index === pkmnIndex)) {
+        toast("You need to select a valid Pokémon to ban, first!", {
+          type: "warning",
+        });
+        return;
+      }
+
+      if (isUserInOfflineMode()) {
+        onBan(pkmnIndex);
+        requestComputerPokemonBanOrDraft(onBan, onDraft, draftTurnPick);
+      } else {
+        try {
+          await requestBanPokemon(pkmnIndex);
+        } catch (err) {
+          toast(`Error: ${err}`, { type: "error" });
+        }
+      }
+    },
+    [
+      requestBanPokemon,
+      gameState.isSpectator,
+      pokemonManager.banPieces,
+      isUserInOfflineMode,
+      onBan,
+      onDraft,
+      requestComputerPokemonBanOrDraft,
+      draftTurnPick,
+    ],
   );
 
   const resetMatchHistory = useCallback(() => {
@@ -251,12 +310,16 @@ export const BattleChessGame = ({
             from: verboseChessMove.from,
             to: verboseChessMove.to,
           });
-          await requestChessMove(san);
+          requestChessMoveWithErrorHandling(san);
         } else {
-          const err = onMove({ sanMove: san });
-          if (!err) {
-            setMostRecentRequestedChessMove(san);
-            await requestChessMove(san);
+          if (!isUserInOfflineMode()) {
+            const err = onMove({ sanMove: san });
+            if (!err) {
+              setMostRecentRequestedChessMove(san);
+              requestChessMoveWithErrorHandling(san);
+            }
+          } else {
+            requestChessMoveWithErrorHandling(san);
           }
         }
       } catch (err) {
@@ -271,15 +334,87 @@ export const BattleChessGame = ({
     resetSimulators();
   };
 
+  useEffect(() => {
+    let timerId: NodeJS.Timeout;
+    if (
+      isUserInOfflineMode() &&
+      !isDrafting &&
+      !currentBattle &&
+      (chessManager.turn() !== color || gameState.isSpectator) &&
+      currentPokemonBoard
+    ) {
+      timerId = setTimeout(
+        () => {
+          if (!gameState.matchEnded) {
+            requestComputerMove();
+          }
+        },
+        gameState.isSpectator ? userState.animationSpeedPreference * 2 : 1000,
+      );
+    } else if (
+      isUserInOfflineMode() &&
+      isDrafting &&
+      (draftTurnPick !== color || gameState.isSpectator)
+    ) {
+      timerId = setTimeout(
+        () => {
+          requestComputerPokemonBanOrDraft(onBan, onDraft, draftTurnPick);
+        },
+        gameState.isSpectator ? userState.animationSpeedPreference * 2 : 1000,
+      );
+    }
+
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [
+    isUserInOfflineMode,
+    gameState.isSpectator,
+    gameState.matchEnded,
+    isDrafting,
+    chessManager,
+    color,
+    currentBattle,
+    requestComputerMove,
+    currentPokemonBoard,
+    userState.animationSpeedPreference,
+    requestComputerPokemonBanOrDraft,
+    draftTurnPick,
+    onBan,
+    onDraft,
+  ]);
+
   const requestChessMoveWithErrorHandling = useCallback(
     async (san: string) => {
-      try {
-        await requestChessMove(san);
-      } catch (err) {
-        handleError(err as unknown as Error);
+      if (!isUserInOfflineMode()) {
+        try {
+          await requestChessMove(san);
+        } catch (err) {
+          handleError(err as unknown as Error);
+        }
+      } else {
+        await updateMatchLogFromChessMove(san);
       }
     },
-    [requestChessMove, handleError],
+    [
+      requestChessMove,
+      handleError,
+      updateMatchLogFromChessMove,
+      isUserInOfflineMode,
+    ],
+  );
+
+  const requestPokemonMoveFromServer = useCallback(
+    async (move: string) => {
+      if (!isUserInOfflineMode()) {
+        await requestPokemonMove(move);
+      } else {
+        await updateMatchLogFromPokemonMove(move);
+      }
+    },
+    [isUserInOfflineMode, requestPokemonMove, updateMatchLogFromPokemonMove],
   );
 
   const onMove = useCallback(
@@ -324,13 +459,7 @@ export const BattleChessGame = ({
       const fromCastledRookSquare = castledRookSquare?.from;
       const toCastledRookSquare = castledRookSquare?.to;
 
-      let capturedPieceSquare;
-      if (verboseChessMove.isEnPassant()) {
-        capturedPieceSquare =
-          `${verboseChessMove.to[0] + (parseInt(verboseChessMove.to[1]) + (verboseChessMove.color === "w" ? -1 : 1))}` as Square;
-      } else if (verboseChessMove.isCapture()) {
-        capturedPieceSquare = verboseChessMove.to;
-      }
+      const capturedPieceSquare = getCaptureSquare(verboseChessMove);
 
       if (moveFailed && capturedPieceSquare) {
         pokemonManager.getPokemonFromSquare(verboseChessMove.from)!.square =
@@ -376,13 +505,18 @@ export const BattleChessGame = ({
               });
               requestChessMoveWithErrorHandling(preMoveSan);
             } else {
-              const err = onMove({
-                sanMove: preMoveSan,
-                shouldValidatePremoveQueue: false,
-              });
-              if (!err) {
+              if (!isUserInOfflineMode()) {
+                const err = onMove({
+                  sanMove: preMoveSan,
+                  shouldValidatePremoveQueue: false,
+                });
+                if (!err) {
+                  setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
+                  setMostRecentRequestedChessMove(preMoveSan);
+                  requestChessMoveWithErrorHandling(preMoveSan);
+                }
+              } else {
                 setPreMoveQueue((curr) => curr.slice(1, preMoveQueue.length));
-                setMostRecentRequestedChessMove(preMoveSan);
                 requestChessMoveWithErrorHandling(preMoveSan);
               }
             }
@@ -407,6 +541,7 @@ export const BattleChessGame = ({
       preMoveQueue,
       setPreMoveQueue,
       requestChessMoveWithErrorHandling,
+      isUserInOfflineMode,
     ],
   );
 
@@ -473,8 +608,8 @@ export const BattleChessGame = ({
     [modalStateDispatch, dispatch],
   );
 
-  const { currentMatchLog } = useBattleHistory({
-    matchHistory,
+  useBattleHistory({
+    currentMatchLog,
     currentBattle,
     onBan,
     onDraft,
@@ -537,11 +672,7 @@ export const BattleChessGame = ({
         chessManager,
       );
       if (chessMove) {
-        if (chessMove.isEnPassant()) {
-          return `${chessMove.to[0] + (parseInt(chessMove.to[1]) + (chessMove.color === "w" ? -1 : 1))}` as Square;
-        } else {
-          return chessMove.to;
-        }
+        return getCaptureSquare(chessMove);
       }
     }
   }, [
@@ -587,6 +718,7 @@ export const BattleChessGame = ({
                 }, userState.animationSpeedPreference);
               }
             }}
+            onRequestPokemonMove={requestPokemonMoveFromServer}
           />
         )}
         {!demoMode && !battleStarted && !isDrafting && (
@@ -642,26 +774,7 @@ export const BattleChessGame = ({
                 });
               }
             }}
-            onBanPokemon={async (pkmnIndex) => {
-              if (gameState.isSpectator) {
-                return;
-              }
-              if (
-                pokemonManager.banPieces.find(
-                  (piece) => piece.index === pkmnIndex,
-                )
-              ) {
-                toast("You need to select a valid Pokémon to ban, first!", {
-                  type: "warning",
-                });
-                return;
-              }
-              try {
-                await requestBanPokemon(pkmnIndex);
-              } catch (err) {
-                toast(`Error: ${err}`, { type: "error" });
-              }
-            }}
+            onBanPokemon={handleOnBan}
           />
         )}
       </div>

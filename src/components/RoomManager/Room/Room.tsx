@@ -1,22 +1,23 @@
 import { Sprites } from "@pkmn/img";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { GameOptions } from "../../../../shared/types/GameOptions";
 import { useGameState } from "../../../context/GameState/GameStateContext";
-import { socket } from "../../../socket";
 import { setGameOptions as setLocalGameOptions } from "../../../util/localWebData";
 import { useSocketRequests } from "../../../util/useSocketRequests";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
 import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameManagerActions/GameManagerActions";
 import Button from "../../common/Button/Button";
 import Spinner from "../../common/Spinner/Spinner";
+import { usePlayAgainstComputerUtil } from "../usePlayAgainstComputerUtil";
 import PlayerList from "./PlayerList/PlayerList";
 import PlayerName from "./PlayerName/PlayerName";
 import "./Room.css";
 import RoomOptions from "./RoomOptions/RoomOptions";
+import { useRoomSocketEvents } from "./useRoomSocketEvents";
 
 const Room = () => {
-  const { gameState } = useGameState();
+  const { gameState, dispatch } = useGameState();
   const [gameOptions, setGameOptions] = useState<GameOptions>(
     gameState.gameSettings.options,
   );
@@ -31,41 +32,33 @@ const Room = () => {
     requestChangeGameOptions,
   } = useSocketRequests();
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      console.log("connected");
-    });
-    socket.on("disconnect", () => {
-      console.log("disconnected");
-    });
+  useRoomSocketEvents(setGameOptions);
 
-    socket.on("changeGameOptions", (options: GameOptions) => {
-      if (!gameState.isHost) {
-        setGameOptions(options);
-      }
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("changeGameOptions");
-    };
-  }, [gameState.isHost]);
+  const { initializeMatch, isUserInOfflineMode } = usePlayAgainstComputerUtil();
 
   const handleStartGame = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
       setLocalGameOptions(gameOptions);
-      await requestStartGame();
+      if (!isUserInOfflineMode()) {
+        await requestStartGame();
+      } else {
+        initializeMatch(gameState.cpuDifficulty, gameOptions);
+      }
     } catch (err) {
       toast(`Error: ${err}`, { type: "error" });
     }
   };
+
   const handleToggleSpectating = async () => {
-    try {
-      await requestToggleSpectating();
-    } catch (err) {
-      toast(`Error: ${err}`, { type: "error" });
+    if (!isUserInOfflineMode()) {
+      try {
+        await requestToggleSpectating();
+      } catch (err) {
+        toast(`Error: ${err}`, { type: "error" });
+      }
+    } else {
+      dispatch({ type: "TOGGLE_SPECTATE_CPU" });
     }
   };
 
@@ -73,14 +66,21 @@ const Room = () => {
     async (options: GameOptions) => {
       if (options && gameState.isHost) {
         try {
-          await requestChangeGameOptions(options);
+          if (!isUserInOfflineMode()) {
+            await requestChangeGameOptions(options);
+          }
           setGameOptions(options);
         } catch (err) {
           toast(`Error: ${err}`, { type: "error" });
         }
       }
     },
-    [requestChangeGameOptions, setGameOptions, gameState.isHost],
+    [
+      requestChangeGameOptions,
+      setGameOptions,
+      gameState.isHost,
+      isUserInOfflineMode,
+    ],
   );
 
   const player1 = useMemo(() => {
@@ -128,13 +128,17 @@ const Room = () => {
                 <div className="roomButtons">
                   <Button
                     disabled={
-                      gameState.isSpectator ? !!player1 && !!player2 : false
+                      gameState.isSpectator
+                        ? !!player1 && !!player2 && !isUserInOfflineMode()
+                        : false
                     }
                     onClick={handleToggleSpectating}
                   >
                     {gameState.isSpectator
                       ? "Stop Spectating"
-                      : "Move to Spectators"}
+                      : isUserInOfflineMode()
+                        ? "Spectate CPU match"
+                        : "Move to Spectators"}
                   </Button>
                   <Button
                     color="primary"

@@ -5,6 +5,7 @@ import {
   CommonClientArgs,
   CommonServerResponse,
 } from "../../shared/types/Socket";
+import { usePlayAgainstComputerUtil } from "../components/RoomManager/usePlayAgainstComputerUtil";
 import { useUserState } from "../context/UserState/UserStateContext";
 import { socket } from "../socket";
 
@@ -46,9 +47,11 @@ export const useSocketRequests = () => {
     }),
     [userState.id, userState.currentRoomId, userState.secretId],
   );
+  const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
 
   const requestChessMove = useCallback(
     (sanMove: string) => {
+      if (isUserInOfflineMode()) return Promise.resolve();
       return new Promise((resolve, reject) => {
         socket
           .timeout(SOCKET_TIMEOUT)
@@ -60,11 +63,12 @@ export const useSocketRequests = () => {
           );
       });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestDraftPokemon = useCallback(
     (square: Square, draftPokemonIndex: number) => {
+      if (isUserInOfflineMode()) return Promise.resolve();
       return new Promise((resolve, reject) => {
         socket.timeout(SOCKET_TIMEOUT).emit(
           "requestDraftPokemon",
@@ -78,11 +82,12 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestBanPokemon = useCallback(
     (draftPokemonIndex: number) => {
+      if (isUserInOfflineMode()) return Promise.resolve();
       return new Promise((resolve, reject) => {
         socket.timeout(SOCKET_TIMEOUT).emit(
           "requestDraftPokemon",
@@ -96,11 +101,12 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestPokemonMove = useCallback(
     (pokemonMove: string) => {
+      if (isUserInOfflineMode()) return Promise.resolve();
       return new Promise((resolve, reject) => {
         socket
           .timeout(SOCKET_TIMEOUT)
@@ -112,21 +118,24 @@ export const useSocketRequests = () => {
           );
       });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestValidateTimers = useCallback(() => {
+    if (isUserInOfflineMode()) return;
     socket.emit("requestValidateTimers", { ...commonClientArgs });
-  }, [commonClientArgs]);
+  }, [commonClientArgs, isUserInOfflineMode]);
 
   const requestSetViewingResults = useCallback(
     (viewingResults: boolean) => {
+      if (isUserInOfflineMode()) return;
       socket.emit("setViewingResults", { viewingResults, ...commonClientArgs });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestReturnEveryoneToRoom = useCallback(() => {
+    if (isUserInOfflineMode()) return Promise.resolve();
     return new Promise((resolve, reject) => {
       socket
         .timeout(SOCKET_TIMEOUT)
@@ -134,9 +143,10 @@ export const useSocketRequests = () => {
           handleCommonServerResponse({ err, resp }, { resolve, reject }),
         );
     });
-  }, [commonClientArgs]);
+  }, [commonClientArgs, isUserInOfflineMode]);
 
   const requestStartGame = useCallback(() => {
+    if (isUserInOfflineMode()) return Promise.resolve();
     return new Promise((resolve, reject) => {
       socket
         .timeout(SOCKET_TIMEOUT)
@@ -144,9 +154,10 @@ export const useSocketRequests = () => {
           handleCommonServerResponse({ err, resp }, { resolve, reject }),
         );
     });
-  }, [commonClientArgs]);
+  }, [commonClientArgs, isUserInOfflineMode]);
 
   const requestToggleSpectating = useCallback(() => {
+    if (isUserInOfflineMode()) return Promise.resolve();
     return new Promise((resolve, reject) => {
       socket
         .timeout(SOCKET_TIMEOUT)
@@ -154,10 +165,11 @@ export const useSocketRequests = () => {
           handleCommonServerResponse({ err, resp }, { resolve, reject }),
         );
     });
-  }, [commonClientArgs]);
+  }, [commonClientArgs, isUserInOfflineMode]);
 
   const requestChangeGameOptions = useCallback(
     (options: GameOptions) => {
+      if (isUserInOfflineMode()) return Promise.resolve();
       return new Promise((resolve, reject) => {
         socket
           .timeout(SOCKET_TIMEOUT)
@@ -169,11 +181,12 @@ export const useSocketRequests = () => {
           );
       });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestKickPlayer = useCallback(
     (playerId: string) => {
+      if (isUserInOfflineMode()) return Promise.resolve();
       return new Promise((resolve, reject) => {
         socket.timeout(SOCKET_TIMEOUT).emit(
           "requestKickPlayer",
@@ -186,11 +199,12 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestMovePlayerToSpectator = useCallback(
     (playerId: string) => {
+      if (isUserInOfflineMode()) return Promise.resolve();
       return new Promise((resolve, reject) => {
         socket.timeout(SOCKET_TIMEOUT).emit(
           "requestMovePlayerToSpectator",
@@ -203,10 +217,11 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestJoinGame = useCallback(() => {
+    if (isUserInOfflineMode()) return Promise.resolve();
     return new Promise((resolve, reject) => {
       socket.timeout(SOCKET_TIMEOUT).emit(
         "joinRoom",
@@ -218,17 +233,19 @@ export const useSocketRequests = () => {
           handleCommonServerResponse({ err, resp }, { resolve, reject }),
       );
     });
-  }, [userState.currentRoomCode, commonClientArgs]);
+  }, [userState.currentRoomCode, isUserInOfflineMode, commonClientArgs]);
 
   const requestSync = useCallback(() => {
+    if (isUserInOfflineMode()) return;
     socket.emit("requestSync", commonClientArgs);
-  }, [commonClientArgs]);
+  }, [commonClientArgs, isUserInOfflineMode]);
 
   const sendChatMessage = useCallback(
     (message: string) => {
+      if (isUserInOfflineMode()) return;
       socket.emit("sendChatMessage", { message, ...commonClientArgs });
     },
-    [commonClientArgs],
+    [commonClientArgs, isUserInOfflineMode],
   );
 
   const requestMatchSearch = useCallback(

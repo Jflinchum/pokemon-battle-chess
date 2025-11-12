@@ -11,7 +11,6 @@ import {
   WeatherId,
 } from "../../../../../shared/types/PokemonTypes";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
-import { useSocketRequests } from "../../../../util/useSocketRequests";
 import "./PokemonBattleDisplay.css";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
@@ -39,6 +38,7 @@ interface PokemonBattleDisplayProps {
   perspective: SideID;
   demoMode?: boolean;
   prng: PRNG;
+  onRequestPokemonMove: (move: string) => Promise<void>;
 }
 
 const PokemonBattleDisplay = ({
@@ -55,10 +55,10 @@ const PokemonBattleDisplay = ({
   perspective,
   demoMode,
   prng,
+  onRequestPokemonMove,
 }: PokemonBattleDisplayProps) => {
   const { gameState } = useGameState();
   const [moveChosen, setMoveChosen] = useState<string>();
-  const { requestPokemonMove } = useSocketRequests();
 
   useEffect(() => {
     // TODO: Better handling for clearing move selection
@@ -67,7 +67,7 @@ const PokemonBattleDisplay = ({
 
   const handleMoveSelect = async (move: string) => {
     try {
-      await requestPokemonMove(move);
+      await onRequestPokemonMove(move);
     } catch (err) {
       setMoveChosen(undefined);
       toast(`Error: ${err}. Please reselect your move`, { type: "error" });

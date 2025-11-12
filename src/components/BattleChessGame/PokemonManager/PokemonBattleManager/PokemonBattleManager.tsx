@@ -13,6 +13,7 @@ import {
 import { useGameState } from "../../../../context/GameState/GameStateContext";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { timer } from "../../../../utils";
+import { usePlayAgainstComputerUtil } from "../../../RoomManager/usePlayAgainstComputerUtil";
 import PokemonBattleDisplay from "../PokemonBattleDisplay/PokemonBattleDisplay";
 import { PokemonMoveChoice } from "../PokemonBattleDisplay/PokemonMoveChoices/PokemonMoveChoices";
 import { shouldDelayBattleOutput } from "../utils/shouldDelayBattleOutput";
@@ -25,6 +26,7 @@ interface PokemonBattleManagerProps {
   currentPokemonMoveHistory: { args: CustomArgTypes; kwArgs: KWArgType }[];
   perspective: SideID;
   demoMode?: boolean;
+  onRequestPokemonMove: (move: string) => Promise<void>;
   onBattleEnd: () => void;
 }
 
@@ -35,6 +37,7 @@ const PokemonBattleManager = ({
   currentPokemonMoveHistory,
   perspective,
   demoMode,
+  onRequestPokemonMove,
   onBattleEnd,
 }: PokemonBattleManagerProps) => {
   const [weatherState, setWeatherState] = useState<
@@ -84,6 +87,8 @@ const PokemonBattleManager = ({
     { args: CustomArgTypes; kwArgs: KWArgType }[]
   >([]);
 
+  const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
+
   useEffect(() => {
     let catchUpTimer:
       | { start: () => Promise<void>; stop: () => void }
@@ -94,6 +99,7 @@ const PokemonBattleManager = ({
       userState.animationSpeedPreference * (skipToEndOfSync ? 0 : 1);
 
     const playMoveHistory = async () => {
+      let battleWon = false;
       while (
         currentPokemonMoveHistoryIndex.current <
         currentPokemonMoveHistory.length
@@ -124,6 +130,7 @@ const PokemonBattleManager = ({
             await catchUpTimer.start();
           }
           onBattleEnd();
+          battleWon = true;
         }
 
         setP1ActivePokemon(
@@ -152,6 +159,12 @@ const PokemonBattleManager = ({
         }
         currentPokemonMoveHistoryIndex.current++;
       }
+
+      if (isUserInOfflineMode() && gameState.isSpectator && !battleWon) {
+        catchUpTimer = timer(timeBetweenSteps * (skipToEndOfSync ? 0 : 1));
+        await catchUpTimer.start();
+        onRequestPokemonMove("");
+      }
     };
 
     playMoveHistory();
@@ -167,6 +180,9 @@ const PokemonBattleManager = ({
     onBattleEnd,
     userState.animationSpeedPreference,
     playAudioEffect,
+    gameState.isSpectator,
+    onRequestPokemonMove,
+    isUserInOfflineMode,
   ]);
 
   return (
@@ -184,6 +200,7 @@ const PokemonBattleManager = ({
       p1PokemonSet={p1PokemonSet}
       p2PokemonSet={p2PokemonSet}
       perspective={perspective}
+      onRequestPokemonMove={onRequestPokemonMove}
     />
   );
 };

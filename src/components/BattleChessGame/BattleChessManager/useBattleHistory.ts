@@ -1,20 +1,19 @@
 import { ArgType, KWArgType, Protocol } from "@pkmn/protocol";
 import { Color, Square } from "chess.js";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SquareModifier } from "../../../../shared/models/PokemonBattleChessManager";
 import {
   EndGameReason,
-  MatchLog,
+  MatchHistory,
   PokemonBeginBattleData,
 } from "../../../../shared/types/Game.js";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
-import { socket } from "../../../socket";
 import { timer } from "../../../utils";
 import { CurrentBattle } from "./BattleChessManager";
 
 interface BattleHistoryProps {
-  matchHistory?: MatchLog[];
+  currentMatchLog: MatchHistory;
   currentBattle?: CurrentBattle | null;
   onBan: (index: number) => void;
   onDraft: (square: Square, index: number, color: Color) => void;
@@ -59,7 +58,7 @@ interface BattleHistoryProps {
  * - Future replay systems can build off of it and fast-forward/rewind/etc.
  */
 const useBattleHistory = ({
-  matchHistory,
+  currentMatchLog,
   currentBattle,
   onBan,
   onDraft,
@@ -75,40 +74,6 @@ const useBattleHistory = ({
 }: BattleHistoryProps) => {
   const { userState } = useUserState();
   const { gameState, dispatch } = useGameState();
-
-  const [currentMatchLog, setCurrentMatchLog] = useState(matchHistory || []);
-
-  useEffect(() => {
-    socket.on("gameOutput", (log, ack) => {
-      setCurrentMatchLog((curr) => [...curr, log]);
-      ack();
-    });
-
-    return () => {
-      socket.off("gameOutput");
-    };
-  }, []);
-
-  useEffect(() => {
-    // Stop listening for gameOutput once the match has ended
-    if (gameState.matchEnded) {
-      socket.off("gameOutput");
-    }
-  }, [gameState.matchEnded]);
-
-  /**
-   * If we receive new match history from the server in an attempt to re-sync the user,
-   * then update our current state
-   */
-  useEffect(() => {
-    if (matchHistory) {
-      setCurrentMatchLog(matchHistory);
-    }
-  }, [matchHistory]);
-
-  useEffect(() => {
-    dispatch({ type: "SET_MATCH_HISTORY", payload: currentMatchLog });
-  }, [currentMatchLog, dispatch]);
 
   useEffect(() => {
     let catchUpTimer:
@@ -259,10 +224,6 @@ const useBattleHistory = ({
     dispatch,
     gameState.isCatchingUp,
   ]);
-
-  return {
-    currentMatchLog: currentMatchLog.slice(0, matchLogIndex.current),
-  };
 };
 
 export default useBattleHistory;

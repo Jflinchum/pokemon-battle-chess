@@ -12,6 +12,7 @@ import {
   setPremovingPreference,
   setVolumePreference,
 } from "../../util/localWebData.ts";
+import { offlineRoomId } from "../../util/offlineUtil.ts";
 
 export interface VolumePreference {
   pieceVolume: number;
@@ -48,8 +49,10 @@ type UserStateAction =
   | { type: "SET_PREMOVING_PREFERENCE"; payload: boolean }
   | { type: "SET_ANIMATED_BACKGROUND_PREFERENCE"; payload: boolean }
   | { type: "PUSH_CHAT_HISTORY"; payload: ChatMessage }
-  | { type: "SET_ROOM"; payload: { roomId: string; roomCode: string } }
-  | { type: "JOIN_ROOM"; payload: { roomId: string; roomCode: string } }
+  | {
+      type: "JOIN_ROOM";
+      payload: { roomId: string | "offline"; roomCode: string };
+    }
   | { type: "LEAVE_ROOM" };
 
 export const UserStateContext = createContext<UserStateType | null>(null);
@@ -85,20 +88,11 @@ export const userStateReducer = (
     case "SET_ANIMATED_BACKGROUND_PREFERENCE":
       setAnimatedBackgroundPreference(action.payload);
       return { ...userState, animatedBackgroundEnabled: action.payload };
-    case "SET_ROOM":
-      setMostRecentRoom({
-        roomId: action.payload.roomId,
-        roomCode: action.payload.roomCode,
-      });
-      return {
-        ...userState,
-        currentRoomId: action.payload.roomId,
-        currentRoomCode: action.payload.roomCode,
-        chatHistory: [],
-      };
     case "LEAVE_ROOM":
       try {
-        leaveRoom(userState.currentRoomId, userState.id);
+        if (userState.currentRoomId !== offlineRoomId) {
+          leaveRoom(userState.currentRoomId, userState.id);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -111,10 +105,12 @@ export const userStateReducer = (
         chatHistory: [],
       };
     case "JOIN_ROOM":
-      setMostRecentRoom({
-        roomId: action.payload.roomId,
-        roomCode: action.payload.roomCode,
-      });
+      if (action.payload.roomId !== offlineRoomId) {
+        setMostRecentRoom({
+          roomId: action.payload.roomId,
+          roomCode: action.payload.roomCode,
+        });
+      }
       return {
         ...userState,
         currentRoomId: action.payload.roomId,

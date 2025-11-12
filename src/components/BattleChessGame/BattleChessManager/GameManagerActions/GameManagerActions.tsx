@@ -15,6 +15,7 @@ import { downloadReplay } from "../../../../util/downloadReplay";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import { NavOptionButton } from "../../../common/NavOptions/NavOptionButton/NavOptionButton";
 import NavOptions from "../../../common/NavOptions/NavOptions";
+import { usePlayAgainstComputerUtil } from "../../../RoomManager/usePlayAgainstComputerUtil";
 import "./GameManagerActions.css";
 
 const GameManagerActions = () => {
@@ -35,6 +36,7 @@ const GameManagerActions = () => {
 
   const handleReturn = () => {
     dispatchGameState({ type: "RETURN_TO_ROOM" });
+
     requestSetViewingResults(false);
   };
 
@@ -42,9 +44,15 @@ const GameManagerActions = () => {
     downloadReplay(gameState);
   }, [gameState]);
 
+  const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
+
   const handleReturnEveryoneToRoom = async () => {
     try {
-      await requestReturnEveryoneToRoom();
+      if (isUserInOfflineMode()) {
+        handleReturn();
+      } else {
+        await requestReturnEveryoneToRoom();
+      }
     } catch (err) {
       toast(`Error: ${err}`, { type: "error" });
     }

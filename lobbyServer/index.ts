@@ -21,6 +21,11 @@ app.use(
     optionsSuccessStatus: 204,
   }),
 );
+app.use((_, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+  next();
+});
 
 http.createServer(app).listen(httpPort, () => {
   console.log(`LobbyServer HTTP is listening on ${httpPort}`);
