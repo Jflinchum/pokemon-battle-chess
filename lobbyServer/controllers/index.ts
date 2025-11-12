@@ -29,6 +29,19 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     res.status(200).send("Ok");
   });
 
+  app.post<
+    Empty,
+    APIResponse<Empty>,
+    {
+      message: string;
+    }
+  >("/lobby-service/log", (req, res) => {
+    if (req.body.message) {
+      console.log(`Logging Service: ${req.body.message}`);
+    }
+    res.status(200).send();
+  });
+
   /**
    * Creates a room.
    * The player that creates the room becomes the host.

@@ -102,3 +102,16 @@ export const getRoom = async (
 
   return response;
 };
+
+export const logToService = async (message: string) => {
+  return await fetch("/lobby-service/log", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    signal: AbortSignal.timeout(TIMEOUT_TIME_MS),
+    body: JSON.stringify({
+      message,
+    }),
+  });
+};

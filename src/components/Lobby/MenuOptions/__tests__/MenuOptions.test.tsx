@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as GameStateContext from "../../../../context/GameState/GameStateContext";
 import * as ModalStateContext from "../../../../context/ModalState/ModalStateContext";
 import * as UserStateContext from "../../../../context/UserState/UserStateContext";
+import * as LobbyService from "../../../../service/lobby";
 import { getMockGameStateContext } from "../../../../testUtils/gameState";
 import { getMockReplayData } from "../../../../testUtils/matchHistory";
 import { getMockModalStateContext } from "../../../../testUtils/modalState";
@@ -14,6 +15,7 @@ import MenuOptions from "../MenuOptions";
 import * as ValidateReplay from "../validateReplay";
 
 vi.mock("./../validateReplay");
+vi.mock("../../../../service/lobby");
 vi.mock("react-toastify");
 vi.mock("@pkmn/img", () => ({
   Sprites: {
@@ -47,6 +49,8 @@ const setup = () => {
     mockedGameStateContext,
   );
   vi.spyOn(ValidateReplay, "validateReplay").mockReturnValue(true);
+
+  vi.spyOn(LobbyService, "logToService");
 
   const utils = render(<MenuOptions />);
 
@@ -130,6 +134,7 @@ describe("MenuOptions", () => {
           playerName: "TestUser",
         },
       });
+      expect(LobbyService.logToService).toHaveBeenCalledOnce();
     });
 
     it("should open quick play modal when clicking quick play", async () => {

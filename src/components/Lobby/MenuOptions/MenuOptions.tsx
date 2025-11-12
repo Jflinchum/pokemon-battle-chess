@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
+import { logToService } from "../../../service/lobby";
 import { isDevCookieEnabled } from "../../../util/devUtil";
 import { ReplayData } from "../../../util/downloadReplay";
 import { offlineRoomId } from "../../../util/offlineUtil";
@@ -60,6 +61,7 @@ const MenuOptions = () => {
   };
 
   const handlePlayBotClick = () => {
+    logToService(`${userState.name} is playing against a CPU`);
     gameStateDispatch({
       type: "CREATE_ROOM",
       payload: {
