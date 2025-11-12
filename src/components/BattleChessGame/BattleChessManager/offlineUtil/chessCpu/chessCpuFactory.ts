@@ -10,6 +10,8 @@ import {
 import { ChessCpu } from "../cpuFactory";
 import {
   getChessMoveIfCpuInCheckmate,
+  getChessMoveIfCpuInDraw,
+  getChessMoveIfCpuInStalemate,
   getChessMoveIfOpponentInCheckOrCheckmate,
   getRandomChessMove,
 } from "./chessCpuHelper";
@@ -163,13 +165,23 @@ export const chessCpuFactory: ChessCpuFactory =
     window.chessWorker = worker;
 
     return {
+      /**
+       * Runs stockfish to find the best move based on the settings.
+       * Due to our chess variant, however, there are a number of invalid chess board FENs
+       * that stockfish will simply not respond to. This includes:
+       * - the opponent being in Check while it is stockfish's turn
+       * - the opponent being in Checkmate while it is stockfish's turn
+       * - Stockfish being in checkmate
+       * - Stalemate
+       * - Draw
+       */
       move: (chessManager, pokemonManager) =>
         new Promise((resolve) => {
           const moveWhenOppInCheckOrCheckmate =
             getChessMoveIfOpponentInCheckOrCheckmate(chessManager);
           if (moveWhenOppInCheckOrCheckmate) {
             console.log(
-              "Opponent in checkmate. Resolving move via opponent checkmate logic",
+              "Opponent in check/checkmate. Resolving move via opponent checkmate logic",
             );
             return resolve(moveWhenOppInCheckOrCheckmate);
           }
@@ -178,6 +190,18 @@ export const chessCpuFactory: ChessCpuFactory =
           if (moveInCheckmate) {
             console.log("In checkmate. Resolving move via checkmate logic");
             return resolve(moveInCheckmate);
+          }
+
+          const moveInStalemate = getChessMoveIfCpuInStalemate(chessManager);
+          if (moveInStalemate) {
+            console.log("In stalemate. Resolving move via stalemate logic");
+            return resolve(moveInStalemate);
+          }
+
+          const moveInDraw = getChessMoveIfCpuInDraw(chessManager);
+          if (moveInDraw) {
+            console.log("In draw. Resolving move via draw logic");
+            return resolve(moveInDraw);
           }
 
           const eventListenerResolver = (verboseMove: Move) => {
@@ -210,6 +234,18 @@ export const chessCpuFactory: ChessCpuFactory =
               possibleMoves.forEach((posMove) => {
                 console.log(`${posMove.move.san} - ${posMove.score}`);
               });
+
+              if (possibleMoves.length === 0) {
+                console.log(
+                  "Stockfish has no recommendations. Choosing random move",
+                );
+                console.log(chessManager.fen());
+                const randomChessMove = getRandomChessMove(chessManager);
+                if (randomChessMove) {
+                  return eventListenerResolver(randomChessMove);
+                }
+              }
+
               const bestMove = possibleMoves[0].move;
               if (!bestMove) {
                 console.error(

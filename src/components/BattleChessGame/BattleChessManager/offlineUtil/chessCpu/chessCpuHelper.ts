@@ -27,6 +27,30 @@ export const getChessMoveIfCpuInCheckmate = (chessManager: Chess) => {
   }
 };
 
+export const getChessMoveIfCpuInStalemate = (chessManager: Chess) => {
+  if (chessManager.isStalemate()) {
+    const randomChessMove = getRandomChessMove(chessManager);
+    if (randomChessMove) {
+      return randomChessMove;
+    } else {
+      console.error("No random chess move could be found while in stalemate");
+      console.log(chessManager.fen());
+    }
+  }
+};
+
+export const getChessMoveIfCpuInDraw = (chessManager: Chess) => {
+  if (chessManager.isDraw()) {
+    const randomChessMove = getRandomChessMove(chessManager);
+    if (randomChessMove) {
+      return randomChessMove;
+    } else {
+      console.error("No random chess move could be found while in draw");
+      console.log(chessManager.fen());
+    }
+  }
+};
+
 export const getChessMoveIfOpponentInCheckOrCheckmate = (
   chessManager: Chess,
 ) => {
@@ -47,7 +71,9 @@ export const getChessMoveIfOpponentInCheckOrCheckmate = (
     if (attackKingMove) {
       return attackKingMove;
     } else {
-      console.error("No random chess move could be found while in checkmate");
+      console.error(
+        "No random chess move could be found while opponent in checkmate",
+      );
       console.log(chessManager.fen());
     }
   }
