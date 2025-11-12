@@ -72,6 +72,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
   const { gameState, dispatch } = useGameState();
 
   const [gameSeed, setGameSeed] = useState("");
+  const [initialChessFen, setInitialChessFen] = useState("");
   const [format, setFormat] = useState<FormatID>(gameOptions.format);
   const [offenseAdvantage, setOffenseAdvantage] = useState<BoostsTable>(
     gameOptions.offenseAdvantage,
@@ -101,6 +102,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
   useEffect(() => {
     onChange({
       gameSeed,
+      initialChessFen,
       format,
       offenseAdvantage,
       weatherWars,
@@ -117,6 +119,7 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
     banTimer,
     timerId,
     gameSeed,
+    initialChessFen,
     onChange,
   ]);
 
@@ -127,18 +130,32 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
       <h3>Room Options</h3>
       <ul className="roomOptionsList">
         {import.meta.env.DEV ? (
-          <li className="roomOption">
-            <div className="roomOptionLabel">
-              <span id="pokemonGenerationSeed">Pokemon Generation Seed:</span>
-              <p>DEV ONLY - Sets the seed used for generating Pokemon.</p>
-            </div>
-            <Input
-              value={gameSeed}
-              onChange={(e) => setGameSeed(e.target.value)}
-              disabled={!isHost}
-              aria-describedby="pokemonGenerationSeed"
-            />
-          </li>
+          <>
+            <li className="roomOption">
+              <div className="roomOptionLabel">
+                <span id="pokemonGenerationSeed">Pokemon Generation Seed:</span>
+                <p>DEV ONLY - Sets the seed used for generating Pokemon.</p>
+              </div>
+              <Input
+                value={gameSeed}
+                onChange={(e) => setGameSeed(e.target.value)}
+                disabled={!isHost}
+                aria-describedby="pokemonGenerationSeed"
+              />
+            </li>
+            <li className="roomOption">
+              <div className="roomOptionLabel">
+                <span id="chessInitialFen">Chess Initial Fen:</span>
+                <p>DEV ONLY - Sets the starting Chess board.</p>
+              </div>
+              <Input
+                value={initialChessFen}
+                onChange={(e) => setInitialChessFen(e.target.value)}
+                disabled={!isHost}
+                aria-describedby="chessInitialFen"
+              />
+            </li>
+          </>
         ) : null}
         {isUserInOfflineMode() ? (
           <li className="roomOption">

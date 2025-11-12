@@ -6,6 +6,7 @@ type FormatID = "random" | "draft";
 
 export interface GameOptions {
   gameSeed?: string;
+  initialChessFen?: string;
   format: FormatID;
   offenseAdvantage: BoostsTable;
   weatherWars: boolean;

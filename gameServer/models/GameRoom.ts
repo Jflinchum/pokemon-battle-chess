@@ -178,38 +178,6 @@ export default class GameRoom {
     );
   }
 
-  public setOptions(options: GameOptions) {
-    this.roomGameOptions = {
-      format: typeof options.format === "string" ? options.format : "random",
-      offenseAdvantage:
-        options.offenseAdvantage || DEFAULT_GAME_OPTIONS.offenseAdvantage,
-      weatherWars:
-        typeof options.weatherWars === "boolean"
-          ? options.weatherWars
-          : DEFAULT_GAME_OPTIONS.weatherWars,
-      timersEnabled:
-        typeof options.timersEnabled === "boolean"
-          ? options.timersEnabled
-          : DEFAULT_GAME_OPTIONS.timersEnabled,
-      banTimerDuration:
-        typeof options.banTimerDuration === "number"
-          ? options.banTimerDuration
-          : DEFAULT_GAME_OPTIONS.banTimerDuration,
-      chessTimerDuration:
-        typeof options.chessTimerDuration === "number"
-          ? options.chessTimerDuration
-          : DEFAULT_GAME_OPTIONS.chessTimerDuration,
-      chessTimerIncrement:
-        typeof options.chessTimerIncrement === "number"
-          ? options.chessTimerIncrement
-          : DEFAULT_GAME_OPTIONS.chessTimerIncrement,
-      pokemonTimerIncrement:
-        typeof options.pokemonTimerIncrement === "number"
-          ? options.pokemonTimerIncrement
-          : DEFAULT_GAME_OPTIONS.pokemonTimerIncrement,
-    };
-  }
-
   public buildStartGameArgs(
     color: "w" | "b",
     whitePlayer: User,
@@ -263,7 +231,6 @@ export default class GameRoom {
       throw Error("Unable to retreive chess fen.");
     }
     this.chessManager = new Chess(chessFen, { skipValidation: true });
-    this.chessManager.board();
     this.currentTurnWhite = this.chessManager.turn() === "w";
   }
 
@@ -625,8 +592,17 @@ export default class GameRoom {
   }
 
   private async resetChessBoard() {
-    this.chessManager = new Chess();
-    return await setChessBoard(this.roomId, this.chessManager.fen());
+    if (this.roomGameOptions.initialChessFen) {
+      this.chessManager = new Chess(this.roomGameOptions.initialChessFen, {
+        skipValidation: true,
+      });
+    } else {
+      this.chessManager = new Chess();
+    }
+    return await setChessBoard(
+      this.roomId,
+      this.roomGameOptions.initialChessFen || this.chessManager.fen(),
+    );
   }
 
   private async generateSquareModifierTarget() {
@@ -660,6 +636,7 @@ export default class GameRoom {
       seed: this.publicSeed,
       format: this.roomGameOptions.format,
       weatherWars: this.roomGameOptions.weatherWars,
+      chessBoard: this.chessManager.board(),
     });
     await setGeneratedPokemonIndices(
       this.roomId,

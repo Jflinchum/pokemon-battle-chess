@@ -529,6 +529,7 @@ export const fetchGameOptions = async (
     .hget(getRoomKey(roomId), `chessTimerDuration`)
     .hget(getRoomKey(roomId), `chessTimerIncrement`)
     .hget(getRoomKey(roomId), `pokemonTimerIncrement`)
+    .hget(getRoomKey(roomId), `initialChessFen`)
     .exec();
 
   if (!response) {
@@ -549,6 +550,7 @@ export const fetchGameOptions = async (
     chessTimerDuration,
     chessTimerIncrement,
     pokemonTimerIncrement,
+    initialChessFen,
   ] = response.map(([, result]) => result);
   return {
     format: format as unknown as FormatID,
@@ -567,6 +569,7 @@ export const fetchGameOptions = async (
     chessTimerDuration: parseInt(chessTimerDuration as unknown as string),
     chessTimerIncrement: parseInt(chessTimerIncrement as unknown as string),
     pokemonTimerIncrement: parseInt(pokemonTimerIncrement as unknown as string),
+    initialChessFen: initialChessFen as unknown as string,
   };
 };
 
@@ -616,6 +619,8 @@ export const setGameRoomOptions = async (
   return await redisClient.hset(getRoomKey(roomId), {
     requestedSeed:
       process.env.NODE_ENV === "production" ? "" : options.gameSeed,
+    initialChessFen:
+      process.env.NODE_ENV === "production" ? "" : options.initialChessFen,
     format: options.format,
     atkBuff: options.offenseAdvantage.atk,
     defBuff: options.offenseAdvantage.def,

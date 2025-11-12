@@ -140,7 +140,7 @@ export class PokemonBattleChessManager {
     cachedChessBoard?: ChessBoardSquare[][],
     cachedChessPieceIndices?: number[],
   ) {
-    const bChessPieceArray = [
+    const bChessPieceArray: PieceSymbol[] = [
       "r",
       "n",
       "b",
@@ -151,7 +151,7 @@ export class PokemonBattleChessManager {
       "r",
       ...Array(8).fill("p"),
     ];
-    const wChessPieceArray = [
+    const wChessPieceArray: PieceSymbol[] = [
       ...Array(8).fill("p"),
       "r",
       "n",
@@ -163,13 +163,23 @@ export class PokemonBattleChessManager {
       "r",
     ];
     for (let i = 0; i < 16; i++) {
-      if (cachedChessBoard && cachedChessPieceIndices) {
-        const square =
-          this.getChessPieceFromCachedBoardAndIndices(
-            i,
-            cachedChessBoard,
-            cachedChessPieceIndices,
-          )?.square || null;
+      if (cachedChessBoard) {
+        let square = null;
+        if (cachedChessPieceIndices) {
+          square =
+            this.getChessPieceFromCachedBoardAndIndices(
+              i,
+              cachedChessBoard,
+              cachedChessPieceIndices,
+            )?.square || null;
+        } else {
+          square =
+            this.getChessPieceFromCachedBoard(
+              bChessPieceArray[i],
+              "b",
+              cachedChessBoard,
+            )?.square || null;
+        }
         this.chessPieces.push({
           index: i,
           type: bChessPieceArray[i],
@@ -193,13 +203,23 @@ export class PokemonBattleChessManager {
       }
     }
     for (let i = 0; i < 16; i++) {
-      if (cachedChessBoard && cachedChessPieceIndices) {
-        const square =
-          this.getChessPieceFromCachedBoardAndIndices(
-            i + 16,
-            cachedChessBoard,
-            cachedChessPieceIndices,
-          )?.square || null;
+      if (cachedChessBoard) {
+        let square = null;
+        if (cachedChessPieceIndices) {
+          square =
+            this.getChessPieceFromCachedBoardAndIndices(
+              i + 16,
+              cachedChessBoard,
+              cachedChessPieceIndices,
+            )?.square || null;
+        } else {
+          square =
+            this.getChessPieceFromCachedBoard(
+              wChessPieceArray[i],
+              "w",
+              cachedChessBoard,
+            )?.square || null;
+        }
         this.chessPieces.push({
           index: i + 16,
           type: wChessPieceArray[i],
@@ -290,6 +310,31 @@ export class PokemonBattleChessManager {
     } else {
       return null;
     }
+  }
+
+  private getChessPieceFromCachedBoard(
+    currentPieceSymbol: PieceSymbol,
+    color: Color,
+    cachedChessBoard?: ChessBoardSquare[][],
+  ) {
+    if (!cachedChessBoard) {
+      return;
+    }
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (
+          cachedChessBoard[i][j] &&
+          cachedChessBoard[i][j]?.type === currentPieceSymbol &&
+          cachedChessBoard[i][j]?.color === color &&
+          !this.chessPieces.find(
+            (piece) => piece.square === cachedChessBoard[i][j]?.square,
+          )
+        ) {
+          return cachedChessBoard[i][j];
+        }
+      }
+    }
+    return null;
   }
 
   /**

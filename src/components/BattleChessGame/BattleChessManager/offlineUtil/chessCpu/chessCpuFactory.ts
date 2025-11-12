@@ -78,7 +78,8 @@ const modifyChessMoveScoreBasedOnTypeEffectiveness = (
     }
   });
 
-  averageEffectiveness /= 4;
+  averageEffectiveness /= 8;
+  averageEffectiveness += 0.5;
 
   console.log("Analyzing capture score modifier: " + averageEffectiveness);
 
@@ -167,11 +168,15 @@ export const chessCpuFactory: ChessCpuFactory =
           const moveWhenOppInCheckOrCheckmate =
             getChessMoveIfOpponentInCheckOrCheckmate(chessManager);
           if (moveWhenOppInCheckOrCheckmate) {
+            console.log(
+              "Opponent in checkmate. Resolving move via opponent checkmate logic",
+            );
             return resolve(moveWhenOppInCheckOrCheckmate);
           }
 
           const moveInCheckmate = getChessMoveIfCpuInCheckmate(chessManager);
           if (moveInCheckmate) {
+            console.log("In checkmate. Resolving move via checkmate logic");
             return resolve(moveInCheckmate);
           }
 
@@ -183,8 +188,6 @@ export const chessCpuFactory: ChessCpuFactory =
           const possibleMoves: PossibleMove[] = [];
 
           const handleStockfishEvent = (e: MessageEvent) => {
-            console.log(e);
-
             const parsedOutput = parseStockfishOutput(e.data, chessManager);
 
             if (parsedOutput?.score) {
@@ -219,6 +222,7 @@ export const chessCpuFactory: ChessCpuFactory =
                   return;
                 }
               }
+              console.log("Stockfish resolved");
               return eventListenerResolver(bestMove);
             } else if (e.data.includes("bestmove (none)") && chessManager) {
               /**

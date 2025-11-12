@@ -29,18 +29,26 @@ function BattleChessManager({
   const whitePlayer = gameState.gameSettings.whitePlayer;
   const blackPlayer = gameState.gameSettings.blackPlayer;
   const chessManager = useMemo(() => {
-    return new Chess();
-  }, []);
+    if (gameState.gameSettings.options.initialChessFen) {
+      return new Chess(gameState.gameSettings.options.initialChessFen, {
+        skipValidation: true,
+      });
+    } else {
+      return new Chess();
+    }
+  }, [gameState.gameSettings.options.initialChessFen]);
   const pokemonManager = useMemo(() => {
     return new PokemonBattleChessManager({
       seed: gameState.gameSettings.seed!,
       format: gameState.gameSettings.options.format,
       weatherWars: gameState.gameSettings.options.weatherWars,
+      chessBoard: chessManager.board(),
     });
   }, [
     gameState.gameSettings.seed,
     gameState.gameSettings.options.format,
     gameState.gameSettings.options.weatherWars,
+    chessManager,
   ]);
 
   const color = useMemo(
