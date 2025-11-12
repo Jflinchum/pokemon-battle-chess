@@ -1,4 +1,4 @@
-import { PRNG } from "@pkmn/sim";
+import { PRNG, PRNGSeed } from "@pkmn/sim";
 import { useCallback } from "react";
 import { GameOptions } from "../../../shared/types/GameOptions";
 import { useGameState } from "../../context/GameState/GameStateContext";
@@ -60,7 +60,7 @@ export const usePlayAgainstComputerUtil = () => {
           whitePlayer: isUserWhite ? opposingPlayer : cpuPlayer,
           blackPlayer: isUserWhite ? cpuPlayer : opposingPlayer,
           color: isUserWhite ? "w" : "b",
-          seed: new PRNG().getSeed(),
+          seed: (gameOptions.gameSeed as PRNGSeed) || new PRNG().getSeed(),
           options: {
             ...gameOptions,
             timersEnabled: false,
