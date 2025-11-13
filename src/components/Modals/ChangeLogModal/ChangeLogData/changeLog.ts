@@ -12,6 +12,35 @@ interface ChangeLog {
 
 export const changeLog: ChangeLog[] = [
   {
+    title: "CPU Matches",
+    version: "v1.0.5",
+    mascot: {
+      identifier: "Pawniard",
+    },
+    body: `
+#### Hello and thank you for checking out Pokémon Gambit!
+I've finally gotten around to adding a computer to play against. It was a lot of work, however I felt it was necessary to allow people
+to check out the game with a lower hurdle. There's still some logic I want to add for the CPU to act smarter, however I felt that this was
+good enough to get a general feel for the game.
+
+##### Change log for v1.0.5
+- Added a way to face off against a CPU, which can be found at the main menu
+- The CPU can be loaded in three different difficulties:
+  - Easy
+    - Lower-level chess plays and considerations
+    - _Mostly_ random Pokémon moves.
+  - Medium
+    - Mid-level chess plays
+    - Pokémon moves are now a little more intelligent, taking type effectiveness/weather/terrain/STAB into account.
+  - Hard
+    - High-level chess plays
+    - Pokémon moves now consider priority, item synergies, recovery and defensive strategies, and setup moves.
+- The Chess AI was implemented via Stockfish (the same AI used on chess.com)
+- The Pokemon AI logic was written by myself, so I'm sure there's many improvements that can be made in this department
+- Draft mode logic is pretty simple at the moment. I also plan on improving this area in the future.
+`,
+  },
+  {
     title: "Theme songs!",
     version: "v1.0.4",
     mascot: {
