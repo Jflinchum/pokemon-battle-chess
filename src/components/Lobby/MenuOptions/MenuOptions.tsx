@@ -16,7 +16,6 @@ import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { logToService } from "../../../service/lobby";
-import { isDevCookieEnabled } from "../../../util/devUtil";
 import { ReplayData } from "../../../util/downloadReplay";
 import { offlineRoomId } from "../../../util/offlineUtil";
 import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
@@ -121,17 +120,15 @@ const MenuOptions = () => {
             </div>
           </div>
         )}
-        {isDevCookieEnabled() ? (
-          <NavOptionButton
-            aria-describedby="playBots"
-            className="menuOptionButtonContainer"
-            onClick={handlePlayBotClick}
-            data-testid="menu-option-play-bots"
-          >
-            <FontAwesomeIcon icon={faComputer} />
-            <span id="playBots">Play Against Computer</span>
-          </NavOptionButton>
-        ) : null}
+        <NavOptionButton
+          aria-describedby="playBots"
+          className="menuOptionButtonContainer"
+          onClick={handlePlayBotClick}
+          data-testid="menu-option-play-bots"
+        >
+          <FontAwesomeIcon icon={faComputer} />
+          <span id="playBots">Play Against Computer</span>
+        </NavOptionButton>
         <NavOptionButton
           aria-describedby="quickPlay"
           className="menuOptionButtonContainer"
