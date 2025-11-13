@@ -1,7 +1,6 @@
 import { Battle } from "@pkmn/client";
 import { Chess, Color, Move, Square } from "chess.js";
 import { PokemonBattleChessManager } from "../../../../../shared/models/PokemonBattleChessManager";
-import stockfishWorker from "../../../../public/stockfishMin/stockfish-17.1-8e4d048.js?url";
 import { cpuDifficultyLevels } from "../../../../util/offlineUtil";
 import { chessCpuFactory } from "./chessCpu/chessCpuFactory";
 import { pokemonCpuFactory } from "./pokemonCpu/pokemonCpuFactory";
@@ -28,7 +27,7 @@ type BotLevels = Record<
 export const availableBotLevels: BotLevels = {
   Easy: {
     chessCpu: chessCpuFactory({
-      file: stockfishWorker,
+      file: "/stockfishMin/stockfish-17.1-8e4d048.js",
       skillLevel: 1,
       depth: 10,
       multiPVLevel: 1,
@@ -44,7 +43,7 @@ export const availableBotLevels: BotLevels = {
   },
   Medium: {
     chessCpu: chessCpuFactory({
-      file: stockfishWorker,
+      file: "/stockfishMin/stockfish-17.1-8e4d048.js",
       skillLevel: 10,
       depth: 10,
       multiPVLevel: 3,
@@ -60,7 +59,7 @@ export const availableBotLevels: BotLevels = {
   },
   Hard: {
     chessCpu: chessCpuFactory({
-      file: stockfishWorker,
+      file: "/stockfishMin/stockfish-17.1-8e4d048.js",
       skillLevel: 20,
       depth: 10,
       multiPVLevel: 5,
