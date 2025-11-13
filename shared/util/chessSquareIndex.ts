@@ -7,11 +7,11 @@ export const getSquareIndexIn1DArray = (square: Square) => {
 };
 
 export const getCaptureSquare = (move: Move) => {
-  let capturedPieceSquare: Square;
+  let capturedPieceSquare: Square | undefined;
   if (move.isEnPassant()) {
     capturedPieceSquare =
       `${move.to[0] + (parseInt(move.to[1]) + (move.color === "w" ? -1 : 1))}` as Square;
-  } else {
+  } else if (move.isCapture()) {
     capturedPieceSquare = move.to;
   }
 
