@@ -61,7 +61,6 @@ export const getTypeEffectivenessFromSet = (
   type = moveModifier
     ? moveModifier(Dex.species.get(currentPokemon.species))
     : type;
-
   const effectiveness = Dex.getEffectiveness(
     type,
     Dex.species.get(opponentPokemon.species),
@@ -196,7 +195,7 @@ export const modifyTypeAbilities: Record<
   },
   multitype: ({ move, holdItem }) => {
     if (move.name === "Judgment" && holdItem) {
-      return plateTypeMapping[holdItem];
+      return plateTypeMapping[holdItem] || move.type;
     }
     return move.type;
   },
@@ -222,24 +221,24 @@ export const modifyTypeAbilities: Record<
 };
 
 const plateTypeMapping: Record<string, TypeName> = {
-  "blank plate": "Normal",
-  "fist plate": "Fighting",
-  "sky plate": "Flying",
-  "toxic plate": "Poison",
-  "earth plate": "Ground",
-  "stone plate": "Rock",
-  "insect plate": "Bug",
-  "spooky plate": "Ghost",
-  "iron plate": "Steel",
-  "flame plate": "Fire",
-  "splash plate": "Water",
-  "meadow plate": "Grass",
-  "zap plate": "Electric",
-  "mind plate": "Psychic",
-  "icicle plate": "Ice",
-  "draco plate": "Dragon",
-  "dread plate": "Dark",
-  "pixie plate": "Fairy",
+  "Blank Plate": "Normal",
+  "Fist Plate": "Fighting",
+  "Sky Plate": "Flying",
+  "Toxic Plate": "Poison",
+  "Earth Plate": "Ground",
+  "Stone Plate": "Rock",
+  "Insect Plate": "Bug",
+  "Spooky Plate": "Ghost",
+  "Iron Plate": "Steel",
+  "Flame Plate": "Fire",
+  "Splash Plate": "Water",
+  "Meadow Plate": "Grass",
+  "Zap Plate": "Electric",
+  "Mind Plate": "Psychic",
+  "Icicle Plate": "Ice",
+  "Draco Plate": "Dragon",
+  "Dread Plate": "Dark",
+  "Pixie Plate": "Fairy",
 };
 
 /**
