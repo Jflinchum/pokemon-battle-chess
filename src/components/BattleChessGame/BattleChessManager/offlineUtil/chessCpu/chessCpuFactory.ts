@@ -49,9 +49,8 @@ const modifyChessMoveScoreBasedOnTypeEffectiveness = (
   /**
    * We iterate through each pokemon move for the current pokemon and opposing pokemon
    * to get the average type effectiveness.
-   * Effectiveness ranges from -2 to 2 where -2 is quad resistant and 2 is quad effective
-   * We average out the effectiveness for all moves to make it more advantageous for the cpu
-   * if the pokemon it controls is more super effective against and resistant to the opposing pokemon
+   * Effectively, we create average out the type matchup and create a multiplier from 0.5 to 1.5
+   * to modify the score by.
    */
   let averageEffectiveness = 0;
   cpuMoves.forEach((move) => {
@@ -61,7 +60,6 @@ const modifyChessMoveScoreBasedOnTypeEffectiveness = (
       cpuPokemon,
       opponentPokemon,
     );
-    console.log(`Analyzing effectiveness ${move} ${effectiveness}`);
     if (notImmune && averageEffectiveness >= 0 && doesMoveDoDamage(dexMove)) {
       // Really just need to see if we have super effective moves
       averageEffectiveness += (effectiveness + 2) / 2;
@@ -74,7 +72,6 @@ const modifyChessMoveScoreBasedOnTypeEffectiveness = (
       opponentPokemon,
       cpuPokemon,
     );
-    console.log(`Analyzing effectiveness ${move} ${effectiveness}`);
     if (notImmune && effectiveness >= 0 && doesMoveDoDamage(dexMove)) {
       averageEffectiveness += (-effectiveness + 2) / 2;
     }
@@ -82,8 +79,6 @@ const modifyChessMoveScoreBasedOnTypeEffectiveness = (
 
   averageEffectiveness /= 8;
   averageEffectiveness += 0.5;
-
-  console.log("Analyzing capture score modifier: " + averageEffectiveness);
 
   if (currScore < 0) {
     // If the score is negative, flip the multiplier range
