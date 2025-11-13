@@ -21,6 +21,7 @@ export const getMockGameState = (
   gameSettings: {
     options: getDefaultGameOptions(),
   },
+  cpuDifficulty: "Easy",
   ...overrides,
 });
 

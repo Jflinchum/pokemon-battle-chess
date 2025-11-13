@@ -70,7 +70,7 @@ type GameStateAction =
 export const GameStateContext = createContext<GameStateType | null>(null);
 
 export const getInitialGameState = (
-  persistantGameState: Partial<GameState>,
+  persistantGameState: Partial<GameState> = {},
 ): GameState => ({
   inGame: false,
   matchEnded: false,
