@@ -36,7 +36,7 @@ const fetchPokemonCryUrl = (pokemon?: string) => {
     return;
   }
 
-  return `https://play.pokemonshowdown.com/audio/cries/${getPokemonCryUrlPath(dexPokemon.baseSpecies.toLowerCase().replace(" ", ""))}.mp3`;
+  return `https://play.pokemonshowdown.com/audio/cries/${getPokemonCryUrlPath(dexPokemon.baseSpecies.toLowerCase().replace(" ", "").replace("-", ""))}.mp3`;
 };
 
 export const usePokemonAudioFx = ({
