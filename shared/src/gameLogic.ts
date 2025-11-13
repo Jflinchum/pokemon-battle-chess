@@ -237,7 +237,7 @@ export const getPokemonBattleOutput = async ({
       ? pokemonManager.getPokemonFromSquare(capturedPieceSquare)
       : pokemonManager.getPokemonFromSquare(currentChessMove.from);
 
-  if (!p1Pokemon || !p2Pokemon) {
+  if (!p1Pokemon || !p2Pokemon || !capturedPieceSquare) {
     console.warn("Could not find pokemon for pokemon battle");
     return;
   }
