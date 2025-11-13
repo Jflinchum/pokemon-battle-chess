@@ -1,7 +1,7 @@
 import { Battle } from "@pkmn/client";
 import { Chess, Color, Move, Square } from "chess.js";
 import { PokemonBattleChessManager } from "../../../../../shared/models/PokemonBattleChessManager";
-import stockfishWorker from "../../../../assets/stockfishMin/stockfish-17.1-8e4d048.js?url";
+import stockfishWorker from "../../../../public/stockfishMin/stockfish-17.1-8e4d048.js?url";
 import { cpuDifficultyLevels } from "../../../../util/offlineUtil";
 import { chessCpuFactory } from "./chessCpu/chessCpuFactory";
 import { pokemonCpuFactory } from "./pokemonCpu/pokemonCpuFactory";
