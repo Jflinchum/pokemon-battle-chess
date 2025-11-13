@@ -17,12 +17,12 @@ import {
 } from "./chessCpuHelper";
 
 type ChessCpuFactory = ({
-  worker,
+  file,
   skillLevel,
   depth,
   multiPVLevel,
 }: {
-  worker: Worker;
+  file: string;
   skillLevel: number;
   depth: number;
   multiPVLevel: number;
@@ -153,9 +153,12 @@ const parseStockfishOutput = (
 };
 
 export const chessCpuFactory: ChessCpuFactory =
-  ({ worker, skillLevel, depth, multiPVLevel }) =>
+  ({ file, skillLevel, depth, multiPVLevel }) =>
   () => {
     // Storing the worker globally to save memory if we create a new one. Terminating the process does not seem to restore memory used
+    const worker =
+      window.chessWorker || new Worker(new URL(file, import.meta.url));
+    window.chessWorker = worker;
 
     return {
       /**

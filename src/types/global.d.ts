@@ -10,6 +10,8 @@ declare global {
   interface Window {
     // Current game seed in a match. Useful for debugging
     gameSeed?: string;
+    // A reference to the chess web worker we instantiate for the stockfish AI. Useful for saving memory and re-using that resource
+    chessWorker?: Worker;
     // The Pokemon library we're using that contains all pokemon data. Useful for debugging
     Dex?: Dex;
   }
