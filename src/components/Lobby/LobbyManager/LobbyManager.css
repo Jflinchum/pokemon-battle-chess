@@ -1,5 +1,4 @@
 .lobbyContainer {
-  height: 100vh;
   display: flex;
 
   @media (max-width: 600px) {
@@ -8,7 +7,7 @@
 }
 
 .roomListLobbyContainer {
-  height: 100%;
+  height: 100vh;
   width: 100%;
   margin: 0 60px;
   display: flex;
