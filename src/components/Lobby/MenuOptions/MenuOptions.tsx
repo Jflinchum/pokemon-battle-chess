@@ -16,6 +16,7 @@ import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { logToService } from "../../../service/lobby";
+import { isDevCookieEnabled } from "../../../util/devUtil";
 import { ReplayData } from "../../../util/downloadReplay";
 import { offlineRoomId } from "../../../util/offlineUtil";
 import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
@@ -129,15 +130,21 @@ const MenuOptions = () => {
           <FontAwesomeIcon icon={faComputer} />
           <span id="playBots">Play Against Computer</span>
         </NavOptionButton>
-        <NavOptionButton
-          aria-describedby="quickPlay"
-          className="menuOptionButtonContainer"
-          onClick={handleQuickMatchClick}
-          data-testid="menu-option-quick-play"
-        >
-          <FontAwesomeIcon icon={faChessKing} />
-          <span id="quickPlay">Quick Play</span>
-        </NavOptionButton>
+        {isDevCookieEnabled() ? (
+          /**
+           * Disabling this feature momentarily until matchmaking becomes a useful community feature.
+           * There's too many buttons on the left nav, so we should reduce the amount of actions there
+           */
+          <NavOptionButton
+            aria-describedby="quickPlay"
+            className="menuOptionButtonContainer"
+            onClick={handleQuickMatchClick}
+            data-testid="menu-option-quick-play"
+          >
+            <FontAwesomeIcon icon={faChessKing} />
+            <span id="quickPlay">Quick Play</span>
+          </NavOptionButton>
+        ) : null}
         <NavOptionButton
           aria-describedby="createNewRoom"
           className="menuOptionButtonContainer"
