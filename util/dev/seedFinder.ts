@@ -9,20 +9,21 @@ import {
  */
 export const findSeed = (
   filter: (pokemonPieces: PokemonPiece[]) => boolean,
+  maxResets = 500,
 ) => {
   let pokemonPieces: PokemonPiece[] = [];
   let prng: PRNG | undefined = undefined;
   const battleManager = new PokemonBattleChessManager({ format: "random" });
   let resets = 0;
 
-  while (!filter(pokemonPieces) && resets < 500) {
+  while (!filter(pokemonPieces) && resets < maxResets) {
     battleManager.reset();
     pokemonPieces = battleManager.chessPieces;
     prng = battleManager.prng;
     resets += 1;
   }
 
-  if (resets >= 500) {
+  if (resets >= maxResets) {
     return undefined;
   }
 

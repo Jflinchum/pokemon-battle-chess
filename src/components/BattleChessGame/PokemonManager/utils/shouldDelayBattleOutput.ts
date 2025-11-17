@@ -22,6 +22,7 @@ export const shouldDelayBattleOutput = (logType: CustomArgTypes[0]) => {
     "-enditem",
     "-immune",
     "-fieldstart",
+    "-block",
   ];
   if (delayLogs.includes(logType)) {
     return true;
