@@ -1,0 +1,27 @@
+.pokemonScreenContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  &.p2 {
+    z-index: var(--pokemon-battle-sprite-p2-effect);
+  }
+}
+
+.pokemonScreenEffect {
+  position: absolute;
+  width: 40%;
+  height: 50%;
+  opacity: 50%;
+
+  animation: screenAppearanceAnimation 0.25s;
+}
+
+@keyframes screenAppearanceAnimation {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}

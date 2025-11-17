@@ -8,6 +8,7 @@ import ProgressBar from "../../../../../common/ProgressBar/ProgressBar";
 import Tooltip from "../../../../../common/Tooltip/Tooltip";
 import { PokemonBattleDetailsCard } from "../../PokemonBattleDetails/PokemonBattleDetails";
 import "./PokemonFieldSprite.css";
+import { PokemonFieldSpriteEffect } from "./PokemonFieldSpriteEffect/PokemonFieldSpriteEffect";
 
 interface PokemonFieldSpriteProps {
   pokemon: Pokemon;
@@ -39,13 +40,25 @@ const boostToLabel: Record<BoostID, string> = {
   accuracy: "Acc",
 };
 
-const volatileToLabelMap: Record<
+const statusToLabelMap: Record<
   string,
   { label: string; benefit: "positive" | "negative" }
 > = {
   confusion: {
     label: "Confused",
     benefit: "negative",
+  },
+  protect: {
+    label: "Protected",
+    benefit: "positive",
+  },
+  lightscreen: {
+    label: "Light Screen",
+    benefit: "positive",
+  },
+  reflect: {
+    label: "Reflect",
+    benefit: "positive",
   },
 };
 
@@ -106,14 +119,25 @@ const PokemonFieldSprite = ({
           <div className="pokemonStatus">
             <PokemonStatus status={pokemon.status} />
             {Object.keys(pokemon.volatiles).map((volatile, index) =>
-              volatileToLabelMap[volatile] ? (
+              statusToLabelMap[volatile] ? (
                 <span
                   key={index}
-                  className={`effects ${volatileToLabelMap[volatile].benefit}`}
+                  className={`effects ${statusToLabelMap[volatile].benefit}`}
                 >
-                  {volatileToLabelMap[volatile].label}
+                  {statusToLabelMap[volatile].label}
                 </span>
               ) : null,
+            )}
+            {Object.keys(pokemon.side.sideConditions).map(
+              (sideCondition, index) =>
+                statusToLabelMap[sideCondition] ? (
+                  <span
+                    key={index}
+                    className={`effects ${statusToLabelMap[sideCondition].benefit}`}
+                  >
+                    {statusToLabelMap[sideCondition].label}
+                  </span>
+                ) : null,
             )}
             {Object.keys(pokemon.boosts).map((boost, index) =>
               pokemon.boosts[boost as BoostID] ? (
@@ -130,6 +154,7 @@ const PokemonFieldSprite = ({
         </div>
 
         <div className="pokemonSpriteContainer">
+          <PokemonFieldSpriteEffect pokemon={pokemon} side={side} />
           <PokemonSprite
             className={`pokemonSprite ${side}PokemonSprite ${pokemon.status || ""}`}
             isSubstitute={!!pokemon.volatiles["substitute"]}

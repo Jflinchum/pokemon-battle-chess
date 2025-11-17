@@ -58,6 +58,7 @@
   --chess-pawn-promotion-z-index: 1;
   --pokemon-battle-sprite-shadow: 1;
   --pokemon-battle-sprite: 2;
+  --pokemon-battle-sprite-p2-effect: 3;
   --pokemon-battle-info-z-index: 3;
   --pokemon-health-z-index: 4;
   --pokemon-battle-text-z-index: 5;

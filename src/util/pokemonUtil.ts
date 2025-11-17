@@ -318,3 +318,17 @@ export const doesMoveDoDamage = (move: Move) => {
     move.basePower > 0 || damagingMovesThatHaveNoBasePower.includes(move.id)
   );
 };
+
+export const isPokemonProtected = (pokemon: Pokemon) => {
+  return !!(
+    pokemon.volatiles["protect"] ||
+    pokemon.volatiles["detect"] ||
+    pokemon.volatiles["maxguard"] ||
+    pokemon.volatiles["kingsshield"] ||
+    pokemon.volatiles["spikyshield"] ||
+    pokemon.volatiles["banefulbunker"] ||
+    pokemon.volatiles["obstruct"] ||
+    pokemon.volatiles["silktrap"] ||
+    pokemon.volatiles["burningbulwark"]
+  );
+};
