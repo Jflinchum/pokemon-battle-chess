@@ -8,6 +8,7 @@ import { useUserState } from "../../../../context/UserState/UserStateContext";
 import { useSocketRequests } from "../../../../util/useSocketRequests";
 import Button from "../../../common/Button/Button";
 import Tooltip from "../../../common/Tooltip/Tooltip";
+import { usePlayAgainstComputerUtil } from "../../usePlayAgainstComputerUtil";
 import PlayerName from "../PlayerName/PlayerName";
 import "./PlayerList.css";
 
@@ -37,6 +38,8 @@ const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
     }
   };
 
+  const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
+
   return (
     <div {...props} className={`playerListContainer ${className}`}>
       <div className="playerList">
@@ -52,7 +55,9 @@ const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
               />
               <PlayerName className="playerListName" player={player} />
 
-              {gameState.isHost && player.playerId !== userState.id && (
+              {gameState.isHost &&
+              player.playerId !== userState.id &&
+              !isUserInOfflineMode() ? (
                 <div className="playerActions">
                   {(player.isPlayer1 || player.isPlayer2) &&
                     !gameState.inGame && (
@@ -86,7 +91,7 @@ const PlayerList = ({ players, className = "", ...props }: PlayerListProps) => {
                     {"Kick Player"}
                   </Tooltip>
                 </div>
-              )}
+              ) : null}
             </li>
           ))}
         </ul>

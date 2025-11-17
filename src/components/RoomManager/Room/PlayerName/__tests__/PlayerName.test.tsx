@@ -1,9 +1,20 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import * as GameStateContext from "../../../../../context/GameState/GameStateContext";
+import * as UserStateContext from "../../../../../context/UserState/UserStateContext";
+import { getMockGameStateContext } from "../../../../../testUtils/gameState";
 import { getMockPlayer } from "../../../../../testUtils/player";
+import { getMockUserStateContext } from "../../../../../testUtils/userState";
 import PlayerName, { PlayerNameProps } from "../PlayerName";
 
 const setup = (props: PlayerNameProps = { player: getMockPlayer() }) => {
+  vi.spyOn(UserStateContext, "useUserState").mockReturnValue(
+    getMockUserStateContext(),
+  );
+  vi.spyOn(GameStateContext, "useGameState").mockReturnValue(
+    getMockGameStateContext(),
+  );
+
   const utils = render(<PlayerName {...props} />);
   const hostIcon = screen.queryByTestId("player-host-icon");
   const viewingResultsIcon = screen.queryByTestId(

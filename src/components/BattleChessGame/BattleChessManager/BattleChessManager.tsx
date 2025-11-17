@@ -6,6 +6,7 @@ import { MatchHistory, Timer } from "../../../../shared/types/Game.js";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import ChatDisplay from "../../RoomManager/Chat/ChatDisplay/ChatDisplay";
 import PlayerList from "../../RoomManager/Room/PlayerList/PlayerList";
+import { usePlayAgainstComputerUtil } from "../../RoomManager/usePlayAgainstComputerUtil.js";
 import { BattleChessGame } from "./BattleChessGame";
 import "./BattleChessManager.css";
 import GameManagerActions from "./GameManagerActions/GameManagerActions";
@@ -28,6 +29,7 @@ function BattleChessManager({
   const { gameState } = useGameState();
   const whitePlayer = gameState.gameSettings.whitePlayer;
   const blackPlayer = gameState.gameSettings.blackPlayer;
+  const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
   const chessManager = useMemo(() => {
     if (gameState.gameSettings.options.initialChessFen) {
       return new Chess(gameState.gameSettings.options.initialChessFen, {
@@ -107,16 +109,18 @@ function BattleChessManager({
           className="bottomPlayerDisplay"
         />
 
-        <div className="playerAndChatContainer">
-          <PlayerList
-            players={gameState.players}
-            className="battleChessPlayerList"
-          />
-          <div className="inGameChatContainer">
-            <span className="inGameChatHeader">Chat</span>
-            <ChatDisplay className="inGameChat" />
+        {!isUserInOfflineMode() ? (
+          <div className="playerAndChatContainer">
+            <PlayerList
+              players={gameState.players}
+              className="battleChessPlayerList"
+            />
+            <div className="inGameChatContainer">
+              <span className="inGameChatHeader">Chat</span>
+              <ChatDisplay className="inGameChat" />
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );
