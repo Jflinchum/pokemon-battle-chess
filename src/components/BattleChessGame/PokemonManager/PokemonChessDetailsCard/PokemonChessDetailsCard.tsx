@@ -22,6 +22,15 @@ interface PokemonChessDetailsCardProps {
   minimizeOnColumnLayout?: boolean;
 }
 
+const sanitizeTooltipId = (str: string) => {
+  return str
+    .split(" ")
+    .join("-")
+    .replace("'", "")
+    .replace("(", "")
+    .replace(")", "");
+};
+
 const PokemonChessDetailsCard = ({
   pokemon,
   chessMoveHistory = [],
@@ -146,7 +155,7 @@ const PokemonChessDetailsCard = ({
                     <span>
                       <b>Item: </b>
                       <div
-                        id={`${pokemon.item.split(" ").join("-").replace("'", "")}`}
+                        id={`${sanitizeTooltipId(pokemon.item)}`}
                         className="pokemonDetailsItemContainer"
                       >
                         {pokemon.item && (
@@ -159,9 +168,7 @@ const PokemonChessDetailsCard = ({
                   <li>
                     <span>
                       <b>Ability: </b>
-                      <div
-                        id={`${pokemon.ability.split(" ").join("-").replace("'", "")}`}
-                      >
+                      <div id={`${sanitizeTooltipId(pokemon.ability)}`}>
                         <span>{pokemon.ability || "None"}</span>
                       </div>
                     </span>
@@ -222,15 +229,11 @@ const PokemonChessDetailsCard = ({
         // Necessary to render this outside of above div to prevent tooltips from scrolling the container
         pokemon ? (
           <>
-            <Tooltip
-              anchorSelect={`#${pokemon.ability.split(" ").join("-").replace("'", "")}`}
-            >
+            <Tooltip anchorSelect={`#${sanitizeTooltipId(pokemon.ability)}`}>
               {Dex.abilities.get(pokemon.ability).shortDesc}
             </Tooltip>
             {pokemon.item ? (
-              <Tooltip
-                anchorSelect={`#${pokemon.item.split(" ").join("-").replace("'", "")}`}
-              >
+              <Tooltip anchorSelect={`#${sanitizeTooltipId(pokemon.item)}`}>
                 {Dex.items.get(pokemon.item).shortDesc}
               </Tooltip>
             ) : null}
