@@ -30,17 +30,11 @@
 .roomButtons {
   display: flex;
   justify-content: space-evenly;
+  gap: 8px;
   padding: 20px 20px;
-
-  button {
-    margin-top: 12px;
-  }
 
   @media (max-width: 500px) {
     padding: 10px 10px;
-    button {
-      width: 80px;
-    }
   }
 }
 
