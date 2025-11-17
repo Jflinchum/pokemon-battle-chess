@@ -128,7 +128,7 @@ const PokemonChessDetailsCard = ({
           {pokemon && dexPokemon ? (
             <>
               <div className="pokemonDetailsCard">
-                <div>
+                <div className="pokemonDetailsOverview">
                   <div className="pokemonDetailsSpriteContainer">
                     <PokemonSprite
                       className="pokemonDetailsSprite"
@@ -141,7 +141,7 @@ const PokemonChessDetailsCard = ({
                     moves={pokemon.moves.map((move) => ({ id: move }))}
                   />
                 </div>
-                <ul>
+                <ul className="pokemonDetailsInfo">
                   <li>
                     <span>
                       <b>Item: </b>

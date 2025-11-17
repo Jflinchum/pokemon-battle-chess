@@ -59,10 +59,27 @@
   flex-direction: row;
   flex-grow: 1;
 
-  ul {
+  .pokemonDetailsOverview {
+    width: 70%;
+    @media (min-width: 600px) {
+      width: 100%;
+    }
+  }
+
+  .pokemonDetailsInfo {
     list-style: none;
     padding: 0;
     margin: 0;
+    width: 30%;
+    /**
+     * 140px is the width of two of the Weakness/Resistance/Immune Typings. We want to make sure we can fit
+     * two of them in a column at all times.
+     */
+    min-width: 140px;
+
+    @media (min-width: 600px) {
+      width: 100%;
+    }
 
     b {
       display: block;
