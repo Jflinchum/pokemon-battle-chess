@@ -66,7 +66,7 @@ const PokemonScreenEffect = ({
   index: number;
   side: SideID;
 }) => {
-  const initialOffset = side === "p1" ? 20 : -20;
+  const initialOffset = side === "p1" ? 30 : -20;
   const additionalOffset = index * SCREEN_OFFSET_PX * (side === "p1" ? 1 : -1);
   return (
     <div
