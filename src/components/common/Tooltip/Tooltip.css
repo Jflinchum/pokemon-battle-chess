@@ -11,8 +11,9 @@
     1px 1px 0 black;
   font-weight: 600;
   z-index: var(--tooltip-z-index);
-
   border-radius: 10px;
+  max-width: 80vw;
+  border: black solid 2px;
 
   p,
   strong {
