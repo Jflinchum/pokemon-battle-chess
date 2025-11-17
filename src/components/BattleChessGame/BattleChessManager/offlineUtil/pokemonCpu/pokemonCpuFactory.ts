@@ -10,7 +10,7 @@ import {
   doesMoveDoDamage,
   getTypeEffectiveness,
   modifyTypeAbilities,
-} from "../../../PokemonManager/PokemonBattleDisplay/PokemonMoveChoices/getTypeEffectiveness";
+} from "../../../../../util/pokemonUtil";
 import { PokemonCpu } from "../cpuFactory";
 import {
   doesItemSynergizeWithMove,

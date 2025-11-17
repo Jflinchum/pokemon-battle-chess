@@ -2,11 +2,11 @@ import { Dex, PokemonSet } from "@pkmn/dex";
 import { Chess, Move, Square } from "chess.js";
 import { PokemonBattleChessManager } from "../../../../../../shared/models/PokemonBattleChessManager";
 import { getCaptureSquare } from "../../../../../../shared/util/chessSquareIndex";
-import { getVerboseChessMove } from "../../../ChessManager/util";
 import {
   doesMoveDoDamage,
   getTypeEffectivenessFromSet,
-} from "../../../PokemonManager/PokemonBattleDisplay/PokemonMoveChoices/getTypeEffectiveness";
+} from "../../../../../util/pokemonUtil";
+import { getVerboseChessMove } from "../../../ChessManager/util";
 import { ChessCpu } from "../cpuFactory";
 import {
   getChessMoveIfCpuInCheckmate,

@@ -3,7 +3,10 @@ import { Move } from "@pkmn/data";
 import { Dex } from "@pkmn/dex";
 import PokemonMoveButton from "../../../../common/PokemonMoveButton/PokemonMoveButton";
 import { PokemonMoveTooltip } from "../PokemonMoveTooltip/PokemonMoveTooltip";
-import { doesMoveDoDamage, getTypeEffectiveness } from "./getTypeEffectiveness";
+import {
+  doesMoveDoDamage,
+  getTypeEffectiveness,
+} from "./../../../../../util/pokemonUtil";
 import "./PokemonMoveInfoButton.css";
 
 interface PokemonMoveInfoButtonProps {

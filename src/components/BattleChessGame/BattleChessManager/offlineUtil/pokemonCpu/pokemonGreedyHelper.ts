@@ -7,7 +7,7 @@ import {
   TerrainId,
   WeatherId,
 } from "../../../../../../shared/types/PokemonTypes";
-import { getTypeEffectiveness } from "../../../PokemonManager/PokemonBattleDisplay/PokemonMoveChoices/getTypeEffectiveness";
+import { getTypeEffectiveness } from "../../../../../util/pokemonUtil";
 
 const isPokemonPhysicalAttacker = (pokemon: Pokemon) => {
   const physicalMoves = [];
