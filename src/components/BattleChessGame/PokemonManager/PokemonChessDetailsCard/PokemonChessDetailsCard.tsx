@@ -227,11 +227,13 @@ const PokemonChessDetailsCard = ({
             >
               {Dex.abilities.get(pokemon.ability).shortDesc}
             </Tooltip>
-            <Tooltip
-              anchorSelect={`#${pokemon.item.split(" ").join("-").replace("'", "")}`}
-            >
-              {Dex.items.get(pokemon.item).shortDesc}
-            </Tooltip>
+            {pokemon.item ? (
+              <Tooltip
+                anchorSelect={`#${pokemon.item.split(" ").join("-").replace("'", "")}`}
+              >
+                {Dex.items.get(pokemon.item).shortDesc}
+              </Tooltip>
+            ) : null}
           </>
         ) : null
       }
