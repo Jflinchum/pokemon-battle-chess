@@ -90,7 +90,6 @@ export const HowToPlayScreen5 = () => {
       </p>
       <div className="gameDemoContainer">
         <BattleChessGame
-          demoMode
           color="w"
           pokemonManager={pokemonManager}
           chessManager={chessManager}

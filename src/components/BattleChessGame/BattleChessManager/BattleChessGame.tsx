@@ -27,6 +27,7 @@ import movePieceFX from "../../../assets/chessAssets/audio/movePiece.ogg";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
+import { useDemoMode } from "../../../util/useDemoMode.js";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
 import { useSocketRequests } from "../../../util/useSocketRequests";
 import Spinner from "../../common/Spinner/Spinner";
@@ -48,7 +49,6 @@ export const BattleChessGame = ({
   matchHistory,
   chessManager,
   pokemonManager,
-  demoMode,
   color,
   matchLogIndex,
   draftMode,
@@ -56,7 +56,6 @@ export const BattleChessGame = ({
   matchHistory?: MatchHistory;
   pokemonManager: PokemonBattleChessManager;
   chessManager: Chess;
-  demoMode?: boolean;
   draftMode?: boolean;
   color: Color;
   matchLogIndex: RefObject<number>;
@@ -110,6 +109,7 @@ export const BattleChessGame = ({
     playerColor: color,
   });
   const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
+  const { demoModeEnabled } = useDemoMode();
 
   const { movePieceAudio, capturePieceAudio } = useMemo(() => {
     const movePieceAudio = new Audio(movePieceFX);
@@ -645,7 +645,7 @@ export const BattleChessGame = ({
       (!gameState.isCatchingUp || userState.animationSpeedPreference >= 1000) &&
       !gameState.isSkippingAhead
     ) {
-      if (!demoMode) {
+      if (!demoModeEnabled) {
         const verboseChessMove = getVerboseSanChessMove(
           currentBattle.attemptedMove.san,
           chessManager,
@@ -661,7 +661,7 @@ export const BattleChessGame = ({
         });
       }
     } else {
-      if (!demoMode) {
+      if (!demoModeEnabled) {
         playGlobalSong();
       }
     }
@@ -683,7 +683,7 @@ export const BattleChessGame = ({
     playGlobalSong,
     userState.animationSpeedPreference,
     currentBattle,
-    demoMode,
+    demoModeEnabled,
   ]);
 
   return (
@@ -705,7 +705,6 @@ export const BattleChessGame = ({
             }
             currentPokemonMoveHistory={currentPokemonMoveHistory}
             perspective={color === "w" ? "p1" : "p2"}
-            demoMode={demoMode}
             onBattleEnd={() => {
               setBattleStarted(false);
               setCurrentPokemonMoveHistory([]);
@@ -721,7 +720,7 @@ export const BattleChessGame = ({
             onRequestPokemonMove={requestPokemonMoveFromServer}
           />
         )}
-        {!demoMode && !battleStarted && !isDrafting && (
+        {!demoModeEnabled && !battleStarted && !isDrafting && (
           <div className="turnNotification">
             {chessManager.turn() === color ? (
               <strong className="highPriorityNotification">

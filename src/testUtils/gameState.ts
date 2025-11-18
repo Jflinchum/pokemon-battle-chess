@@ -22,6 +22,7 @@ export const getMockGameState = (
     options: getDefaultGameOptions(),
   },
   cpuDifficulty: "Easy",
+  isDemoMode: false,
   ...overrides,
 });
 

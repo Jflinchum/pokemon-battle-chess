@@ -25,7 +25,6 @@ interface PokemonBattleManagerProps {
   p2PokemonSet: PokemonSet;
   currentPokemonMoveHistory: { args: CustomArgTypes; kwArgs: KWArgType }[];
   perspective: SideID;
-  demoMode?: boolean;
   onRequestPokemonMove: (move: string) => Promise<void>;
   onBattleEnd: () => void;
 }
@@ -36,7 +35,6 @@ const PokemonBattleManager = ({
   p2PokemonSet,
   currentPokemonMoveHistory,
   perspective,
-  demoMode,
   onRequestPokemonMove,
   onBattleEnd,
 }: PokemonBattleManagerProps) => {
@@ -187,7 +185,6 @@ const PokemonBattleManager = ({
 
   return (
     <PokemonBattleDisplay
-      demoMode={demoMode}
       prng={prng}
       fullBattleLog={processedBattleLog}
       moves={moves}

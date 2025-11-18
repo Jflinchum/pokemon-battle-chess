@@ -75,7 +75,6 @@ export const HowToPlayScreen2 = () => {
       </p>
       <div className="gameDemoContainer">
         <BattleChessGame
-          demoMode
           color="w"
           pokemonManager={pokemonManager}
           chessManager={chessManager}

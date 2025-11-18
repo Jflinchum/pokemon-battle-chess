@@ -28,6 +28,7 @@ export interface GameState {
   players: Player[];
   gameSettings: GameSettings;
   cpuDifficulty: (typeof cpuDifficultyLevels)[number];
+  isDemoMode: boolean;
 }
 
 export interface GameStateType {
@@ -87,6 +88,7 @@ export const getInitialGameState = (
   },
   matchHistory: [],
   ...persistantGameState,
+  isDemoMode: false,
 });
 
 const initalizeOfflinePlayers = ({
@@ -190,6 +192,7 @@ export const gameStateReducer = (
       return {
         ...gameState,
         matchEnded: false,
+        isDemoMode: true,
         gameSettings: {
           ...gameState.gameSettings,
           options: {

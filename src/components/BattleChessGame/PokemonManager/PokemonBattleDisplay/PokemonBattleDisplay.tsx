@@ -11,6 +11,7 @@ import {
   WeatherId,
 } from "../../../../../shared/types/PokemonTypes";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
+import { useDemoMode } from "../../../../util/useDemoMode";
 import "./PokemonBattleDisplay.css";
 import PokemonBattleField from "./PokemonBattleField/PokemonBattleField";
 import PokemonBattleLog from "./PokemonBattleLog/PokemonBattleLog";
@@ -36,7 +37,6 @@ interface PokemonBattleDisplayProps {
   p1PokemonSet: PokemonSet;
   p2PokemonSet: PokemonSet;
   perspective: SideID;
-  demoMode?: boolean;
   prng: PRNG;
   onRequestPokemonMove: (move: string) => Promise<void>;
 }
@@ -53,12 +53,12 @@ const PokemonBattleDisplay = ({
   p1PokemonSet,
   p2PokemonSet,
   perspective,
-  demoMode,
   prng,
   onRequestPokemonMove,
 }: PokemonBattleDisplayProps) => {
   const { gameState } = useGameState();
   const [moveChosen, setMoveChosen] = useState<string>();
+  const { demoModeEnabled } = useDemoMode();
 
   useEffect(() => {
     // TODO: Better handling for clearing move selection
@@ -95,7 +95,7 @@ const PokemonBattleDisplay = ({
           simple={true}
           perspective={perspective}
         />
-        {!demoMode && (
+        {!demoModeEnabled && (
           <div className="battleMoveContainer">
             <BattleMoveContainer
               hideMoves={
