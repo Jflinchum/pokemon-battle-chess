@@ -74,7 +74,7 @@ export const getGameOptions = () => {
     : defaultGameOptions;
 };
 
-export const setGameOptions = (gameOptions: GameOptions) => {
+export const setLocalGameOptions = (gameOptions: GameOptions) => {
   localStorage.setItem("localStorageGameOptions", JSON.stringify(gameOptions));
 };
 

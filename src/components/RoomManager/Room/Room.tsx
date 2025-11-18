@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { GameOptions } from "../../../../shared/types/GameOptions";
 import { useGameState } from "../../../context/GameState/GameStateContext";
-import { setGameOptions as setLocalGameOptions } from "../../../util/localWebData";
+import { setLocalGameOptions } from "../../../util/localWebData";
 import { useSocketRequests } from "../../../util/useSocketRequests";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
 import GameManagerActions from "../../BattleChessGame/BattleChessManager/GameManagerActions/GameManagerActions";
@@ -39,7 +39,6 @@ const Room = () => {
   const handleStartGame = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
-      setLocalGameOptions(gameOptions);
       if (!isUserInOfflineMode()) {
         await requestStartGame();
       } else {
@@ -66,6 +65,7 @@ const Room = () => {
     async (options: GameOptions) => {
       if (options && gameState.isHost) {
         try {
+          setLocalGameOptions(options);
           if (!isUserInOfflineMode()) {
             await requestChangeGameOptions(options);
           }
