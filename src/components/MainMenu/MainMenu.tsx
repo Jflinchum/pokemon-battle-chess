@@ -6,6 +6,7 @@ import { useModalState } from "../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../context/UserState/UserStateContext";
 import { getRoom, joinRoom } from "../../service/lobby";
 import { downloadReplay } from "../../util/downloadReplay";
+import { FAILED_TO_JOIN_ROOM_ERROR } from "../../util/errorMessages";
 import {
   clearMostRecentRoom,
   getMostRecentRoom,
@@ -45,10 +46,10 @@ const MainMenu = () => {
             payload: { roomId, roomCode },
           });
         } else {
-          toast("Error: Failed to join room.", { type: "error" });
+          toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
         }
       } catch (err) {
-        toast("Error: Failed to join room.", { type: "error" });
+        toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
         console.error(err);
       }
     },

@@ -8,6 +8,7 @@ import * as LobbyService from "../../../../service/lobby";
 import { getMockModalStateContext } from "../../../../testUtils/modalState";
 import { createMockRoom } from "../../../../testUtils/room";
 import { getMockUserStateContext } from "../../../../testUtils/userState";
+import { FAILED_TO_JOIN_ROOM_ERROR } from "../../../../util/errorMessages";
 import RoomList, { RoomListProps } from "../RoomList";
 
 vi.mock("react-toastify");
@@ -188,7 +189,7 @@ describe("RoomList", () => {
       const noPasswordRoom = getRoomItems()[0].querySelector("button");
       await user.click(noPasswordRoom!);
 
-      expect(toast).toHaveBeenNthCalledWith(1, "Error: Failed to join room.", {
+      expect(toast).toHaveBeenNthCalledWith(1, FAILED_TO_JOIN_ROOM_ERROR, {
         type: "error",
       });
 
@@ -198,7 +199,7 @@ describe("RoomList", () => {
 
       await user.click(noPasswordRoom!);
 
-      expect(toast).toHaveBeenNthCalledWith(2, "Error: Failed to join room.", {
+      expect(toast).toHaveBeenNthCalledWith(2, FAILED_TO_JOIN_ROOM_ERROR, {
         type: "error",
       });
     });

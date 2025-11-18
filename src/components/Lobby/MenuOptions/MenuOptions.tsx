@@ -18,6 +18,10 @@ import { useUserState } from "../../../context/UserState/UserStateContext";
 import { logToService } from "../../../service/lobby";
 import { isDevCookieEnabled } from "../../../util/devUtil";
 import { ReplayData } from "../../../util/downloadReplay";
+import {
+  COULD_NOT_READ_REPLAY_ERROR,
+  INVALID_REPLAY_ERROR,
+} from "../../../util/errorMessages";
 import { offlineRoomId } from "../../../util/offlineUtil";
 import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
 import NavOptions from "../../common/NavOptions/NavOptions";
@@ -90,10 +94,10 @@ const MenuOptions = () => {
         if (validateReplay(matchReplay)) {
           gameStateDispatch({ type: "START_REPLAY", payload: matchReplay });
         } else {
-          toast("Error: Replay file invalid", { type: "error" });
+          toast(INVALID_REPLAY_ERROR, { type: "error" });
         }
       } catch (err) {
-        toast("Error: Unable to read replay file", { type: "error" });
+        toast(COULD_NOT_READ_REPLAY_ERROR, { type: "error" });
         console.log(err);
       }
     };

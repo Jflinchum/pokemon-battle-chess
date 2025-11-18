@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { isStringProfane } from "../../../../../shared/util/profanityFilter";
 import { useModalState } from "../../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../../context/UserState/UserStateContext";
+import { PROFANE_NAME_ERROR } from "../../../../util/errorMessages";
 import Button from "../../../common/Button/Button";
 import TextInput from "../../../common/TextInput/TextInput";
 import "./NameChangeForm.css";
@@ -29,7 +30,7 @@ export const NameChangeForm = ({ closeModalOnSubmit }: NameChangeFormProps) => {
   const handleChangeName = (e: React.FormEvent) => {
     e.preventDefault();
     if (isStringProfane(name)) {
-      toast("Error: Cannot accept this name due to our profanity filters.", {
+      toast(PROFANE_NAME_ERROR, {
         type: "error",
       });
       return;

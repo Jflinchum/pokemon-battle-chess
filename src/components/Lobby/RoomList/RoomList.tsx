@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { joinRoom } from "../../../service/lobby";
+import { FAILED_TO_JOIN_ROOM_ERROR } from "../../../util/errorMessages";
 import { useDebounce } from "../../../utils";
 import TextInput from "../../common/TextInput/TextInput";
 import "./RoomList.css";
@@ -54,10 +55,10 @@ const RoomList = ({ availableRooms, onSearch }: RoomListProps) => {
             payload: { roomId: roomId, roomCode: "" },
           });
         } else {
-          toast("Error: Failed to join room.", { type: "error" });
+          toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
         }
       } catch (err) {
-        toast("Error: Failed to join room.", { type: "error" });
+        toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
         console.error(err);
       }
     }

@@ -70,7 +70,13 @@ const PokemonBattleDisplay = ({
       await onRequestPokemonMove(move);
     } catch (err) {
       setMoveChosen(undefined);
-      toast(`Error: ${err}. Please reselect your move`, { type: "error" });
+      console.error(err);
+      toast(
+        `Error: Unable to send your move to the server. Please reselect your move`,
+        {
+          type: "error",
+        },
+      );
     }
   };
 

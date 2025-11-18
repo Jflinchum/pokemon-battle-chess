@@ -15,6 +15,10 @@ import {
 } from "../../../../../shared/src/gameLogic";
 import { MatchHistory, MatchLog } from "../../../../../shared/types/Game";
 import { useGameState } from "../../../../context/GameState/GameStateContext";
+import {
+  CHESS_MOVE_ERROR,
+  POKEMON_ENGINE_ERROR,
+} from "../../../../util/errorMessages";
 import { getCpuPlayerId } from "../../../../util/offlineUtil";
 import { usePlayAgainstComputerUtil } from "../../../RoomManager/usePlayAgainstComputerUtil";
 import { availableBotLevels } from "./cpuFactory";
@@ -162,7 +166,7 @@ export const useOfflineMode = ({
           handlePokemonOutput(blackPokemonBattle, log),
         );
       } else {
-        toast("Error: Unable to determine player move");
+        toast(CHESS_MOVE_ERROR, { type: "error" });
         console.error(san);
         console.error(output);
       }
@@ -190,7 +194,9 @@ export const useOfflineMode = ({
   const requestComputerPokemonMove = useCallback(
     async (playerSide: "p1" | "p2") => {
       if (!whitePokemonBattle.current || !blackPokemonBattle.current) {
-        toast("Error: Could not initialize battle");
+        console.error(
+          "Unable to initialize battle for CPU. Choosing to forfeit.",
+        );
         return "forfeit";
       }
       try {
@@ -230,7 +236,7 @@ export const useOfflineMode = ({
   const updateMatchLogFromPokemonMove = useCallback(
     async (move: string) => {
       if (!currentPokemonBattleStakes) {
-        toast("Error: Unable to determine pokemon move");
+        toast(POKEMON_ENGINE_ERROR, { type: "error" });
         console.error(currentPokemonBattleStakes);
         return;
       }
@@ -268,7 +274,9 @@ export const useOfflineMode = ({
       });
 
       if (!pokemonOutput?.whiteStream || !pokemonOutput.blackStream) {
-        toast("Error: Unable to get pokemon battle output", { type: "error" });
+        toast(POKEMON_ENGINE_ERROR, {
+          type: "error",
+        });
         return;
       }
       pokemonOutput.whiteStream.forEach((log) =>
@@ -290,7 +298,7 @@ export const useOfflineMode = ({
           `>${playerColor === "w" ? "p2" : "p1"} move ${cpuMove}`,
         ]);
       } else {
-        toast("Error: Unable to determine pokemon move");
+        toast(POKEMON_ENGINE_ERROR, { type: "error" });
         console.error(opposingPlayerPokemonMove);
         console.error(output);
       }

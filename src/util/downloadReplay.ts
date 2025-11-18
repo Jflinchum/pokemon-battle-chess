@@ -4,6 +4,7 @@ import { MatchHistory } from "../../shared/types/Game.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import { Player } from "../../shared/types/Player.js";
 import { GameState } from "../context/GameState/GameStateContext.js";
+import { DOWNLOAD_REPLAY_ERROR } from "./errorMessages.js";
 
 export interface ReplayData {
   players: Player[];
@@ -23,7 +24,7 @@ export const downloadReplay = (gameState: GameState, error?: Error) => {
   const seed = gameState.gameSettings.seed;
 
   if (!whitePlayer || !blackPlayer || !seed) {
-    toast("Error: Unable to download the replay", { type: "error" });
+    toast(DOWNLOAD_REPLAY_ERROR, { type: "error" });
     return;
   }
   const replayData: ReplayData = {

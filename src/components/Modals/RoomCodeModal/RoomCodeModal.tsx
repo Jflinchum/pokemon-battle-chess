@@ -6,6 +6,10 @@ import {
 } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { joinRoom } from "../../../service/lobby";
+import {
+  FAILED_TO_JOIN_ROOM_ERROR,
+  INVALID_PASSWORD_ERROR,
+} from "../../../util/errorMessages";
 import Button from "../../common/Button/Button";
 import PasscodeInput from "../../common/PasscodeInput/PasscodeInput";
 import "./RoomCodeModal.css";
@@ -29,16 +33,16 @@ const RoomCodeModal = () => {
         userState.secretId,
       );
       if (response.status === 401) {
-        toast("Incorrect Password", { type: "error" });
+        toast(INVALID_PASSWORD_ERROR, { type: "error" });
         return;
       } else if (response.status > 399) {
-        toast("Error: Failed to join room.", { type: "error" });
+        toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
         return;
       }
       userStateDispatch({ type: "JOIN_ROOM", payload: { roomId, roomCode } });
       dispatch({ type: "CLOSE_MODAL" });
     } catch (err) {
-      toast("Error: Failed to join room.", { type: "error" });
+      toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
       console.error(err);
     }
   };

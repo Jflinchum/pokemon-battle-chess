@@ -27,6 +27,12 @@ import movePieceFX from "../../../assets/chessAssets/audio/movePiece.ogg";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
+import {
+  GAME_RESYNC_ERROR as GAME_ERROR_ATTEMPT_RECOVERY,
+  INVALID_CHESS_MOVE,
+  INVALID_POKEMON_BAN,
+  INVALID_POKEMON_DRAFT,
+} from "../../../util/errorMessages.js";
 import { useDemoMode } from "../../../util/useDemoMode.js";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
 import { useSocketRequests } from "../../../util/useSocketRequests";
@@ -187,7 +193,7 @@ export const BattleChessGame = ({
         return;
       }
       if (pokemonManager.banPieces.find((piece) => piece.index === pkmnIndex)) {
-        toast("You need to select a valid Pokémon to ban, first!", {
+        toast(INVALID_POKEMON_BAN, {
           type: "warning",
         });
         return;
@@ -252,7 +258,7 @@ export const BattleChessGame = ({
   const handleError = useCallback(
     (err: Error) => {
       if (errorRecoveryAttempts.current < 3) {
-        toast("Oops! We encountered an error. Attempting to recover...", {
+        toast(GAME_ERROR_ATTEMPT_RECOVERY, {
           type: "error",
         });
         console.log(`Encountered error: ${err.message}. Attempting resync.`);
@@ -302,7 +308,7 @@ export const BattleChessGame = ({
           simulatedChessManager,
         );
         if (!verboseChessMove) {
-          toast("Error: Invalid chess move.");
+          toast(INVALID_CHESS_MOVE, { type: "error" });
           return;
         }
         if (verboseChessMove.isEnPassant() || verboseChessMove.isCapture()) {
@@ -768,7 +774,7 @@ export const BattleChessGame = ({
                   toast(`Error: ${err}`, { type: "error" });
                 }
               } else {
-                toast("Invalid Pokémon.", {
+                toast(INVALID_POKEMON_DRAFT, {
                   type: "warning",
                 });
               }

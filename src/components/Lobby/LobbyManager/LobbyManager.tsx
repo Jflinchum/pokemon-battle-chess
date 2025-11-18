@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { getAvailableRooms } from "../../../service/lobby";
+import { COULD_NOT_GET_ROOMS_ERROR } from "../../../util/errorMessages";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
 import usePageVisibility from "../../../util/usePageVisibility";
 import AnimatedBackground from "../../AnimatedBackground/AnimatedBackground";
@@ -43,7 +44,7 @@ const LobbyManager = () => {
           setAvailableRooms(rooms || []);
           setTotalPages(pageCount);
         } else {
-          toast("Error: Could not get rooms.", { type: "error" });
+          toast(COULD_NOT_GET_ROOMS_ERROR, { type: "error" });
         }
       };
       fetchRooms();

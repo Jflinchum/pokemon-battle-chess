@@ -4,6 +4,7 @@ import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { createNewRoom } from "../../../service/lobby";
+import { FAILED_TO_CREATE_ROOM_ERROR } from "../../../util/errorMessages";
 import CreateRoomForm from "./CreateRoomForm/CreateRoomForm";
 import "./CreateRoomModal.css";
 
@@ -33,11 +34,11 @@ const CreateRoomModal = () => {
         dispatchGameState({ type: "CREATE_ROOM" });
         dispatch({ type: "CLOSE_MODAL" });
       } else {
-        toast("Error: Could not create room.", { type: "error" });
+        toast(FAILED_TO_CREATE_ROOM_ERROR, { type: "error" });
       }
     } catch (err) {
       console.error(err);
-      toast("Error: Could not create room.", { type: "error" });
+      toast(FAILED_TO_CREATE_ROOM_ERROR, { type: "error" });
     }
     setCreateRoomLoading(false);
   };

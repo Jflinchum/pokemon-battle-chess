@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getMockGameState } from "../../testUtils/gameState";
 import { getMockPlayer } from "../../testUtils/player";
 import { downloadReplay } from "../downloadReplay";
+import { DOWNLOAD_REPLAY_ERROR } from "../errorMessages";
 import { getDefaultGameOptions } from "../localWebData";
 
 vi.mock("react-toastify");
@@ -22,7 +23,7 @@ describe("downloadReplay.ts", () => {
         },
       }),
     );
-    expect(toast).toHaveBeenCalledWith("Error: Unable to download the replay", {
+    expect(toast).toHaveBeenCalledWith(DOWNLOAD_REPLAY_ERROR, {
       type: "error",
     });
   });
@@ -37,7 +38,7 @@ describe("downloadReplay.ts", () => {
         },
       }),
     );
-    expect(toast).toHaveBeenCalledWith("Error: Unable to download the replay", {
+    expect(toast).toHaveBeenCalledWith(DOWNLOAD_REPLAY_ERROR, {
       type: "error",
     });
   });
@@ -52,7 +53,7 @@ describe("downloadReplay.ts", () => {
         },
       }),
     );
-    expect(toast).toHaveBeenCalledWith("Error: Unable to download the replay", {
+    expect(toast).toHaveBeenCalledWith(DOWNLOAD_REPLAY_ERROR, {
       type: "error",
     });
   });

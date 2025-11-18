@@ -10,6 +10,10 @@ import { getMockGameStateContext } from "../../../../testUtils/gameState";
 import { getMockReplayData } from "../../../../testUtils/matchHistory";
 import { getMockModalStateContext } from "../../../../testUtils/modalState";
 import { getMockUserStateContext } from "../../../../testUtils/userState";
+import {
+  COULD_NOT_READ_REPLAY_ERROR,
+  INVALID_REPLAY_ERROR,
+} from "../../../../util/errorMessages";
 import { offlineRoomId } from "../../../../util/offlineUtil";
 import MenuOptions from "../MenuOptions";
 import * as ValidateReplay from "../validateReplay";
@@ -234,7 +238,7 @@ describe("MenuOptions", () => {
       const fileInput = getFileInput();
       await userEvent.upload(fileInput, file);
 
-      expect(toast).toHaveBeenCalledWith("Error: Replay file invalid", {
+      expect(toast).toHaveBeenCalledWith(INVALID_REPLAY_ERROR, {
         type: "error",
       });
     });
@@ -248,7 +252,7 @@ describe("MenuOptions", () => {
       const fileInput = getFileInput();
       await userEvent.upload(fileInput, file);
 
-      expect(toast).toHaveBeenCalledWith("Error: Unable to read replay file", {
+      expect(toast).toHaveBeenCalledWith(COULD_NOT_READ_REPLAY_ERROR, {
         type: "error",
       });
     });
