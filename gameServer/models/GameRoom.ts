@@ -74,6 +74,7 @@ import {
   unpackSquareModifierFromBitField,
 } from "../cache/squareModifierBitField.js";
 import { DEFAULT_GAME_OPTIONS } from "../constants/gameRoomConstants.js";
+import logger from "../logger.js";
 import GameTimer from "./GameTimer.js";
 
 export default class GameRoom {
@@ -298,7 +299,13 @@ export default class GameRoom {
           return await this.randomDraftPick("b");
         }
       } catch (err) {
-        console.error(err);
+        logger.error({
+          body: {
+            name: "validateGameTimer",
+            textPayload: "Unable to validate random draft pick for timers",
+            err,
+          },
+        });
       }
     } else {
       if (timerExpired.white) {
@@ -335,25 +342,64 @@ export default class GameRoom {
     try {
       await this.setGameState();
     } catch (err) {
-      console.error(err);
+      logger.error({
+        body: {
+          name: "validateAndEmitChessMove",
+          textPayload: "Unable to set game state",
+          err,
+        },
+      });
       return;
     }
     if (!this.whitePlayer || !this.blackPlayer || !this.isOngoing) {
-      console.error("State error");
+      logger.error({
+        body: {
+          name: "validateAndEmitChessMove",
+          textPayload: "Invalid game state for chess move",
+          whitePlayerId: this.whitePlayer?.playerId,
+          blackPlayerId: this.blackPlayer?.playerId,
+          isOngoing: this.isOngoing,
+        },
+      });
       return;
     }
     if (this.currentTurnWhite && this.whitePlayer.playerId !== playerId) {
-      console.warn("Player id does not match with white");
+      logger.warn({
+        body: {
+          name: "validateAndEmitChessMove",
+          textPayload: "Player ID does not match white player ID",
+          currentTurn: this.currentTurnWhite ? "w" : "b",
+          whitePlayerId: this.whitePlayer?.playerId,
+          playerId,
+        },
+      });
       return;
     } else if (
       !this.currentTurnWhite &&
       this.blackPlayer.playerId !== playerId
     ) {
-      console.warn("Player id does not match with black");
+      logger.warn({
+        body: {
+          name: "validateAndEmitChessMove",
+          textPayload: "Player ID does not match black player ID",
+          currentTurn: this.currentTurnWhite ? "w" : "b",
+          blackPlayerId: this.blackPlayer?.playerId,
+          playerId,
+        },
+      });
       return;
     }
     if (this.currentPokemonBattleStakes) {
-      console.warn("Already pokemon stakes. No chess moves allowed");
+      logger.warn({
+        body: {
+          name: "validateAndEmitChessMove",
+          textPayload:
+            "No chess moves allowed when there currently is a pokemon battle",
+          currentTurn: this.currentTurnWhite ? "w" : "b",
+          playerId,
+          battleStakes: this.currentPokemonBattleStakes.san,
+        },
+      });
       return;
     }
     const hasTimerExpired = await this.validateGameTimer();
@@ -692,7 +738,14 @@ export default class GameRoom {
     try {
       await this.setGameState();
     } catch (err) {
-      console.error(err);
+      logger.error({
+        body: {
+          name: "validateAndEmitPokemonMove",
+          textPayload: "Unable to set game state",
+          playerId,
+          err,
+        },
+      });
       return;
     }
     if (
@@ -701,7 +754,16 @@ export default class GameRoom {
       !this.isOngoing ||
       !this.currentPokemonBattleStakes
     ) {
-      console.warn("Players or stakes are not set");
+      logger.warn({
+        body: {
+          name: "validateAndEmitPokemonMove",
+          textPayload: "Invalid game state for pokemon move",
+          whitePlayerId: this.whitePlayer?.playerId,
+          blackPlayerId: this.blackPlayer?.playerId,
+          isOngoing: this.isOngoing,
+          battle: this.currentPokemonBattleStakes?.san,
+        },
+      });
       return;
     }
 
@@ -766,7 +828,13 @@ export default class GameRoom {
           await this.processRoomTimers("pokemonMovesFinalized");
         }
       } catch (err) {
-        console.error(err);
+        logger.error({
+          body: {
+            name: "validateAndEmitPokemonMove",
+            textPayload: "Unable to process pokemon battle",
+            err,
+          },
+        });
         return;
       }
     } else {
@@ -885,7 +953,14 @@ export default class GameRoom {
     try {
       await this.setGameState();
     } catch (err) {
-      console.error("Error setting state:", (err as unknown as Error).message);
+      logger.error({
+        body: {
+          name: "validateAndEmitPokemonBan",
+          textPayload: "Unable to set game state",
+          playerId,
+          err,
+        },
+      });
     }
     if (
       !this.whitePlayer ||
@@ -893,7 +968,16 @@ export default class GameRoom {
       !this.pokemonGameManager.draftPieces.length ||
       this.chessManager.moveNumber() > 1
     ) {
-      console.warn("Incorrect state for pokemon ban");
+      logger.warn({
+        body: {
+          name: "validateAndEmitPokemonBan",
+          textPayload: "Invalid state for pokemon ban",
+          whitePlayerId: this.whitePlayer?.playerId,
+          blackPlayerId: this.blackPlayer?.playerId,
+          currentTurnNumber: this.chessManager.moveNumber(),
+          currentDraftablePieces: this.pokemonGameManager.draftPieces.length,
+        },
+      });
       return;
     }
 
@@ -974,7 +1058,14 @@ export default class GameRoom {
     try {
       await this.setGameState();
     } catch (err) {
-      console.error("Error setting state:", (err as unknown as Error).message);
+      logger.error({
+        body: {
+          name: "validateAndEmitPokemonDraft",
+          textPayload: "Unable to set game state",
+          playerId,
+          err,
+        },
+      });
     }
     if (
       !square ||
@@ -985,7 +1076,19 @@ export default class GameRoom {
       !this.pokemonGameManager.draftPieces.length ||
       this.chessManager.moveNumber() > 1
     ) {
-      console.warn("Incorrect state for pokemon ban");
+      logger.warn({
+        body: {
+          name: "validateAndEmitPokemonDraft",
+          textPayload: "Invalid state for pokemon draft",
+          whitePlayerId: this.whitePlayer?.playerId,
+          blackPlayerId: this.blackPlayer?.playerId,
+          chessPiece,
+          square,
+          isOngoing: this.isOngoing,
+          currentTurnNumber: this.chessManager.moveNumber(),
+          currentDraftablePieces: this.pokemonGameManager.draftPieces.length,
+        },
+      });
       return;
     }
 

@@ -5,13 +5,14 @@ import {
   roomExists,
 } from "./cache/redis.js";
 import { InternalConfig } from "./config.js";
+import logger from "./logger.js";
 
 const SCHEDULER_INTERVAL = 1000 * 60 * 5;
 
 export const registerScheduler = (config: InternalConfig) => {
   const setUpDisconnectedUserCleanUpInterval = () => {
     setInterval(async () => {
-      console.log("Running clean up job.");
+      logger.info("Running clean up job.");
       const disconnectedUsers = await getDisconnectedUsers();
 
       disconnectedUsers.forEach(async (user) => {
@@ -45,7 +46,12 @@ export const registerScheduler = (config: InternalConfig) => {
           deleteRoom(roomId);
         });
       } catch (err) {
-        console.log("Could not clean up rooms with no users", err);
+        logger.error({
+          body: {
+            textPayload: "Could not clean up rooms with no users",
+            err,
+          },
+        });
       }
     }, SCHEDULER_INTERVAL);
   };

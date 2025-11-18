@@ -42,6 +42,7 @@ import {
   setUserAsTransient,
 } from "../cache/redis.js";
 import { DEFAULT_GAME_OPTIONS } from "../constants/gameRoomConstants.js";
+import logger from "../logger.js";
 import GameRoom from "./GameRoom.js";
 
 interface GameRoomList {
@@ -84,11 +85,24 @@ export default class GameRoomManager {
   }
 
   public async getRoomOptions(roomId: string): Promise<GameOptions> {
-    const gameRoomOptions = await fetchGameOptions(roomId);
-    if (gameRoomOptions) {
-      return gameRoomOptions;
+    try {
+      const gameRoomOptions = await fetchGameOptions(roomId);
+      if (gameRoomOptions) {
+        return gameRoomOptions;
+      }
+    } catch (err) {
+      logger.error({
+        body: {
+          textPayload: "Unable to fetch game options from redis",
+          err,
+        },
+      });
     }
-    console.warn("Defaulting game room options");
+    logger.warn({
+      body: {
+        textPayload: "No game options found. Defaulting game room options",
+      },
+    });
 
     return {
       format: "random",
@@ -200,27 +214,53 @@ export default class GameRoomManager {
     altOptions?: { roomCode?: string },
   ): Promise<boolean> {
     if (!roomId || !playerId || !secretId) {
-      console.warn(`${playerId} mismatch for ${roomId}`);
+      logger.warn({
+        body: {
+          name: "verifyPlayerConnection",
+          textPayload: "Could not verify player",
+          roomId,
+          playerId,
+          secretId: !!secretId,
+        },
+      });
       return false;
     }
 
     const cachedRoomExist = await doesRoomExist(roomId);
     if (cachedRoomExist === 0) {
-      console.warn(`${roomId} does not exist`);
+      logger.warn({
+        body: {
+          name: "verifyPlayerConnection",
+          textPayload: "Room does not exist",
+          roomId,
+        },
+      });
       return false;
     }
 
     if (altOptions) {
       const roomCode = await fetchRoomCode(roomId);
       if (altOptions.roomCode !== roomCode) {
-        console.log(`${playerId} invalid password for ${roomId}`);
+        logger.warn({
+          body: {
+            name: "verifyPlayerConnection",
+            textPayload: "Room passcode does not match",
+            roomId,
+          },
+        });
         return false;
       }
     }
 
     const cachedPlayerSecret = await fetchPlayerSecret(playerId);
     if (cachedPlayerSecret !== secretId) {
-      console.log(`${playerId} invalid player secret`);
+      logger.warn({
+        body: {
+          name: "verifyPlayerConnection",
+          textPayload: "Player secret does not match",
+          playerId,
+        },
+      });
       return false;
     }
 
@@ -242,7 +282,14 @@ export default class GameRoomManager {
           roomIds.map((roomId) => removePlayerIdFromRoom(roomId, playerId, 0)),
         );
       } catch (err) {
-        console.error(err);
+        logger.error({
+          body: {
+            name: "createAndCacheNewRoom",
+            textPayload: "Unable to remove player from previous rooms",
+            playerId,
+            err,
+          },
+        });
         // attempt to continue with creating the new room, anyways
       }
     }
@@ -256,13 +303,26 @@ export default class GameRoomManager {
     }
 
     const gameRoom = new GameRoom(newRoomId, password, undefined, gameOptions);
-    console.log(`Creating room ${newRoomId}`);
     await createRoomInCache(newRoomId, gameRoom, !!matchMaking);
+    logger.info({
+      body: {
+        name: "createAndCacheNewRoom",
+        textPayload: "Creating new room",
+        roomId: newRoomId,
+        playerId,
+      },
+    });
     return gameRoom;
   }
 
   public async removeRoom(roomId: string) {
-    console.log(`Cleaning up room ${roomId}`);
+    logger.info({
+      body: {
+        name: "removeRoom",
+        textPayload: "Removing room",
+        roomId,
+      },
+    });
     this.io.to(roomId).emit("roomClosed");
     await deleteRoom(roomId);
   }
@@ -368,9 +428,17 @@ export default class GameRoomManager {
       ) {
         if (currentRoomId) {
           if (currentRoomId === roomId) {
-            console.log(
-              "Player disconnection exceeded timeout. Forcing them out of the room.",
-            );
+            logger.info({
+              body: {
+                name: "preparePlayerDisconnect",
+                textPayload:
+                  "Player disconnection exceeded timeout. Forcing them out of the room.",
+                playerId,
+                roomId,
+                currentRoomId,
+                transientTimestamp,
+              },
+            });
             this.playerLeaveRoom(roomId, playerId);
           }
         } else {

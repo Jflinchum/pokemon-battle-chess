@@ -25,6 +25,7 @@ import User from "../../shared/models/User.js";
 import { MatchLog } from "../../shared/types/Game.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import { getConfig } from "../config.js";
+import logger from "../logger.js";
 import GameRoom from "../models/GameRoom.js";
 
 /**
@@ -67,7 +68,12 @@ export const redisClient = new Redis({
 
 const connectAndIndexRedis = async () => {
   redisClient.on("error", (err) => {
-    console.error("Redis Client Error", err);
+    logger.error({
+      body: {
+        textPayload: "Redis Client Error",
+        err,
+      },
+    });
     redisClient.disconnect();
   });
   await redisClient.connect();
@@ -867,11 +873,13 @@ export const getPokemonBattleStakes = async (
     if (currentPokemonBattleStakes) {
       return JSON.parse(currentPokemonBattleStakes);
     }
-  } catch (e) {
-    console.log(
-      "Could not parse battle stakes:",
-      (e as unknown as Error).message,
-    );
+  } catch (err) {
+    logger.error({
+      body: {
+        textPayload: "Could not parse battle stakes",
+        err,
+      },
+    });
   }
   return null;
 };

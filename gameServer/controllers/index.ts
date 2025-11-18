@@ -10,6 +10,7 @@ import {
   UNABLE_TO_FIND_ROOM_ERROR,
   UNABLE_TO_JOIN_ROOM,
 } from "../constants/errorMessages.js";
+import logger from "../logger.js";
 import GameRoom from "../models/GameRoom.js";
 import GameRoomManager from "../models/GameRoomManager.js";
 
@@ -60,17 +61,31 @@ export const registerRoutes = (
         playerId,
         password,
       );
-      console.log(
-        `Player ${playerName} (${playerId}) has created a new room ${roomId}`,
-      );
       await gameRoomManager.playerJoinRoom(roomId, playerId);
       gameRoomManager.clearPlayerTransientState(playerId);
 
+      logger.info({
+        request: "/game-service/create-room",
+        body: {
+          textPayload: "Successfully created a new room",
+          playerName,
+          playerId,
+          roomId,
+        },
+      });
       res.status(200).send({
         data: { roomId },
       });
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/game-service/create-room",
+        body: {
+          textPayload: "Failed to create a new room",
+          playerName,
+          playerId,
+          err,
+        },
+      });
       res.status(500).send({ message: FAILED_TO_CREATE_ROOM_ERROR });
     }
   });
@@ -103,8 +118,15 @@ export const registerRoutes = (
         return;
       }
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/game-service/join-room",
+        body: {
+          textPayload: "Could not fetch room from redis",
+          err,
+        },
+      });
       res.status(500).send({ message: UNABLE_TO_FIND_ROOM_ERROR });
+      return;
     }
 
     if (!roomId || !playerId || !playerName) {
@@ -123,12 +145,27 @@ export const registerRoutes = (
       } else {
         await gameRoomManager.playerJoinRoom(roomId, playerId);
       }
-      console.log(
-        `Player ${playerName} (${playerId}) has joined room ${roomId}`,
-      );
+      logger.info({
+        request: "/game-service/join-room",
+        body: {
+          textPayload: "Player has succesfully joined the room",
+          playerName,
+          playerId,
+          roomId,
+        },
+      });
       res.status(200).send({ data: { roomId: roomId } });
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/game-service/join-room",
+        body: {
+          textPayload: "Failed to allow player to join the room",
+          playerName,
+          playerId,
+          roomId,
+          err,
+        },
+      });
       res.status(500).send({ message: UNABLE_TO_JOIN_ROOM });
     }
   });
@@ -149,10 +186,25 @@ export const registerRoutes = (
     }
 
     try {
-      console.log(`Player (${playerId}) has left room ${roomId}`);
+      logger.info({
+        request: "/game-service/leave-room",
+        body: {
+          textPayload: "Player has left the room",
+          playerId,
+          roomId,
+        },
+      });
       await gameRoomManager.playerLeaveRoom(roomId, playerId);
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/game-service/leave-room",
+        body: {
+          textPayload: "Failed to allow player to leave the room",
+          playerId,
+          roomId,
+          err,
+        },
+      });
       // Continue silently
     }
 

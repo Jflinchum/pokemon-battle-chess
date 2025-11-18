@@ -10,6 +10,7 @@ import {
 } from "../shared/types/Socket.js";
 import { getConfig } from "./config.js";
 import { registerRoutes } from "./controllers/index.js";
+import logger from "./logger.js";
 import GameRoomManager from "./models/GameRoomManager.js";
 import { registerSocketEvents } from "./socket/socketEvents.js";
 import { registerSocketIoAdmin } from "./socket/socketIoAdmin.js";
@@ -30,7 +31,7 @@ app.use(
 );
 
 const server = http.createServer(app).listen(serverPort, () => {
-  console.log(`GameServer is listening on ${serverPort}`);
+  logger.info(`GameServer is listening on ${serverPort}`);
 });
 
 const redisClient = new Redis(configSettings.redisOptions);

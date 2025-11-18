@@ -23,6 +23,7 @@ import {
   UNABLE_TO_JOIN_ROOM,
   UNABLE_TO_VERIFY_PASSWORD_ERROR,
 } from "../constants/constants.js";
+import logger from "../logger.js";
 
 interface APIResponse<Data> {
   data?: Data;
@@ -40,18 +41,21 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     res.status(200).send("Ok");
   });
 
-  app.post<
-    Empty,
-    APIResponse<Empty>,
-    {
-      message: string;
-    }
-  >("/lobby-service/log", (req, res) => {
-    if (req.body.message) {
-      console.log(`Logging Service: ${req.body.message}`);
-    }
-    res.status(200).send();
-  });
+  app.post<Empty, APIResponse<Empty>, object>(
+    "/lobby-service/log",
+    (req, res) => {
+      if (!req.body || Object.keys(req.body).length === 0) {
+        res.status(400).send();
+        return;
+      }
+
+      logger.info({
+        request: "/lobby-service/log",
+        body: req.body,
+      });
+      res.status(200).send();
+    },
+  );
 
   /**
    * Creates a room.
@@ -122,12 +126,28 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
           );
           await Promise.all([cacheCreateRoomPromise, cacheAddPlayerPromise]);
         } catch (err) {
-          console.error(
-            "Failed to create rooms in redis: " + (err as unknown as Error),
-          );
+          logger.error({
+            request: "/lobby-service/create-room",
+            body: {
+              textPayload: "Failed to create rooms in redis",
+              playerName,
+              playerId,
+              avatarId,
+              error: err,
+            },
+          });
           res.status(500).send({ message: UNABLE_TO_CREATE_ROOM });
           return;
         }
+        logger.info({
+          request: "/lobby-service/create-room",
+          body: {
+            textPayload: "Successfully created a new room",
+            playerName,
+            playerId,
+            avatarId,
+          },
+        });
         res.status(200).send({
           data: { roomId: gameServerRespBody.data.roomId },
         });
@@ -137,9 +157,16 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         return;
       }
     } catch (err) {
-      console.error(
-        "Failed to request from game service: " + (err as unknown as Error),
-      );
+      logger.error({
+        request: "/lobby-service/create-room",
+        body: {
+          textPayload: "Failed to request from game service",
+          playerName,
+          playerId,
+          avatarId,
+          error: err,
+        },
+      });
       res.status(500).send({ message: UNABLE_TO_CREATE_ROOM });
       return;
     }
@@ -177,7 +204,13 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         return;
       }
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/lobby-service/join-room",
+        body: {
+          textPayload: "Could not fetch room from redis",
+          err,
+        },
+      });
       // Continue checking other parameters
     }
 
@@ -196,7 +229,13 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         return;
       }
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/lobby-service/join-room",
+        body: {
+          textPayload: "Could not fetch room passcode from redis",
+          err,
+        },
+      });
       res.status(401).send({ message: UNABLE_TO_VERIFY_PASSWORD_ERROR });
       return;
     }
@@ -204,9 +243,13 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     try {
       const cachedUser = await fetchUser(playerId);
       if (cachedUser?.connectedRoom && cachedUser?.connectedRoom !== roomId) {
-        console.log(
-          "User in a different room already. Kicking them out of their previous room",
-        );
+        logger.info({
+          request: "/lobby-service/join-room",
+          body: {
+            textPayload:
+              "User in a different room already. Kicking them out of their previous room",
+          },
+        });
         await fetch(`${config.gameServiceUrl}/game-service/leave-room`, {
           method: "PUT",
           headers: {
@@ -219,7 +262,14 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         });
       }
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/lobby-service/join-room",
+        body: {
+          textPayload:
+            "Could not fetch user from redis to kick them out of any other rooms that they are in",
+          err,
+        },
+      });
       // Continue silently
     }
 
@@ -250,12 +300,43 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
           playerId,
         );
       } catch (err) {
-        console.error(err);
+        logger.error({
+          request: "/lobby-service/join-room",
+          body: {
+            textPayload: "Failed to join room",
+            err,
+            playerName,
+            playerId,
+            roomId,
+            avatarId,
+          },
+        });
         res.status(500).send({ message: UNABLE_TO_JOIN_ROOM });
         return;
       }
+      logger.info({
+        request: "/lobby-service/join-room",
+        body: {
+          textPayload: "Successfully let player join the room",
+          playerName,
+          playerId,
+          roomId,
+          avatarId,
+        },
+      });
       res.status(200).send({ data: { roomId: roomId } });
     } else {
+      logger.error({
+        request: "/lobby-service/join-room",
+        body: {
+          textPayload: "Game Server responded with a failure",
+          status: gameServerResp.status,
+          playerName,
+          playerId,
+          roomId,
+          avatarId,
+        },
+      });
       res.status(gameServerResp.status).send(await gameServerResp.json());
     }
   });
@@ -335,7 +416,13 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         },
       });
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/lobby-service/get-rooms",
+        body: {
+          textPayload: "Could not fetch rooms",
+          err,
+        },
+      });
       res.status(500).send({
         message: COULD_NOT_FETCH_ROOMS,
       });
@@ -371,7 +458,13 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
       });
       return;
     } catch (err) {
-      console.error(err);
+      logger.error({
+        request: "/lobby-service/get-room",
+        body: {
+          textPayload: "Could not get room details from redis",
+          err,
+        },
+      });
       res.status(404).send({ message: ROOM_NOT_FOUND_ERROR });
       return;
     }

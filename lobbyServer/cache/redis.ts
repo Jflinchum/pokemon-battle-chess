@@ -10,6 +10,7 @@ import {
   getRoomWhiteMatchHistoryKey,
 } from "../../shared/cache/redis.js";
 import { getConfig } from "../config.js";
+import logger from "../logger.js";
 import {
   PLAYER_KEY,
   REDIS_KEY_EXPIRY,
@@ -55,7 +56,12 @@ const redisClient = new Redis({
 
 const connectAndIndexRedis = async () => {
   redisClient.on("error", (err) => {
-    console.log("Redis Client Error", err);
+    logger.error({
+      body: {
+        textPayload: "Redis Client Error",
+        err,
+      },
+    });
     redisClient.disconnect();
   });
   await redisClient.connect();
@@ -235,7 +241,12 @@ export const getRoomFromName = async (
       })),
     };
   } catch (err) {
-    console.log(err);
+    logger.error({
+      body: {
+        textPayload: "getRoomFromName",
+        err,
+      },
+    });
     return {
       roomCount: 0,
       rooms: [],
@@ -325,7 +336,12 @@ export const getDisconnectedUsers = async (): Promise<
 
     return results;
   } catch (err) {
-    console.log(err);
+    logger.error({
+      body: {
+        textPayload: "getDisconnectedUsers",
+        err,
+      },
+    });
     return [];
   }
 };

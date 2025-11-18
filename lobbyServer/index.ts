@@ -4,6 +4,7 @@ import http from "http";
 import path from "path";
 import { getConfig } from "./config.js";
 import { registerRoutes } from "./controllers/index.js";
+import logger from "./logger.js";
 import { registerScheduler } from "./scheduler.js";
 
 const configSettings = getConfig();
@@ -28,7 +29,7 @@ app.use((_, res, next) => {
 });
 
 http.createServer(app).listen(httpPort, () => {
-  console.log(`LobbyServer HTTP is listening on ${httpPort}`);
+  logger.info(`LobbyServer HTTP is listening on ${httpPort}`);
 });
 
 app.use(express.json());
