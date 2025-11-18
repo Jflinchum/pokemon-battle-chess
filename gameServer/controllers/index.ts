@@ -2,6 +2,14 @@ import { Express } from "express";
 import User from "../../shared/models/User.js";
 import { isStringProfane } from "../../shared/util/profanityFilter.js";
 import { doesRoomExist, setPlayerViewingResults } from "../cache/redis.js";
+import {
+  FAILED_TO_CREATE_ROOM_ERROR,
+  MISSING_PARAMETERS as MISSING_PARAMETERS_ERROR,
+  NAME_PROFANITY_ERROR,
+  ROOM_NO_LONGER_AVAILABLE_ERROR,
+  UNABLE_TO_FIND_ROOM_ERROR,
+  UNABLE_TO_JOIN_ROOM,
+} from "../constants/errorMessages.js";
 import GameRoom from "../models/GameRoom.js";
 import GameRoomManager from "../models/GameRoomManager.js";
 
@@ -38,12 +46,12 @@ export const registerRoutes = (
     const password = req.body.password;
 
     if (!playerName || !playerId) {
-      res.status(400).send();
+      res.status(400).send({ message: MISSING_PARAMETERS_ERROR });
       return;
     }
 
     if (isStringProfane(playerName)) {
-      res.status(400).send({ message: "Name does not pass profanity filter." });
+      res.status(400).send({ message: NAME_PROFANITY_ERROR });
       return;
     }
 
@@ -63,7 +71,7 @@ export const registerRoutes = (
       });
     } catch (err) {
       console.error(err);
-      res.status(500).send({ message: "Could not create room." });
+      res.status(500).send({ message: FAILED_TO_CREATE_ROOM_ERROR });
     }
   });
 
@@ -91,19 +99,19 @@ export const registerRoutes = (
       const roomExists = await doesRoomExist(roomId);
 
       if (!roomExists) {
-        res.status(400).send({ message: "Room is no longer available" });
+        res.status(400).send({ message: ROOM_NO_LONGER_AVAILABLE_ERROR });
         return;
       }
     } catch (err) {
       console.error(err);
-      res.status(500).send({ message: "Unable to find room" });
+      res.status(500).send({ message: UNABLE_TO_FIND_ROOM_ERROR });
     }
 
     if (!roomId || !playerId || !playerName) {
-      res.status(400).send({ message: "Missing parameters" });
+      res.status(400).send({ message: MISSING_PARAMETERS_ERROR });
       return;
     } else if (isStringProfane(playerName)) {
-      res.status(400).send({ message: "Name does not pass profanity filter." });
+      res.status(400).send({ message: NAME_PROFANITY_ERROR });
       return;
     }
 
@@ -121,7 +129,7 @@ export const registerRoutes = (
       res.status(200).send({ data: { roomId: roomId } });
     } catch (err) {
       console.error(err);
-      res.status(500).send({ message: "Unable to add player to room." });
+      res.status(500).send({ message: UNABLE_TO_JOIN_ROOM });
     }
   });
 

@@ -12,6 +12,17 @@ import {
   roomExists,
 } from "../cache/redis.js";
 import { InternalConfig } from "../config.js";
+import {
+  COULD_NOT_FETCH_ROOMS,
+  INVALID_PASSWORD_ERROR,
+  MISSING_PARAMETERS_ERROR,
+  NAME_PROFANITY_ERROR,
+  ROOM_NO_LONGER_AVAILABLE_ERROR,
+  ROOM_NOT_FOUND_ERROR,
+  UNABLE_TO_CREATE_ROOM,
+  UNABLE_TO_JOIN_ROOM,
+  UNABLE_TO_VERIFY_PASSWORD_ERROR,
+} from "../constants/constants.js";
 
 interface APIResponse<Data> {
   data?: Data;
@@ -71,7 +82,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     }
 
     if (isStringProfane(playerName)) {
-      res.status(400).send({ message: "Name does not pass profanity filter." });
+      res.status(400).send({ message: NAME_PROFANITY_ERROR });
       return;
     }
 
@@ -111,10 +122,10 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
           );
           await Promise.all([cacheCreateRoomPromise, cacheAddPlayerPromise]);
         } catch (err) {
-          console.log(
+          console.error(
             "Failed to create rooms in redis: " + (err as unknown as Error),
           );
-          res.status(500).send();
+          res.status(500).send({ message: UNABLE_TO_CREATE_ROOM });
           return;
         }
         res.status(200).send({
@@ -126,10 +137,10 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         return;
       }
     } catch (err) {
-      console.log(
+      console.error(
         "Failed to request from game service: " + (err as unknown as Error),
       );
-      res.status(500).send();
+      res.status(500).send({ message: UNABLE_TO_CREATE_ROOM });
       return;
     }
   });
@@ -162,7 +173,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     try {
       const doesRoomExist = await roomExists(roomId);
       if (!doesRoomExist) {
-        res.status(400).send({ message: "Room is no longer available" });
+        res.status(400).send({ message: ROOM_NO_LONGER_AVAILABLE_ERROR });
         return;
       }
     } catch (err) {
@@ -171,24 +182,22 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     }
 
     if (!roomId || !playerId || !playerName || !playerSecret) {
-      res.status(400).send({ message: "Missing parameters" });
+      res.status(400).send({ message: MISSING_PARAMETERS_ERROR });
       return;
     } else if (isStringProfane(playerName)) {
-      res.status(400).send({ message: "Name does not pass profanity filter." });
+      res.status(400).send({ message: NAME_PROFANITY_ERROR });
       return;
     }
 
     try {
       const roomPasscode = await getRoomPasscode(roomId);
       if (roomPasscode !== password) {
-        res.status(401).send({ message: "Invalid password" });
+        res.status(401).send({ message: INVALID_PASSWORD_ERROR });
         return;
       }
     } catch (err) {
       console.error(err);
-      res
-        .status(401)
-        .send({ message: "Unable to verify password. Please try again." });
+      res.status(401).send({ message: UNABLE_TO_VERIFY_PASSWORD_ERROR });
       return;
     }
 
@@ -241,8 +250,8 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
           playerId,
         );
       } catch (err) {
-        console.log(err);
-        res.status(500).send();
+        console.error(err);
+        res.status(500).send({ message: UNABLE_TO_JOIN_ROOM });
         return;
       }
       res.status(200).send({ data: { roomId: roomId } });
@@ -328,7 +337,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     } catch (err) {
       console.error(err);
       res.status(500).send({
-        message: "Error: could not fetch rooms.",
+        message: COULD_NOT_FETCH_ROOMS,
       });
     }
   });
@@ -353,7 +362,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
       const roomListDetails = await getRoomListDetails(roomId);
 
       if (!roomListDetails) {
-        res.status(404).send({ message: "Room not found." });
+        res.status(404).send({ message: ROOM_NOT_FOUND_ERROR });
         return;
       }
 
@@ -363,7 +372,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
       return;
     } catch (err) {
       console.error(err);
-      res.status(404).send({ message: "Room not found." });
+      res.status(404).send({ message: ROOM_NOT_FOUND_ERROR });
       return;
     }
   });

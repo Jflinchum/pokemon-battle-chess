@@ -1,6 +1,6 @@
 export const INVALID_PLAYER_ERROR = "Unable to verify player";
 
-export const UNABLE_TO_FIND_PLAYER = "Unable to find player";
+export const UNABLE_TO_FIND_PLAYER_ERROR = "Unable to find player";
 export const UNABLE_TO_FIND_ROOM_ERROR = "Unable to find room";
 
 export const UNABLE_TO_BAN_POKEMON = "Unable to ban Pokémon";
@@ -17,3 +17,8 @@ export const NAME_PROFANITY_ERROR =
 
 export const INVALID_CHESS_MOVE = "Chess move not valid";
 export const POKEMON_ENGINE_ERROR = "Failed to process Pokémon battle";
+
+export const FAILED_TO_CREATE_ROOM_ERROR = "Could not create room.";
+export const ROOM_NO_LONGER_AVAILABLE_ERROR = "Room is no longer available.";
+export const UNABLE_TO_JOIN_ROOM = "Unable to join room.";
+export const MISSING_PARAMETERS = "Missing parameters";

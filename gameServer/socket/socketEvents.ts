@@ -24,7 +24,7 @@ import {
   POKEMON_ENGINE_ERROR,
   UNABLE_TO_BAN_POKEMON,
   UNABLE_TO_DRAFT_POKEMON,
-  UNABLE_TO_FIND_PLAYER,
+  UNABLE_TO_FIND_PLAYER_ERROR,
   UNABLE_TO_FIND_ROOM_ERROR,
 } from "../constants/errorMessages.js";
 import GameRoom from "../models/GameRoom.js";
@@ -261,7 +261,7 @@ export const registerSocketEvents = (
         }
         const user = await gameRoomManager.getUser(playerId);
         if (!user) {
-          return cb({ status: "err", message: UNABLE_TO_FIND_PLAYER });
+          return cb({ status: "err", message: UNABLE_TO_FIND_PLAYER_ERROR });
         }
         if (
           !(await gameRoomManager.verifyPlayerConnection({
@@ -428,7 +428,7 @@ export const registerSocketEvents = (
         if (!kickedPlayer || !host || room.hostPlayer?.playerId !== playerId) {
           return cb({
             status: "err",
-            message: UNABLE_TO_FIND_PLAYER,
+            message: UNABLE_TO_FIND_PLAYER_ERROR,
           });
         }
         if (
@@ -468,7 +468,7 @@ export const registerSocketEvents = (
         if (!spectatorUser || !host || room.hostPlayer?.playerId !== playerId) {
           return cb({
             status: "err",
-            message: UNABLE_TO_FIND_PLAYER,
+            message: UNABLE_TO_FIND_PLAYER_ERROR,
           });
         }
         if (
