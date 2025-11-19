@@ -22,7 +22,7 @@ import {
   UNABLE_TO_CREATE_ROOM,
   UNABLE_TO_JOIN_ROOM,
   UNABLE_TO_VERIFY_PASSWORD_ERROR,
-} from "../constants/constants.js";
+} from "../constants/errorMessages.js";
 import logger from "../logger.js";
 
 interface APIResponse<Data> {
