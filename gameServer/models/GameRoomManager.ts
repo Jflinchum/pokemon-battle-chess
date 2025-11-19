@@ -1,6 +1,5 @@
 import { Color } from "chess.js";
 import { Server } from "socket.io";
-import { TRANSIENT_DISCONNECT_TIME } from "../../shared/constants/userConstants.js";
 import User from "../../shared/models/User.js";
 import { GameOptions } from "../../shared/types/GameOptions.js";
 import { Player } from "../../shared/types/Player.js";
@@ -42,6 +41,7 @@ import {
   setUserAsTransient,
 } from "../cache/redis.js";
 import { DEFAULT_GAME_OPTIONS } from "../constants/gameRoomConstants.js";
+import { TRANSIENT_DISCONNECT_TIME } from "../constants/userConstants.js";
 import logger from "../logger.js";
 import GameRoom from "./GameRoom.js";
 
