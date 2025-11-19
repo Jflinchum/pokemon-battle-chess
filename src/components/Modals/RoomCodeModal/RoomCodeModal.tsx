@@ -10,6 +10,7 @@ import {
   FAILED_TO_JOIN_ROOM_ERROR,
   INVALID_PASSWORD_ERROR,
 } from "../../../util/errorMessages";
+import { useLogger } from "../../../util/useLogger";
 import Button from "../../common/Button/Button";
 import PasscodeInput from "../../common/PasscodeInput/PasscodeInput";
 import "./RoomCodeModal.css";
@@ -17,6 +18,7 @@ import "./RoomCodeModal.css";
 const RoomCodeModal = () => {
   const { modalState, dispatch } = useModalState();
   const { userState, dispatch: userStateDispatch } = useUserState();
+  const { logger } = useLogger();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleJoinRoom = async (e: React.FormEvent) => {
@@ -42,8 +44,13 @@ const RoomCodeModal = () => {
       userStateDispatch({ type: "JOIN_ROOM", payload: { roomId, roomCode } });
       dispatch({ type: "CLOSE_MODAL" });
     } catch (err) {
+      const error = err as unknown as Error;
       toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
-      console.error(err);
+      logger.error("Failed to create room", {
+        name: "CreateRoomModal-handleCreateRoom",
+        err: error.message,
+        stack: error.stack,
+      });
     }
   };
 

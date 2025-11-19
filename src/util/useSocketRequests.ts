@@ -8,34 +8,9 @@ import {
 import { usePlayAgainstComputerUtil } from "../components/RoomManager/usePlayAgainstComputerUtil";
 import { useUserState } from "../context/UserState/UserStateContext";
 import { socket } from "../socket";
+import { useLogger } from "./useLogger";
 
 const SOCKET_TIMEOUT = 10 * 1000;
-
-const handleCommonServerResponse = (
-  {
-    err,
-    resp,
-  }: {
-    err: Error;
-    resp?: CommonServerResponse;
-  },
-  {
-    resolve,
-    reject,
-  }: { resolve: (s?: string) => void; reject: (s?: string) => void },
-) => {
-  if (err) {
-    console.trace();
-    console.error(err);
-    return reject("Could not connect to the server. Please try again");
-  } else if (resp?.status === "err") {
-    console.trace();
-    console.error(resp);
-    return reject(resp.message);
-  } else {
-    return resolve(resp?.status);
-  }
-};
 
 export const useSocketRequests = () => {
   const { userState } = useUserState();
@@ -48,6 +23,39 @@ export const useSocketRequests = () => {
     [userState.id, userState.currentRoomId, userState.secretId],
   );
   const { isUserInOfflineMode } = usePlayAgainstComputerUtil();
+  const { logger } = useLogger();
+
+  const handleCommonServerResponse = useCallback(
+    (
+      {
+        err,
+        resp,
+      }: {
+        err: Error;
+        resp?: CommonServerResponse;
+      },
+      {
+        resolve,
+        reject,
+      }: { resolve: (s?: string) => void; reject: (s?: string) => void },
+    ) => {
+      if (err) {
+        logger.error("Failed socket request", {
+          err: err.message,
+          stack: err.stack,
+        });
+        return reject("Could not connect to the server. Please try again");
+      } else if (resp?.status === "err") {
+        logger.error("Failed socket request", {
+          respMessage: resp.message,
+        });
+        return reject(resp.message);
+      } else {
+        return resolve(resp?.status);
+      }
+    },
+    [logger],
+  );
 
   const requestChessMove = useCallback(
     (sanMove: string) => {
@@ -63,7 +71,7 @@ export const useSocketRequests = () => {
           );
       });
     },
-    [commonClientArgs, isUserInOfflineMode],
+    [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode],
   );
 
   const requestDraftPokemon = useCallback(
@@ -82,7 +90,7 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [commonClientArgs, isUserInOfflineMode],
+    [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode],
   );
 
   const requestBanPokemon = useCallback(
@@ -101,7 +109,7 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [commonClientArgs, isUserInOfflineMode],
+    [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode],
   );
 
   const requestPokemonMove = useCallback(
@@ -118,7 +126,7 @@ export const useSocketRequests = () => {
           );
       });
     },
-    [commonClientArgs, isUserInOfflineMode],
+    [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode],
   );
 
   const requestValidateTimers = useCallback(() => {
@@ -143,7 +151,7 @@ export const useSocketRequests = () => {
           handleCommonServerResponse({ err, resp }, { resolve, reject }),
         );
     });
-  }, [commonClientArgs, isUserInOfflineMode]);
+  }, [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode]);
 
   const requestStartGame = useCallback(() => {
     if (isUserInOfflineMode()) return Promise.resolve();
@@ -154,7 +162,7 @@ export const useSocketRequests = () => {
           handleCommonServerResponse({ err, resp }, { resolve, reject }),
         );
     });
-  }, [commonClientArgs, isUserInOfflineMode]);
+  }, [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode]);
 
   const requestToggleSpectating = useCallback(() => {
     if (isUserInOfflineMode()) return Promise.resolve();
@@ -165,7 +173,7 @@ export const useSocketRequests = () => {
           handleCommonServerResponse({ err, resp }, { resolve, reject }),
         );
     });
-  }, [commonClientArgs, isUserInOfflineMode]);
+  }, [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode]);
 
   const requestChangeGameOptions = useCallback(
     (options: GameOptions) => {
@@ -181,7 +189,7 @@ export const useSocketRequests = () => {
           );
       });
     },
-    [commonClientArgs, isUserInOfflineMode],
+    [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode],
   );
 
   const requestKickPlayer = useCallback(
@@ -199,7 +207,7 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [commonClientArgs, isUserInOfflineMode],
+    [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode],
   );
 
   const requestMovePlayerToSpectator = useCallback(
@@ -217,7 +225,7 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [commonClientArgs, isUserInOfflineMode],
+    [handleCommonServerResponse, commonClientArgs, isUserInOfflineMode],
   );
 
   const requestJoinGame = useCallback(() => {
@@ -233,7 +241,12 @@ export const useSocketRequests = () => {
           handleCommonServerResponse({ err, resp }, { resolve, reject }),
       );
     });
-  }, [userState.currentRoomCode, isUserInOfflineMode, commonClientArgs]);
+  }, [
+    handleCommonServerResponse,
+    userState.currentRoomCode,
+    isUserInOfflineMode,
+    commonClientArgs,
+  ]);
 
   const requestSync = useCallback(() => {
     if (isUserInOfflineMode()) return;
@@ -265,7 +278,13 @@ export const useSocketRequests = () => {
         );
       });
     },
-    [userState.id, userState.name, userState.avatarId, userState.secretId],
+    [
+      handleCommonServerResponse,
+      userState.id,
+      userState.name,
+      userState.avatarId,
+      userState.secretId,
+    ],
   );
 
   return {

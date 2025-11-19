@@ -2,9 +2,11 @@ import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { toast } from "react-toastify";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as GameStateContext from "../../../../context/GameState/GameStateContext";
 import * as ModalStateContext from "../../../../context/ModalState/ModalStateContext";
 import * as UserStateContext from "../../../../context/UserState/UserStateContext";
 import * as LobbyService from "../../../../service/lobby";
+import { getMockGameStateContext } from "../../../../testUtils/gameState";
 import { getMockModalStateContext } from "../../../../testUtils/modalState";
 import { createMockRoom } from "../../../../testUtils/room";
 import { getMockUserStateContext } from "../../../../testUtils/userState";
@@ -46,6 +48,9 @@ const setup = (props: Partial<RoomListProps> = {}) => {
   });
   const mockedModalStateContext = getMockModalStateContext();
 
+  vi.spyOn(GameStateContext, "useGameState").mockReturnValue(
+    getMockGameStateContext(),
+  );
   vi.spyOn(UserStateContext, "useUserState").mockReturnValue(
     mockedUserStateContext,
   );

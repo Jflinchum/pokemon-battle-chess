@@ -194,10 +194,10 @@ export const getMostRecentRoom = ():
       roomCode,
     };
   } catch (err: unknown) {
-    console.log(
+    console.error(
       "Unable to parse most recent room from local storage. Clearing it out.",
     );
-    console.log(err);
+    console.error(err);
     clearMostRecentRoom();
   }
 };

@@ -15,7 +15,6 @@ import { toast } from "react-toastify";
 import { useGameState } from "../../../context/GameState/GameStateContext";
 import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
-import { logToService } from "../../../service/lobby";
 import { isDevCookieEnabled } from "../../../util/devUtil";
 import { ReplayData } from "../../../util/downloadReplay";
 import {
@@ -23,6 +22,7 @@ import {
   INVALID_REPLAY_ERROR,
 } from "../../../util/errorMessages";
 import { offlineRoomId } from "../../../util/offlineUtil";
+import { useLogger } from "../../../util/useLogger";
 import { NavOptionButton } from "../../common/NavOptions/NavOptionButton/NavOptionButton";
 import NavOptions from "../../common/NavOptions/NavOptions";
 import PokemonOfTheDay from "../PokemonOfTheDay/PokemonOfTheDay";
@@ -33,6 +33,7 @@ const MenuOptions = () => {
   const { dispatch } = useModalState();
   const { userState, dispatch: userStateDispatch } = useUserState();
   const { dispatch: gameStateDispatch } = useGameState();
+  const { logger } = useLogger();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -65,7 +66,7 @@ const MenuOptions = () => {
   };
 
   const handlePlayBotClick = () => {
-    logToService(`${userState.name} is playing against a CPU`);
+    logger.info("Creating room against CPU.");
     gameStateDispatch({
       type: "CREATE_ROOM",
       payload: {
@@ -97,8 +98,12 @@ const MenuOptions = () => {
           toast(INVALID_REPLAY_ERROR, { type: "error" });
         }
       } catch (err) {
+        const error = err as unknown as Error;
         toast(COULD_NOT_READ_REPLAY_ERROR, { type: "error" });
-        console.log(err);
+        logger.warn("Unable to read uploaded replay", {
+          err: error.message,
+          stack: error.stack,
+        });
       }
     };
 

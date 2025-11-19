@@ -96,7 +96,7 @@ const useBattleHistory = ({
         }
 
         const currentLog = currentMatchLog[matchLogIndex.current];
-        console.log(currentLog);
+        console.debug(currentLog);
 
         /**
          * Hold off on processing chess moves while a battle is still

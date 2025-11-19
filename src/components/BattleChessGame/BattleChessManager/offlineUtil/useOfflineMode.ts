@@ -20,6 +20,7 @@ import {
   POKEMON_ENGINE_ERROR,
 } from "../../../../util/errorMessages";
 import { getCpuPlayerId } from "../../../../util/offlineUtil";
+import { useLogger } from "../../../../util/useLogger";
 import { usePlayAgainstComputerUtil } from "../../../RoomManager/usePlayAgainstComputerUtil";
 import { availableBotLevels } from "./cpuFactory";
 
@@ -89,6 +90,7 @@ export const useOfflineMode = ({
   const [squareModTarget, setSquareModTarget] = useState(
     getNewSquareModTargetNumber(),
   );
+  const { logger } = useLogger();
 
   const whitePlayerId = useMemo(
     () => gameState.gameSettings.whitePlayer?.playerId || "",
@@ -167,8 +169,9 @@ export const useOfflineMode = ({
         );
       } else {
         toast(CHESS_MOVE_ERROR, { type: "error" });
-        console.error(san);
-        console.error(output);
+        logger.error("Unable to parse chess move in offline mode.", {
+          san,
+        });
       }
     },
     [
@@ -180,6 +183,7 @@ export const useOfflineMode = ({
       setCurrentMatchLog,
       gameState.gameSettings.options,
       squareModTarget,
+      logger,
     ],
   );
 
@@ -194,9 +198,7 @@ export const useOfflineMode = ({
   const requestComputerPokemonMove = useCallback(
     async (playerSide: "p1" | "p2") => {
       if (!whitePokemonBattle.current || !blackPokemonBattle.current) {
-        console.error(
-          "Unable to initialize battle for CPU. Choosing to forfeit.",
-        );
+        logger.error("Unable to initialize battle for CPU.");
         return "forfeit";
       }
       try {
@@ -208,11 +210,15 @@ export const useOfflineMode = ({
         );
         return pokemonMove || "default";
       } catch (err) {
-        console.error(err);
+        const error = err as unknown as Error;
+        logger.error("Unable to get CPU pokemon move.", {
+          err: error.message,
+          stack: error.stack,
+        });
         return "default";
       }
     },
-    [pokemonCpu],
+    [pokemonCpu, logger],
   );
 
   const requestComputerPokemonBanOrDraft = useCallback(
@@ -237,7 +243,10 @@ export const useOfflineMode = ({
     async (move: string) => {
       if (!currentPokemonBattleStakes) {
         toast(POKEMON_ENGINE_ERROR, { type: "error" });
-        console.error(currentPokemonBattleStakes);
+        logger.error("Invalid state for pokemon move in offline mode.", {
+          name: "updateMatchLogFromPokemonMove",
+          currentPokemonBattleStakes,
+        });
         return;
       }
 
@@ -299,8 +308,10 @@ export const useOfflineMode = ({
         ]);
       } else {
         toast(POKEMON_ENGINE_ERROR, { type: "error" });
-        console.error(opposingPlayerPokemonMove);
-        console.error(output);
+        logger.error("Unable to process output for pokemon match.", {
+          name: "updateMatchLogFromPokemonMove",
+          opposingPlayerPokemonMove,
+        });
       }
     },
     [
@@ -317,6 +328,7 @@ export const useOfflineMode = ({
       requestComputerPokemonMove,
       gameState.isSpectator,
       gameState.gameSettings.whitePlayer,
+      logger,
     ],
   );
 

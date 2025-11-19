@@ -105,9 +105,9 @@ export const getRoom = async (
 
 export const logToService = async (
   log: string | { [key: string]: string },
-  logPayload?: { [key: string]: string },
+  logPayload?: { [key: string]: string | boolean | undefined | null },
 ) => {
-  let logBody: { [key: string]: string } = {};
+  let logBody: { [key: string]: string | boolean | undefined | null } = {};
   if (typeof log === "string") {
     logBody.textPayload = log;
   } else {

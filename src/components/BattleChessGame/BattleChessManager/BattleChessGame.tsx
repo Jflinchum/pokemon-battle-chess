@@ -34,6 +34,7 @@ import {
   INVALID_POKEMON_DRAFT,
 } from "../../../util/errorMessages.js";
 import { useDemoMode } from "../../../util/useDemoMode.js";
+import { useLogger } from "../../../util/useLogger.js";
 import { useMusicPlayer } from "../../../util/useMusicPlayer";
 import { useSocketRequests } from "../../../util/useSocketRequests";
 import Spinner from "../../common/Spinner/Spinner";
@@ -69,6 +70,7 @@ export const BattleChessGame = ({
   const { userState } = useUserState();
   const { dispatch: modalStateDispatch } = useModalState();
   const { gameState, dispatch } = useGameState();
+  const { logger } = useLogger();
   window.gameSeed = gameState.gameSettings.seed;
 
   const [currentBattle, setCurrentBattle] = useState<CurrentBattle | null>(
@@ -261,8 +263,10 @@ export const BattleChessGame = ({
         toast(GAME_ERROR_ATTEMPT_RECOVERY, {
           type: "error",
         });
-        console.log(`Encountered error: ${err.message}. Attempting resync.`);
-        console.log(err.stack);
+        logger.error("Encountered error. Attempting Resync", {
+          err: err.message,
+          stack: err.stack,
+        });
         chessManager.reset();
         pokemonManager.reset();
         resetSimulators();
@@ -278,7 +282,10 @@ export const BattleChessGame = ({
           "Error: Could not recover from game bug. Please refresh and try to reconnect.",
           { type: "error" },
         );
-        console.log("Max error recovery attempts reached.");
+        logger.error("Max error recovery attempts reached.", {
+          err: err.message,
+          stack: err.stack,
+        });
       }
     },
     [
@@ -287,6 +294,7 @@ export const BattleChessGame = ({
       errorRecoveryAttempts,
       resetMatchHistory,
       resetSimulators,
+      logger,
     ],
   );
 

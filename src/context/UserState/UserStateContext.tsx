@@ -94,7 +94,7 @@ export const userStateReducer = (
           leaveRoom(userState.currentRoomId, userState.id);
         }
       } catch (err) {
-        console.error(err);
+        console.debug(err);
       }
 
       clearMostRecentRoom();

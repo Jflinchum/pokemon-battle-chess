@@ -20,8 +20,8 @@ export const useRoomManagerSocketEvents = (
 
   const startSync = useCallback(
     ({ history }: { history: MatchHistory }, cb: () => void) => {
-      console.log("starting sync");
-      console.log(history);
+      console.debug("starting sync");
+      console.debug(history);
       setMatchHistory(history);
 
       cb();
@@ -30,7 +30,7 @@ export const useRoomManagerSocketEvents = (
   );
 
   const reconnect = useCallback(() => {
-    console.log("reconnecting -- attempting resync");
+    console.debug("reconnecting -- attempting resync");
     requestSync();
   }, [requestSync]);
 
@@ -170,10 +170,10 @@ export const useRoomManagerSocketEvents = (
     socket.on("kickedFromRoom", kickedFromRoom);
 
     socket.on("connect", () => {
-      console.log("connected");
+      console.debug("connected");
     });
     socket.on("disconnect", () => {
-      console.log("disconnected");
+      console.debug("disconnected");
     });
 
     socket.on("health", (cb) => {

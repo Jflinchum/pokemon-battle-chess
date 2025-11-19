@@ -11,6 +11,7 @@ import {
   clearMostRecentRoom,
   getMostRecentRoom,
 } from "../../util/localWebData";
+import { useLogger } from "../../util/useLogger";
 import BattleChessManager from "../BattleChessGame/BattleChessManager/BattleChessManager";
 import ErrorBoundary from "../common/ErrorBoundary/ErrorBoundary";
 import LobbyManager from "../Lobby/LobbyManager/LobbyManager";
@@ -22,6 +23,7 @@ const MainMenu = () => {
   const { userState, dispatch: userStateDispatch } = useUserState();
   const { gameState } = useGameState();
   const { dispatch } = useModalState();
+  const { logger } = useLogger();
   window.Dex = Dex;
 
   const handleNoClick = useCallback(() => {
@@ -49,8 +51,13 @@ const MainMenu = () => {
           toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
         }
       } catch (err) {
+        const error = err as unknown as Error;
         toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
-        console.error(err);
+        logger.error("Failed to join room", {
+          name: "MainMenu-handleYesClick",
+          err: error.message,
+          stack: error.stack,
+        });
       }
     },
     [
@@ -59,6 +66,7 @@ const MainMenu = () => {
       userState.name,
       userState.avatarId,
       userState.secretId,
+      logger,
     ],
   );
 

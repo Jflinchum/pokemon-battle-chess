@@ -4,6 +4,7 @@ import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { joinRoom } from "../../../service/lobby";
 import { FAILED_TO_JOIN_ROOM_ERROR } from "../../../util/errorMessages";
+import { useLogger } from "../../../util/useLogger";
 import { useDebounce } from "../../../utils";
 import TextInput from "../../common/TextInput/TextInput";
 import "./RoomList.css";
@@ -25,6 +26,7 @@ export interface RoomListProps {
 const RoomList = ({ availableRooms, onSearch }: RoomListProps) => {
   const { dispatch, userState } = useUserState();
   const { dispatch: dispatchModalState } = useModalState();
+  const { logger } = useLogger();
   const [roomSearch, setRoomSearch] = useState("");
 
   const handleJoinRoom = async ({
@@ -58,8 +60,13 @@ const RoomList = ({ availableRooms, onSearch }: RoomListProps) => {
           toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
         }
       } catch (err) {
+        const error = err as unknown as Error;
         toast(FAILED_TO_JOIN_ROOM_ERROR, { type: "error" });
-        console.error(err);
+        logger.error("Failed to join room", {
+          name: "RoomList-handleJoinRoom",
+          err: error.message,
+          stack: error.stack,
+        });
       }
     }
   };

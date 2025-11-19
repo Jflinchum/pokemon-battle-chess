@@ -35,8 +35,7 @@ export const validateReplay = (replayData: ReplayData) => {
      */
     return true;
   } catch (err) {
-    console.log("Unable to parse replay data");
-    console.log(err);
+    console.error(err);
     return false;
   }
 };

@@ -176,7 +176,7 @@ export const chessCpuFactory: ChessCpuFactory =
           const moveWhenOppInCheckOrCheckmate =
             getChessMoveIfOpponentInCheckOrCheckmate(chessManager);
           if (moveWhenOppInCheckOrCheckmate) {
-            console.log(
+            console.debug(
               "Opponent in check/checkmate. Resolving move via opponent checkmate logic",
             );
             return resolve(moveWhenOppInCheckOrCheckmate);
@@ -184,19 +184,19 @@ export const chessCpuFactory: ChessCpuFactory =
 
           const moveInCheckmate = getChessMoveIfCpuInCheckmate(chessManager);
           if (moveInCheckmate) {
-            console.log("In checkmate. Resolving move via checkmate logic");
+            console.debug("In checkmate. Resolving move via checkmate logic");
             return resolve(moveInCheckmate);
           }
 
           const moveInStalemate = getChessMoveIfCpuInStalemate(chessManager);
           if (moveInStalemate) {
-            console.log("In stalemate. Resolving move via stalemate logic");
+            console.debug("In stalemate. Resolving move via stalemate logic");
             return resolve(moveInStalemate);
           }
 
           const moveInDraw = getChessMoveIfCpuInDraw(chessManager);
           if (moveInDraw) {
-            console.log("In draw. Resolving move via draw logic");
+            console.debug("In draw. Resolving move via draw logic");
             return resolve(moveInDraw);
           }
 
@@ -228,14 +228,14 @@ export const chessCpuFactory: ChessCpuFactory =
               modifyPossibleCaptureMoves(possibleMoves, pokemonManager);
               possibleMoves.sort((moveA, moveB) => moveB.score - moveA.score);
               possibleMoves.forEach((posMove) => {
-                console.log(`${posMove.move.san} - ${posMove.score}`);
+                console.debug(`${posMove.move.san} - ${posMove.score}`);
               });
 
               if (possibleMoves.length === 0) {
-                console.log(
+                console.debug(
                   "Stockfish has no recommendations. Choosing random move",
                 );
-                console.log(chessManager.fen());
+                console.debug(chessManager.fen());
                 const randomChessMove = getRandomChessMove(chessManager);
                 if (randomChessMove) {
                   return eventListenerResolver(randomChessMove);
@@ -244,7 +244,7 @@ export const chessCpuFactory: ChessCpuFactory =
 
               const bestMove = possibleMoves[0].move;
               if (!bestMove) {
-                console.error(
+                console.debug(
                   "Something went wrong. Defaulting to random move",
                 );
                 const randomChessMove = getRandomChessMove(chessManager);
@@ -254,16 +254,16 @@ export const chessCpuFactory: ChessCpuFactory =
                   return;
                 }
               }
-              console.log("Stockfish resolved");
+              console.debug("Stockfish resolved");
               return eventListenerResolver(bestMove);
             } else if (e.data.includes("bestmove (none)") && chessManager) {
               /**
                * Fallback, choose a random move
                */
-              console.log(
+              console.debug(
                 "Stockfish has no recommendations. Choosing random move",
               );
-              console.log(chessManager.fen());
+              console.debug(chessManager.fen());
               const randomChessMove = getRandomChessMove(chessManager);
               if (randomChessMove) {
                 return eventListenerResolver(randomChessMove);

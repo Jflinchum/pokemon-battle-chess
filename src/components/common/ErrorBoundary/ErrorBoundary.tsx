@@ -2,6 +2,7 @@ import { faClipboard, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as React from "react";
 import sadPikachu from "../../../assets/pokemonAssets/sadPikachu.png";
+import { logToService } from "../../../service/lobby";
 import "./ErrorBoundary.css";
 
 class ErrorBoundary extends React.Component<
@@ -22,9 +23,14 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    // TODO: log to service
-    console.log(error);
-    console.log(info);
+    console.error(error);
+    console.error(info);
+    logToService("Error Boundary reached", {
+      error: error.message,
+      stack: error.stack,
+      infoStack: info.componentStack,
+      infoDigest: info.digest,
+    });
     this.setState({
       hasError: true,
       error,

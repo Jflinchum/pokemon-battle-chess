@@ -5,6 +5,7 @@ import { useModalState } from "../../../context/ModalState/ModalStateContext";
 import { useUserState } from "../../../context/UserState/UserStateContext";
 import { createNewRoom } from "../../../service/lobby";
 import { FAILED_TO_CREATE_ROOM_ERROR } from "../../../util/errorMessages";
+import { useLogger } from "../../../util/useLogger";
 import CreateRoomForm from "./CreateRoomForm/CreateRoomForm";
 import "./CreateRoomModal.css";
 
@@ -12,6 +13,7 @@ const CreateRoomModal = () => {
   const { dispatch } = useModalState();
   const { userState, dispatch: userStateDispatch } = useUserState();
   const { dispatch: dispatchGameState } = useGameState();
+  const { logger } = useLogger();
 
   const [createRoomLoading, setCreateRoomLoading] = useState(false);
 
@@ -37,7 +39,12 @@ const CreateRoomModal = () => {
         toast(FAILED_TO_CREATE_ROOM_ERROR, { type: "error" });
       }
     } catch (err) {
-      console.error(err);
+      const error = err as unknown as Error;
+      logger.error("Failed to create room", {
+        name: "CreateRoomModal-handleCreateRoom",
+        err: error.message,
+        stack: error.stack,
+      });
       toast(FAILED_TO_CREATE_ROOM_ERROR, { type: "error" });
     }
     setCreateRoomLoading(false);
