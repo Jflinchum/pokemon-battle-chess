@@ -12,6 +12,32 @@ interface ChangeLog {
 
 export const changeLog: ChangeLog[] = [
   {
+    title: "Things look a little better now!",
+    version: "v1.0.6",
+    mascot: {
+      identifier: "Meowstic",
+    },
+    body: `
+#### Hello and thank you for checking out Pokémon Gambit!
+I've mostly been focusing on working on some visual fixes to improve the clarity on some stuff in-game. The game itself
+should be much easier to play on mobile now.
+
+##### Change log for v1.0.6
+###### Features
+- Improved the visuals of tooltips to make them easier to read
+- Cleaned up some visuals when playing against a CPU
+    - Removed some buttons that didn't do anything (kicking players, the chat window, etc.)
+- Added battle effects for Protect, Light Screen, and Reflect
+    - I felt that it wasn't always clear when those moves were being used/were in effect, so this should help in that regard
+- Improved logging capabilities
+    - I know that from my own testing, I won't always be able to catch all bugs that make it out there. I'm hoping that better
+    logs and error reporting will make it easier for me to reproduce those issues
+
+###### Bug Fixes
+- Made it so tooltips don't flow off of the screen (mostly an issue affecting mobile devices)
+`,
+  },
+  {
     title: "CPU Matches",
     version: "v1.0.5",
     mascot: {

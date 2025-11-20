@@ -12,6 +12,13 @@
   max-height: 60vh;
   overflow-y: auto;
   padding: 0 6px;
+
+  h5 {
+    margin: 10px 0;
+  }
+  h6 {
+    margin: 10px 0 0 0;
+  }
 }
 
 .changeLogPaginationButton {
