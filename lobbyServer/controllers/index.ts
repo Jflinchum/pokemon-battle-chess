@@ -41,7 +41,7 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
     res.status(200).send("Ok");
   });
 
-  app.post<Empty, APIResponse<Empty>, object>(
+  app.post<Empty, APIResponse<Empty>, { [key: string]: string | boolean }>(
     "/lobby-service/log",
     (req, res) => {
       if (!req.body || Object.keys(req.body).length === 0) {
@@ -49,10 +49,22 @@ export const registerRoutes = (app: Express, config: InternalConfig) => {
         return;
       }
 
-      logger.info({
-        request: "/lobby-service/log",
-        body: req.body,
-      });
+      if (req.body.level === "error") {
+        logger.error({
+          request: "/lobby-service/log",
+          body: req.body,
+        });
+      } else if (req.body.level === "warn") {
+        logger.warn({
+          request: "/lobby-service/log",
+          body: req.body,
+        });
+      } else {
+        logger.info({
+          request: "/lobby-service/log",
+          body: req.body,
+        });
+      }
       res.status(200).send();
     },
   );

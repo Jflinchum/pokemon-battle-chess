@@ -26,6 +26,7 @@ class ErrorBoundary extends React.Component<
     console.error(error);
     console.error(info);
     logToService("Error Boundary reached", {
+      level: "error",
       error: error.message,
       stack: error.stack,
       infoStack: info.componentStack,
