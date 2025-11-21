@@ -69,7 +69,11 @@ export const registerSocketEvents = (
     let player: User | null = null;
 
     socket.on("disconnect", async () => {
-      logger.info("User Disconnected");
+      logger.info("User Disconnected", {
+        playerId: player?.playerId,
+        playerName: player?.playerName,
+        avatarId: player?.avatarId,
+      });
 
       const room = await gameRoomManager.getCachedRoom(
         player?.connectedRoom ?? undefined,
