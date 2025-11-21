@@ -11,7 +11,7 @@ interface PokemonFieldSpriteEffect {
 type ScreenEffectIds = ["protect", "lightscreen", "reflect"];
 
 const screenEffectToColor: Record<ScreenEffectIds[number], string> = {
-  protect: "blue",
+  protect: "lightblue",
   lightscreen: "pink",
   reflect: "purple",
 };
