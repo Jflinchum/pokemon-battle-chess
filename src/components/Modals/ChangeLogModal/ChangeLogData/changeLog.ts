@@ -12,7 +12,7 @@ interface ChangeLog {
 
 export const changeLog: ChangeLog[] = [
   {
-    title: "Things look a little better now!",
+    title: "Quick fix for CPU matches",
     version: "v1.0.7",
     mascot: {
       identifier: "Psyduck",
