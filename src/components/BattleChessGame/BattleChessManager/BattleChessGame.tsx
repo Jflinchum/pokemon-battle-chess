@@ -162,8 +162,11 @@ export const BattleChessGame = ({
     (draftPokemonIndex: number) => {
       pokemonManager.banDraftPiece(draftPokemonIndex);
       setDraftTurnPick((curr) => (curr === "w" ? "b" : "w"));
+      setCurrentPokemonBoard(
+        mergeBoardAndPokemonState(chessManager.board(), pokemonManager),
+      );
     },
-    [pokemonManager],
+    [pokemonManager, setCurrentPokemonBoard, chessManager],
   );
 
   const onDraft = useCallback(
@@ -203,7 +206,6 @@ export const BattleChessGame = ({
 
       if (isUserInOfflineMode()) {
         onBan(pkmnIndex);
-        requestComputerPokemonBanOrDraft(onBan, onDraft, draftTurnPick);
       } else {
         try {
           await requestBanPokemon(pkmnIndex);
@@ -218,9 +220,6 @@ export const BattleChessGame = ({
       pokemonManager.banPieces,
       isUserInOfflineMode,
       onBan,
-      onDraft,
-      requestComputerPokemonBanOrDraft,
-      draftTurnPick,
     ],
   );
 
@@ -653,6 +652,40 @@ export const BattleChessGame = ({
     [pokemonManager, chessManager, gameState.isSpectator, color, draftTurnPick],
   );
 
+  const handleOnDraft = useCallback(
+    async (sq: Square, pkmnIndex: number) => {
+      if (gameState.isSpectator) {
+        return;
+      }
+      if (validateDraftPick(sq, color!)) {
+        try {
+          if (isUserInOfflineMode()) {
+            onDraft(sq, pkmnIndex, color);
+          } else {
+            await requestDraftPokemon(sq, pkmnIndex);
+            setIsDrafting(!!pokemonManager.draftPieces.length);
+          }
+        } catch (err) {
+          toast(`Error: ${err}`, { type: "error" });
+        }
+      } else {
+        toast(INVALID_POKEMON_DRAFT, {
+          type: "warning",
+        });
+      }
+    },
+    [
+      gameState.isSpectator,
+      validateDraftPick,
+      requestDraftPokemon,
+      setIsDrafting,
+      pokemonManager,
+      color,
+      onDraft,
+      isUserInOfflineMode,
+    ],
+  );
+
   const battleSquare = useMemo(() => {
     if (
       currentBattle &&
@@ -773,20 +806,7 @@ export const BattleChessGame = ({
             chessManager={chessManager}
             pokemonManager={pokemonManager}
             boardState={currentPokemonBoard}
-            onDraftPokemon={async (sq, pkmnIndex) => {
-              if (validateDraftPick(sq, color!)) {
-                try {
-                  await requestDraftPokemon(sq, pkmnIndex);
-                  setIsDrafting(!!pokemonManager.draftPieces.length);
-                } catch (err) {
-                  toast(`Error: ${err}`, { type: "error" });
-                }
-              } else {
-                toast(INVALID_POKEMON_DRAFT, {
-                  type: "warning",
-                });
-              }
-            }}
+            onDraftPokemon={handleOnDraft}
             onBanPokemon={handleOnBan}
           />
         )}
