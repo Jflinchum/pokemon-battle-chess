@@ -13,6 +13,22 @@ interface ChangeLog {
 export const changeLog: ChangeLog[] = [
   {
     title: "Things look a little better now!",
+    version: "v1.0.7",
+    mascot: {
+      identifier: "Psyduck",
+    },
+    body: `
+#### Hello and thank you for checking out Pokémon Gambit!
+Really appreciate all of the enthusiasm and feedback so far! This patch is a quick hotfix to the draft/ban mode when playing against a CPU.
+
+##### Change log for v1.0.7
+
+###### Bug Fixes
+- Drafting and Banning pokemon when facing a CPU now properly updates the state of the game correctly
+`,
+  },
+  {
+    title: "Things look a little better now!",
     version: "v1.0.6",
     mascot: {
       identifier: "Meowstic",
