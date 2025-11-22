@@ -12,6 +12,7 @@ export const HowToPlayScreen4 = () => {
         seed: "1234,tutorial",
         format: "random",
         weatherWars: true,
+        isDemo: true,
       }),
     [],
   );
@@ -65,7 +66,7 @@ export const HowToPlayScreen4 = () => {
   useEffect(() => {
     if (currentMatchHistory.length === 0) {
       chessManager.reset();
-      pokemonManager.reset();
+      pokemonManager.reset(true);
       matchLogIndex.current = 0;
     }
   }, [currentMatchHistory.length, chessManager, pokemonManager]);

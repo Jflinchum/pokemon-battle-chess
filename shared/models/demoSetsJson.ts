@@ -1,9 +1,3 @@
-import { Move, SpeciesName, TypeName } from "@pkmn/data";
-import { Dex, PokemonSet, Species } from "@pkmn/dex";
-import { PRNG } from "@pkmn/sim";
-import { fastPop } from "../util/fastPop.js";
-import { randomSetsJSONDemo } from "./demoSetsJson.js";
-
 type RandomSet = {
   level: number;
   baseSpecies: string;
@@ -15,1347 +9,8 @@ type RandomSet = {
   }[];
 };
 
-/**
- * Below is taken directly from @pkmn/random and heavily modified. This is
- * necessary for a few reasons:
- * - @pkmn/random includes learnsets/datasets from all gens when importing it, when we only need the latest gen. Should improve load time performance by omitting the other gens
- * - Pokemon Battle Chess is a unique variant where hazards aren't useful at all. By splitting out generation logic, we can filter out those moves/heavy duty boots
- * - @pkmn/random generates teams of 6, not solo pokemon. It also takes team details into account when generating these pokemon (if the team has a rain setter, include swift swim). We don't need that in Pokemon Battle Chess
- */
-
-// Moves that restore HP:
-const RECOVERY_MOVES = [
-  "healorder",
-  "milkdrink",
-  "moonlight",
-  "morningsun",
-  "recover",
-  "roost",
-  "shoreup",
-  "slackoff",
-  "softboiled",
-  "strengthsap",
-  "synthesis",
-];
-// Moves that drop stats:
-const CONTRARY_MOVES = [
-  "armorcannon",
-  "closecombat",
-  "leafstorm",
-  "makeitrain",
-  "overheat",
-  "spinout",
-  "superpower",
-  "vcreate",
-];
-// Moves that boost Attack:
-const PHYSICAL_SETUP = [
-  "bellydrum",
-  "bulkup",
-  "coil",
-  "curse",
-  "dragondance",
-  "honeclaws",
-  "howl",
-  "meditate",
-  "poweruppunch",
-  "swordsdance",
-  "tidyup",
-  "victorydance",
-];
-// Moves which boost Special Attack:
-const SPECIAL_SETUP = [
-  "calmmind",
-  "chargebeam",
-  "geomancy",
-  "nastyplot",
-  "quiverdance",
-  "tailglow",
-  "takeheart",
-  "torchsong",
-];
-// Moves that boost Attack AND Special Attack:
-const MIXED_SETUP = [
-  "clangoroussoul",
-  "growth",
-  "happyhour",
-  "holdhands",
-  "noretreat",
-  "shellsmash",
-  "workup",
-];
-// Some moves that only boost Speed:
-const SPEED_SETUP = [
-  "agility",
-  "autotomize",
-  "flamecharge",
-  "rockpolish",
-  "snowscape",
-  "trailblaze",
-];
-// Conglomerate for ease of access
-const SETUP = [
-  "acidarmor",
-  "agility",
-  "autotomize",
-  "bellydrum",
-  "bulkup",
-  "calmmind",
-  "clangoroussoul",
-  "coil",
-  "cosmicpower",
-  "curse",
-  "dragondance",
-  "flamecharge",
-  "growth",
-  "honeclaws",
-  "howl",
-  "irondefense",
-  "meditate",
-  "nastyplot",
-  "noretreat",
-  "poweruppunch",
-  "quiverdance",
-  "rockpolish",
-  "shellsmash",
-  "shiftgear",
-  "swordsdance",
-  "tailglow",
-  "takeheart",
-  "tidyup",
-  "trailblaze",
-  "workup",
-  "victorydance",
-];
-const SPEED_CONTROL = [
-  "electroweb",
-  "glare",
-  "icywind",
-  "lowsweep",
-  "nuzzle",
-  "quash",
-  "tailwind",
-  "thunderwave",
-  "trickroom",
-];
-// Moves that shouldn't be the only STAB moves:
-const NO_STAB = [
-  "accelerock",
-  "aquajet",
-  "bounce",
-  "breakingswipe",
-  "bulletpunch",
-  "chatter",
-  "chloroblast",
-  "clearsmog",
-  "covet",
-  "dragontail",
-  "doomdesire",
-  "electroweb",
-  "eruption",
-  "explosion",
-  "fakeout",
-  "feint",
-  "flamecharge",
-  "flipturn",
-  "futuresight",
-  "grassyglide",
-  "iceshard",
-  "icywind",
-  "incinerate",
-  "infestation",
-  "machpunch",
-  "meteorbeam",
-  "mortalspin",
-  "nuzzle",
-  "pluck",
-  "pursuit",
-  "quickattack",
-  "rapidspin",
-  "reversal",
-  "selfdestruct",
-  "shadowsneak",
-  "skydrop",
-  "snarl",
-  "strugglebug",
-  "suckerpunch",
-  "uturn",
-  "vacuumwave",
-  "voltswitch",
-  "watershuriken",
-  "waterspout",
-];
-// Hazard-setting moves
-const HAZARDS = ["spikes", "stealthrock", "stickyweb", "toxicspikes"];
-// Protect and its variants
-const PROTECT_MOVES = [
-  "banefulbunker",
-  "burningbulwark",
-  "protect",
-  "silktrap",
-  "spikyshield",
-];
-
-// Moves that should be paired together when possible
-const MOVE_PAIRS = [
-  ["lightscreen", "reflect"],
-  ["sleeptalk", "rest"],
-  ["protect", "wish"],
-  ["leechseed", "protect"],
-  ["leechseed", "substitute"],
-];
-
-/** Pokemon who always want priority STAB, and are fine with it as its only STAB move of that type */
-const PRIORITY_POKEMON = [
-  "breloom",
-  "brutebonnet",
-  "cacturne",
-  "honchkrow",
-  "mimikyu",
-  "ragingbolt",
-  "scizor",
-];
-
-const DEFENSIVE_TERA_BLAST_USERS = [
-  "alcremie",
-  "bellossom",
-  "comfey",
-  "fezandipiti",
-  "florges",
-  "raikou",
-];
-
-function sereneGraceBenefits(move: Move) {
-  return (
-    move.secondary?.chance &&
-    move.secondary.chance > 20 &&
-    move.secondary.chance < 100
-  );
-}
-
-export class PokeSimRandomGen {
-  private prng: PRNG;
-  private pokemonPool: SpeciesName[];
-  private randomSets: Record<string, RandomSet>;
-  private maxMoveCount = 4;
-  private dex = Dex;
-
-  constructor(prng: PRNG, isDemo?: boolean) {
-    let setsJson = randomSetsJSON;
-    if (isDemo) {
-      setsJson = randomSetsJSONDemo;
-    }
-    this.randomSets = this.filterSets(setsJson);
-
-    this.pokemonPool = Object.keys(this.randomSets) as SpeciesName[];
-    this.prng = prng;
-  }
-
-  private filterSets = (randomSets: Record<string, RandomSet>) => {
-    const finalSet: Record<string, RandomSet> = {};
-    Object.keys(randomSets).forEach((species) => {
-      const speciesSets = randomSets[species];
-      const filteredSets = speciesSets.sets
-        .map((set) => {
-          return {
-            ...set,
-            abilities: set.abilities.filter((ability) => {
-              if (ability === "Battle Bond") {
-                return false;
-              }
-              return true;
-            }),
-            movepool: set.movepool.filter((moveName) => {
-              const move = this.dex.moves.get(moveName);
-              if (HAZARDS.includes(move.id)) {
-                return false;
-              }
-              if (move.forceSwitch || move.selfSwitch) {
-                return false;
-              }
-              if (move.id === "destinybond") {
-                return false;
-              }
-              if (move.selfdestruct) {
-                return false;
-              }
-              return true;
-            }),
-          };
-        })
-        .filter((set) => {
-          if (set.movepool.length < 4 && species !== "ditto") {
-            return false;
-          }
-          if (set.abilities.length === 0) {
-            return false;
-          }
-          return true;
-        });
-
-      if (filteredSets.length > 0) {
-        finalSet[species] = {
-          ...speciesSets,
-          sets: filteredSets,
-        };
-      }
-    });
-    return finalSet;
-  };
-
-  public buildRandomPokemon = (filter?: (pkmn: string) => boolean) => {
-    let pool: SpeciesName[] = [];
-    if (filter) {
-      pool = this.pokemonPool.filter(filter);
-    } else {
-      pool = this.pokemonPool;
-    }
-    const randomIndex = this.random(0, pool.length);
-    const pokemon = fastPop(pool, randomIndex);
-    this.pokemonPool = this.pokemonPool.filter(
-      (species) =>
-        this.randomSets[pokemon].baseSpecies !==
-        this.randomSets[species].baseSpecies,
-    );
-    return this.buildRandomSet(pokemon);
-  };
-
-  private getForme = (species: Species) => {
-    if (typeof species.battleOnly === "string") {
-      // Only change the forme. The species has custom moves, and may have different typing and requirements.
-      return species.battleOnly;
-    }
-    if (species.cosmeticFormes)
-      return this.sample([species.name].concat(species.cosmeticFormes));
-
-    // Consolidate mostly-cosmetic formes, at least for the purposes of Random Battles
-    if (
-      [
-        "Dudunsparce",
-        "Magearna",
-        "Maushold",
-        "Polteageist",
-        "Sinistcha",
-        "Zarude",
-      ].includes(species.baseSpecies)
-    ) {
-      return this.sample([species.name].concat(species.otherFormes!));
-    }
-    if (species.baseSpecies === "Basculin")
-      return "Basculin" + this.sample(["", "-Blue-Striped"]);
-    if (species.baseSpecies === "Pikachu") {
-      return (
-        "Pikachu" +
-        this.sample([
-          "",
-          "-Original",
-          "-Hoenn",
-          "-Sinnoh",
-          "-Unova",
-          "-Kalos",
-          "-Alola",
-          "-Partner",
-          "-World",
-        ])
-      );
-    }
-    return species.name;
-  };
-
-  getLevel(species: Species): number {
-    if (this.randomSets[species.id]["level"])
-      return this.randomSets[species.id]["level"]!;
-    // Default to tier-based leveling
-    const tier = species.tier;
-    const tierScale: Partial<Record<Species["tier"], number>> = {
-      Uber: 76,
-      OU: 80,
-      UUBL: 81,
-      UU: 82,
-      RUBL: 83,
-      RU: 84,
-      NUBL: 85,
-      NU: 86,
-      PUBL: 87,
-      PU: 88,
-      "(PU)": 88,
-      NFE: 88,
-    };
-    return tierScale[tier] || 80;
-  }
-
-  private buildRandomSet = (s: SpeciesName): PokemonSet => {
-    const species = Dex.species.get(s);
-    const forme = this.getForme(species);
-    const sets = this.randomSets[s].sets;
-
-    const set = this.sampleIfArray(sets);
-    const role = set.role;
-    const movePool: string[] = [];
-    for (const movename of set.movepool) {
-      movePool.push(Dex.moves.get(movename).id);
-    }
-    const teraTypes = set.teraTypes!;
-    const teraType = this.sampleIfArray(teraTypes) as TypeName;
-
-    let ability = "";
-    let item: string | undefined = undefined;
-
-    const evs = { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 };
-    const ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
-
-    const types = species.types;
-    const abilities = set.abilities!;
-
-    // Get moves
-    const moves = this.randomMoveset(
-      types,
-      abilities,
-      species,
-      movePool,
-      teraType,
-      role,
-    );
-    const counter = this.queryMoves(moves, species, teraType, abilities);
-
-    // Get ability
-    ability = this.getAbility(moves, abilities, counter, species, teraType);
-
-    // Get items
-    // First, the priority items
-    item = this.getPriorityItem(ability, types, moves, counter, species, role);
-    if (item === undefined) {
-      item = this.getItem(ability, moves, counter, species, role);
-    }
-
-    // Get level
-    const level = this.getLevel(species);
-
-    // Prepare optimal HP
-    const srImmunity = ability === "Magic Guard" || item === "Heavy-Duty Boots";
-    let srWeakness = srImmunity ? 0 : Dex.getEffectiveness("Rock", species);
-    // Crash damage move users want an odd HP to survive two misses
-    if (
-      ["axekick", "highjumpkick", "jumpkick", "supercellslam"].some((m) =>
-        moves.has(m),
-      )
-    )
-      srWeakness = 2;
-    while (evs.hp > 1) {
-      const hp = Math.floor(
-        (Math.floor(
-          2 * species.baseStats.hp + ivs.hp + Math.floor(evs.hp / 4) + 100,
-        ) *
-          level) /
-          100 +
-          10,
-      );
-      if (
-        (moves.has("substitute") &&
-          ["Sitrus Berry", "Salac Berry"].includes(item)) ||
-        species.id === "minior"
-      ) {
-        // Two Substitutes should activate Sitrus Berry. Two switch-ins to Stealth Rock should activate Shields Down on Minior.
-        if (hp % 4 === 0) break;
-      } else if (
-        (moves.has("bellydrum") ||
-          moves.has("filletaway") ||
-          moves.has("shedtail")) &&
-        (item === "Sitrus Berry" || ability === "Gluttony")
-      ) {
-        // Belly Drum should activate Sitrus Berry
-        if (hp % 2 === 0) break;
-      } else if (moves.has("substitute") && moves.has("endeavor")) {
-        // Luvdisc should be able to Substitute down to very low HP
-        if (hp % 4 > 0) break;
-      } else {
-        // Maximize number of Stealth Rock switch-ins in singles
-        if (
-          srWeakness <= 0 ||
-          ability === "Regenerator" ||
-          ["Leftovers", "Life Orb"].includes(item)
-        )
-          break;
-        if (item !== "Sitrus Berry" && hp % (4 / srWeakness) > 0) break;
-        // Minimise number of Stealth Rock switch-ins to activate Sitrus Berry
-        if (item === "Sitrus Berry" && hp % (4 / srWeakness) === 0) break;
-      }
-      evs.hp -= 4;
-    }
-
-    // Minimize confusion damage
-    const noAttackStatMoves = [...moves].every((m) => {
-      const move = Dex.moves.get(m);
-      if (move.damage) return true;
-      if (move.id === "shellsidearm") return false;
-      // Physical Tera Blast
-      if (
-        move.id === "terablast" &&
-        (species.id === "porygon2" ||
-          ["Contrary", "Defiant"].includes(ability) ||
-          moves.has("shiftgear") ||
-          species.baseStats.atk > species.baseStats.spa)
-      )
-        return false;
-      return (
-        move.category !== "Physical" ||
-        move.id === "bodypress" ||
-        move.id === "foulplay"
-      );
-    });
-    if (noAttackStatMoves && !moves.has("transform")) {
-      evs.atk = 0;
-      ivs.atk = 0;
-    }
-
-    if (moves.has("gyroball") || moves.has("trickroom")) {
-      evs.spe = 0;
-      ivs.spe = 0;
-    }
-
-    // shuffle moves to add more randomness to camomons
-    const shuffledMoves = Array.from(moves);
-    this.prng!.shuffle(shuffledMoves);
-
-    return {
-      name: species.baseSpecies,
-      species: forme,
-      gender:
-        species.baseSpecies === "Greninja"
-          ? "M"
-          : this.generateRandomGender(species),
-      shiny: this.random(1, 1024) === 1,
-      level,
-      moves: shuffledMoves,
-      ability,
-      evs,
-      ivs,
-      item,
-      teraType,
-      nature: "Serious",
-    };
-  };
-
-  private generateRandomGender(species: Species) {
-    if (species.genderRatio.M === 1) {
-      return "M";
-    }
-    if (species.genderRatio.F === 1) {
-      return "F";
-    }
-    if (species.genderRatio.M === 0 && species.genderRatio.F === 0) {
-      return "N";
-    }
-    return this.random(1, 3) === 1 ? "F" : "M";
-  }
-
-  // Generate random moveset for a given species, role, tera type.
-  private randomMoveset(
-    types: string[],
-    abilities: string[],
-    species: Species,
-    movePool: string[],
-    teraType: TypeName,
-    role: string,
-  ): Set<string> {
-    const moves = new Set<string>();
-
-    // If there are only four moves, add all moves and return early
-    if (movePool.length <= this.maxMoveCount) {
-      for (const moveid of movePool) {
-        moves.add(moveid);
-      }
-      return moves;
-    }
-
-    if (role === "Tera Blast user") {
-      this.addMove("terablast", moves, movePool);
-    }
-    // Add required move (e.g. Relic Song for Meloetta-P)
-    if (species.requiredMove) {
-      const move = this.dex.moves.get(species.requiredMove).id;
-      this.addMove(move, moves, movePool);
-    }
-
-    // Add other moves you really want to have, e.g. STAB, recovery, setup.
-
-    // Enforce Facade if Guts is a possible ability
-    if (movePool.includes("facade") && abilities.includes("Guts")) {
-      this.addMove("facade", moves, movePool);
-    }
-
-    // Enforce Night Shade, Revelation Dance, Revival Blessing, and Sticky Web
-    for (const moveid of [
-      "nightshade",
-      "revelationdance",
-      "revivalblessing",
-      "stickyweb",
-    ]) {
-      if (movePool.includes(moveid)) {
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-
-    // Enforce Trick Room on Doubles Wallbreaker
-    if (movePool.includes("trickroom") && role === "Doubles Wallbreaker") {
-      this.addMove("trickroom", moves, movePool);
-    }
-
-    if (movePool.includes("auroraveil")) {
-      this.addMove("auroraveil", moves, movePool);
-    }
-
-    // Enforce Knock Off on pure Normal- and Fighting-types in singles
-    if (
-      types.length === 1 &&
-      (types.includes("Normal") || types.includes("Fighting"))
-    ) {
-      if (movePool.includes("knockoff")) {
-        this.addMove("knockoff", moves, movePool);
-      }
-    }
-
-    // Enforce Spore on Smeargle
-    if (species.id === "smeargle") {
-      if (movePool.includes("spore")) {
-        this.addMove("spore", moves, movePool);
-      }
-    }
-
-    // Enforce STAB priority
-    if (
-      [
-        "Bulky Attacker",
-        "Bulky Setup",
-        "Wallbreaker",
-        "Doubles Wallbreaker",
-      ].includes(role) ||
-      PRIORITY_POKEMON.includes(species.id)
-    ) {
-      const priorityMoves: string[] = [];
-      for (const moveid of movePool) {
-        const move = this.dex.moves.get(moveid);
-        const moveType = this.getMoveType(move, species, abilities, teraType);
-        if (
-          types.includes(moveType) &&
-          (move.priority > 0 ||
-            (moveid === "grassyglide" && abilities.includes("Grassy Surge"))) &&
-          move.basePower
-        ) {
-          priorityMoves.push(moveid);
-        }
-      }
-      if (priorityMoves.length) {
-        const moveid = this.sample(priorityMoves);
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-
-    // Enforce STAB
-    for (const type of types) {
-      // Check if a STAB move of that type should be required
-      const stabMoves: string[] = [];
-      for (const moveid of movePool) {
-        const move = this.dex.moves.get(moveid);
-        const moveType = this.getMoveType(move, species, abilities, teraType);
-        if (!NO_STAB.includes(moveid) && move.basePower && type === moveType) {
-          stabMoves.push(moveid);
-        }
-      }
-    }
-
-    // Enforce Tera STAB
-    if (!["Bulky Support", "Doubles Support"].includes(role)) {
-      const stabMoves: string[] = [];
-      for (const moveid of movePool) {
-        const move = this.dex.moves.get(moveid);
-        const moveType = this.getMoveType(move, species, abilities, teraType);
-        if (
-          !NO_STAB.includes(moveid) &&
-          move.basePower &&
-          teraType === moveType
-        ) {
-          stabMoves.push(moveid);
-        }
-      }
-      if (stabMoves.length) {
-        const moveid = this.sample(stabMoves);
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-    let counter = this.queryMoves(moves, species, teraType, abilities);
-
-    // If no STAB move was added, add a STAB move
-    if (!counter.stab.length) {
-      const stabMoves: string[] = [];
-      for (const moveid of movePool) {
-        const move = this.dex.moves.get(moveid);
-        const moveType = this.getMoveType(move, species, abilities, teraType);
-        if (
-          !NO_STAB.includes(moveid) &&
-          move.basePower &&
-          types.includes(moveType)
-        ) {
-          stabMoves.push(moveid);
-        }
-      }
-      if (stabMoves.length) {
-        const moveid = this.sample(stabMoves);
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-
-    // Enforce recovery
-    if (["Bulky Support", "Bulky Attacker", "Bulky Setup"].includes(role)) {
-      const recoveryMoves = movePool.filter((moveid) =>
-        RECOVERY_MOVES.includes(moveid),
-      );
-      if (recoveryMoves.length) {
-        const moveid = this.sample(recoveryMoves);
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-
-    // Enforce pivoting moves on AV Pivot
-    if (role === "AV Pivot") {
-      const pivotMoves = movePool.filter((moveid) =>
-        ["uturn", "voltswitch"].includes(moveid),
-      );
-      if (pivotMoves.length) {
-        const moveid = this.sample(pivotMoves);
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-
-    // Enforce setup
-    if (role.includes("Setup") || role === "Tera Blast user") {
-      // First, try to add a non-Speed setup move
-      const nonSpeedSetupMoves = movePool.filter(
-        (moveid) => SETUP.includes(moveid) && !SPEED_SETUP.includes(moveid),
-      );
-      if (nonSpeedSetupMoves.length) {
-        const moveid = this.sample(nonSpeedSetupMoves);
-        this.addMove(moveid, moves, movePool);
-      } else {
-        // No non-Speed setup moves, so add any (Speed) setup move
-        const setupMoves = movePool.filter((moveid) => SETUP.includes(moveid));
-        if (setupMoves.length) {
-          const moveid = this.sample(setupMoves);
-          this.addMove(moveid, moves, movePool);
-        }
-      }
-    }
-
-    // Enforce redirecting moves and Fake Out on Doubles Support
-    if (role === "Doubles Support") {
-      for (const moveid of ["fakeout", "followme", "ragepowder"]) {
-        if (movePool.includes(moveid)) {
-          this.addMove(moveid, moves, movePool);
-        }
-      }
-      const speedControl = movePool.filter((moveid) =>
-        SPEED_CONTROL.includes(moveid),
-      );
-      if (speedControl.length) {
-        const moveid = this.sample(speedControl);
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-
-    // Enforce Protect
-    if (role.includes("Protect")) {
-      const protectMoves = movePool.filter((moveid) =>
-        PROTECT_MOVES.includes(moveid),
-      );
-      if (protectMoves.length) {
-        const moveid = this.sample(protectMoves);
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-
-    counter = this.queryMoves(moves, species, teraType, abilities);
-    // Enforce a move not on the noSTAB list
-    if (!counter.damagingMoves.length) {
-      // Choose an attacking move
-      const attackingMoves: string[] = [];
-      for (const moveid of movePool) {
-        const move = this.dex.moves.get(moveid);
-        if (!NO_STAB.includes(moveid) && move.category !== "Status")
-          attackingMoves.push(moveid);
-      }
-      if (attackingMoves.length) {
-        const moveid = this.sample(attackingMoves);
-        this.addMove(moveid, moves, movePool);
-      }
-    }
-
-    counter = this.queryMoves(moves, species, teraType, abilities);
-    // Enforce coverage move
-    if (
-      ![
-        "AV Pivot",
-        "Fast Support",
-        "Bulky Support",
-        "Bulky Protect",
-        "Doubles Support",
-      ].includes(role)
-    ) {
-      if (counter.damagingMoves.length === 1) {
-        // Find the type of the current attacking move
-        const currentAttackType = counter.damagingMoves[0].type;
-        // Choose an attacking move that is of different type to the current single attack
-        const coverageMoves: string[] = [];
-        for (const moveid of movePool) {
-          const move = this.dex.moves.get(moveid);
-          const moveType = this.getMoveType(move, species, abilities, teraType);
-          if (!NO_STAB.includes(moveid) && move.basePower) {
-            if (currentAttackType !== moveType) coverageMoves.push(moveid);
-          }
-        }
-        if (coverageMoves.length) {
-          const moveid = this.sample(coverageMoves);
-          this.addMove(moveid, moves, movePool);
-        }
-      }
-    }
-
-    // Add (moves.size < this.maxMoveCount) as a condition if moves is getting larger than 4 moves.
-    // If you want moves to be favored but not required, add something like && this.randomChance(1, 2) to your condition.
-
-    // Choose remaining moves randomly from movepool and add them to moves list:
-    while (moves.size < this.maxMoveCount && movePool.length) {
-      if (moves.size + movePool.length <= this.maxMoveCount) {
-        for (const moveid of movePool) {
-          moves.add(moveid);
-        }
-        break;
-      }
-      const moveid = this.sample(movePool);
-      this.addMove(moveid, moves, movePool);
-      for (const pair of MOVE_PAIRS) {
-        if (moveid === pair[0] && movePool.includes(pair[1])) {
-          this.addMove(pair[1], moves, movePool);
-        }
-        if (moveid === pair[1] && movePool.includes(pair[0])) {
-          this.addMove(pair[0], moves, movePool);
-        }
-      }
-    }
-    return moves;
-  }
-
-  getMoveType(
-    move: Move,
-    species: Species,
-    abilities: string[],
-    teraType: TypeName,
-  ): TypeName {
-    if (move.id === "terablast") return teraType;
-    if (["judgment", "revelationdance"].includes(move.id))
-      return species.types[0];
-
-    if (
-      move.name === "Raging Bull" &&
-      species.name.startsWith("Tauros-Paldea")
-    ) {
-      if (species.name.endsWith("Combat")) return "Fighting";
-      if (species.name.endsWith("Blaze")) return "Fire";
-      if (species.name.endsWith("Aqua")) return "Water";
-    }
-
-    if (move.name === "Ivy Cudgel" && species.name.startsWith("Ogerpon")) {
-      if (species.name.endsWith("Wellspring")) return "Water";
-      if (species.name.endsWith("Hearthflame")) return "Fire";
-      if (species.name.endsWith("Cornerstone")) return "Rock";
-    }
-
-    const moveType = move.type;
-    if (moveType === "Normal") {
-      if (abilities.includes("Aerilate")) return "Flying";
-      if (abilities.includes("Galvanize")) return "Electric";
-      if (abilities.includes("Pixilate")) return "Fairy";
-      if (abilities.includes("Refrigerate")) return "Ice";
-    }
-    return moveType;
-  }
-
-  queryMoves(
-    moves: Set<string> | null,
-    species: Species,
-    teraType: TypeName,
-    abilities: string[],
-  ) {
-    // This is primarily a helper function for random setbuilder functions.
-    const counter: MoveCounter = {
-      physical: 0,
-      special: 0,
-      status: 0,
-      damagingMoves: [],
-      technician: [],
-      skilllink: [],
-      recoil: [],
-      drain: [],
-      stab: [],
-      stabtera: [],
-      strongjaw: [],
-      ironfist: [],
-      sound: [],
-      priority: [],
-      sheerforce: [],
-      inaccurate: [],
-      recovery: [],
-      serenegrace: [],
-      contrary: [],
-      physicalsetup: [],
-      specialsetup: [],
-      mixedsetup: [],
-      speedsetup: [],
-      setup: [],
-      hazards: [],
-    };
-    const types = species.types;
-    if (!moves?.size) return counter;
-
-    const categories = { Physical: 0, Special: 0, Status: 0 };
-
-    // Iterate through all moves we've chosen so far and keep track of what they do:
-    for (const moveid of moves) {
-      const move = this.dex.moves.get(moveid);
-
-      const moveType = this.getMoveType(move, species, abilities, teraType);
-      if (move.damage) {
-        // Moves that do a set amount of damage:
-        counter.damagingMoves.push(move);
-      } else {
-        // Are Physical/Special/Status moves:
-        categories[move.category]++;
-      }
-      // Moves that have a low base power:
-      if (
-        moveid === "lowkick" ||
-        (move.basePower && move.basePower <= 60 && moveid !== "rapidspin")
-      ) {
-        counter.technician.push(move);
-      }
-      // Moves that hit up to 5 times:
-      if (
-        move.multihit &&
-        Array.isArray(move.multihit) &&
-        move.multihit[1] === 5
-      )
-        counter.skilllink.push(move);
-      if (move.recoil || move.hasCrashDamage) counter.recoil.push(move);
-      if (move.drain) counter.drain.push(move);
-      // Moves which have a base power:
-      if (move.basePower) {
-        if (
-          !NO_STAB.includes(moveid) ||
-          (PRIORITY_POKEMON.includes(species.id) && move.priority > 0)
-        ) {
-          if (types.includes(moveType)) counter.stab.push(move);
-          if (teraType === moveType) counter.stabtera.push(move);
-          counter.damagingMoves.push(move);
-        }
-        if (move.flags["bite"]) counter.strongjaw.push(move);
-        if (move.flags["punch"]) counter.ironfist.push(move);
-        if (move.flags["sound"]) counter.sound.push(move);
-        if (
-          move.priority > 0 ||
-          (moveid === "grassyglide" && abilities.includes("Grassy Surge"))
-        ) {
-          counter.priority.push(move);
-        }
-      }
-      // Moves with secondary effects:
-      if (move.secondary || move.hasSheerForce) {
-        counter.sheerforce.push(move);
-        if (sereneGraceBenefits(move)) {
-          counter.serenegrace.push(move);
-        }
-      }
-      // Moves with low accuracy:
-      if (move.accuracy && move.accuracy !== true && move.accuracy < 90)
-        counter.inaccurate.push(move);
-
-      // Moves that change stats:
-      if (RECOVERY_MOVES.includes(moveid)) counter.recovery.push(move);
-      if (CONTRARY_MOVES.includes(moveid)) counter.contrary.push(move);
-      if (PHYSICAL_SETUP.includes(moveid)) counter.physicalsetup.push(move);
-      if (SPECIAL_SETUP.includes(moveid)) counter.specialsetup.push(move);
-      if (MIXED_SETUP.includes(moveid)) counter.mixedsetup.push(move);
-      if (SPEED_SETUP.includes(moveid)) counter.speedsetup.push(move);
-      if (SETUP.includes(moveid)) counter.setup.push(move);
-      if (HAZARDS.includes(moveid)) counter.hazards.push(move);
-    }
-
-    counter.physical = Math.floor(categories["Physical"]);
-    counter.special = Math.floor(categories["Special"]);
-    counter.status = Math.floor(categories["Status"]);
-    return counter;
-  }
-
-  getAbility(
-    moves: Set<string>,
-    abilities: string[],
-    counter: MoveCounter,
-    species: Species,
-    teraType: string,
-  ): string {
-    if (abilities.length <= 1) return abilities[0];
-
-    // Hard-code abilities here
-    if (species.id === "drifblim")
-      return moves.has("defog") ? "Aftermath" : "Unburden";
-    if (
-      abilities.includes("Flash Fire") &&
-      this.dex.getEffectiveness("Fire", teraType) >= 1
-    )
-      return "Flash Fire";
-    if (species.id === "hitmonchan" && counter.ironfist.length)
-      return "Iron Fist";
-    if (
-      (species.id === "thundurus" || species.id === "tornadus") &&
-      !counter.physical
-    )
-      return "Prankster";
-    if (species.id === "toucannon" && counter.skilllink.length)
-      return "Skill Link";
-    if (abilities.includes("Slush Rush") && moves.has("snowscape"))
-      return "Slush Rush";
-
-    // Pick a random ability
-    return this.sample(abilities);
-  }
-
-  getPriorityItem(
-    ability: string,
-    types: string[],
-    moves: Set<string>,
-    counter: MoveCounter,
-    species: Species,
-    role: string,
-  ) {
-    if (
-      role === "Fast Bulky Setup" &&
-      (ability === "Quark Drive" || ability === "Protosynthesis")
-    ) {
-      return "Booster Energy";
-    }
-    if (species.id === "lokix") {
-      return role === "Fast Attacker" ? "Silver Powder" : "Life Orb";
-    }
-    if (species.requiredItems) {
-      // Z-Crystals aren't available in Gen 9, so require Plates
-      if (species.baseSpecies === "Arceus") {
-        return species.requiredItems[0];
-      }
-      return this.sample(species.requiredItems);
-    }
-    if (role === "AV Pivot") return "Assault Vest";
-    if (species.id === "pikachu") return "Light Ball";
-    if (species.id === "regieleki") return "Magnet";
-    if (
-      types.includes("Normal") &&
-      moves.has("doubleedge") &&
-      moves.has("fakeout")
-    )
-      return "Silk Scarf";
-    if (
-      species.id === "froslass" ||
-      moves.has("populationbomb") ||
-      (ability === "Hustle" && counter.setup.length && this.random(1, 3) === 1)
-    )
-      return "Wide Lens";
-    if (species.id === "smeargle") return "Focus Sash";
-    if (
-      moves.has("clangoroussoul") ||
-      (species.id === "toxtricity" && moves.has("shiftgear"))
-    )
-      return "Throat Spray";
-    if (
-      (species.baseSpecies === "Magearna" && role === "Tera Blast user") ||
-      species.id === "necrozmaduskmane"
-    )
-      return "Weakness Policy";
-    if (
-      ["dragonenergy", "lastrespects", "waterspout"].some((m) => moves.has(m))
-    )
-      return "Choice Scarf";
-    if (
-      ability === "Imposter" ||
-      (species.id === "magnezone" && role === "Fast Attacker")
-    )
-      return "Choice Scarf";
-    if (species.id === "rampardos" && role === "Fast Attacker")
-      return "Choice Scarf";
-    if (species.id === "palkia" && counter.special < 4) return "Lustrous Orb";
-    if (moves.has("bellydrum") && moves.has("substitute")) return "Salac Berry";
-    if (
-      ["Cheek Pouch", "Cud Chew", "Harvest", "Ripen"].some(
-        (m) => ability === m,
-      ) ||
-      moves.has("bellydrum") ||
-      moves.has("filletaway")
-    ) {
-      return "Sitrus Berry";
-    }
-    if (["healingwish", "switcheroo", "trick"].some((m) => moves.has(m))) {
-      if (
-        species.baseStats.spe >= 60 &&
-        species.baseStats.spe <= 108 &&
-        role !== "Wallbreaker" &&
-        role !== "Doubles Wallbreaker" &&
-        !counter.priority.length
-      ) {
-        return "Choice Scarf";
-      } else {
-        return counter.physical > counter.special
-          ? "Choice Band"
-          : "Choice Specs";
-      }
-    }
-    if (
-      counter.status &&
-      (species.name === "Latias" || species.name === "Latios")
-    )
-      return "Soul Dew";
-    if (species.id === "scyther") return "Eviolite";
-    if (ability === "Poison Heal" || ability === "Quick Feet")
-      return "Toxic Orb";
-    if (species.nfe) return "Eviolite";
-    if (
-      (ability === "Guts" || moves.has("facade")) &&
-      !moves.has("sleeptalk")
-    ) {
-      return types.includes("Fire") || ability === "Toxic Boost"
-        ? "Toxic Orb"
-        : "Flame Orb";
-    }
-    if (
-      ability === "Magic Guard" ||
-      (ability === "Sheer Force" && counter.sheerforce)
-    )
-      return "Life Orb";
-    if (ability === "Anger Shell")
-      return this.sample([
-        "Rindo Berry",
-        "Passho Berry",
-        "Scope Lens",
-        "Sitrus Berry",
-      ]);
-    if (
-      counter.skilllink.length &&
-      ability !== "Skill Link" &&
-      species.id !== "breloom"
-    )
-      return "Loaded Dice";
-    if (ability === "Unburden") {
-      return moves.has("closecombat") || moves.has("leafstorm")
-        ? "White Herb"
-        : "Sitrus Berry";
-    }
-    if (moves.has("shellsmash") && ability !== "Weak Armor")
-      return "White Herb";
-    if (moves.has("meteorbeam") || moves.has("electroshot"))
-      return "Power Herb";
-    if (moves.has("acrobatics") && ability !== "Protosynthesis") return "";
-    if (
-      moves.has("auroraveil") ||
-      (moves.has("lightscreen") && moves.has("reflect"))
-    )
-      return "Light Clay";
-    if (ability === "Gluttony")
-      return `${this.sample(["Aguav", "Figy", "Iapapa", "Mago", "Wiki"])} Berry`;
-    if (
-      species.id === "giratina" &&
-      moves.has("rest") &&
-      !moves.has("sleeptalk")
-    )
-      return "Leftovers";
-    if (
-      moves.has("rest") &&
-      !moves.has("sleeptalk") &&
-      ability !== "Natural Cure" &&
-      ability !== "Shed Skin"
-    ) {
-      return "Chesto Berry";
-    }
-  }
-
-  getItem(
-    ability: string,
-    moves: Set<string>,
-    counter: MoveCounter,
-    species: Species,
-    role: string,
-  ): string {
-    if (
-      species.id !== "jirachi" &&
-      counter.physical >= 4 &&
-      [
-        "dragontail",
-        "fakeout",
-        "firstimpression",
-        "flamecharge",
-        "rapidspin",
-      ].every((m) => !moves.has(m))
-    ) {
-      const scarfReqs =
-        role !== "Wallbreaker" &&
-        (species.baseStats.atk >= 100 ||
-          ability === "Huge Power" ||
-          ability === "Pure Power") &&
-        species.baseStats.spe >= 60 &&
-        species.baseStats.spe <= 108 &&
-        ability !== "Speed Boost" &&
-        !counter.priority.length &&
-        !moves.has("aquastep");
-      return scarfReqs && this.random(1, 3) === 1
-        ? "Choice Scarf"
-        : "Choice Band";
-    }
-    if (
-      counter.special >= 4 ||
-      (counter.special >= 3 && ["flipturn", "uturn"].some((m) => moves.has(m)))
-    ) {
-      const scarfReqs =
-        role !== "Wallbreaker" &&
-        species.baseStats.spa >= 100 &&
-        species.baseStats.spe >= 60 &&
-        species.baseStats.spe <= 108 &&
-        ability !== "Speed Boost" &&
-        ability !== "Tinted Lens" &&
-        !moves.has("uturn") &&
-        !counter.priority.length;
-      return scarfReqs && this.random(1, 3) === 1
-        ? "Choice Scarf"
-        : "Choice Specs";
-    }
-    if (counter.speedsetup.length && role === "Bulky Setup")
-      return "Weakness Policy";
-    if (
-      !counter.status &&
-      !["Fast Attacker", "Wallbreaker", "Tera Blast user"].includes(role)
-    ) {
-      return "Assault Vest";
-    }
-    if (species.id === "golem")
-      return counter.speedsetup.length ? "Weakness Policy" : "Custap Berry";
-    if (moves.has("substitute")) return "Leftovers";
-    if (
-      moves.has("stickyweb") &&
-      species.baseStats.hp + species.baseStats.def + species.baseStats.spd <=
-        235
-    )
-      return "Focus Sash";
-
-    // Low Priority
-    if (
-      ability === "Rough Skin" ||
-      (ability === "Regenerator" &&
-        (role === "Bulky Support" || role === "Bulky Attacker") &&
-        species.baseStats.hp + species.baseStats.def >= 180 &&
-        this.random(1, 3) === 1) ||
-      (ability !== "Regenerator" &&
-        !counter.setup.length &&
-        counter.recovery.length &&
-        this.dex.getEffectiveness("Fighting", species) < 1 &&
-        species.baseStats.hp + species.baseStats.def > 200 &&
-        this.random(1, 3) === 1)
-    )
-      return "Rocky Helmet";
-    if (moves.has("outrage") && counter.setup.length) return "Lum Berry";
-    if (moves.has("protect") && ability !== "Speed Boost") return "Leftovers";
-    if (
-      role === "Fast Support" &&
-      !counter.recovery.length &&
-      !counter.recoil.length &&
-      (counter.hazards.length || counter.setup.length) &&
-      species.baseStats.hp + species.baseStats.def + species.baseStats.spd < 258
-    )
-      return "Focus Sash";
-    if (
-      !counter.setup.length &&
-      ability !== "Levitate" &&
-      this.dex.getEffectiveness("Ground", species) >= 2
-    )
-      return "Air Balloon";
-    if (
-      ["Bulky Attacker", "Bulky Support", "Bulky Setup"].some((m) => role === m)
-    )
-      return "Leftovers";
-    if (species.id === "pawmot" && moves.has("nuzzle")) return "Leppa Berry";
-    if (role === "Fast Support" || role === "Fast Bulky Setup") {
-      return counter.physical + counter.special >= 3 && !moves.has("nuzzle")
-        ? "Life Orb"
-        : "Leftovers";
-    }
-    if (
-      role === "Tera Blast user" &&
-      DEFENSIVE_TERA_BLAST_USERS.includes(species.id)
-    )
-      return "Leftovers";
-    if (
-      ["flamecharge", "rapidspin", "trailblaze"].every((m) => !moves.has(m)) &&
-      ["Fast Attacker", "Setup Sweeper", "Tera Blast user", "Wallbreaker"].some(
-        (m) => role === m,
-      )
-    )
-      return "Life Orb";
-    return "Leftovers";
-  }
-
-  addMove(move: string, moves: Set<string>, movePool: string[]) {
-    moves.add(move);
-    fastPop(movePool, movePool.indexOf(move));
-  }
-
-  private random = (numerator: number, denominator: number) => {
-    return this.prng!.random(numerator, denominator);
-  };
-
-  private sample<T>(items: readonly T[]): T {
-    return this.prng!.sample(items);
-  }
-
-  private sampleIfArray<T>(item: T | T[]): T {
-    if (Array.isArray(item)) {
-      return this.sample(item);
-    }
-    return item;
-  }
-}
-
-type MoveCounter = {
-  physical: number;
-  special: number;
-  status: number;
-  damagingMoves: Move[];
-  technician: Move[];
-  skilllink: Move[];
-  recoil: Move[];
-  drain: Move[];
-  stab: Move[];
-  stabtera: Move[];
-  strongjaw: Move[];
-  ironfist: Move[];
-  sound: Move[];
-  priority: Move[];
-  sheerforce: Move[];
-  inaccurate: Move[];
-  recovery: Move[];
-  serenegrace: Move[];
-  contrary: Move[];
-  physicalsetup: Move[];
-  specialsetup: Move[];
-  mixedsetup: Move[];
-  speedsetup: Move[];
-  setup: Move[];
-  hazards: Move[];
-};
-
 // Taken from @pkmn/randoms/src/gen9.ts
-const randomSetsJSON: Record<string, RandomSet> = {
+export const randomSetsJSONDemo: Record<string, RandomSet> = {
   venusaur: {
     level: 84,
     sets: [
@@ -1426,6 +81,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Earthquake", "Hydro Pump", "Ice Beam", "Shell Smash"],
         abilities: ["Torrent"],
         teraTypes: ["Ground", "Steel", "Water"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Hydro Pump", "Ice Beam", "Shell Smash", "Tera Blast"],
+        abilities: ["Torrent"],
+        teraTypes: ["Electric", "Grass"],
       },
     ],
     baseSpecies: "Blastoise",
@@ -1499,6 +160,19 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Lightning Rod"],
         teraTypes: ["Grass", "Water"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: [
+          "Encore",
+          "Focus Blast",
+          "Nasty Plot",
+          "Surf",
+          "Tera Blast",
+          "Thunderbolt",
+        ],
+        abilities: ["Lightning Rod"],
+        teraTypes: ["Ice"],
       },
     ],
     baseSpecies: "Raichu",
@@ -1781,6 +455,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Fur Coat"],
         teraTypes: ["Dark", "Electric"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Dark Pulse", "Nasty Plot", "Tera Blast", "Thunderbolt"],
+        abilities: ["Fur Coat"],
+        teraTypes: ["Fairy", "Poison"],
       },
       {
         role: "Fast Support",
@@ -2269,6 +949,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Aftermath", "Soundproof", "Static"],
         teraTypes: ["Dark", "Electric"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Taunt", "Tera Blast", "Thunderbolt", "Volt Switch"],
+        abilities: ["Aftermath", "Soundproof", "Static"],
+        teraTypes: ["Ice"],
+      },
     ],
     baseSpecies: "Electrode",
   },
@@ -2597,6 +1283,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Intimidate", "Moxie"],
         teraTypes: ["Ground"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Dragon Dance", "Earthquake", "Tera Blast", "Waterfall"],
+        abilities: ["Intimidate", "Moxie"],
+        teraTypes: ["Flying"],
+      },
     ],
     baseSpecies: "Gyarados",
   },
@@ -2693,6 +1385,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Volt Absorb"],
         teraTypes: ["Electric", "Fairy"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Calm Mind", "Substitute", "Tera Blast", "Thunderbolt"],
+        abilities: ["Volt Absorb"],
+        teraTypes: ["Ice"],
       },
     ],
     baseSpecies: "Jolteon",
@@ -2846,6 +1544,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Dragon Dance", "Earthquake", "Iron Head", "Outrage"],
         abilities: ["Multiscale"],
         teraTypes: ["Steel"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Dragon Dance", "Earthquake", "Outrage", "Tera Blast"],
+        abilities: ["Multiscale"],
+        teraTypes: ["Flying"],
       },
     ],
     baseSpecies: "Dragonite",
@@ -3134,6 +1838,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Chlorophyll"],
         teraTypes: ["Fairy", "Poison"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Giga Drain", "Quiver Dance", "Strength Sap", "Tera Blast"],
+        abilities: ["Chlorophyll"],
+        teraTypes: ["Fire", "Rock"],
       },
     ],
     baseSpecies: "Bellossom",
@@ -3811,6 +2521,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Discharge", "Ice Beam", "Recover", "Tri Attack"],
         abilities: ["Download"],
         teraTypes: ["Electric", "Ghost", "Poison"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Recover", "Shadow Ball", "Tera Blast", "Thunder Wave"],
+        abilities: ["Download"],
+        teraTypes: ["Fairy", "Fighting"],
       },
     ],
     baseSpecies: "Porygon2",
@@ -5515,6 +4231,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Levitate"],
         teraTypes: ["Electric", "Fairy"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Nasty Plot", "Shadow Ball", "Substitute", "Tera Blast"],
+        abilities: ["Levitate"],
+        teraTypes: ["Fighting"],
+      },
     ],
     baseSpecies: "Mismagius",
   },
@@ -5938,6 +4660,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Tinted Lens"],
         teraTypes: ["Bug"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Air Slash", "Bug Buzz", "Protect", "Tera Blast"],
+        abilities: ["Speed Boost"],
+        teraTypes: ["Ground"],
+      },
     ],
     baseSpecies: "Yanmega",
   },
@@ -6023,6 +4751,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
   porygonz: {
     level: 83,
     sets: [
+      {
+        role: "Tera Blast user",
+        movepool: ["Agility", "Nasty Plot", "Shadow Ball", "Tera Blast"],
+        abilities: ["Adaptability"],
+        teraTypes: ["Fighting"],
+      },
       {
         role: "Fast Attacker",
         movepool: [
@@ -7034,6 +5768,19 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 79,
     sets: [
       {
+        role: "Tera Blast user",
+        movepool: [
+          "Glare",
+          "Leaf Storm",
+          "Leech Seed",
+          "Substitute",
+          "Synthesis",
+          "Tera Blast",
+        ],
+        abilities: ["Contrary"],
+        teraTypes: ["Fire", "Rock"],
+      },
+      {
         role: "Fast Attacker",
         movepool: [
           "Dragon Pulse",
@@ -7261,6 +6008,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
   lilligant: {
     level: 86,
     sets: [
+      {
+        role: "Tera Blast user",
+        movepool: ["Giga Drain", "Quiver Dance", "Sleep Powder", "Tera Blast"],
+        abilities: ["Chlorophyll"],
+        teraTypes: ["Fire", "Rock"],
+      },
       {
         role: "Setup Sweeper",
         movepool: [
@@ -7721,6 +6474,18 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Levitate"],
         teraTypes: ["Poison", "Steel"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Ice Beam", "Rapid Spin", "Recover", "Tera Blast"],
+        abilities: ["Levitate"],
+        teraTypes: ["Electric"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Freeze-Dry", "Rapid Spin", "Recover", "Tera Blast"],
+        abilities: ["Levitate"],
+        teraTypes: ["Fire"],
+      },
     ],
     baseSpecies: "Cryogonal",
   },
@@ -7874,6 +6639,19 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Flame Body", "Swarm"],
         teraTypes: ["Fire", "Grass", "Steel"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: [
+          "Bug Buzz",
+          "Fiery Dance",
+          "Fire Blast",
+          "Giga Drain",
+          "Quiver Dance",
+          "Tera Blast",
+        ],
+        abilities: ["Flame Body", "Swarm"],
+        teraTypes: ["Ground", "Water"],
+      },
     ],
     baseSpecies: "Volcarona",
   },
@@ -8009,6 +6787,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         teraTypes: ["Electric", "Grass", "Steel"],
       },
       {
+        role: "Tera Blast user",
+        movepool: ["Focus Blast", "Nasty Plot", "Tera Blast", "Thunderbolt"],
+        abilities: ["Defiant"],
+        teraTypes: ["Flying"],
+      },
+      {
         role: "Wallbreaker",
         movepool: [
           "Acrobatics",
@@ -8042,6 +6826,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Volt Absorb"],
         teraTypes: ["Electric", "Poison", "Psychic"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Focus Blast", "Nasty Plot", "Tera Blast", "Thunderbolt"],
+        abilities: ["Volt Absorb"],
+        teraTypes: ["Flying"],
       },
     ],
     baseSpecies: "Thundurus",
@@ -8124,6 +6914,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 77,
     sets: [
       {
+        role: "Tera Blast user",
+        movepool: ["Dragon Dance", "Icicle Spear", "Scale Shot", "Tera Blast"],
+        abilities: ["Pressure"],
+        teraTypes: ["Ground"],
+      },
+      {
         role: "Wallbreaker",
         movepool: [
           "Draco Meteor",
@@ -8164,6 +6960,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Dragon Dance", "Fusion Bolt", "Icicle Spear", "Scale Shot"],
         abilities: ["Teravolt"],
         teraTypes: ["Electric"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Dragon Dance", "Icicle Spear", "Scale Shot", "Tera Blast"],
+        abilities: ["Teravolt"],
+        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Kyurem",
@@ -8327,6 +7129,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Flame Body"],
         teraTypes: ["Dragon", "Ground"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Brave Bird", "Flare Blitz", "Swords Dance", "Tera Blast"],
+        abilities: ["Flame Body"],
+        teraTypes: ["Ground"],
+      },
     ],
     baseSpecies: "Talonflame",
   },
@@ -8338,6 +7146,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Bug Buzz", "Hurricane", "Quiver Dance", "Sleep Powder"],
         abilities: ["Compound Eyes"],
         teraTypes: ["Flying"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Hurricane", "Quiver Dance", "Sleep Powder", "Tera Blast"],
+        abilities: ["Compound Eyes"],
+        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Vivillon",
@@ -8369,6 +7183,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Calm Mind", "Moonblast", "Protect", "Wish"],
         abilities: ["Flower Veil"],
         teraTypes: ["Steel"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Calm Mind", "Moonblast", "Synthesis", "Tera Blast"],
+        abilities: ["Flower Veil"],
+        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Florges",
@@ -9062,6 +7882,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Shield Dust"],
         teraTypes: ["Ghost"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Bug Buzz", "Moonblast", "Quiver Dance", "Tera Blast"],
+        abilities: ["Shield Dust"],
+        teraTypes: ["Ground"],
+      },
     ],
     baseSpecies: "Ribombee",
   },
@@ -9205,6 +8031,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Corrosion"],
         teraTypes: ["Flying", "Grass"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Fire Blast", "Nasty Plot", "Sludge Wave", "Tera Blast"],
+        abilities: ["Corrosion"],
+        teraTypes: ["Grass"],
+      },
     ],
     baseSpecies: "Salazzle",
   },
@@ -9236,6 +8068,20 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Calm Mind", "Draining Kiss", "Giga Drain", "Stored Power"],
         abilities: ["Triage"],
         teraTypes: ["Fairy", "Poison", "Steel"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: [
+          "Calm Mind",
+          "Draining Kiss",
+          "Encore",
+          "Giga Drain",
+          "Synthesis",
+          "Taunt",
+          "Tera Blast",
+        ],
+        abilities: ["Triage"],
+        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Comfey",
@@ -9580,6 +8426,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Soul-Heart"],
         teraTypes: ["Fairy", "Flying", "Steel", "Water"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Fleur Cannon", "Iron Head", "Shift Gear", "Tera Blast"],
+        abilities: ["Soul-Heart"],
+        teraTypes: ["Ground"],
+      },
     ],
     baseSpecies: "Magearna",
   },
@@ -9749,6 +8601,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         abilities: ["Hustle"],
         teraTypes: ["Dragon", "Grass"],
       },
+      {
+        role: "Tera Blast user",
+        movepool: ["Dragon Dance", "Grav Apple", "Outrage", "Tera Blast"],
+        abilities: ["Hustle"],
+        teraTypes: ["Fire"],
+      },
     ],
     baseSpecies: "Flapple",
   },
@@ -9846,6 +8704,18 @@ const randomSetsJSON: Record<string, RandomSet> = {
   polteageist: {
     level: 79,
     sets: [
+      {
+        role: "Tera Blast user",
+        movepool: [
+          "Shadow Ball",
+          "Shell Smash",
+          "Stored Power",
+          "Strength Sap",
+          "Tera Blast",
+        ],
+        abilities: ["Cursed Body"],
+        teraTypes: ["Fighting"],
+      },
       {
         role: "Setup Sweeper",
         movepool: [
@@ -9955,6 +8825,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 90,
     sets: [
       {
+        role: "Tera Blast user",
+        movepool: ["Alluring Voice", "Calm Mind", "Recover", "Tera Blast"],
+        abilities: ["Aroma Veil"],
+        teraTypes: ["Ground"],
+      },
+      {
         role: "Bulky Setup",
         movepool: [
           "Acid Armor",
@@ -10010,6 +8886,18 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 82,
     sets: [
       {
+        role: "Tera Blast user",
+        movepool: [
+          "Bug Buzz",
+          "Giga Drain",
+          "Ice Beam",
+          "Quiver Dance",
+          "Tera Blast",
+        ],
+        abilities: ["Ice Scales"],
+        teraTypes: ["Ground"],
+      },
+      {
         role: "Setup Sweeper",
         movepool: [
           "Bug Buzz",
@@ -10057,6 +8945,24 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Ice Face"],
         teraTypes: ["Water"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: [
+          "Belly Drum",
+          "Ice Spinner",
+          "Liquidation",
+          "Substitute",
+          "Tera Blast",
+        ],
+        abilities: ["Ice Face"],
+        teraTypes: ["Electric"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Belly Drum", "Ice Spinner", "Substitute", "Tera Blast"],
+        abilities: ["Ice Face"],
+        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Eiscue",
@@ -10179,6 +9085,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Draco Meteor", "Fire Blast", "Shadow Ball", "U-turn"],
         abilities: ["Infiltrator"],
         teraTypes: ["Dragon", "Fire", "Ghost"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Dragon Dance", "Dragon Darts", "Fire Blast", "Tera Blast"],
+        abilities: ["Clear Body"],
+        teraTypes: ["Ghost"],
       },
       {
         role: "Fast Support",
@@ -10370,15 +9282,16 @@ const randomSetsJSON: Record<string, RandomSet> = {
     level: 79,
     sets: [
       {
-        role: "Fast Attacker",
-        movepool: [
-          "Ancient Power",
-          "Rapid Spin",
-          "Thunderbolt",
-          "Electro Ball",
-        ],
+        role: "Fast Support",
+        movepool: ["Explosion", "Rapid Spin", "Thunderbolt", "Volt Switch"],
         abilities: ["Transistor"],
         teraTypes: ["Electric"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Rapid Spin", "Tera Blast", "Thunderbolt", "Volt Switch"],
+        abilities: ["Transistor"],
+        teraTypes: ["Ice"],
       },
     ],
     baseSpecies: "Regieleki",
@@ -10391,6 +9304,12 @@ const randomSetsJSON: Record<string, RandomSet> = {
         movepool: ["Draco Meteor", "Dragon Dance", "Earthquake", "Outrage"],
         abilities: ["Dragon's Maw"],
         teraTypes: ["Dragon"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Dragon Claw", "Dragon Dance", "Earthquake", "Tera Blast"],
+        abilities: ["Dragon's Maw"],
+        teraTypes: ["Steel"],
       },
       {
         role: "Fast Attacker",
@@ -10434,6 +9353,18 @@ const randomSetsJSON: Record<string, RandomSet> = {
         ],
         abilities: ["Grim Neigh"],
         teraTypes: ["Dark", "Fairy"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: [
+          "Nasty Plot",
+          "Shadow Ball",
+          "Substitute",
+          "Tera Blast",
+          "Will-O-Wisp",
+        ],
+        abilities: ["Grim Neigh"],
+        teraTypes: ["Fighting"],
       },
     ],
     baseSpecies: "Spectrier",
@@ -12319,15 +11250,21 @@ const randomSetsJSON: Record<string, RandomSet> = {
     sets: [
       {
         role: "AV Pivot",
-        movepool: ["Gunk Shot", "Heat Wave", "Moonblast", "U-turn"],
+        movepool: ["Beat Up", "Gunk Shot", "Heat Wave", "Moonblast", "U-turn"],
         abilities: ["Toxic Chain"],
         teraTypes: ["Dark", "Steel", "Water"],
       },
       {
         role: "Bulky Attacker",
-        movepool: ["Gunk Shot", "Moonblast", "Roost", "U-turn"],
+        movepool: ["Beat Up", "Gunk Shot", "Moonblast", "Roost", "U-turn"],
         abilities: ["Toxic Chain"],
         teraTypes: ["Dark", "Steel", "Water"],
+      },
+      {
+        role: "Tera Blast user",
+        movepool: ["Gunk Shot", "Play Rough", "Swords Dance", "Tera Blast"],
+        abilities: ["Toxic Chain"],
+        teraTypes: ["Ground"],
       },
     ],
     baseSpecies: "Fezandipiti",

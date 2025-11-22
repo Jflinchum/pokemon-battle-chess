@@ -10,6 +10,7 @@ export const HowToPlayScreen5 = () => {
       new PokemonBattleChessManager({
         seed: "1234,tutorial",
         format: "random",
+        isDemo: true,
       }),
     [],
   );

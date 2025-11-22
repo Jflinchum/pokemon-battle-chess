@@ -10,6 +10,7 @@ export const HowToPlayScreen1 = () => {
       new PokemonBattleChessManager({
         seed: "1234,tutorial",
         format: "random",
+        isDemo: true,
       }),
     [],
   );
@@ -42,7 +43,7 @@ export const HowToPlayScreen1 = () => {
   useEffect(() => {
     if (currentMatchHistory.length === 0) {
       chessManager.reset();
-      pokemonManager.reset();
+      pokemonManager.reset(true);
       matchLogIndex.current = 0;
     }
   }, [currentMatchHistory, chessManager, pokemonManager]);

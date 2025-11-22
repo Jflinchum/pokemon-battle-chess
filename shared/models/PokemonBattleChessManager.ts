@@ -80,6 +80,7 @@ export class PokemonBattleChessManager {
     pokemonPieceIndices,
     pokemonBannedIndices,
     squareModifiers,
+    isDemo,
   }: {
     seed?: PRNGSeed;
     format?: FormatID;
@@ -89,9 +90,10 @@ export class PokemonBattleChessManager {
     pokemonPieceIndices?: number[];
     pokemonBannedIndices?: number[];
     squareModifiers?: SquareModifier[];
+    isDemo?: boolean;
   }) {
     this.prng = new PRNG(seed);
-    this.pokeSimRandomGen = new PokeSimRandomGen(this.prng);
+    this.pokeSimRandomGen = new PokeSimRandomGen(this.prng, isDemo);
     this.seed = seed;
     this.format = format;
     this.weatherWars = weatherWars;
@@ -119,13 +121,13 @@ export class PokemonBattleChessManager {
     }
   }
 
-  public reset() {
+  public reset(isDemo?: boolean) {
     this.chessPieces = [];
     this.draftPieces = [];
     this.banPieces = [];
     this.squareModifiers = [];
     this.prng = new PRNG(this.seed);
-    this.pokeSimRandomGen = new PokeSimRandomGen(this.prng);
+    this.pokeSimRandomGen = new PokeSimRandomGen(this.prng, isDemo);
     if (this.format === "random") {
       this.populateBoardWithRandomTeams();
     } else if (this.format === "draft") {
