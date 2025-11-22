@@ -12,7 +12,7 @@ interface ChangeLog {
 
 export const changeLog: ChangeLog[] = [
   {
-    title: "Quick fix for CPU matches",
+    title: "Hotfix for CPU matches",
     version: "v1.0.7",
     mascot: {
       identifier: "Psyduck",
@@ -24,7 +24,8 @@ Really appreciate all of the enthusiasm and feedback so far! This patch is a qui
 ##### Change log for v1.0.7
 
 ###### Bug Fixes
-- Drafting and Banning pokemon when facing a CPU now properly updates the state of the game correctly
+- Drafting and Banning Pokémon when facing a CPU now properly updates the state of the game correctly
+- How To Play now uses the correct Pokémon when initiating a Pokémon battle
 `,
   },
   {
