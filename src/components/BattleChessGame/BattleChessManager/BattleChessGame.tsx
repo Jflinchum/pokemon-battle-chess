@@ -194,7 +194,7 @@ export const BattleChessGame = ({
 
   const handleOnBan = useCallback(
     async (pkmnIndex: number) => {
-      if (gameState.isSpectator) {
+      if (gameState.isSpectator || demoModeEnabled) {
         return;
       }
       if (pokemonManager.banPieces.find((piece) => piece.index === pkmnIndex)) {
@@ -220,6 +220,7 @@ export const BattleChessGame = ({
       pokemonManager.banPieces,
       isUserInOfflineMode,
       onBan,
+      demoModeEnabled,
     ],
   );
 
@@ -638,7 +639,7 @@ export const BattleChessGame = ({
 
   const validateDraftPick = useCallback(
     (square: Square, draftColor: Color) => {
-      if (draftTurnPick !== color || gameState.isSpectator) {
+      if (draftTurnPick !== color || gameState.isSpectator || demoModeEnabled) {
         return false;
       }
       const chessSquare = chessManager.get(square);
@@ -649,12 +650,19 @@ export const BattleChessGame = ({
         !pokemonManager.getPokemonFromSquare(square)
       );
     },
-    [pokemonManager, chessManager, gameState.isSpectator, color, draftTurnPick],
+    [
+      pokemonManager,
+      chessManager,
+      gameState.isSpectator,
+      color,
+      draftTurnPick,
+      demoModeEnabled,
+    ],
   );
 
   const handleOnDraft = useCallback(
     async (sq: Square, pkmnIndex: number) => {
-      if (gameState.isSpectator) {
+      if (gameState.isSpectator || demoModeEnabled) {
         return;
       }
       if (validateDraftPick(sq, color!)) {
@@ -683,6 +691,7 @@ export const BattleChessGame = ({
       color,
       onDraft,
       isUserInOfflineMode,
+      demoModeEnabled,
     ],
   );
 
@@ -793,7 +802,7 @@ export const BattleChessGame = ({
           squareModifiers={currentSquareModifiers}
           battleSquare={battleSquare}
           onMove={(san) => {
-            if (gameState.isSpectator) {
+            if (gameState.isSpectator || demoModeEnabled) {
               return;
             }
 
