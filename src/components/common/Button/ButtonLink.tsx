@@ -2,7 +2,7 @@ import "./Button.css";
 
 interface ButtonLinkProps
   extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
-  color?: "primary" | "secondary" | "danger";
+  color?: "primary" | "secondary" | "danger" | "light";
   highlighted?: boolean;
 }
 

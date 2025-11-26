@@ -21,10 +21,32 @@
   }
 }
 
-.changeLogPaginationButton {
-  cursor: pointer;
-  padding: 0px 8px;
-  margin: 0px 8px;
+.changeLogList {
+  list-style: none;
+  text-align: left;
+  padding-left: 0;
+  overflow-y: auto;
+  max-height: 60vh;
+
+  li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .changeLogLink {
+    height: initial;
+    width: initial;
+    padding: 2px;
+  }
+
+  .changeLogLinkMascot {
+    max-height: 25px;
+  }
+}
+
+.changeLogViewAll {
+  padding: 4px;
 }
 
 .changeLogMascot {
