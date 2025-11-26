@@ -1,6 +1,9 @@
 import { CustomArgTypes } from "../../../../../shared/types/PokemonTypes";
 
-export const shouldDelayBattleOutput = (logType: CustomArgTypes[0]) => {
+export const shouldDelayBattleOutput = (
+  logType: CustomArgTypes[0],
+  futureArgType?: CustomArgTypes[0],
+) => {
   const delayLogs: CustomArgTypes[0][] = [
     "start",
     "win",
@@ -24,8 +27,12 @@ export const shouldDelayBattleOutput = (logType: CustomArgTypes[0]) => {
     "-fieldstart",
     "-block",
   ];
-  if (delayLogs.includes(logType)) {
-    return true;
+  if (logType === "-boost" && futureArgType === "-boost") {
+    return false;
   }
-  return false;
+  if (logType === "-unboost" && futureArgType === "-unboost") {
+    return false;
+  }
+
+  return delayLogs.includes(logType);
 };

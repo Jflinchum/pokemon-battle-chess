@@ -106,11 +106,21 @@ const PokemonBattleManager = ({
           currentPokemonMoveHistory[currentPokemonMoveHistoryIndex.current];
 
         let previousArgs;
+        let futureArgs;
         if (currentPokemonMoveHistoryIndex.current > 0) {
           previousArgs =
             currentPokemonMoveHistory[
               currentPokemonMoveHistoryIndex.current - 1
             ].args;
+        }
+        if (
+          currentPokemonMoveHistoryIndex.current + 1 !==
+          currentPokemonMoveHistory.length
+        ) {
+          futureArgs =
+            currentPokemonMoveHistory[
+              currentPokemonMoveHistoryIndex.current + 1
+            ];
         }
         // Custom handling for forfeit
         if (args[0] === "-forfeit") {
@@ -150,7 +160,7 @@ const PokemonBattleManager = ({
 
         if (!gameState.isSkippingAhead) {
           playAudioEffect({ args, kwArgs }, { args: previousArgs });
-          if (shouldDelayBattleOutput(args[0])) {
+          if (shouldDelayBattleOutput(args[0], futureArgs?.args[0])) {
             catchUpTimer = timer(timeBetweenSteps * (skipToEndOfSync ? 0 : 1));
             await catchUpTimer.start();
           }

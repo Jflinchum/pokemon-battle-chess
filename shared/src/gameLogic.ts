@@ -303,12 +303,18 @@ export const getPokemonBattleOutput = async ({
         onSwitchIn(pokemon) {
           if (pokemon.side.id === advantageSide) {
             pokemon.boostBy(offenseAdvantage);
+            if (
+              Object.keys(offenseAdvantage).some(
+                (key) => offenseAdvantage[key as BoostID] > 0,
+              )
+            ) {
+              this.add(
+                "message",
+                `${pokemon.name} receives a stat boost from starting the battle!`,
+              );
+            }
             for (const stat in offenseAdvantage) {
               if (offenseAdvantage[stat as BoostID]) {
-                this.add(
-                  "message",
-                  `${pokemon.name} receives a stat boost from starting the battle!`,
-                );
                 this.add(
                   "-boost",
                   pokemon.fullname.replace(/(p[1-2])/g, "$1a"),
