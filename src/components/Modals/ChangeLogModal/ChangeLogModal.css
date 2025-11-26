@@ -14,6 +14,7 @@
   padding: 0 6px;
 
   h5 {
+    text-decoration: underline;
     margin: 10px 0;
   }
   h6 {
