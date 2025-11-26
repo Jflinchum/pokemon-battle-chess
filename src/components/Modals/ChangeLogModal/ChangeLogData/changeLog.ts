@@ -12,6 +12,39 @@ interface ChangeLog {
 
 export const changeLog: ChangeLog[] = [
   {
+    title: "QOL Improvements",
+    version: "v1.0.8",
+    mascot: {
+      identifier: "Blaziken",
+    },
+    body: `
+#### Hello and thank you for checking out Pokémon Gambit!
+This one is a smaller update, but I wanted to address some of the feedback I've been getting.
+People have suggested some great ideas that I've been mulling over how to implement. Specifically, there have been requests for abilities to use outside of battle (setting up stat boosts or hazards on the field) as well as having Pokémon preserve their damage/statuses/stat boosts after a battle is over.
+
+Sacrificing a Chess turn to do a Pokémon move is something that I do want to incorporate into the game, however I want to be careful to make sure it doesn't enable
+making a singular Chess piece too powerful with setup. I also would like to avoid extending how long each game takes, since it could just devolve
+into both players constantly taking turns to setup. Restricting it to hazards/weather/defog seems like a good middle ground for Pokémon moves outside of battle.
+
+For the other request (Pokémon keeping their damage after a battle), the one thing I want to avoid there is having a Chess piece become useless after
+taking too much damage. It feels like it would further increase the strength of bulkier Pokémon with recovery moves in this format. I could potentially get around this
+by making it so a Chess piece recovers 25%-50% of their health when they start a battle, to encourage more aggressive play.
+
+Anyways, I'm still considering those options. Thank you for listening to me ramble.
+
+##### Change log for v1.0.8
+###### Features
+- Stat boosts now happen all at once. No more waiting around for your omni-boosts to take forever!
+- The Easy Pokémon CPU is now a _little_ harder.
+  - Instead of choosing random moves, it now chooses random damaging moves.
+- You can now adjust the difficulty of the CPU's Chess skills and Pokémon skills separately
+- Improved the UI of viewing previous patch notes in the Change Log screen (that's here!)
+
+###### Bug Fixes
+- Fixed an issue where you could perform chess moves on the How To Play demos, which caused a whole bunch of errors
+`,
+  },
+  {
     title: "Hotfix for CPU matches",
     version: "v1.0.7",
     mascot: {
