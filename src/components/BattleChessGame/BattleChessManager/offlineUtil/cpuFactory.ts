@@ -33,7 +33,7 @@ export const availableBotLevels: BotLevels = {
       multiPVLevel: 1,
     }),
     pokemonCpu: pokemonCpuFactory({
-      randomEffectiveMoves: true,
+      randomEffectiveDamagingMoves: true,
       enableWeatherAndTerrainConsiderations: false,
       enableDefensiveStrategies: false,
       enableItemSynergies: false,
@@ -49,7 +49,7 @@ export const availableBotLevels: BotLevels = {
       multiPVLevel: 3,
     }),
     pokemonCpu: pokemonCpuFactory({
-      randomEffectiveMoves: false,
+      randomEffectiveDamagingMoves: false,
       enableWeatherAndTerrainConsiderations: true,
       enableDefensiveStrategies: false,
       enableItemSynergies: false,
@@ -65,7 +65,7 @@ export const availableBotLevels: BotLevels = {
       multiPVLevel: 5,
     }),
     pokemonCpu: pokemonCpuFactory({
-      randomEffectiveMoves: false,
+      randomEffectiveDamagingMoves: false,
       enableDefensiveStrategies: true,
       enableItemSynergies: true,
       enableWeatherAndTerrainConsiderations: true,

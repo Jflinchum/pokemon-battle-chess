@@ -28,13 +28,13 @@ import {
 } from "./pokemonGreedyHelper";
 
 type PokemonCpuFactory = ({
-  randomEffectiveMoves,
+  randomEffectiveDamagingMoves,
   enableDefensiveStrategies,
   enableItemSynergies,
   enableWeatherAndTerrainConsiderations,
   enablePriority,
 }: {
-  randomEffectiveMoves: boolean;
+  randomEffectiveDamagingMoves: boolean;
   enableDefensiveStrategies: boolean;
   enableItemSynergies: boolean;
   enableWeatherAndTerrainConsiderations: boolean;
@@ -44,7 +44,7 @@ type PokemonCpuFactory = ({
 
 export const pokemonCpuFactory: PokemonCpuFactory =
   ({
-    randomEffectiveMoves,
+    randomEffectiveDamagingMoves,
     enableDefensiveStrategies,
     enableItemSynergies,
     enableWeatherAndTerrainConsiderations,
@@ -118,9 +118,15 @@ export const pokemonCpuFactory: PokemonCpuFactory =
              * hit the opponent
              */
             if (
-              randomEffectiveMoves &&
+              randomEffectiveDamagingMoves &&
               getTypeEffectiveness(move, botPokemon, opponentPokemon).notImmune
             ) {
+              if (doesMoveDoDamage(move)) {
+                return {
+                  priority: 2,
+                  move,
+                };
+              }
               return {
                 priority: 1,
                 move,
@@ -280,16 +286,23 @@ export const pokemonCpuFactory: PokemonCpuFactory =
             }
             return evalResult;
           });
-          console.log(prioritizations);
 
-          if (randomEffectiveMoves) {
-            const effectiveMoves = prioritizations.filter(
-              (move) => move.priority === 1,
+          if (randomEffectiveDamagingMoves) {
+            const effectiveDamagingMoves = prioritizations.filter(
+              (move) => move.priority === 2,
             );
-            const randomMove =
-              effectiveMoves[Math.floor(Math.random() * effectiveMoves.length)];
+            const randomDamageMove =
+              effectiveDamagingMoves[
+                Math.floor(Math.random() * effectiveDamagingMoves.length)
+              ];
 
-            if (randomMove) {
+            if (randomDamageMove) {
+              return resolve(randomDamageMove.move.id);
+            } else {
+              const randomMove =
+                prioritizations[
+                  Math.floor(Math.random() * prioritizations.length)
+                ];
               return resolve(randomMove.move.id);
             }
           } else {
