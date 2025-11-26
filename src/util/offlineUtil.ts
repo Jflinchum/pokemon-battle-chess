@@ -32,14 +32,22 @@ export const getCpuPlayerId = ({ playerSide }: { playerSide: "p1" | "p2" }) =>
   `${cpuPlayerId}-${playerSide}`;
 
 export const getCpuAvatarId = (
-  cpuDifficulty: (typeof cpuDifficultyLevels)[number],
+  cpuChessDifficulty: (typeof cpuDifficultyLevels)[number],
+  cpuPokemonDifficulty: (typeof cpuDifficultyLevels)[number],
 ) => {
-  switch (cpuDifficulty) {
-    case "Easy":
+  const difficultyLevels = ["Easy", "Medium", "Hard"];
+  const chessNum = difficultyLevels.indexOf(cpuChessDifficulty);
+  const pokemonNum = difficultyLevels.indexOf(cpuPokemonDifficulty);
+  switch (chessNum + pokemonNum) {
+    case 0:
       return "12";
-    case "Medium":
+    case 1:
+      return "130";
+    case 2:
       return "294";
-    case "Hard":
+    case 3:
+      return "148";
+    case 4:
       return "260";
 
     default:
@@ -49,15 +57,17 @@ export const getCpuAvatarId = (
 
 export const getCpuPlayerData = ({
   playerSide,
-  cpuDifficulty,
+  cpuChessDifficulty,
+  cpuPokemonDifficulty,
 }: {
   playerSide: "p1" | "p2";
-  cpuDifficulty: (typeof cpuDifficultyLevels)[number];
+  cpuChessDifficulty: (typeof cpuDifficultyLevels)[number];
+  cpuPokemonDifficulty: (typeof cpuDifficultyLevels)[number];
 }): Player => ({
   ...connectedPlayerDefaults,
   playerName: "CPU",
   playerId: getCpuPlayerId({ playerSide }),
-  avatarId: getCpuAvatarId(cpuDifficulty),
+  avatarId: getCpuAvatarId(cpuChessDifficulty, cpuPokemonDifficulty),
   isPlayer1: playerSide === "p1",
   isPlayer2: playerSide === "p2",
 });

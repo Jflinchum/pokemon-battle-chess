@@ -108,15 +108,15 @@ export const useOfflineMode = ({
 
   const chessCpu = useMemo(() => {
     if (isUserInOfflineMode()) {
-      return availableBotLevels[gameState.cpuDifficulty]["chessCpu"]();
+      return availableBotLevels[gameState.cpuChessDifficulty]["chessCpu"]();
     }
-  }, [isUserInOfflineMode, gameState.cpuDifficulty]);
+  }, [isUserInOfflineMode, gameState.cpuChessDifficulty]);
 
   const pokemonCpu = useMemo(() => {
     if (isUserInOfflineMode()) {
-      return availableBotLevels[gameState.cpuDifficulty]["pokemonCpu"]();
+      return availableBotLevels[gameState.cpuPokemonDifficulty]["pokemonCpu"]();
     }
-  }, [isUserInOfflineMode, gameState.cpuDifficulty]);
+  }, [isUserInOfflineMode, gameState.cpuPokemonDifficulty]);
 
   const updateMatchLogFromChessMove = useCallback(
     async (san: string) => {

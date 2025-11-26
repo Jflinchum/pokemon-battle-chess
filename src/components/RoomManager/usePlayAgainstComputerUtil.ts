@@ -19,11 +19,16 @@ export const usePlayAgainstComputerUtil = () => {
   }, [userState.currentRoomId]);
 
   const initializeMatch = (
-    cpuDifficulty: (typeof cpuDifficultyLevels)[number],
+    cpuChessDifficulty: (typeof cpuDifficultyLevels)[number],
+    cpuPokemonDifficulty: (typeof cpuDifficultyLevels)[number],
     gameOptions: GameOptions,
   ) => {
     const isUserWhite = Math.random() > 0.5;
-    const cpuPlayer = getCpuPlayerData({ playerSide: "p2", cpuDifficulty });
+    const cpuPlayer = getCpuPlayerData({
+      playerSide: "p2",
+      cpuChessDifficulty,
+      cpuPokemonDifficulty,
+    });
     const currentPlayer = getOfflinePlayerData({
       playerName: userState.name,
       playerId: userState.id,
@@ -34,7 +39,11 @@ export const usePlayAgainstComputerUtil = () => {
 
     const playerList = [cpuPlayer, currentPlayer];
     if (gameState.isSpectator) {
-      opposingPlayer = getCpuPlayerData({ playerSide: "p1", cpuDifficulty });
+      opposingPlayer = getCpuPlayerData({
+        playerSide: "p1",
+        cpuChessDifficulty,
+        cpuPokemonDifficulty,
+      });
       playerList.push(opposingPlayer);
 
       currentPlayer.isSpectator = true;

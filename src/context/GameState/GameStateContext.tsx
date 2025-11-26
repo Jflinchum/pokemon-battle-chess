@@ -27,7 +27,8 @@ export interface GameState {
   matchHistory: MatchHistory;
   players: Player[];
   gameSettings: GameSettings;
-  cpuDifficulty: (typeof cpuDifficultyLevels)[number];
+  cpuChessDifficulty: (typeof cpuDifficultyLevels)[number];
+  cpuPokemonDifficulty: (typeof cpuDifficultyLevels)[number];
   isDemoMode: boolean;
 }
 
@@ -60,7 +61,10 @@ type GameStateAction =
   | { type: "START_DEMO" }
   | {
       type: "SET_CPU_DIFFICULTY";
-      payload: (typeof cpuDifficultyLevels)[number];
+      payload: {
+        chessDifficulty?: (typeof cpuDifficultyLevels)[number];
+        pokemonDifficulty?: (typeof cpuDifficultyLevels)[number];
+      };
     }
   | { type: "TOGGLE_SPECTATE_CPU" }
   | {
@@ -81,7 +85,8 @@ export const getInitialGameState = (
   isCatchingUp: false,
   isWatchingReplay: false,
   replayHistory: [],
-  cpuDifficulty: "Easy",
+  cpuChessDifficulty: "Easy",
+  cpuPokemonDifficulty: "Easy",
   players: [],
   gameSettings: {
     options: getGameOptions(),
@@ -96,13 +101,15 @@ const initalizeOfflinePlayers = ({
   playerId,
   avatarId,
   isSpectating,
-  cpuDifficulty,
+  cpuChessDifficulty,
+  cpuPokemonDifficulty,
 }: {
   playerName: string;
   playerId: string;
   avatarId: string;
   isSpectating: boolean;
-  cpuDifficulty: (typeof cpuDifficultyLevels)[number];
+  cpuChessDifficulty: (typeof cpuDifficultyLevels)[number];
+  cpuPokemonDifficulty: (typeof cpuDifficultyLevels)[number];
 }) => {
   const playerData = getOfflinePlayerData({ playerName, playerId, avatarId });
   const offlinePlayerList: Player[] = [];
@@ -112,11 +119,21 @@ const initalizeOfflinePlayers = ({
   }
   offlinePlayerList.push(playerData);
 
-  offlinePlayerList.push(getCpuPlayerData({ playerSide: "p2", cpuDifficulty }));
+  offlinePlayerList.push(
+    getCpuPlayerData({
+      playerSide: "p2",
+      cpuChessDifficulty,
+      cpuPokemonDifficulty,
+    }),
+  );
 
   if (isSpectating) {
     offlinePlayerList.push(
-      getCpuPlayerData({ playerSide: "p1", cpuDifficulty }),
+      getCpuPlayerData({
+        playerSide: "p1",
+        cpuChessDifficulty,
+        cpuPokemonDifficulty,
+      }),
     );
   }
 
@@ -129,7 +146,9 @@ export const gameStateReducer = (
 ): GameState => {
   switch (action.type) {
     case "RESET_ROOM":
-      return getInitialGameState({ cpuDifficulty: gameState.cpuDifficulty });
+      return getInitialGameState({
+        cpuChessDifficulty: gameState.cpuChessDifficulty,
+      });
     case "CREATE_ROOM":
       if (action.payload?.offline) {
         return {
@@ -137,7 +156,8 @@ export const gameStateReducer = (
           players: initalizeOfflinePlayers({
             ...action.payload,
             isSpectating: false,
-            cpuDifficulty: gameState.cpuDifficulty,
+            cpuChessDifficulty: gameState.cpuChessDifficulty,
+            cpuPokemonDifficulty: gameState.cpuPokemonDifficulty,
           }),
           isHost: true,
           matchEnded: false,
@@ -155,14 +175,20 @@ export const gameStateReducer = (
       const currentPlayer = gameState.players.find(
         (player) => !player.playerId.includes("offline"),
       )!;
+      const newChessDifficulty =
+        action.payload.chessDifficulty || gameState.cpuChessDifficulty;
+      const newPokemonDifficulty =
+        action.payload.pokemonDifficulty || gameState.cpuPokemonDifficulty;
       return {
         ...gameState,
         players: initalizeOfflinePlayers({
           ...currentPlayer,
           isSpectating: currentPlayer.isSpectator,
-          cpuDifficulty: action.payload,
+          cpuChessDifficulty: newChessDifficulty,
+          cpuPokemonDifficulty: newPokemonDifficulty,
         }),
-        cpuDifficulty: action.payload,
+        cpuChessDifficulty: newChessDifficulty,
+        cpuPokemonDifficulty: newPokemonDifficulty,
       };
     }
     case "SET_SKIPPING_AHEAD":
@@ -229,7 +255,8 @@ export const gameStateReducer = (
       const playerList = initalizeOfflinePlayers({
         ...currentPlayer,
         isSpectating: !currentPlayer.isSpectator,
-        cpuDifficulty: gameState.cpuDifficulty,
+        cpuChessDifficulty: gameState.cpuChessDifficulty,
+        cpuPokemonDifficulty: gameState.cpuPokemonDifficulty,
       });
 
       return {

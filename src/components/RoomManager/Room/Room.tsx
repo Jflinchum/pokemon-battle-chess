@@ -42,7 +42,11 @@ const Room = () => {
       if (!isUserInOfflineMode()) {
         await requestStartGame();
       } else {
-        initializeMatch(gameState.cpuDifficulty, gameOptions);
+        initializeMatch(
+          gameState.cpuChessDifficulty,
+          gameState.cpuPokemonDifficulty,
+          gameOptions,
+        );
       }
     } catch (err) {
       toast(`Error: ${err}`, { type: "error" });

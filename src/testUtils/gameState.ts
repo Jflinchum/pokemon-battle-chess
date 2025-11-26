@@ -21,7 +21,8 @@ export const getMockGameState = (
   gameSettings: {
     options: getDefaultGameOptions(),
   },
-  cpuDifficulty: "Easy",
+  cpuChessDifficulty: "Easy",
+  cpuPokemonDifficulty: "Easy",
   isDemoMode: false,
   ...overrides,
 });

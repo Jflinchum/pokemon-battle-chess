@@ -160,20 +160,56 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
         {isUserInOfflineMode() ? (
           <li className="roomOption">
             <div className="roomOptionLabel">
-              <span id="cpuOptions">CPU Difficulty Level:</span>
-              <p>Assign a difficulty to the CPU.</p>
+              <span id="cpuChessOptions">CPU Chess Difficulty Level:</span>
+              <p>Assign a difficulty to the CPU for their Chess skills.</p>
             </div>
             <ul>
               <li key={`difficultyLevel`}>
                 <select
                   disabled={!isHost}
-                  value={gameState.cpuDifficulty || "Easy"}
-                  aria-describedby="cpuOptions"
+                  value={gameState.cpuChessDifficulty || "Easy"}
+                  aria-describedby="cpuChessOptions"
                   onChange={(e) => {
                     dispatch({
                       type: "SET_CPU_DIFFICULTY",
-                      payload: e.target
-                        .value as (typeof cpuDifficultyLevels)[number],
+                      payload: {
+                        chessDifficulty: e.target
+                          .value as (typeof cpuDifficultyLevels)[number],
+                      },
+                    });
+                  }}
+                >
+                  {cpuDifficultyLevels.map((level) => (
+                    <option value={level} key={level}>
+                      {level}
+                    </option>
+                  ))}
+                </select>
+              </li>
+            </ul>
+          </li>
+        ) : null}
+        {isUserInOfflineMode() ? (
+          <li className="roomOption">
+            <div className="roomOptionLabel">
+              <span id="cpuPokemonOptions">CPU Pokémon Difficulty Level:</span>
+              <p>
+                Assign a difficulty to the CPU their Pokémon battling skills.
+              </p>
+            </div>
+            <ul>
+              <li key={`difficultyLevel`}>
+                <select
+                  disabled={!isHost}
+                  value={gameState.cpuPokemonDifficulty || "Easy"}
+                  aria-describedby="cpuPokemonOptions"
+                  onChange={(e) => {
+                    dispatch({
+                      type: "SET_CPU_DIFFICULTY",
+                      payload: {
+                        pokemonDifficulty: e.target
+                          .value as (typeof cpuDifficultyLevels)[number],
+                      },
                     });
                   }}
                 >
@@ -189,13 +225,13 @@ const RoomOptions = ({ isHost, gameOptions, onChange }: RoomOptionsProp) => {
         ) : null}
         <li className="roomOption">
           <div className="roomOptionLabel">
-            <span id="pokemonAssignmentsOption">Pokemon Assignments:</span>
+            <span id="pokemonAssignmentsOption">Pokémon Assignments:</span>
             <p>
-              Random will randomly assign a Pokemon to each chess piece and then
+              Random will randomly assign a Pokémon to each chess piece and then
               start the match.
             </p>
             <p>
-              Draft will give players a shared pool of Pokemon to choose from.
+              Draft will give players a shared pool of Pokémon to choose from.
               After taking turns banning from the pool, players can then assign
               Pokemon to their piece of choice.
             </p>
